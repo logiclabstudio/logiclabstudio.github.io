@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f19" />
+  <title>Logic Lab | Software Development Studio</title>
+  <meta name="description" content="Logic Lab is a software development studio building fast, reliable web and mobile products for growing businesses." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Logic Lab | Software Development Studio" />
+  <meta property="og:description" content="We build fast, reliable web and mobile products for growing businesses." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --soft:#1f2937;
+      --brand:#60a5fa;
+      --brand2:#a78bfa;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --ring: rgba(96,165,250,.45);
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --shadow2: 0 10px 25px rgba(0,0,0,.28);
+      --radius: 18px;
+      --radius2: 24px;
+      --max: 1120px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, rgba(167,139,250,.22), transparent 55%),
+        radial-gradient(900px 600px at 50% 120%, rgba(34,197,94,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.4;
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 20px}
+
+    /* Top bar */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: rgba(11,15,25,.55);
+      border-bottom: 1px solid rgba(148,163,184,.12);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      height:72px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 14px 28px rgba(96,165,250,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:before{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 40% 40%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(25deg);
+    }
+    .navlinks{display:flex; align-items:center; gap:18px; color:rgba(229,231,235,.9)}
+    .navlinks a{
+      font-weight:600; font-size:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      transition: background .2s ease, color .2s ease;
+    }
+    .navlinks a:hover{background: rgba(148,163,184,.10)}
+
+    .actions{display:flex; align-items:center; gap:10px}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.18);
+      background: rgba(17,24,39,.55);
+      color:var(--text);
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: var(--shadow2); border-color: rgba(96,165,250,.35)}
+    .btn:focus{outline:none; box-shadow: 0 0 0 4px var(--ring)}
+    .btn.primary{
+      border-color: rgba(96,165,250,.45);
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0,0,0,.25);
+    }
+
+    .hamburger{display:none}
+
+    /* Hero */
+    .hero{padding:64px 0 30px}
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:32px;
+      align-items:stretch;
+    }
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border:1px solid rgba(148,163,184,.16);
+      border-radius:999px;
+      background: rgba(17,24,39,.55);
+      color: rgba(229,231,235,.92);
+      font-weight:700;
+      font-size:13px;
+      width:fit-content;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--ok);
+      box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+    }
+    h1{
+      margin:14px 0 12px;
+      font-size: clamp(34px, 4.4vw, 54px);
+      line-height:1.05;
+      letter-spacing: -0.8px;
+    }
+    .lead{
+      margin:0 0 22px;
+      font-size: 16px;
+      color: rgba(148,163,184,.95);
+      max-width: 56ch;
+    }
+    .hero-cta{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+    .hero-cta .btn{padding:13px 16px}
+
+    .trust{
+      margin-top:18px;
+      display:flex; flex-wrap:wrap; gap:10px;
+      color: rgba(148,163,184,.92);
+      font-weight:650;
+      font-size:13px;
+    }
+    .chip{
+      padding:8px 10px;
+      border:1px solid rgba(148,163,184,.14);
+      border-radius:999px;
+      background: rgba(17,24,39,.45);
+    }
+
+    .hero-card{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(148,163,184,.14);
+      background: rgba(17,24,39,.65);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      min-height: 420px;
+    }
+
+    .hero-card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(480px 240px at 30% 15%, rgba(96,165,250,.22), transparent 60%),
+                  radial-gradient(520px 300px at 75% 30%, rgba(167,139,250,.20), transparent 60%),
+                  radial-gradient(520px 320px at 40% 90%, rgba(34,197,94,.12), transparent 60%);
+      pointer-events:none;
+    }
+
+    .mock{
+      position:absolute; inset:18px;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,.12);
+      background: rgba(11,15,25,.55);
+      overflow:hidden;
+    }
+
+    .mock-top{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px;
+      border-bottom: 1px solid rgba(148,163,184,.10);
+      background: rgba(17,24,39,.45);
+    }
+    .circles{display:flex; gap:8px}
+    .c{width:10px; height:10px; border-radius:999px; background: rgba(148,163,184,.35)}
+    .c:nth-child(1){background: rgba(239,68,68,.65)}
+    .c:nth-child(2){background: rgba(245,158,11,.65)}
+    .c:nth-child(3){background: rgba(34,197,94,.65)}
+
+    .mock-title{font-size:13px; color: rgba(229,231,235,.85); font-weight:700}
+
+    .mock-body{
+      padding:14px;
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr;
+    }
+
+    .mini{
+      border:1px solid rgba(148,163,184,.12);
+      border-radius: 14px;
+      background: rgba(17,24,39,.45);
+      padding:12px;
+    }
+    .mini h3{margin:0 0 6px; font-size:14px; letter-spacing:-.2px}
+    .mini p{margin:0; color: rgba(148,163,184,.92); font-size:13px}
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(148,163,184,.14);
+      background: rgba(17,24,39,.45);
+      color: rgba(229,231,235,.9);
+      font-size:12px;
+      font-weight:700;
+      width: fit-content;
+    }
+    .spark{
+      width:10px; height:10px;
+      border-radius:3px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 0 0 4px rgba(96,165,250,.12);
+    }
+
+    /* Sections */
+    section{padding:56px 0}
+    .section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px}
+    .section-head h2{margin:0; font-size: clamp(22px, 3vw, 30px); letter-spacing:-.5px}
+    .section-head p{margin:0; color: rgba(148,163,184,.95); max-width:60ch}
+
+    .grid-3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
+    }
+    .grid-2{display:grid; grid-template-columns: 1fr 1fr; gap:16px}
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid rgba(148,163,184,.14);
+      background: rgba(17,24,39,.55);
+      box-shadow: var(--shadow2);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(420px 200px at 10% 0%, rgba(96,165,250,.12), transparent 55%);
+      pointer-events:none;
+    }
+
+    .icon{
+      width:44px; height:44px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      background: rgba(96,165,250,.12);
+      border: 1px solid rgba(96,165,250,.22);
+      margin-bottom:12px;
+    }
+    .icon svg{width:22px; height:22px; fill:none; stroke: rgba(229,231,235,.9); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+
+    .card h3{margin:0 0 8px; font-size:16px; letter-spacing:-.2px}
+    .card p{margin:0; color: rgba(148,163,184,.95); font-size:14px}
+
+    .list{display:grid; gap:10px; margin-top:12px;}
+    .li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid rgba(148,163,184,.12);
+      background: rgba(11,15,25,.35);
+    }
+    .check{
+      width:22px; height:22px;
+      border-radius: 8px;
+      display:grid; place-items:center;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.22);
+      flex: 0 0 auto;
+      margin-top:1px;
+    }
+    .check svg{width:14px; height:14px; fill:none; stroke: rgba(229,231,235,.9); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+    .li b{display:block; margin-bottom:2px}
+    .li span{color: rgba(148,163,184,.95); font-size:13px}
+
+    /* Pricing */
+    .pricing{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;}
+    .price{
+      padding:18px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(148,163,184,.14);
+      background: rgba(17,24,39,.55);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .price.featured{
+      border-color: rgba(96,165,250,.32);
+      background: linear-gradient(135deg, rgba(96,165,250,.14), rgba(167,139,250,.14));
+    }
+    .badge{
+      position:absolute;
+      top:16px; right:16px;
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(96,165,250,.18);
+      border:1px solid rgba(96,165,250,.26);
+      font-weight:800;
+      font-size:12px;
+      color: rgba(229,231,235,.95);
+    }
+    .price h3{margin:0 0 6px; font-size:16px}
+    .price p{margin:0 0 14px; color: rgba(148,163,184,.95); font-size:13px}
+    .money{display:flex; align-items:baseline; gap:8px; margin:0 0 14px}
+    .money strong{font-size:34px; letter-spacing:-.8px}
+    .money em{font-style:normal; color: rgba(148,163,184,.95); font-weight:700}
+
+    .divider{height:1px; background: rgba(148,163,184,.12); margin:14px 0}
+
+    /* CTA */
+    .cta{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(148,163,184,.16);
+      background:
+        radial-gradient(700px 340px at 10% 0%, rgba(96,165,250,.20), transparent 60%),
+        radial-gradient(700px 340px at 95% 20%, rgba(167,139,250,.18), transparent 60%),
+        rgba(17,24,39,.55);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .cta h2{margin:0; font-size:22px; letter-spacing:-.4px}
+    .cta p{margin:6px 0 0; color: rgba(148,163,184,.95); max-width:60ch}
+
+    /* Contact modal */
+    .backdrop{position:fixed; inset:0; background: rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding: 18px; z-index: 100;}
+    .modal{width:min(560px, 100%); border-radius: var(--radius2); border: 1px solid rgba(148,163,184,.18); background: rgba(11,15,25,.92); box-shadow: var(--shadow); overflow:hidden;}
+    .modal-top{padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid rgba(148,163,184,.12); background: rgba(17,24,39,.55);}
+    .modal-top b{font-size:14px}
+    .modal-body{padding:16px}
+    form{display:grid; gap:12px;}
+    label{font-weight:700; font-size:13px; color: rgba(229,231,235,.9)}
+    input, textarea, select{width:100%; padding:12px 12px; border-radius: 14px; border: 1px solid rgba(148,163,184,.18); background: rgba(17,24,39,.45); color: var(--text); font-size:14px; outline:none;}
+    input:focus, textarea:focus, select:focus{box-shadow: 0 0 0 4px var(--ring); border-color: rgba(96,165,250,.35)}
+    textarea{min-height:120px; resize:vertical}
+    .modal-actions{display:flex; gap:10px; flex-wrap:wrap}
+
+    /* Footer */
+    footer{padding:40px 0 46px; color: rgba(148,163,184,.95)}
+    .footer-grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; align-items:start}
+    .small{font-size:13px; color: rgba(148,163,184,.92)}
+    .footlinks{display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end}
+    .footlinks a{padding:8px 10px; border-radius:12px; border:1px solid rgba(148,163,184,.12); background: rgba(17,24,39,.35)}
+
+    /* Mobile */
+    @media (max-width: 920px){
+      .hero-grid{grid-template-columns: 1fr;}
+      .hero-card{min-height: 380px}
+      .grid-3{grid-template-columns: 1fr;}
+      .grid-2{grid-template-columns: 1fr;}
+      .pricing{grid-template-columns: 1fr;}
+      .section-head{flex-direction:column; align-items:flex-start}
+      .footer-grid{grid-template-columns: 1fr;}
+      .footlinks{justify-content:flex-start}
+    }
+    @media (max-width: 720px){
+      .navlinks{display:none}
+      .hamburger{display:inline-flex}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto !important; transition:none !important}
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Logic Lab">
+          <span class="logo" aria-hidden="true"></span>
+          <span>Logic Lab</span>
+        </a>
+
+        <nav class="navlinks" aria-label="Primary">
+          <a href="#services">Services</a>
+          <a href="#process">Process</a>
+          <a href="#work">Work</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="actions">
+          <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Get a quote</a>
+          <button class="btn hamburger" id="menuBtn" type="button" aria-label="Open menu">Menu</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="container">
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <div class="kicker"><span class="dot" aria-hidden="true"></span>Shipping clean software, fast.</div>
+            <h1>Build products that feel premium — and work reliably.</h1>
+            <p class="lead">
+              Logic Lab is a software development studio for founders and businesses that need quality.
+              We design, build, and ship web apps, mobile apps, and APIs with speed and discipline.
+            </p>
+
+            <div class="hero-cta">
+              <a class="btn primary" href="#pricing">See packages</a>
+              <a class="btn" href="#work">View work</a>
+            </div>
+
+            <div class="trust" aria-label="Highlights">
+              <span class="chip">⚡ Fast delivery</span>
+              <span class="chip">🔒 Secure by default</span>
+              <span class="chip">📈 Built to scale</span>
+              <span class="chip">🧾 Clear pricing</span>
+            </div>
+          </div>
+
+          <div class="hero-card" aria-label="Preview">
+            <div class="mock" role="img" aria-label="Product delivery dashboard mock">
+              <div class="mock-top">
+                <div class="circles" aria-hidden="true"><span class="c"></span><span class="c"></span><span class="c"></span></div>
+                <div class="mock-title">Logic Lab · Delivery Dashboard</div>
+                <span class="tag"><span class="spark" aria-hidden="true"></span>Live build</span>
+              </div>
+              <div class="mock-body">
+                <div class="mini">
+                  <h3>Weekly build status</h3>
+                  <p>Milestones, QA checks, and deployment logs — always visible.</p>
+                </div>
+                <div class="row">
+                  <div class="mini"><h3>Speed</h3><p>Lean scope, tight feedback loops, rapid iteration.</p></div>
+                  <div class="mini"><h3>Quality</h3><p>Testing + reviews to keep bugs low and confidence high.</p></div>
+                </div>
+                <div class="mini"><h3>Stack options</h3><p>React / Next.js, Node / .NET, PostgreSQL, Firebase, AWS, Azure.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="services">
+        <div class="section-head">
+          <div>
+            <h2>Services</h2>
+            <p>Pick what you need. We can deliver end-to-end or plug into your existing team.</p>
+          </div>
+          <a class="btn" href="#pricing">Get pricing</a>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h16"/></svg></div>
+            <h3>Web apps</h3>
+            <p>Dashboards, SaaS platforms, portals, eCommerce, admin systems — built for speed and clarity.</p>
+          </div>
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 18h.01"/><path d="M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg></div>
+            <h3>Mobile apps</h3>
+            <p>React Native apps that feel native. Auth, payments, push notifications, offline support.</p>
+          </div>
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M7 8l-3 4 3 4"/><path d="M17 8l3 4-3 4"/></svg></div>
+            <h3>APIs & integrations</h3>
+            <p>Secure APIs, third-party integrations, automations, and data pipelines that don’t break.</p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px">
+          <div class="card">
+            <h3>What you get</h3>
+            <div class="list">
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Production-ready builds</b><span>Clean code, documented handover, and smooth deployment.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Strong UX</b><span>Simple flows that convert users and reduce support.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Security basics done right</b><span>Auth, validation, rate limits, and safe data handling.</span></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Tech we’re strong in</h3>
+            <p>We pick tools that match your budget and timelines — no over-engineering.</p>
+            <div class="trust" style="margin-top:12px">
+              <span class="chip">Next.js / React</span>
+              <span class="chip">Node.js</span>
+              <span class="chip">.NET</span>
+              <span class="chip">PostgreSQL</span>
+              <span class="chip">MongoDB</span>
+              <span class="chip">Firebase</span>
+              <span class="chip">AWS / Azure</span>
+              <span class="chip">CI/CD</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="process">
+        <div class="section-head">
+          <div>
+            <h2>Process</h2>
+            <p>A simple delivery system that keeps scope controlled and progress visible.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h8"/><path d="M16 3h5v5"/><path d="M21 3l-7 7"/></svg></div>
+            <h3>1) Scope + plan</h3>
+            <p>We turn your idea into a lean plan: core features, timelines, milestones, and risks.</p>
+          </div>
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M7 12v8"/><path d="M17 12v8"/><path d="M5 4h14v6H5z"/></svg></div>
+            <h3>2) Build in sprints</h3>
+            <p>Weekly delivery with demos. You approve direction early — no surprises at the end.</p>
+          </div>
+          <div class="card">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.2L18.5 21 12 16.8 5.5 21 7.5 13.2 2 9h7z"/></svg></div>
+            <h3>3) Launch + support</h3>
+            <p>Deployment, monitoring, and small improvements so the product stays healthy.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="work">
+        <div class="section-head">
+          <div>
+            <h2>Website Templates</h2>
+            <p>Ready-made templates you can launch fast. Click any card to view a live demo.</p>
+          </div>
+          <button class="btn" type="button" id="openContact3">Start a project</button>
+        </div>
+
+        <div class="grid-3">
+          <a class="card" href="Modern Saloon/Modern Saloon.html">
+            <h3>Modern Salon</h3>
+            <p>Clean, high-end salon layout with services, bookings, and WhatsApp link.</p>
+            <div class="divider"></div>
+            <p class="small"><b>Best for:</b> Hair salons, beauty studios, nail bars.</p>
+          </a>
+
+          <a class="card" href="Bar/bar.html">
+            <h3>Premium Bar & Lounge</h3>
+            <p>Dark, stylish bar design with menu, events, and reservations.</p>
+            <div class="divider"></div>
+            <p class="small"><b>Best for:</b> Bars, lounges, rooftop venues.</p>
+          </a>
+
+          <a class="card" href="Landing Page/Landingpage.html">
+            <h3>Simple Landing Page</h3>
+            <p>One-page site for new venues with WhatsApp, hours, and directions.</p>
+            <div class="divider"></div>
+            <p class="small"><b>Best for:</b> New businesses, pop-ups, small teams.</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="pricing">
+        <div class="section-head">
+          <div>
+            <h2>Pricing</h2>
+            <p>Clear packages. Custom quotes available for bigger builds.</p>
+          </div>
+        </div>
+
+        <div class="pricing">
+          <div class="price">
+            <h3>Starter</h3>
+            <p>One-page site or simple landing page with WhatsApp/email contact + basic hosting.</p>
+            <div class="money"><strong>R1,500</strong><em>deposit</em></div>
+            <div class="small" style="margin:6px 0 10px">+ R800 / month hosting & maintenance</div>
+            <div class="divider"></div>
+            <div class="list">
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Modern design</b><span>Mobile-first, fast loading.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Basic SEO</b><span>Metadata + performance best practices.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Hosting included</b><span>Secure, monitored, and backed up.</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <button class="btn primary" type="button" data-plan="Starter">Choose Starter</button>
+          </div>
+
+          <div class="price featured">
+            <span class="badge">Most popular</span>
+            <h3>Business</h3>
+            <p>Multi-page site + basic CMS content, analytics, and lead capture.</p>
+            <div class="money"><strong>R7,999</strong><em>from</em></div>
+            <div class="small" style="margin:6px 0 10px">+ R1,200 / month hosting & maintenance</div>
+            <div class="divider"></div>
+            <div class="list">
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Pages + sections</b><span>Services, About, Contact, FAQs.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Lead capture</b><span>Forms + WhatsApp + email routing.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Deployment</b><span>Live hosting setup + backups.</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <button class="btn primary" type="button" data-plan="Business">Choose Business</button>
+          </div>
+
+          <div class="price">
+            <h3>Product</h3>
+            <p>MVP web app or mobile app with auth, database, and admin panel.</p>
+            <div class="money"><strong>R19,999</strong><em>from</em></div>
+            <div class="small" style="margin:6px 0 10px">+ R2,000 / month hosting, monitoring & backups</div>
+            <div class="divider"></div>
+            <div class="list">
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Design + build</b><span>UX, UI, and implementation.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Auth + roles</b><span>Secure sign-in and permissions.</span></div></div>
+              <div class="li"><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>API + database</b><span>Reliable backend foundation.</span></div></div>
+            </div>
+            <div class="divider"></div>
+            <button class="btn primary" type="button" data-plan="Product">Choose Product</button>
+          </div>
+        </div>
+
+        <p class="small" style="margin-top:14px">Starter: R1,500 deposit + R800/month. Business: + R1,200/month. Product: + R2,000/month (includes monitoring & backups).</p>
+      </section>
+
+      <section id="faq">
+        <div class="section-head">
+          <div>
+            <h2>FAQ</h2>
+            <p>Quick answers. If you’re ready, hit “Get a quote”.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>How fast can you deliver?</h3>
+            <p>Landing pages: 3–7 days. Business sites: 1–3 weeks. MVPs: 4–10 weeks depending on scope.</p>
+            <div class="divider"></div>
+            <h3>Do you do hosting?</h3>
+            <p>We can set up hosting with you (Vercel, Netlify, Azure, AWS) and hand over access. You own everything.</p>
+          </div>
+          <div class="card">
+            <h3>What do you need from me?</h3>
+            <p>Goals, examples you like, your content (or we help write it), and fast feedback during sprints.</p>
+            <div class="divider"></div>
+            <h3>Can you work with my budget?</h3>
+            <p>Yes — we can cut scope to the highest-impact features and ship in phases.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="cta">
+          <div>
+            <h2>Ready to build with Logic Lab?</h2>
+            <p>Tell us what you’re trying to launch. We’ll respond with scope, timeline, and a quote.</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Get a quote</a>
+            <a class="btn" href="#services">Explore services</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="footer-grid">
+          <div>
+            <div class="brand" style="gap:10px; margin-bottom:8px">
+              <span class="logo" aria-hidden="true" style="width:32px;height:32px;border-radius:12px"></span>
+              <span>Logic Lab</span>
+            </div>
+            <div class="small">
+              © <span id="year"></span> Logic Lab. Built to ship.
+              <br />
+              <span class="small">Email: mosamokgesi@gmail.com · Call/WhatsApp +27 62 388 1570</span>
+            </div>
+          </div>
+          <div class="footlinks" aria-label="Footer links">
+            <a href="#services">Services</a>
+            <a href="#process">Process</a>
+            <a href="#work">Work</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Contact Modal -->
+  <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <div class="modal">
+      <div class="modal-top">
+        <b id="contactTitle">Request a quote</b>
+        <button class="btn" id="closeContact" type="button" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        <form id="contactForm">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" autocomplete="name" placeholder="Your name" required />
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required />
+          </div>
+          <div>
+            <label for="service">Service</label>
+            <select id="service" name="service" required>
+              <option value="">Select one…</option>
+              <option>Web app</option>
+              <option>Website</option>
+              <option>Mobile app</option>
+              <option>API / Integration</option>
+              <option>Maintenance</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div>
+            <label for="message">Project details</label>
+            <textarea id="message" name="message" placeholder="What are you building? Timeline? Budget range? Links/examples?" required></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn primary" type="submit">Generate message</button>
+            <a class="btn" id="whatsBtn" href="#" target="_blank" rel="noreferrer">Open WhatsApp</a>
+          </div>
+          <p class="small" id="formHint" style="margin:0">We’ll generate a clean WhatsApp message you can send instantly.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Drawer -->
+  <div class="backdrop" id="menuBackdrop" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="modal">
+      <div class="modal-top">
+        <b>Menu</b>
+        <button class="btn" id="closeMenu" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="list" style="margin-top:0">
+          <a class="li" href="#services"><div><b>Services</b><span>What we build</span></div></a>
+          <a class="li" href="#process"><div><b>Process</b><span>How we deliver</span></div></a>
+          <a class="li" href="#work"><div><b>Work</b><span>Examples</span></div></a>
+          <a class="li" href="#pricing"><div><b>Pricing</b><span>Packages</span></div></a>
+          <a class="li" href="#faq"><div><b>FAQ</b><span>Quick answers</span></div></a>
+        </div>
+        <div class="divider"></div>
+        <button class="btn primary" type="button" id="menuQuote">Get a quote</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    // Year
+    $('#year').textContent = new Date().getFullYear();
+
+    // Modal logic
+    const backdrop = $('#backdrop');
+    const menuBackdrop = $('#menuBackdrop');
+
+    function openModal(){
+      backdrop.style.display = 'flex';
+      setTimeout(() => $('#name')?.focus(), 0);
+    }
+    function closeModal(){ backdrop.style.display = 'none'; }
+
+    function openMenu(){ menuBackdrop.style.display = 'flex'; }
+    function closeMenu(){ menuBackdrop.style.display = 'none'; }
+
+    // Wire up open buttons if they exist
+    ['#openContact', '#openContact2', '#openContact3', '#openContact4'].forEach(id => {
+      const el = $(id);
+      if(el) el.addEventListener('click', openModal);
+    });
+
+    $('#closeContact')?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', (e) => { if(e.target === backdrop) closeModal(); });
+
+    $('#menuBtn')?.addEventListener('click', openMenu);
+    $('#closeMenu')?.addEventListener('click', closeMenu);
+    menuBackdrop?.addEventListener('click', (e) => { if(e.target === menuBackdrop) closeMenu(); });
+    $$('#menuBackdrop a').forEach(a => a.addEventListener('click', closeMenu));
+    $('#menuQuote')?.addEventListener('click', () => { closeMenu(); openModal(); });
+
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        if(backdrop?.style.display === 'flex') closeModal();
+        if(menuBackdrop?.style.display === 'flex') closeMenu();
+      }
+    });
+
+    // ===== WhatsApp helpers (UPDATED) =====
+    const WHATSAPP_NUMBER = '27623881570'; // digits only
+
+    function openWhatsAppWithPlan(plan){
+      const digits = WHATSAPP_NUMBER.replace(/\D/g, '');
+
+      const planDetails = {
+        Starter: {
+          price: 'R1,500 deposit + R800/month hosting',
+          ideal: 'One-page site / landing page'
+        },
+        Business: {
+          price: 'From R7,999 + R1,200/month hosting',
+          ideal: 'Multi-page business website'
+        },
+        Product: {
+          price: 'From R19,999 + R2,000/month hosting',
+          ideal: 'MVP web app / mobile app'
+        }
+      };
+
+      const d = planDetails[plan] || { price: '', ideal: '' };
+
+      const text = encodeURIComponent(
+`Hi Logic Lab 👋\n\nI’m interested in the ${plan} package.\n${d.price ? `Pricing: ${d.price}\n` : ''}${d.ideal ? `Ideal for: ${d.ideal}\n` : ''}\nMy business name:\nWhat I need built:\nWhen I want to launch:\nMy budget range:\nAny examples/links:`
+      );
+
+      const url = `https://wa.me/${digits}?text=${text}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    // Pricing buttons -> WhatsApp direct
+    $$('[data-plan]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plan = btn.getAttribute('data-plan') || 'Starter';
+        openWhatsAppWithPlan(plan);
+      });
+    });
+
+    // Contact form -> generate WhatsApp message (kept)
+    $('#contactForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = $('#name')?.value?.trim() || '';
+      const email = $('#email')?.value?.trim() || '';
+      const service = $('#service')?.value?.trim() || '';
+      const msg = $('#message')?.value?.trim() || '';
+
+      const text = encodeURIComponent(
+        `Hi Logic Lab, I'm ${name}.\n\nService: ${service}\nEmail: ${email}\n\nProject details:\n${msg}`
+      );
+
+      const digits = WHATSAPP_NUMBER.replace(/\D/g, '');
+      const url = `https://wa.me/${digits}?text=${text}`;
+      const btn = $('#whatsBtn');
+      if(btn){
+        btn.href = url;
+        btn.textContent = 'Open WhatsApp';
+      }
+      const hint = $('#formHint');
+      if(hint) hint.textContent = 'Your WhatsApp message is ready — click Open WhatsApp.';
+    });
+
+    // Smooth anchor scroll
+    $$('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const href = a.getAttribute('href');
+        if(!href || href === '#') return;
+        const target = document.querySelector(href);
+        if(!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>

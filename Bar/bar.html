@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Midnight Barrel — Bar • Lounge • Live Music</title>
+  <meta name="description" content="Midnight Barrel — cocktails, cold taps, good food, and live music in the city." />
+
+  <!-- Icons (Lucide) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#fff;
+      --muted:rgba(255,255,255,.68);
+      --muted2:rgba(255,255,255,.55);
+      --border:rgba(255,255,255,.12);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.04);
+      --chip:rgba(255,255,255,.10);
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --r1: 28px;
+      --max: 1120px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--fg);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 24px;}
+
+    /* Background graphics */
+    .bg{
+      position:fixed; inset:0; z-index:-1;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,.09), transparent 60%),
+        radial-gradient(900px 500px at 90% 30%, rgba(255,255,255,.07), transparent 55%),
+        radial-gradient(600px 400px at 50% 90%, rgba(255,255,255,.07), transparent 55%),
+        linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,1));
+    }
+    .bg::after{
+      content:"";
+      position:absolute; inset:0;
+      opacity:.06;
+      background: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 22px 22px;
+      pointer-events:none;
+    }
+    .glow{
+      position:absolute; width:680px; height:680px; border-radius:999px;
+      background: radial-gradient(closest-side, rgba(255,255,255,.16), transparent 70%);
+      filter: blur(46px);
+      opacity:.42;
+    }
+    .glow.a{top:-220px; left:-240px}
+    .glow.b{bottom:-260px; right:-280px}
+
+    /* Top nav */
+    header{
+      position:sticky; top:0; z-index:30;
+      backdrop-filter: blur(18px);
+      background: rgba(0,0,0,.40);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:14px;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:220px;}
+    .logo{
+      width:40px; height:40px;
+      border-radius:18px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.10);
+      border:1px solid var(--border);
+    }
+    .brand strong{display:block; font-weight:650; letter-spacing:-.2px;}
+    .brand span{display:block; font-size:12px; color: var(--muted2)}
+
+    nav.links{display:none; gap:6px; align-items:center;}
+    nav.links a{
+      font-size:14px;
+      color: rgba(255,255,255,.72);
+      padding:10px 12px;
+      border-radius:16px;
+    }
+    nav.links a:hover{color:#fff; background: rgba(255,255,255,.06)}
+    .actions{display:flex; gap:10px; align-items:center;}
+
+    /* Buttons */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px;
+      border-radius:18px;
+      padding:10px 14px;
+      font-weight:600;
+      font-size:14px;
+      border:1px solid transparent;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+      white-space:nowrap;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{background:#fff; color:#000;}
+    .btn.primary:hover{opacity:.92}
+    .btn.outline{background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.15); color:#fff;}
+    .btn.outline:hover{background: rgba(255,255,255,.10)}
+    .btn.ghost{background: transparent; color: rgba(255,255,255,.78);}
+    .btn.ghost:hover{background: rgba(255,255,255,.06); color:#fff}
+
+    /* Chips */
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: var(--chip);
+      color:#fff;
+    }
+    .chip.white{background:#fff; color:#000; border-color:#fff;}
+
+    /* Sections */
+    section{padding:44px 0;}
+    .title{margin-bottom:18px;}
+    .kicker{display:flex; gap:10px; align-items:center;}
+    .kicker .line{height:1px; flex:1; background: rgba(255,255,255,.12)}
+    .title h2{margin:14px 0 0; font-size: clamp(22px, 3vw, 32px); letter-spacing:-.6px;}
+    .title p{margin:10px 0 0; color: var(--muted); max-width: 740px;}
+
+    /* Cards */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r1);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card.soft{background: var(--card2); box-shadow:none;}
+    .card .pad{padding:22px;}
+    .card .pad.lg{padding:28px;}
+
+    /* Grid */
+    .grid{display:grid; gap:18px;}
+    .grid.hero{grid-template-columns: 1fr;}
+    .grid.two{grid-template-columns: 1fr;}
+    .grid.three{grid-template-columns: 1fr;}
+
+    /* Hero */
+    .hero h1{
+      margin:18px 0 0;
+      font-size: clamp(34px, 5.2vw, 64px);
+      line-height:1.05;
+      letter-spacing:-1.4px;
+      font-weight:700;
+    }
+    .hero h1 .sub{display:block; color: rgba(255,255,255,.70); font-weight:650;}
+    .hero .lead{margin-top:14px; color: var(--muted); max-width: 620px;}
+    .hero .cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+
+    .heroGlow{
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.9;
+    }
+    .heroGlow::before, .heroGlow::after{
+      content:"";
+      position:absolute;
+      width:290px; height:290px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      filter: blur(48px);
+    }
+    .heroGlow::before{top:-110px; left:-110px}
+    .heroGlow::after{bottom:-120px; right:-120px}
+
+    .pillRow{display:grid; grid-template-columns: 1fr; gap:10px; margin-top:20px;}
+    .pill{
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding:12px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .pill .i{
+      width:40px; height:40px; border-radius:18px;
+      background: rgba(255,255,255,.10);
+      display:grid; place-items:center;
+    }
+    .pill .meta{font-size:13px; color: rgba(255,255,255,.62)}
+    .pill .val{font-weight:650; letter-spacing:-.2px}
+
+    /* Lists */
+    .list{display:grid; gap:10px; margin-top:14px;}
+    .list .item{border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); border-radius:22px; padding:14px;}
+    .item .h{display:flex; align-items:center; gap:10px; font-weight:650;}
+    .item .d{color: rgba(255,255,255,.62); font-size:13px; margin-top:6px;}
+
+    /* Menu rows */
+    .menuRow{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:14px;
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .menuRow:last-child{border-bottom:0}
+    .menuRow .left{display:flex; gap:12px;}
+    .menuRow .iconBox{
+      width:36px; height:36px; border-radius:16px;
+      background: rgba(255,255,255,.10);
+      display:grid; place-items:center;
+      margin-top:2px;
+    }
+    .menuRow .name{font-weight:650; letter-spacing:-.2px}
+    .menuRow .desc{color: rgba(255,255,255,.62); font-size:13px; margin-top:2px}
+    .menuRow .price{font-weight:700}
+
+    /* Gallery tiles */
+    .tile{
+      border-radius: var(--r1);
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(800px 400px at 20% 20%, rgba(255,255,255,.12), transparent 55%),
+        radial-gradient(900px 500px at 80% 60%, rgba(255,255,255,.08), transparent 55%),
+        linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,1));
+      min-height: 220px;
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    .tile.small{
+      min-height:130px;
+      background:
+        radial-gradient(600px 300px at 40% 20%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(to bottom right, rgba(0,0,0,.12), rgba(0,0,0,1));
+    }
+
+    /* Form */
+    form .row{display:grid; grid-template-columns: 1fr; gap:12px;}
+    label{display:block; font-size:13px; color: rgba(255,255,255,.70)}
+    input{
+      width:100%;
+      margin-top:6px;
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.40);
+      color:#fff;
+      outline:none;
+    }
+    input::placeholder{color: rgba(255,255,255,.35)}
+    input:focus{border-color: rgba(255,255,255,.22)}
+
+    .formFooter{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+    .formFooter .note{color: rgba(255,255,255,.55); font-size:13px}
+    .formFooter .btns{display:flex; gap:10px; flex-wrap:wrap;}
+
+    /* Footer */
+    footer{padding:22px 0 44px; color: rgba(255,255,255,.45); font-size:13px; text-align:center;}
+
+    /* Responsive */
+    @media (min-width: 860px){
+      nav.links{display:flex;}
+      .grid.hero{grid-template-columns: 7fr 5fr; align-items:stretch;}
+      .grid.two{grid-template-columns: 1fr 1fr;}
+      .grid.three{grid-template-columns: 1fr 1fr 1fr;}
+      .pillRow{grid-template-columns: 1fr 1fr 1fr;}
+      form .row{grid-template-columns: 2fr 2fr 1fr 1fr 1fr;}
+      .formFooter{flex-direction:row; align-items:center; justify-content:space-between;}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto !important; transition:none !important; animation:none !important}
+    }
+    html{scroll-behavior:smooth;}
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="glow a"></div>
+    <div class="glow b"></div>
+  </div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+          <div class="logo" aria-hidden>
+            <i data-lucide="beer"></i>
+          </div>
+          <div>
+            <strong id="barName">Midnight Barrel</strong>
+            <span>Bar • Lounge • Live Music</span>
+          </div>
+        </div>
+
+        <nav class="links" aria-label="Primary">
+          <a href="#menu">Menu</a>
+          <a href="#events">Events</a>
+          <a href="#gallery">Inside</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="actions">
+          <a id="waTop" class="btn outline" href="#reserve">Book a Table</a>
+          <a class="btn primary" href="#menu">What’s Pouring</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="container">
+    <div class="grid hero">
+      <div class="card hero">
+        <div class="heroGlow"></div>
+        <div class="pad lg">
+          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <span class="chip white">Open Daily</span>
+            <span class="chip">Happy Hour 5–7PM</span>
+            <span class="chip">Live Sets Weekends</span>
+          </div>
+
+          <h1>
+            Cocktails. Cold taps.
+            <span class="sub">A proper night out in the city.</span>
+          </h1>
+
+          <p class="lead">
+            A modern bar experience — quality drinks, solid food, and music that keeps the room moving.
+          </p>
+
+          <div class="cta">
+            <a class="btn primary" href="#reserve">Reserve</a>
+            <a class="btn outline" href="#events">This Week</a>
+            <a class="btn ghost" href="#contact">Directions</a>
+          </div>
+
+          <div class="pillRow">
+            <div class="pill">
+              <div class="i"><i data-lucide="clock"></i></div>
+              <div>
+                <div class="meta">Hours</div>
+                <div class="val">Mon–Thu 16:00–01:00</div>
+              </div>
+            </div>
+            <div class="pill">
+              <div class="i"><i data-lucide="map-pin"></i></div>
+              <div>
+                <div class="meta">Location</div>
+                <div class="val">Braamfontein</div>
+              </div>
+            </div>
+            <div class="pill">
+              <div class="i"><i data-lucide="music-2"></i></div>
+              <div>
+                <div class="meta">Sound</div>
+                <div class="val">R&B • Amapiano • Afrohouse</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="gap:18px;">
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="logo" style="width:42px;height:42px;border-radius:18px;"><i data-lucide="sparkles"></i></div>
+                <div>
+                  <div style="font-weight:650;">Tonight’s Highlights</div>
+                  <div style="font-size:13px; color: rgba(255,255,255,.60);">Ask the bar team for recommendations</div>
+                </div>
+              </div>
+              <span class="chip">Limited</span>
+            </div>
+
+            <div class="list">
+              <div class="item">
+                <div class="h"><i data-lucide="martini"></i> Signature Cocktail Flight</div>
+                <div class="d">Three mini pours — perfect for trying new flavors.</div>
+              </div>
+              <div class="item">
+                <div class="h"><i data-lucide="beer"></i> Tap Feature</div>
+                <div class="d">Rotating local brew on special while it lasts.</div>
+              </div>
+              <div class="item">
+                <div class="h"><i data-lucide="music-2"></i> Late Set</div>
+                <div class="d">Resident DJ from 20:30 on Fridays & Saturdays.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="logo" style="width:42px;height:42px;border-radius:18px;"><i data-lucide="shield-check"></i></div>
+                <div>
+                  <div style="font-weight:650;">Good to Know</div>
+                  <div style="font-size:13px; color: rgba(255,255,255,.60);">Door policy & safety</div>
+                </div>
+              </div>
+              <span class="chip">18+</span>
+            </div>
+
+            <ul style="margin:14px 0 0; padding-left:18px; color: rgba(255,255,255,.70); font-size:13px;">
+              <li style="margin:8px 0;">Smart-casual recommended from 19:00.</li>
+              <li style="margin:8px 0;">Valid ID required for entry.</li>
+              <li style="margin:8px 0;">Respect the space — no drama.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="container">
+      <div class="title">
+        <div class="kicker"><span class="chip">Menu</span><span class="line"></span></div>
+        <h2>What we’re serving</h2>
+        <p>Signature cocktails, cold taps, and bar food that actually hits. (Prices may change.)</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; font-weight:650;">
+                <i data-lucide="martini"></i> Cocktails
+              </div>
+              <span class="chip">House favorites</span>
+            </div>
+
+            <div style="margin-top:10px;">
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="sparkles"></i></div>
+                  <div>
+                    <div class="name">Midnight Mule <span class="chip" style="margin-left:8px; font-size:11px;">Top</span></div>
+                    <div class="desc">Ginger, citrus, clean finish.</div>
+                  </div>
+                </div>
+                <div class="price">R95</div>
+              </div>
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="martini"></i></div>
+                  <div>
+                    <div class="name">Black Velvet</div>
+                    <div class="desc">Dark rum, vanilla, lime.</div>
+                  </div>
+                </div>
+                <div class="price">R105</div>
+              </div>
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="badge-check"></i></div>
+                  <div>
+                    <div class="name">Barrel Old Fashioned</div>
+                    <div class="desc">Bourbon, bitters, orange oils.</div>
+                  </div>
+                </div>
+                <div class="price">R120</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; font-weight:650;">
+                <i data-lucide="beer"></i> Beer & Cider
+              </div>
+              <span class="chip">Always cold</span>
+            </div>
+
+            <div style="margin-top:10px;">
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="beer"></i></div>
+                  <div>
+                    <div class="name">Lager (Tap) <span class="chip" style="margin-left:8px; font-size:11px;">HH</span></div>
+                    <div class="desc">Crisp, easy drinking.</div>
+                  </div>
+                </div>
+                <div class="price">R48</div>
+              </div>
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="beer"></i></div>
+                  <div>
+                    <div class="name">IPA</div>
+                    <div class="desc">Hoppy, aromatic.</div>
+                  </div>
+                </div>
+                <div class="price">R58</div>
+              </div>
+              <div class="menuRow">
+                <div class="left">
+                  <div class="iconBox"><i data-lucide="beer"></i></div>
+                  <div>
+                    <div class="name">Cider</div>
+                    <div class="desc">Fresh apple sparkle.</div>
+                  </div>
+                </div>
+                <div class="price">R52</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / -1;">
+          <div class="pad">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; font-weight:650;">
+                <i data-lucide="utensils-crossed"></i> Food
+              </div>
+              <span class="chip">Kitchen until late</span>
+            </div>
+
+            <div class="grid three" style="margin-top:14px;">
+              <div class="card soft">
+                <div class="pad">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="font-weight:650;">Loaded Fries</div>
+                    <span class="chip">R79</span>
+                  </div>
+                  <div style="margin-top:8px; color: rgba(255,255,255,.62); font-size:13px;">Cheese, sauce, and a little heat if you want it.</div>
+                </div>
+              </div>
+              <div class="card soft">
+                <div class="pad">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="font-weight:650;">Sticky Wings (6pc)</div>
+                    <span class="chip">R99</span>
+                  </div>
+                  <div style="margin-top:8px; color: rgba(255,255,255,.62); font-size:13px;">Choice of mild, hot, or honey BBQ.</div>
+                </div>
+              </div>
+              <div class="card soft">
+                <div class="pad">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="font-weight:650;">Beef Sliders</div>
+                    <span class="chip">R109</span>
+                  </div>
+                  <div style="margin-top:8px; color: rgba(255,255,255,.62); font-size:13px;">Two sliders with a side of fries.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="events">
+    <div class="container">
+      <div class="title">
+        <div class="kicker"><span class="chip">Events</span><span class="line"></span></div>
+        <h2>This week at Midnight Barrel</h2>
+        <p>Walk-ins welcome. For birthdays or groups, reserve ahead.</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
+              <div style="display:flex; gap:12px;">
+                <div class="logo" style="width:44px;height:44px;border-radius:18px;"><i data-lucide="music-2"></i></div>
+                <div>
+                  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <div style="font-weight:650; font-size:18px;">Friday Sessions</div>
+                    <span class="chip white">Busiest</span>
+                  </div>
+                  <div style="color: rgba(255,255,255,.70); font-size:13px;">Friday • 20:30 – Late</div>
+                </div>
+              </div>
+              <a class="btn outline" href="#reserve">Reserve <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div style="margin-top:12px; color: rgba(255,255,255,.65);">Resident DJ + guest set. Table service available.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
+              <div style="display:flex; gap:12px;">
+                <div class="logo" style="width:44px;height:44px;border-radius:18px;"><i data-lucide="martini"></i></div>
+                <div>
+                  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <div style="font-weight:650; font-size:18px;">Cocktail Hour</div>
+                    <span class="chip white">5–7PM</span>
+                  </div>
+                  <div style="color: rgba(255,255,255,.70); font-size:13px;">Tue–Thu • Early evening</div>
+                </div>
+              </div>
+              <a class="btn outline" href="#reserve">Reserve <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div style="margin-top:12px; color: rgba(255,255,255,.65);">Selected cocktails and taps at reduced pricing.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
+              <div style="display:flex; gap:12px;">
+                <div class="logo" style="width:44px;height:44px;border-radius:18px;"><i data-lucide="sparkles"></i></div>
+                <div>
+                  <div style="font-weight:650; font-size:18px;">Ladies Night</div>
+                  <div style="color: rgba(255,255,255,.70); font-size:13px;">Wednesday • 19:00 – 23:00</div>
+                </div>
+              </div>
+              <a class="btn outline" href="#reserve">Reserve <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div style="margin-top:12px; color: rgba(255,255,255,.65);">Special menu and a softer lounge set.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px;">
+              <div style="display:flex; gap:12px;">
+                <div class="logo" style="width:44px;height:44px;border-radius:18px;"><i data-lucide="calendar-days"></i></div>
+                <div>
+                  <div style="font-weight:650; font-size:18px;">Sunday Wind-Down</div>
+                  <div style="color: rgba(255,255,255,.70); font-size:13px;">Sunday • 15:00 – 22:00</div>
+                </div>
+              </div>
+              <a class="btn outline" href="#reserve">Reserve <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div style="margin-top:12px; color: rgba(255,255,255,.65);">Easy afternoon energy, food specials, earlier close.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INSIDE / GALLERY -->
+  <section id="gallery">
+    <div class="container">
+      <div class="title">
+        <div class="kicker"><span class="chip">Inside</span><span class="line"></span></div>
+        <h2>The vibe</h2>
+        <p>Warm lighting, a clean bar, and space to sit or move — depending on the night.</p>
+      </div>
+
+      <div class="grid" style="grid-template-columns: 1fr; gap:18px;">
+        <div class="tile">
+          <div style="font-size:26px; font-weight:750; letter-spacing:-.6px;">Lounge comfort with late-night energy</div>
+          <div style="margin-top:10px; color: rgba(255,255,255,.70); max-width: 720px;">
+            Come for a quiet drink after work or stay for the weekend set. The room changes as the night builds.
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip">Table service</span>
+            <span class="chip">Indoor seating</span>
+            <span class="chip">Weekend DJs</span>
+          </div>
+        </div>
+
+        <div class="grid three">
+          <div class="tile small">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:700;">Cocktail bar</div>
+                <div style="color: rgba(255,255,255,.60); font-size:13px; margin-top:4px;">Seasonal menu</div>
+              </div>
+              <div class="logo" style="width:46px;height:46px;border-radius:22px;"><i data-lucide="martini"></i></div>
+            </div>
+          </div>
+          <div class="tile small">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:700;">Cold taps</div>
+                <div style="color: rgba(255,255,255,.60); font-size:13px; margin-top:4px;">Local + imports</div>
+              </div>
+              <div class="logo" style="width:46px;height:46px;border-radius:22px;"><i data-lucide="beer"></i></div>
+            </div>
+          </div>
+          <div class="tile small">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-weight:700;">Music room</div>
+                <div style="color: rgba(255,255,255,.60); font-size:13px; margin-top:4px;">Live sets</div>
+              </div>
+              <div class="logo" style="width:46px;height:46px;border-radius:22px;"><i data-lucide="music-2"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESERVE -->
+  <section id="reserve">
+    <div class="container">
+      <div class="title">
+        <div class="kicker"><span class="chip">Reservations</span><span class="line"></span></div>
+        <h2>Reserve a table</h2>
+        <p>For groups, birthdays, or busy nights — send your details and we’ll confirm quickly.</p>
+      </div>
+
+      <div class="card">
+        <div class="pad">
+          <form id="bookingForm" autocomplete="on">
+            <div class="row">
+              <div>
+                <label for="name">Name</label>
+                <input id="name" name="name" placeholder="Your name" />
+              </div>
+              <div>
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" placeholder="+27..." />
+              </div>
+              <div>
+                <label for="party">Guests</label>
+                <input id="party" name="party" placeholder="2" value="2" />
+              </div>
+              <div>
+                <label for="date">Date</label>
+                <input id="date" name="date" placeholder="YYYY-MM-DD" />
+              </div>
+              <div>
+                <label for="time">Time</label>
+                <input id="time" name="time" placeholder="19:30" />
+              </div>
+            </div>
+
+            <div class="formFooter">
+              <div class="note">Entry is 18+. Please bring a valid ID.</div>
+              <div class="btns">
+                <a class="btn outline" href="#menu">View Menu</a>
+                <button class="btn primary" type="submit">Send Request</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="title">
+        <div class="kicker"><span class="chip">Contact</span><span class="line"></span></div>
+        <h2>Where to find us</h2>
+        <p>Walk-ins welcome. For tables and events, message us on WhatsApp.</p>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="pad lg">
+            <div style="font-weight:700;">Directions</div>
+            <div style="margin-top:8px; color: rgba(255,255,255,.70);">
+              44 Juta Street, Braamfontein, Johannesburg (parking available nearby).
+            </div>
+
+            <div class="pillRow" style="margin-top:18px; grid-template-columns: 1fr;">
+              <div class="pill"><div class="i"><i data-lucide="map-pin"></i></div><div><div class="meta">Address</div><div class="val">44 Juta St, Braamfontein</div></div></div>
+              <div class="pill"><div class="i"><i data-lucide="phone"></i></div><div><div class="meta">Call</div><div class="val">+27 11 486 2094</div></div></div>
+              <div class="pill"><div class="i"><i data-lucide="clock"></i></div><div><div class="meta">Hours</div><div class="val">Fri–Sat until 02:00</div></div></div>
+              <div class="pill"><div class="i"><i data-lucide="instagram"></i></div><div><div class="meta">Instagram</div><div class="val">@midnightbarrel_za</div></div></div>
+            </div>
+
+            <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+              <a id="waBottom" class="btn primary" href="#reserve">WhatsApp</a>
+              <a class="btn outline" href="#reserve">Reserve</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="pad">
+            <div style="font-weight:700;">Quick info</div>
+
+            <div class="list">
+              <div class="item" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="badge-check"></i> Entry</div>
+                <div style="color: rgba(255,255,255,.80); font-weight:650;">18+ ID required</div>
+              </div>
+              <div class="item" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="sparkles"></i> Dress</div>
+                <div style="color: rgba(255,255,255,.80); font-weight:650;">Smart-casual</div>
+              </div>
+              <div class="item" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="music-2"></i> Music</div>
+                <div style="color: rgba(255,255,255,.80); font-weight:650;">DJs weekends</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <a class="btn outline" style="width:100%;" href="#menu">See Menu</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        © <span id="year"></span> Midnight Barrel. All rights reserved.
+      </footer>
+    </div>
+  </section>
+
+  <script>
+    // Render lucide icons
+    lucide.createIcons();
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // WhatsApp booking link builder
+    const BAR_NAME = (document.getElementById('barName')?.textContent || 'Midnight Barrel').trim();
+
+    // Replace with your real WhatsApp number (international format, no +)
+    const WHATSAPP_NUMBER = '27721234567';
+
+    function buildWhatsAppLink({ name, phone, party, date, time }){
+      const lines = [
+        `Hi ${BAR_NAME}! I'd like to reserve a table.`,
+        name ? `Name: ${name}` : null,
+        phone ? `Phone: ${phone}` : null,
+        party ? `Guests: ${party}` : null,
+        date ? `Date: ${date}` : null,
+        time ? `Time: ${time}` : null,
+      ].filter(Boolean);
+
+      const text = encodeURIComponent(lines.join('\\n'));
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+    }
+
+    function updateStaticWhatsAppButtons(){
+      const link = buildWhatsAppLink({});
+      const top = document.getElementById('waTop');
+      const bottom = document.getElementById('waBottom');
+      if(top) top.href = link;
+      if(bottom) bottom.href = link;
+    }
+
+    updateStaticWhatsAppButtons();
+
+    const form = document.getElementById('bookingForm');
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name')?.value?.trim();
+      const phone = document.getElementById('phone')?.value?.trim();
+      const party = document.getElementById('party')?.value?.trim();
+      const date = document.getElementById('date')?.value?.trim();
+      const time = document.getElementById('time')?.value?.trim();
+
+      const link = buildWhatsAppLink({ name, phone, party, date, time });
+      window.open(link, '_blank', 'noopener,noreferrer');
+    });
+  </script>
+</body>
+</html>

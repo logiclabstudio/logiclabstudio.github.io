@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f19" />
+
+  <title>Kaya Lounge | Bookings, Hours & Directions</title>
+  <meta name="description" content="Bookings, operating hours, and directions. Reserve your spot via WhatsApp." />
+
+  <!-- Basic OG -->
+  <meta property="og:title" content="Kaya Lounge | Bookings, Hours & Directions" />
+  <meta property="og:description" content="Reserve via WhatsApp. View hours and get directions." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --card:#0f172a;
+      --card2:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --ring:rgba(255,255,255,.12);
+      --brand:#22c55e;   /* WhatsApp */
+      --accent:#60a5fa;  /* blue */
+      --gold:#fbbf24;    /* warm accent */
+      --shadow: 0 25px 70px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(96,165,250,.18), transparent 60%),
+        radial-gradient(900px 500px at 110% 20%, rgba(34,197,94,.14), transparent 55%),
+        radial-gradient(800px 500px at 50% 110%, rgba(251,191,36,.10), transparent 55%),
+        var(--bg);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+
+    .wrap{max-width:1180px; margin:0 auto; padding:28px 16px 64px}
+
+    /* Top bar */
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,15,25,.78), rgba(11,15,25,.38));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .topbar{
+      max-width:1180px;
+      margin:0 auto;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:220px;
+    }
+
+    .logo{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:
+        radial-gradient(18px 18px at 25% 25%, rgba(255,255,255,.55), transparent 55%),
+        linear-gradient(135deg, rgba(96,165,250,.95), rgba(34,197,94,.85));
+      box-shadow: 0 18px 45px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .brandTitle{display:flex; flex-direction:column; gap:2px}
+    .brandTitle strong{font-size:14px; letter-spacing:.2px}
+    .brandTitle span{font-size:12px; color:var(--muted)}
+
+    nav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    .navlink{
+      font-size:13px;
+      color:var(--muted);
+      padding:9px 10px;
+      border-radius:12px;
+      border:1px solid transparent;
+      transition: .15s ease;
+    }
+    .navlink:hover{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+    }
+
+    .navcta{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(34,197,94,.28);
+      background:rgba(34,197,94,.14);
+      font-size:13px;
+      font-weight:650;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .navcta:hover{background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.40)}
+
+    /* Hero */
+    .hero{
+      padding-top:28px;
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr}
+      .brand{min-width:auto}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border:1px solid var(--ring);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .heroLeft{
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* Decorative “visuals” without images */
+    .heroVisual{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.95;
+      background:
+        radial-gradient(520px 320px at 18% 18%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(520px 320px at 82% 20%, rgba(34,197,94,.20), transparent 60%),
+        radial-gradient(520px 320px at 55% 92%, rgba(251,191,36,.16), transparent 55%);
+    }
+    .gridOverlay{
+      position:absolute;
+      inset:-1px;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 64px 64px;
+      opacity:.12;
+      mask-image: radial-gradient(closest-side at 50% 35%, black 50%, transparent 90%);
+      pointer-events:none;
+    }
+
+    .heroContent{position:relative; padding:26px}
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(96,165,250,.24);
+      background:rgba(96,165,250,.12);
+      color:#d7ebff;
+      font-size:13px;
+      margin-bottom:14px;
+    }
+
+    .headline{
+      margin:0;
+      font-size:44px;
+      line-height:1.05;
+      letter-spacing:-.7px;
+    }
+
+    .sub{
+      margin:12px 0 18px;
+      color:var(--muted);
+      max-width:65ch;
+      font-size:16px;
+    }
+
+    .ctaRow{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      font-weight:650;
+      font-size:14px;
+      transition:.15s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .btn:hover{background:rgba(255,255,255,.085); border-color:rgba(255,255,255,.22)}
+
+    .btnPrimary{
+      border-color: rgba(34,197,94,.30);
+      background: rgba(34,197,94,.14);
+    }
+    .btnPrimary:hover{background: rgba(34,197,94,.18); border-color: rgba(34,197,94,.42)}
+
+    .btnSecondary{
+      border-color: rgba(96,165,250,.26);
+      background: rgba(96,165,250,.12);
+    }
+    .btnSecondary:hover{background: rgba(96,165,250,.16); border-color: rgba(96,165,250,.40)}
+
+    .features{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top:18px;
+    }
+    @media (max-width: 980px){
+      .features{grid-template-columns:1fr}
+      .headline{font-size:38px}
+    }
+
+    .feature{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,23,42,.35);
+      border-radius:16px;
+      padding:14px;
+    }
+    .feature strong{display:block; font-size:14px; margin-bottom:6px}
+    .feature span{display:block; color:var(--muted); font-size:13px}
+
+    /* Right column */
+    .side{padding:18px}
+    .side h3{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
+
+    .infoGrid{display:grid; gap:10px; margin-top:10px}
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      font-size:14px;
+    }
+    .row span{color:var(--muted)}
+
+    .note{
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(251,191,36,.22);
+      background: rgba(251,191,36,.08);
+      color:#ffe7b3;
+      font-size:13px;
+    }
+
+    /* Sections */
+    section{scroll-margin-top:90px}
+
+    .section{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){
+      .section{grid-template-columns:1fr}
+    }
+
+    .sectionCard{padding:18px}
+    .sectionCard h3{margin:0 0 10px; font-size:16px}
+    .sectionCard p{margin:0; color:var(--muted); font-size:14px}
+
+    .kv{display:grid; gap:10px; margin-top:12px}
+
+    .mapWrap{padding:14px}
+    .map{
+      width:100%;
+      height:360px;
+      border:0;
+      border-radius:16px;
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    /* Footer */
+    footer{
+      margin-top:22px;
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .mutedLink{color:var(--muted)}
+    .mutedLink:hover{color:var(--text)}
+
+    /* Small icon dots */
+    .dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35)}
+    .dot.green{background:rgba(34,197,94,.85)}
+    .dot.blue{background:rgba(96,165,250,.85)}
+    .dot.gold{background:rgba(251,191,36,.85)}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brandTitle">
+          <strong id="venueNameTop">Kaya Lounge</strong>
+          <span id="venueTag">Bookings • Events • Good Vibes</span>
+        </div>
+      </div>
+
+      <nav aria-label="Primary">
+        <a class="navlink" href="#book">Bookings</a>
+        <a class="navlink" href="#hours">Hours</a>
+        <a class="navlink" href="#directions">Directions</a>
+        <a class="navcta" id="navWhatsApp" href="#" target="_blank" rel="noopener">
+          <span class="dot green" aria-hidden="true"></span>
+          WhatsApp
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero" id="book">
+      <div class="card heroLeft">
+        <div class="heroVisual" aria-hidden="true"></div>
+        <div class="gridOverlay" aria-hidden="true"></div>
+
+        <div class="heroContent">
+          <div class="pill">
+            <span class="dot blue" aria-hidden="true"></span>
+            Open for reservations · Quick reply on WhatsApp
+          </div>
+
+          <h1 class="headline" id="headline">A premium venue experience — without the hassle.</h1>
+          <p class="sub" id="subline">
+            Book tables, birthdays, and group arrivals in seconds. Get hours, directions, and the fastest way to secure your spot.
+          </p>
+
+          <div class="ctaRow">
+            <a class="btn btnPrimary" id="waBtn" href="#" target="_blank" rel="noopener">
+              <span class="dot green" aria-hidden="true"></span>
+              Book on WhatsApp
+            </a>
+            <a class="btn btnSecondary" id="mapsBtn" href="#" target="_blank" rel="noopener">
+              <span class="dot blue" aria-hidden="true"></span>
+              Open Maps
+            </a>
+            <a class="btn" id="callBtn" href="tel:+27623881570">
+              <span class="dot" aria-hidden="true"></span>
+              Call
+            </a>
+          </div>
+
+          <div class="features" aria-label="Highlights">
+            <div class="feature">
+              <strong>Bookings</strong>
+              <span>Tables · Birthdays · Corporate groups</span>
+            </div>
+            <div class="feature">
+              <strong>Atmosphere</strong>
+              <span>Curated music · Clean service · Safe setting</span>
+            </div>
+            <div class="feature">
+              <strong>Convenience</strong>
+              <span>Fast response · Clear info · Easy directions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card side" id="hours">
+        <h3>Today</h3>
+
+        <div class="infoGrid">
+          <div class="row">
+            <strong>Status</strong>
+            <span id="openStatus">Checking…</span>
+          </div>
+          <div class="row">
+            <strong>Hours</strong>
+            <span id="hoursToday">—</span>
+          </div>
+          <div class="row">
+            <strong>Area</strong>
+            <span id="area">Orkney, North West</span>
+          </div>
+        </div>
+
+        <div class="note">
+          Tip: Message <b>date</b>, <b>time</b>, and <b>number of guests</b> for the fastest booking.
+        </div>
+
+        <div class="infoGrid" style="margin-top:12px">
+          <div class="row">
+            <strong>WhatsApp</strong>
+            <span id="waDisplay">+27 62 388 1570</span>
+          </div>
+          <div class="row">
+            <strong>Phone</strong>
+            <span id="phoneDisplay">062 388 1570</span>
+          </div>
+          <div class="row">
+            <strong>Location</strong>
+            <span id="shortAddress">123 Main Road</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="directions">
+      <div class="card sectionCard">
+        <h3>Directions</h3>
+        <p>Use Google Maps for the quickest route. If you’re running late, WhatsApp your ETA.</p>
+
+        <div class="kv">
+          <div class="row">
+            <strong>Address</strong>
+            <span id="addressLine">123 Main Road, Orkney, 2620</span>
+          </div>
+          <div class="row">
+            <strong>Landmark</strong>
+            <span id="landmarkLine">Near the taxi rank</span>
+          </div>
+        </div>
+
+        <div class="ctaRow" style="margin-top:14px">
+          <a class="btn btnSecondary" id="mapsBtn2" href="#" target="_blank" rel="noopener">
+            <span class="dot blue" aria-hidden="true"></span>
+            Get Directions
+          </a>
+          <a class="btn btnPrimary" id="waBtn2" href="#" target="_blank" rel="noopener">
+            <span class="dot green" aria-hidden="true"></span>
+            WhatsApp Booking
+          </a>
+        </div>
+      </div>
+
+      <div class="card mapWrap">
+        <iframe
+          class="map"
+          id="mapFrame"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=Orkney%20North%20West%20South%20Africa&output=embed"
+          title="Map">
+        </iframe>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> <span id="venueNameFoot">Kaya Lounge</span>. All rights reserved.</div>
+      <div>
+        <a class="mutedLink" href="#book">Bookings</a>
+        · <a class="mutedLink" href="#hours">Hours</a>
+        · <a class="mutedLink" href="#directions">Directions</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // =========================
+    // EDIT THESE DETAILS ONLY
+    // =========================
+    const VENUE = {
+      name: "Kaya Lounge",
+      tag: "Bookings • Events • Good Vibes",
+      area: "Orkney, North West",
+      shortAddress: "123 Main Road",
+      address: "123 Main Road, Orkney, 2620",
+      landmark: "Near the taxi rank",
+      phoneDisplay: "062 388 1570",
+      phoneTel: "+27623881570",
+      whatsappNumberInternational: "27623881570", // no +, no spaces
+      mapsQuery: "123 Main Road, Orkney, 2620"
+    };
+
+    // Hours (24h). 0=Sunday ... 6=Saturday
+    // If close time is after midnight, just set it (e.g. 02:00). Logic supports rollover.
+    const HOURS = {
+      0: { open: null, close: null, label: "Closed" },
+      1: { open: "16:00", close: "23:00" },
+      2: { open: "16:00", close: "23:00" },
+      3: { open: "16:00", close: "23:00" },
+      4: { open: "16:00", close: "00:00" },
+      5: { open: "16:00", close: "02:00" },
+      6: { open: "14:00", close: "02:00" }
+    };
+
+    // =========================
+    // NO NEED TO EDIT BELOW
+    // =========================
+    const $ = (id) => document.getElementById(id);
+
+    function setText(id, value){
+      const el = $(id);
+      if (el) el.textContent = value;
+    }
+
+    function toMinutes(hhmm){
+      const [h,m] = hhmm.split(":").map(Number);
+      return h*60 + m;
+    }
+
+    function formatTime(hhmm){
+      if (!hhmm) return "";
+      let [h,m] = hhmm.split(":").map(Number);
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12; if (h === 0) h = 12;
+      return `${h}:${String(m).padStart(2,"0")} ${ampm}`;
+    }
+
+    function isOpenNow(day, nowMins){
+      const cfg = HOURS[day];
+      if (!cfg || !cfg.open || !cfg.close) return false;
+
+      const open = toMinutes(cfg.open);
+      let close = toMinutes(cfg.close);
+
+      // Handle midnight close
+      if (cfg.close === "00:00") close = 24*60;
+
+      // If close is <= open, it closes next day
+      if (close <= open){
+        return nowMins >= open || nowMins < close;
+      }
+      return nowMins >= open && nowMins < close;
+    }
+
+    function todayLabel(day){
+      const cfg = HOURS[day];
+      if (!cfg || cfg.label === "Closed" || !cfg.open || !cfg.close) return "Closed";
+
+      // Display midnight as 12:00 AM
+      const closeLabel = (cfg.close === "00:00") ? "12:00 AM" : formatTime(cfg.close);
+      return `${formatTime(cfg.open)} – ${closeLabel}`;
+    }
+
+    function prettifyInternational(num){
+      // crude formatting for ZA numbers: 27 6x xxx xxxx
+      if (!num || num.length < 11) return `+${num}`;
+      return `+${num.slice(0,2)} ${num.slice(2,4)} ${num.slice(4,7)} ${num.slice(7)}`;
+    }
+
+    function init(){
+      // Title + labels
+      document.title = `${VENUE.name} | Bookings, Hours & Directions`;
+      setText("venueNameTop", VENUE.name);
+      setText("venueNameFoot", VENUE.name);
+      setText("venueTag", VENUE.tag);
+      setText("area", VENUE.area);
+      setText("shortAddress", VENUE.shortAddress);
+      setText("addressLine", VENUE.address);
+      setText("landmarkLine", VENUE.landmark);
+      setText("phoneDisplay", VENUE.phoneDisplay);
+      $("callBtn").setAttribute("href", `tel:${VENUE.phoneTel}`);
+      setText("year", new Date().getFullYear());
+
+      // WhatsApp links
+      const waBase = `https://wa.me/${VENUE.whatsappNumberInternational}`;
+      const waMsg = encodeURIComponent(
+        `Hi ${VENUE.name}, I'd like to book.\n\nDate: \nTime: \nGuests: \nName: `
+      );
+      const waLink = `${waBase}?text=${waMsg}`;
+      $("waBtn").setAttribute("href", waLink);
+      $("waBtn2").setAttribute("href", waLink);
+      $("navWhatsApp").setAttribute("href", waLink);
+      setText("waDisplay", prettifyInternational(VENUE.whatsappNumberInternational));
+
+      // Maps
+      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE.mapsQuery)}`;
+      $("mapsBtn").setAttribute("href", mapsLink);
+      $("mapsBtn2").setAttribute("href", mapsLink);
+      $("mapFrame").setAttribute("src", `https://www.google.com/maps?q=${encodeURIComponent(VENUE.mapsQuery)}&output=embed`);
+
+      // Hours
+      const now = new Date();
+      const day = now.getDay();
+      const nowMins = now.getHours()*60 + now.getMinutes();
+      setText("hoursToday", todayLabel(day));
+      setText("openStatus", isOpenNow(day, nowMins) ? "Open now" : "Currently closed");
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modern Salon | Luxury Hair & Beauty</title>
+  <meta name="description" content="Modern Salon – premium hair, beauty, and nail services." />
+  <style>
+    :root{
+      /* Gold-luxe theme */
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(20,24,34,.72);
+      --text:#f3f4f6;
+      --muted:#cbd5e1;
+      --gold:#d4af37;
+      --gold2:#f5d06f;
+      --ring: rgba(212,175,55,.35);
+      --shadow: 0 18px 40px rgba(0,0,0,.45);
+      --radius: 20px;
+      --max: 1120px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 75% 10%, rgba(212,175,55,.22), transparent 60%),
+        radial-gradient(900px 520px at 15% 0%, rgba(245,208,111,.10), transparent 60%),
+        url("C:/Users/Mokge/source/repos/Logic Lab/Modern Saloon/images/background.png") center/cover no-repeat fixed,
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max);margin:0 auto;padding:0 20px}
+
+    header{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:blur(12px);
+      background: rgba(7,10,18,.62);
+      border-bottom: 1px solid rgba(212,175,55,.18);
+    }
+    .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+    .brand{font-weight:900;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+    .brand:before{
+      content:"";
+      width:34px;height:34px;
+      border-radius:12px;
+      background: linear-gradient(135deg, rgba(212,175,55,.95), rgba(245,208,111,.85));
+      box-shadow: 0 14px 28px rgba(212,175,55,.20);
+      border: 1px solid rgba(212,175,55,.22);
+    }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:12px 14px;
+      border-radius: 16px;
+      border:1px solid rgba(212,175,55,.20);
+      background: rgba(20,24,34,.55);
+      color: var(--text);
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: 0 12px 26px rgba(0,0,0,.35); border-color: rgba(245,208,111,.38)}
+    .btn:focus{outline:none; box-shadow: 0 0 0 4px var(--ring)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(212,175,55,.95), rgba(245,208,111,.92));
+      border-color: rgba(245,208,111,.55);
+      color: #0b0f19;
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .hero{padding:64px 0}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px}
+
+    /* headings black & readable */
+    h1, h2, h3, h4, h5, h6{
+      color: #0b0f19;
+      text-shadow: 0 0 8px rgba(255,255,255,.75), 0 2px 4px rgba(255,255,255,.5);
+      margin: 0 0 10px;
+    }
+    h1{font-size:clamp(32px,4vw,52px);margin:14px 0}
+    .lead{
+      color:#0b0f19;
+      max-width:56ch;
+      text-shadow: 0 0 8px rgba(255,255,255,.75), 0 2px 4px rgba(255,255,255,.5);
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid rgba(212,175,55,.16);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position: relative;
+      overflow:hidden;
+    }
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    section{padding:58px 0}
+
+    /* Hero image frame */
+    .hero .card{
+      background: linear-gradient(180deg, rgba(20,24,34,.62), rgba(15,18,28,.68));
+      border-color: rgba(245,208,111,.22);
+    }
+
+    /* SERVICES */
+    #services .service-card{
+      background: linear-gradient(180deg, rgba(20,24,34,.78), rgba(15,18,28,.72));
+    }
+
+    /* Dropdown service (hair) with background image */
+    details.service-dd{
+      border-radius: var(--radius);
+      border: 1px solid rgba(212,175,55,.16);
+      box-shadow: var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(12,14,20,.10), rgba(12,14,20,.55)),
+        url("C:/Users/Mokge/source/repos/Logic Lab/Modern Saloon/images/Hairstyling.png") center/cover no-repeat;
+      overflow:hidden;
+    }
+    details.service-dd summary{
+      list-style:none;
+      cursor:pointer;
+      padding: 22px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+    details.service-dd summary::-webkit-details-marker{display:none}
+    .dd-title{display:flex;flex-direction:column;gap:8px;min-width:0}
+
+    /* Make Hair/Nails/Beauty titles white */
+    #services h3{color:#fff !important;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+
+    .dd-sub{color: rgba(255,255,255,.92);text-shadow:0 1px 2px rgba(0,0,0,.35);margin:0}
+
+    .chev{
+      width:34px;height:34px;border-radius:12px;
+      display:grid;place-items:center;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.18);
+      flex:0 0 auto;
+    }
+    .chev svg{width:18px;height:18px;opacity:.95;transition:transform .18s ease}
+    details[open] .chev svg{transform:rotate(180deg)}
+
+    .dd-panel{
+      background: rgba(12,14,20,.65);
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding: 18px 22px 22px;
+      backdrop-filter: blur(10px);
+    }
+    .prices{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .price-box{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .price-box h4{
+      margin:0 0 10px;
+      font-size: 14px;
+      letter-spacing:.3px;
+      color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.45);
+    }
+    .price-list{margin:0;padding-left: 16px;color: rgba(255,255,255,.92)}
+    .price-list li{margin:6px 0}
+    .price-list b{color:#fff}
+
+    footer{padding:40px 0;color:rgba(203,213,225,.92)}
+
+    @media (max-width:920px){
+      .hero-grid,.grid-3{grid-template-columns:1fr}
+      .prices{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">Modern Salon</div>
+      <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Book Now</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <h1>Where beauty meets confidence.</h1>
+        <p class="lead">Modern Salon delivers premium hair, nail, and beauty services in a sleek, relaxing space designed around you.</p>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Book via WhatsApp</a>
+          <a class="btn" href="#services">Our Services</a>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <img src="C:/Users/Mokge/source/repos/Logic Lab/Modern Saloon/images/salooninterior.png"
+             alt="Modern Salon interior"
+             style="width:100%;height:100%;object-fit:cover;display:block" />
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="section-head"><h2>Services</h2></div>
+
+    <div class="grid-3">
+      <!-- HAIR STYLING: button + dropdown -->
+      <details class="service-dd" id="hair">
+        <summary>
+          <div class="dd-title">
+            <h3>Hair Styling</h3>
+            <p class="dd-sub">Tap to view women & men pricing.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9l6 6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="dd-panel">
+          <div class="prices">
+            <div class="price-box">
+              <h4>Women (from)</h4>
+              <ul class="price-list">
+                <li>Wash + Blowdry <b>R180</b></li>
+                <li>Wash + Straighten <b>R220</b></li>
+                <li>Wash + Braids (simple) <b>R350</b></li>
+                <li>Install + Style (weave) <b>R450</b></li>
+                <li>Silk Press <b>R380</b></li>
+                <li>Color (single tone) <b>R650</b></li>
+              </ul>
+            </div>
+
+            <div class="price-box">
+              <h4>Men (from)</h4>
+              <ul class="price-list">
+                <li>Classic Cut <b>R80</b></li>
+                <li>Fade / Taper <b>R100</b></li>
+                <li>Beard Trim <b>R60</b></li>
+                <li>Cut + Beard <b>R140</b></li>
+                <li>Wash + Style <b>R90</b></li>
+                <li>Line-up <b>R50</b></li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Book Hair Styling</a>
+            <a class="btn" href="#contact">Ask for a custom quote</a>
+          </div>
+        </div>
+      </details>
+
+      <!-- NAILS: button + dropdown -->
+      <details class="service-dd" id="nails" style="background:
+        linear-gradient(180deg, rgba(12,14,20,.10), rgba(12,14,20,.55)),
+        url(\"C:/Users/Mokge/source/repos/Logic Lab/Modern Saloon/images/Nails.png\") center/cover no-repeat;">
+        <summary>
+          <div class="dd-title">
+            <h3>Nails</h3>
+            <p class="dd-sub">Tap to view nail pricing.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9l6 6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="dd-panel">
+          <div class="prices">
+            <div class="price-box">
+              <h4>Hands</h4>
+              <ul class="price-list">
+                <li>Basic Manicure <b>R150</b></li>
+                <li>Gel Overlay <b>R280</b></li>
+                <li>Acrylic Full Set <b>R420</b></li>
+                <li>Acrylic Refill <b>R260</b></li>
+                <li>Nail Art (from) <b>R60</b></li>
+                <li>Soak Off <b>R90</b></li>
+              </ul>
+            </div>
+
+            <div class="price-box">
+              <h4>Feet</h4>
+              <ul class="price-list">
+                <li>Basic Pedicure <b>R180</b></li>
+                <li>Gel Toes <b>R260</b></li>
+                <li>Callus Treatment <b>R120</b></li>
+                <li>Foot Spa + Massage <b>R200</b></li>
+                <li>Toe Art (from) <b>R50</b></li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Book Nails</a>
+            <a class="btn" href="#contact">Ask for a custom quote</a>
+          </div>
+        </div>
+      </details>
+
+      <!-- BEAUTY: button + dropdown -->
+      <details class="service-dd" id="beauty" style="background:
+        linear-gradient(180deg, rgba(12,14,20,.10), rgba(12,14,20,.55)),
+        url(\"C:/Users/Mokge/source/repos/Logic Lab/Modern Saloon/images/Beauty.png\") center/cover no-repeat;">
+        <summary>
+          <div class="dd-title">
+            <h3>Beauty</h3>
+            <p class="dd-sub">Tap to view beauty pricing.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9l6 6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="dd-panel">
+          <div class="prices">
+            <div class="price-box">
+              <h4>Face & Brows</h4>
+              <ul class="price-list">
+                <li>Eyebrow Shape <b>R90</b></li>
+                <li>Brow Tint <b>R120</b></li>
+                <li>Full Face Wax <b>R260</b></li>
+                <li>Express Facial <b>R320</b></li>
+                <li>Luxury Facial <b>R580</b></li>
+              </ul>
+            </div>
+
+            <div class="price-box">
+              <h4>Lashes & Makeup</h4>
+              <ul class="price-list">
+                <li>Classic Lashes <b>R420</b></li>
+                <li>Hybrid Lashes <b>R520</b></li>
+                <li>Volume Lashes <b>R680</b></li>
+                <li>Day Makeup <b>R450</b></li>
+                <li>Glam Makeup <b>R650</b></li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn primary" href="https://wa.me/27623881570" target="_blank" rel="noreferrer">Book Beauty</a>
+            <a class="btn" href="#contact">Ask for a custom quote</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="hours">
+    <div class="section-head"><h2>Opening Hours</h2></div>
+    <div class="card">
+      <p style="color: rgba(203,213,225,.92)">Mon–Fri: 09:00 – 18:00<br/>Sat: 09:00 – 16:00<br/>Sun: Closed</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-head"><h2>Contact</h2></div>
+    <div class="card">
+      <p style="color: rgba(203,213,225,.92)">Call/WhatsApp: +27 62 388 1570<br/>Email: mosamokgesi@gmail.com<br/>Location: Your salon address here</p>
+    </div>
+  </section>
+</main>
+
+<footer class="container">
+  © <span id="year"></span> Modern Salon.
+</footer>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
