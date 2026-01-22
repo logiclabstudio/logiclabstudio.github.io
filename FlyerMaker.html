@@ -1,0 +1,1393 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Digital Flyer Maker</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#0f172a;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --line:rgba(255,255,255,.12);
+      --accent:#60a5fa;
+      --danger:#fb7185;
+      --ok:#22c55e;
+      --radius:16px;
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(96,165,250,.18), transparent 60%),
+                  radial-gradient(900px 700px at 90% 20%, rgba(167,139,250,.14), transparent 55%),
+                  linear-gradient(180deg, #070a12, var(--bg));
+      color:var(--text);
+    }
+    .app{
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:16px;
+      padding:16px;
+      height:100%;
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:auto;
+    }
+    .panel-inner{padding:14px}
+    .title{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding-bottom:10px; border-bottom:1px solid var(--line);
+      position:sticky; top:0; background: rgba(15,23,42,.75); backdrop-filter: blur(10px);
+      z-index:5;
+    }
+    .title h1{font-size:14px; margin:0; letter-spacing:.4px; color:#fff}
+    .badge{
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line); color:var(--muted); background: rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+    .group{margin-top:12px; padding:12px; border:1px solid var(--line); border-radius:14px; background: rgba(17,24,39,.55)}
+    .group h2{margin:0 0 10px; font-size:12px; color:#cbd5e1; letter-spacing:.35px}
+    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
+    input[type="text"], input[type="number"], textarea, select{
+      width:100%;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 10px;
+      outline:none;
+    }
+    textarea{min-height:84px; resize:vertical}
+    input[type="color"]{
+      width:100%;
+      height:40px;
+      background: transparent;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:4px;
+    }
+    input[type="checkbox"]{transform: translateY(1px);}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    .row3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
+    .inline{
+      display:flex; align-items:center; gap:10px;
+      padding:10px; border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .btns{display:flex; flex-wrap:wrap; gap:10px}
+    button{
+      border:none; cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color:var(--text);
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+    button:hover{border-color: rgba(255,255,255,.22)}
+    .primary{background: linear-gradient(180deg, rgba(96,165,250,.22), rgba(96,165,250,.12)); border-color: rgba(96,165,250,.35)}
+    .danger{background: rgba(251,113,133,.12); border-color: rgba(251,113,133,.35)}
+    .ok{background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.35)}
+    .hint{font-size:12px; color:var(--muted); line-height:1.35}
+    .canvasWrap{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display:flex; flex-direction:column;
+      overflow:hidden;
+      min-width: 520px;
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background: rgba(15,23,42,.65);
+      backdrop-filter: blur(10px);
+      flex-wrap:wrap;
+    }
+    .topbar .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .topbar .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .kbd{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03)
+    }
+    .stage{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      overflow:auto;
+    }
+    .paper{
+      position:relative;
+      /* size is set dynamically via JS (px based on editing DPI) */
+      width: 794px;
+      height:1123px;
+      background:#0b1220;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 30px 70px rgba(0,0,0,.55);
+      overflow:hidden;
+      transform-origin: top left;
+    }
+    .gridOverlay{
+      pointer-events:none;
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity:.25;
+      display:none;
+    }
+    .paper.show-grid .gridOverlay{display:block}
+    .guides{
+      pointer-events:none;
+      position:absolute; inset:0;
+      display:none;
+    }
+    .paper.show-guides .guides{display:block}
+    .guide-bleed, .guide-safe{
+      position:absolute; inset:0;
+      border:2px dashed rgba(255,255,255,.22);
+      border-radius:10px;
+    }
+    .guide-safe{ border-style: solid; border-color: rgba(96,165,250,.28); }
+    .item{
+      position:absolute;
+      left:80px; top:80px;
+      min-width: 40px; min-height: 28px;
+      user-select:none;
+      border:1px solid transparent;
+      border-radius:10px;
+    }
+    .item.selected{border-color: rgba(96,165,250,.7); box-shadow: 0 0 0 3px rgba(96,165,250,.18)}
+    .item .content{
+      width:100%; height:100%;
+      border-radius:10px;
+      overflow:hidden;
+    }
+    .textBox{
+      padding:10px 12px;
+      color:#fff;
+      white-space:pre-wrap;
+      line-height:1.2;
+      font-weight:700;
+    }
+    .shape{ width:100%; height:100%; }
+    .shape.rect{border-radius:12px}
+    .handle{
+      position:absolute;
+      width:12px; height:12px;
+      border-radius:4px;
+      background: rgba(229,231,235,.9);
+      border:1px solid rgba(0,0,0,.25);
+      right:-6px; bottom:-6px;
+      cursor: nwse-resize;
+      display:none;
+    }
+    .item.selected .handle{display:block}
+    .img{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
+      border-radius:10px;
+    }
+    .small{font-size:11px}
+    .divider{height:1px; background:var(--line); margin:12px 0}
+    .status{
+      padding:10px 12px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:12px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      background: rgba(15,23,42,.55);
+    }
+    .zoom{ width:140px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- LEFT PANEL -->
+    <aside class="panel">
+      <div class="title panel-inner">
+        <h1>Digital Flyer Maker</h1>
+        <div class="badge" id="badgeSize">A4 • 96DPI Edit</div>
+      </div>
+
+      <div class="panel-inner">
+        <div class="group">
+          <h2>Canvas</h2>
+
+          <label>Flyer Size</label>
+          <select id="sizePreset"></select>
+
+          <div class="row">
+            <div>
+              <label>Orientation</label>
+              <select id="orientation">
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+            <div>
+              <label>Background Color</label>
+              <input id="bgColor" type="color" value="#0b1220">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="inline">
+              <input id="scaleLayout" type="checkbox" checked />
+              <label for="scaleLayout" style="margin:0;color:var(--text)">Scale layout when resizing</label>
+            </div>
+            <div class="inline">
+              <input id="showGuides" type="checkbox" />
+              <label for="showGuides" style="margin:0;color:var(--text)">Show print guides</label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Show Grid</label>
+              <button id="toggleGrid" class="primary" type="button">Toggle</button>
+            </div>
+            <div>
+              <label>Export DPI</label>
+              <select id="exportDpi">
+                <option value="96">96 (Web)</option>
+                <option value="150">150 (Print)</option>
+                <option value="300" selected>300 (Pro Print)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <label>Preset</label>
+          <div class="btns">
+            <button type="button" class="primary" id="presetBusiness">Business (Black/Blue)</button>
+            <button type="button" id="presetLuxe">Luxe (Black/Gold)</button>
+            <button type="button" id="presetClean">Clean (Light)</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btns">
+            <button type="button" class="ok" id="exportPng">Export PNG</button>
+            <button type="button" id="downloadJson">Save JSON</button>
+            <button type="button" id="uploadJsonBtn">Load JSON</button>
+            <input id="uploadJson" type="file" accept="application/json" hidden>
+          </div>
+
+          <p class="hint small" style="margin:10px 0 0">
+            Tips: Click an element to edit. Drag to move. Drag the corner handle to resize.
+            <br/>Shortcuts: <b>Del</b> delete • <b>Ctrl/Cmd + D</b> duplicate • Arrow keys nudge • <b>Shift</b> = faster.
+          </p>
+        </div>
+
+        <div class="group">
+          <h2>Add Elements</h2>
+          <div class="btns">
+            <button type="button" class="primary" id="addHeadline">Add Headline</button>
+            <button type="button" id="addBody">Add Text</button>
+            <button type="button" id="addButton">Add CTA Button</button>
+            <button type="button" id="addRect">Add Rectangle</button>
+            <button type="button" id="addCircle">Add Circle</button>
+          </div>
+
+          <label>Upload Image / Logo</label>
+          <input id="imgUpload" type="file" accept="image/*" />
+          <p class="hint small" style="margin:8px 0 0">Uploads stay local in your browser.</p>
+        </div>
+
+        <div class="group">
+          <h2>Selected Element</h2>
+
+          <div id="noSelection" class="hint">Select something on the flyer to edit its style.</div>
+
+          <div id="editPanel" style="display:none">
+            <label>Type</label>
+            <input id="elType" type="text" disabled />
+
+            <div class="row">
+              <div>
+                <label>X</label>
+                <input id="posX" type="number" />
+              </div>
+              <div>
+                <label>Y</label>
+                <input id="posY" type="number" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Width</label>
+                <input id="sizeW" type="number" />
+              </div>
+              <div>
+                <label>Height</label>
+                <input id="sizeH" type="number" />
+              </div>
+            </div>
+
+            <div id="textControls">
+              <label>Text</label>
+              <textarea id="textValue"></textarea>
+
+              <div class="row">
+                <div>
+                  <label>Font Size</label>
+                  <input id="fontSize" type="number" min="8" max="160" />
+                </div>
+                <div>
+                  <label>Weight</label>
+                  <select id="fontWeight">
+                    <option value="400">400</option>
+                    <option value="600">600</option>
+                    <option value="700" selected>700</option>
+                    <option value="800">800</option>
+                    <option value="900">900</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <label>Text Color</label>
+                  <input id="textColor" type="color" value="#ffffff">
+                </div>
+                <div>
+                  <label>Align</label>
+                  <select id="textAlign">
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+
+              <label>Background (Text Box)</label>
+              <input id="textBg" type="color" value="#000000">
+              <label>Background Opacity</label>
+              <input id="textBgAlpha" type="number" min="0" max="1" step="0.05" value="0">
+              <p class="hint small">Set opacity to 0 for transparent text background.</p>
+            </div>
+
+            <div id="shapeControls">
+              <div class="row">
+                <div>
+                  <label>Fill</label>
+                  <input id="shapeFill" type="color" value="#60a5fa">
+                </div>
+                <div>
+                  <label>Opacity</label>
+                  <input id="shapeAlpha" type="number" min="0" max="1" step="0.05" value="0.25">
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <label>Border</label>
+                  <input id="shapeBorder" type="color" value="#60a5fa">
+                </div>
+                <div>
+                  <label>Border Width</label>
+                  <input id="shapeBorderW" type="number" min="0" max="20" value="1">
+                </div>
+              </div>
+              <label>Corner Radius (Rect)</label>
+              <input id="shapeRadius" type="number" min="0" max="80" value="12">
+            </div>
+
+            <div id="imageControls">
+              <label>Image Fit</label>
+              <select id="imgFit">
+                <option value="cover">Cover</option>
+                <option value="contain">Contain</option>
+              </select>
+              <label>Corner Radius</label>
+              <input id="imgRadius" type="number" min="0" max="80" value="10">
+            </div>
+
+            <div class="divider"></div>
+
+            <label>Arrange</label>
+            <div class="btns">
+              <button type="button" id="bringFront">Bring Front</button>
+              <button type="button" id="sendBack">Send Back</button>
+              <button type="button" id="alignLeft">Align Left</button>
+              <button type="button" id="alignCenter">Align Center</button>
+              <button type="button" id="alignRight">Align Right</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="btns">
+              <button type="button" class="danger" id="deleteEl">Delete</button>
+              <button type="button" id="duplicateEl">Duplicate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT CANVAS -->
+    <main class="canvasWrap">
+      <div class="topbar">
+        <div class="left">
+          <span class="kbd" id="topSize">A4</span>
+          <span class="kbd" id="topPx">794×1123 px</span>
+          <span class="kbd">Click • Drag • Resize</span>
+        </div>
+        <div class="right">
+          <span class="kbd">Zoom</span>
+          <input class="zoom" id="zoom" type="range" min="40" max="140" value="100">
+          <span class="kbd" id="zoomLabel">100%</span>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="paper" id="paper">
+          <div class="gridOverlay"></div>
+          <div class="guides">
+            <div class="guide-bleed" id="guideBleed"></div>
+            <div class="guide-safe" id="guideSafe"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status">
+        <div id="statusLeft">No selection</div>
+        <div id="statusRight">Ready</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== Utilities =====
+    const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+    const rgba = (hex, a=1) => {
+      const h = hex.replace("#","").trim();
+      const full = h.length === 3 ? h.split("").map(x=>x+x).join("") : h;
+      const r = parseInt(full.slice(0,2),16);
+      const g = parseInt(full.slice(2,4),16);
+      const b = parseInt(full.slice(4,6),16);
+      return `rgba(${r},${g},${b},${a})`;
+    };
+    const inchesToPx = (inches, dpi) => Math.round(inches * dpi);
+
+    // ===== Size presets (inches) =====
+    const SIZE_PRESETS = {
+      a4:        { label: "A4 (8.27×11.69 in)", wIn: 8.27, hIn: 11.69 },
+      letter:    { label: "Letter (8.5×11 in)", wIn: 8.5,  hIn: 11 },
+      a5:        { label: "A5 (5.83×8.27 in)", wIn: 5.83, hIn: 8.27 },
+      half:      { label: "Half-page (5.5×8.5 in)", wIn: 5.5,  hIn: 8.5 },
+      quarter:   { label: "Quarter-page (4.25×5.5 in)", wIn: 4.25, hIn: 5.5 },
+      postcard4x6:{ label: "Postcard (4×6 in)", wIn: 4,    hIn: 6 },
+      postcard6x9:{ label: "Postcard (6×9 in)", wIn: 6,    hIn: 9 },
+      rack35:    { label: "Rack card (3.5×8.5 in)", wIn: 3.5,  hIn: 8.5 },
+      rack367:   { label: "Rack card (3.67×8.5 in)", wIn: 3.67, hIn: 8.5 },
+    };
+
+    // ===== Core DOM =====
+    const paper = document.getElementById("paper");
+    const bgColor = document.getElementById("bgColor");
+    const toggleGrid = document.getElementById("toggleGrid");
+    const statusLeft = document.getElementById("statusLeft");
+    const statusRight = document.getElementById("statusRight");
+    const zoom = document.getElementById("zoom");
+    const zoomLabel = document.getElementById("zoomLabel");
+    const badgeSize = document.getElementById("badgeSize");
+    const topSize = document.getElementById("topSize");
+    const topPx = document.getElementById("topPx");
+
+    const sizePreset = document.getElementById("sizePreset");
+    const orientation = document.getElementById("orientation");
+    const scaleLayout = document.getElementById("scaleLayout");
+    const exportDpi = document.getElementById("exportDpi");
+    const showGuides = document.getElementById("showGuides");
+    const guideBleed = document.getElementById("guideBleed");
+    const guideSafe = document.getElementById("guideSafe");
+
+    // ===== App state =====
+    const EDIT_DPI = 96;             // keep editing stable
+    const BLEED_IN = 0.125;          // 1/8 inch
+    const SAFE_IN = 0.25;            // 1/4 inch
+
+    let canvasPresetKey = "a4";
+    let canvasLandscape = false;
+
+    let elements = [];
+    let selectedId = null;
+    let drag = null;    // {id, startX, startY, elX, elY}
+    let resize = null;  // {id, startX, startY, w, h}
+    let zCounter = 1;
+
+    // ===== Helpers =====
+    function setStatus(left, right){
+      statusLeft.textContent = left;
+      statusRight.textContent = right;
+    }
+    function getSelected(){
+      return elements.find(e=>e.id === selectedId) || null;
+    }
+
+    function currentCanvasInches(){
+      const p = SIZE_PRESETS[canvasPresetKey] || SIZE_PRESETS.a4;
+      let wIn = p.wIn, hIn = p.hIn;
+      if(canvasLandscape) [wIn,hIn] = [hIn,wIn];
+      return { wIn, hIn, label: p.label.split(" (")[0] };
+    }
+    function currentCanvasPx(){
+      const { wIn, hIn } = currentCanvasInches();
+      return { wPx: inchesToPx(wIn, EDIT_DPI), hPx: inchesToPx(hIn, EDIT_DPI) };
+    }
+
+    function updateSizeLabels(){
+      const p = SIZE_PRESETS[canvasPresetKey] || SIZE_PRESETS.a4;
+      const base = p.label.split(" (")[0];
+      const { wPx, hPx } = currentCanvasPx();
+      const { wIn, hIn } = currentCanvasInches();
+      badgeSize.textContent = `${base} • ${canvasLandscape ? "Landscape" : "Portrait"} • 96DPI Edit`;
+      topSize.textContent = `${base} (${canvasLandscape ? "Land" : "Port"})`;
+      topPx.textContent = `${wPx}×${hPx} px`;
+      // print guides
+      const bleedPx = inchesToPx(BLEED_IN, EDIT_DPI);
+      const safePx  = inchesToPx(SAFE_IN, EDIT_DPI);
+      guideBleed.style.inset = `${bleedPx}px`;
+      guideSafe.style.inset  = `${safePx}px`;
+      guideBleed.title = `Bleed: ${BLEED_IN}"`;
+      guideSafe.title  = `Safe margin: ${SAFE_IN}"`;
+    }
+
+    function applyCanvasSize({presetKey, landscape, scale}){
+      const oldW = paper.clientWidth;
+      const oldH = paper.clientHeight;
+
+      canvasPresetKey = presetKey;
+      canvasLandscape = landscape;
+
+      const { wPx, hPx } = currentCanvasPx();
+
+      paper.style.width  = wPx + "px";
+      paper.style.height = hPx + "px";
+
+      if(scale && oldW && oldH){
+        const sx = wPx / oldW;
+        const sy = hPx / oldH;
+        const sFont = Math.min(sx, sy);
+        for(const el of elements){
+          el.x *= sx; el.y *= sy; el.w *= sx; el.h *= sy;
+          if(el.type === "text") el.fontSize *= sFont;
+        }
+      }
+
+      // clamp inside bounds
+      for(const el of elements){
+        el.x = clamp(el.x, 0, wPx - 10);
+        el.y = clamp(el.y, 0, hPx - 10);
+        el.w = clamp(el.w, 30, wPx - el.x);
+        el.h = clamp(el.h, 24, hPx - el.y);
+        if(el.type === "text") el.fontSize = clamp(el.fontSize, 8, 240);
+      }
+
+      updateSizeLabels();
+      render();
+      updateEditPanel(false);
+      setStatus("Canvas resized", `${wPx}×${hPx}px`);
+    }
+
+    // ===== Element creation =====
+    function addText(opts={}){
+      const id = uid();
+      const el = {
+        id,
+        type: "text",
+        x: opts.x ?? 70,
+        y: opts.y ?? 90,
+        w: opts.w ?? 520,
+        h: opts.h ?? 90,
+        z: ++zCounter,
+        text: opts.text ?? "Your Headline Here",
+        fontSize: opts.fontSize ?? 54,
+        fontWeight: opts.fontWeight ?? 800,
+        color: opts.color ?? "#ffffff",
+        align: opts.align ?? "left",
+        bg: opts.bg ?? "#000000",
+        bgAlpha: opts.bgAlpha ?? 0
+      };
+      elements.push(el);
+      render();
+      select(id);
+    }
+
+    function addShape(kind="rect", opts={}){
+      const id = uid();
+      const el = {
+        id,
+        type: "shape",
+        kind,
+        x: opts.x ?? 60,
+        y: opts.y ?? 60,
+        w: opts.w ?? (kind === "circle" ? 180 : 680),
+        h: opts.h ?? (kind === "circle" ? 180 : 140),
+        z: ++zCounter,
+        fill: opts.fill ?? "#60a5fa",
+        alpha: opts.alpha ?? 0.18,
+        border: opts.border ?? "#60a5fa",
+        borderW: opts.borderW ?? 1,
+        radius: opts.radius ?? 12,
+      };
+      elements.push(el);
+      render();
+      select(id);
+    }
+
+    function addButton(opts={}){
+      const id = uid();
+      const el = {
+        id,
+        type: "text",
+        x: opts.x ?? 70,
+        y: opts.y ?? (paper.clientHeight ? Math.max(70, paper.clientHeight - 220) : 860),
+        w: opts.w ?? 420,
+        h: opts.h ?? 80,
+        z: ++zCounter,
+        text: opts.text ?? "WhatsApp: 062 388 1570",
+        fontSize: opts.fontSize ?? 28,
+        fontWeight: opts.fontWeight ?? 900,
+        color: opts.color ?? "#0b1220",
+        align: opts.align ?? "center",
+        bg: opts.bg ?? "#60a5fa",
+        bgAlpha: opts.bgAlpha ?? 1
+      };
+      elements.push(el);
+      render();
+      select(id);
+    }
+
+    function addImage(dataUrl, opts={}){
+      const id = uid();
+      const el = {
+        id,
+        type: "image",
+        x: opts.x ?? 520,
+        y: opts.y ?? 240,
+        w: opts.w ?? 220,
+        h: opts.h ?? 220,
+        z: ++zCounter,
+        src: dataUrl,
+        fit: opts.fit ?? "cover",
+        radius: opts.radius ?? 10
+      };
+      elements.push(el);
+      render();
+      select(id);
+    }
+
+    function clearAll(){
+      elements = [];
+      selectedId = null;
+      zCounter = 1;
+      render();
+      updateEditPanel();
+      setStatus("No selection", "Cleared");
+    }
+
+    // ===== Rendering =====
+    function render(){
+      paper.querySelectorAll(".item").forEach(n=>n.remove());
+      paper.style.background = bgColor.value;
+
+      const sorted = [...elements].sort((a,b)=>a.z-b.z);
+
+      for(const el of sorted){
+        const node = document.createElement("div");
+        node.className = "item";
+        node.dataset.id = el.id;
+        node.style.left = el.x + "px";
+        node.style.top = el.y + "px";
+        node.style.width = el.w + "px";
+        node.style.height = el.h + "px";
+        node.style.zIndex = el.z;
+
+        if(el.id === selectedId) node.classList.add("selected");
+
+        const content = document.createElement("div");
+        content.className = "content";
+
+        if(el.type === "text"){
+          const t = document.createElement("div");
+          t.className = "textBox";
+          t.textContent = el.text;
+          t.style.fontSize = el.fontSize + "px";
+          t.style.fontWeight = el.fontWeight;
+          t.style.color = el.color;
+          t.style.textAlign = el.align;
+          t.style.background = rgba(el.bg, el.bgAlpha);
+          t.style.width = "100%";
+          t.style.height = "100%";
+          t.style.display = "flex";
+          t.style.alignItems = "center";
+          t.style.justifyContent = el.align === "left" ? "flex-start" : (el.align === "center" ? "center" : "flex-end");
+          content.appendChild(t);
+        }
+
+        if(el.type === "shape"){
+          const s = document.createElement("div");
+          s.className = "shape " + (el.kind === "circle" ? "circle" : "rect");
+          s.style.background = rgba(el.fill, el.alpha);
+          s.style.border = `${el.borderW}px solid ${rgba(el.border, 1)}`;
+          s.style.width = "100%";
+          s.style.height = "100%";
+          if(el.kind === "circle"){
+            s.style.borderRadius = "999px";
+          } else {
+            s.style.borderRadius = (el.radius ?? 12) + "px";
+          }
+          content.appendChild(s);
+        }
+
+        if(el.type === "image"){
+          const img = document.createElement("img");
+          img.className = "img";
+          img.src = el.src;
+          img.style.objectFit = el.fit || "cover";
+          img.style.borderRadius = (el.radius ?? 10) + "px";
+          content.appendChild(img);
+        }
+
+        const handle = document.createElement("div");
+        handle.className = "handle";
+        handle.title = "Resize";
+
+        node.appendChild(content);
+        node.appendChild(handle);
+
+        node.addEventListener("mousedown", (e) => {
+          const isHandle = e.target.classList.contains("handle");
+          if(isHandle){
+            e.preventDefault();
+            select(el.id);
+            startResize(e, el.id);
+            return;
+          }
+          e.preventDefault();
+          select(el.id);
+          startDrag(e, el.id);
+        });
+
+        paper.appendChild(node);
+      }
+
+      paper.onmousedown = (e) => {
+        if(e.target === paper || e.target.classList.contains("gridOverlay") || e.target.classList.contains("guides") || e.target.classList.contains("guide-bleed") || e.target.classList.contains("guide-safe")){
+          selectedId = null;
+          updateEditPanel();
+          render();
+          setStatus("No selection", "Ready");
+        }
+      };
+    }
+
+    function select(id){
+      selectedId = id;
+      updateEditPanel();
+      render();
+      const el = getSelected();
+      if(el) setStatus(`${el.type.toUpperCase()} selected`, `x:${Math.round(el.x)} y:${Math.round(el.y)} w:${Math.round(el.w)} h:${Math.round(el.h)}`);
+    }
+
+    // ===== Dragging / Resizing =====
+    function startDrag(e, id){
+      const el = elements.find(x=>x.id===id);
+      if(!el) return;
+      drag = { id, startX: e.clientX, startY: e.clientY, elX: el.x, elY: el.y };
+      window.addEventListener("mousemove", onDragMove);
+      window.addEventListener("mouseup", onDragEnd, { once:true });
+    }
+    function onDragMove(e){
+      if(!drag) return;
+      const el = elements.find(x=>x.id===drag.id);
+      if(!el) return;
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      el.x = clamp(drag.elX + dx, 0, paper.clientWidth - 10);
+      el.y = clamp(drag.elY + dy, 0, paper.clientHeight - 10);
+      render();
+      updateEditPanel(false);
+      setStatus("Moving", `x:${Math.round(el.x)} y:${Math.round(el.y)}`);
+    }
+    function onDragEnd(){
+      drag = null;
+      window.removeEventListener("mousemove", onDragMove);
+      const el = getSelected();
+      if(el) setStatus(`${el.type.toUpperCase()} selected`, "Moved");
+    }
+
+    function startResize(e, id){
+      const el = elements.find(x=>x.id===id);
+      if(!el) return;
+      resize = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
+      window.addEventListener("mousemove", onResizeMove);
+      window.addEventListener("mouseup", onResizeEnd, { once:true });
+    }
+    function onResizeMove(e){
+      if(!resize) return;
+      const el = elements.find(x=>x.id===resize.id);
+      if(!el) return;
+      const dx = e.clientX - resize.startX;
+      const dy = e.clientY - resize.startY;
+      el.w = clamp(resize.w + dx, 30, paper.clientWidth - el.x);
+      el.h = clamp(resize.h + dy, 24, paper.clientHeight - el.y);
+      render();
+      updateEditPanel(false);
+      setStatus("Resizing", `w:${Math.round(el.w)} h:${Math.round(el.h)}`);
+    }
+    function onResizeEnd(){
+      resize = null;
+      window.removeEventListener("mousemove", onResizeMove);
+      const el = getSelected();
+      if(el) setStatus(`${el.type.toUpperCase()} selected`, "Resized");
+    }
+
+    // ===== Controls =====
+    const noSelection = document.getElementById("noSelection");
+    const editPanel = document.getElementById("editPanel");
+    const elType = document.getElementById("elType");
+    const posX = document.getElementById("posX");
+    const posY = document.getElementById("posY");
+    const sizeW = document.getElementById("sizeW");
+    const sizeH = document.getElementById("sizeH");
+
+    const textControls = document.getElementById("textControls");
+    const textValue = document.getElementById("textValue");
+    const fontSize = document.getElementById("fontSize");
+    const fontWeight = document.getElementById("fontWeight");
+    const textColor = document.getElementById("textColor");
+    const textAlign = document.getElementById("textAlign");
+    const textBg = document.getElementById("textBg");
+    const textBgAlpha = document.getElementById("textBgAlpha");
+
+    const shapeControls = document.getElementById("shapeControls");
+    const shapeFill = document.getElementById("shapeFill");
+    const shapeAlpha = document.getElementById("shapeAlpha");
+    const shapeBorder = document.getElementById("shapeBorder");
+    const shapeBorderW = document.getElementById("shapeBorderW");
+    const shapeRadius = document.getElementById("shapeRadius");
+
+    const imageControls = document.getElementById("imageControls");
+    const imgFit = document.getElementById("imgFit");
+    const imgRadius = document.getElementById("imgRadius");
+
+    function updateEditPanel(){
+      const el = getSelected();
+      if(!el){
+        noSelection.style.display = "block";
+        editPanel.style.display = "none";
+        return;
+      }
+      noSelection.style.display = "none";
+      editPanel.style.display = "block";
+
+      elType.value = el.type + (el.type==="shape" ? ` (${el.kind})` : "");
+      posX.value = Math.round(el.x);
+      posY.value = Math.round(el.y);
+      sizeW.value = Math.round(el.w);
+      sizeH.value = Math.round(el.h);
+
+      textControls.style.display = (el.type === "text") ? "block" : "none";
+      shapeControls.style.display = (el.type === "shape") ? "block" : "none";
+      imageControls.style.display = (el.type === "image") ? "block" : "none";
+
+      if(el.type === "text"){
+        textValue.value = el.text;
+        fontSize.value = Math.round(el.fontSize);
+        fontWeight.value = String(el.fontWeight);
+        textColor.value = el.color;
+        textAlign.value = el.align;
+        textBg.value = el.bg;
+        textBgAlpha.value = el.bgAlpha;
+      }
+
+      if(el.type === "shape"){
+        shapeFill.value = el.fill;
+        shapeAlpha.value = el.alpha;
+        shapeBorder.value = el.border;
+        shapeBorderW.value = el.borderW;
+        shapeRadius.value = el.radius ?? 12;
+      }
+
+      if(el.type === "image"){
+        imgFit.value = el.fit || "cover";
+        imgRadius.value = el.radius ?? 10;
+      }
+    }
+
+    function updateEditPanelQuiet(){ /* keep inputs in sync while dragging */
+      const el = getSelected();
+      if(!el) return;
+      posX.value = Math.round(el.x);
+      posY.value = Math.round(el.y);
+      sizeW.value = Math.round(el.w);
+      sizeH.value = Math.round(el.h);
+    }
+
+    function bindInput(input, fn){
+      input.addEventListener("input", () => {
+        const el = getSelected();
+        if(!el) return;
+        fn(el);
+        render();
+        updateEditPanelQuiet();
+      });
+    }
+
+    bindInput(posX, (el)=> el.x = clamp(Number(posX.value)||0, 0, paper.clientWidth-10));
+    bindInput(posY, (el)=> el.y = clamp(Number(posY.value)||0, 0, paper.clientHeight-10));
+    bindInput(sizeW, (el)=> el.w = clamp(Number(sizeW.value)||50, 30, paper.clientWidth - el.x));
+    bindInput(sizeH, (el)=> el.h = clamp(Number(sizeH.value)||30, 24, paper.clientHeight - el.y));
+
+    bindInput(textValue, (el)=> el.text = textValue.value);
+    bindInput(fontSize, (el)=> el.fontSize = clamp(Number(fontSize.value)||16, 8, 240));
+    bindInput(fontWeight, (el)=> el.fontWeight = Number(fontWeight.value)||700);
+    bindInput(textColor, (el)=> el.color = textColor.value);
+    bindInput(textAlign, (el)=> el.align = textAlign.value);
+    bindInput(textBg, (el)=> el.bg = textBg.value);
+    bindInput(textBgAlpha, (el)=> el.bgAlpha = clamp(Number(textBgAlpha.value)||0, 0, 1));
+
+    bindInput(shapeFill, (el)=> el.fill = shapeFill.value);
+    bindInput(shapeAlpha, (el)=> el.alpha = clamp(Number(shapeAlpha.value)||0, 0, 1));
+    bindInput(shapeBorder, (el)=> el.border = shapeBorder.value);
+    bindInput(shapeBorderW, (el)=> el.borderW = clamp(Number(shapeBorderW.value)||0, 0, 30));
+    bindInput(shapeRadius, (el)=> el.radius = clamp(Number(shapeRadius.value)||0, 0, 120));
+
+    bindInput(imgFit, (el)=> el.fit = imgFit.value);
+    bindInput(imgRadius, (el)=> el.radius = clamp(Number(imgRadius.value)||0, 0, 120));
+
+    // Keep edit panel synced during drag/resize
+    function updateEditPanel(push){
+      // shim for existing calls
+      const el = getSelected();
+      if(!el){
+        noSelection.style.display = "block";
+        editPanel.style.display = "none";
+        return;
+      }
+      noSelection.style.display = "none";
+      editPanel.style.display = "block";
+      updateEditPanelQuiet();
+      elType.value = el.type + (el.type==="shape" ? ` (${el.kind})` : "");
+      if(el.type === "text"){
+        textValue.value = el.text;
+        fontSize.value = Math.round(el.fontSize);
+        fontWeight.value = String(el.fontWeight);
+        textColor.value = el.color;
+        textAlign.value = el.align;
+        textBg.value = el.bg;
+        textBgAlpha.value = el.bgAlpha;
+      }
+      if(el.type === "shape"){
+        shapeFill.value = el.fill;
+        shapeAlpha.value = el.alpha;
+        shapeBorder.value = el.border;
+        shapeBorderW.value = el.borderW;
+        shapeRadius.value = el.radius ?? 12;
+      }
+      if(el.type === "image"){
+        imgFit.value = el.fit || "cover";
+        imgRadius.value = el.radius ?? 10;
+      }
+      textControls.style.display = (el.type === "text") ? "block" : "none";
+      shapeControls.style.display = (el.type === "shape") ? "block" : "none";
+      imageControls.style.display = (el.type === "image") ? "block" : "none";
+    }
+
+    // ===== Add buttons =====
+    document.getElementById("addHeadline").onclick = () => addText({
+      text:"Your Business Name",
+      fontSize: 62,
+      fontWeight: 900,
+      x: 70, y: 110, w: Math.min(650, paper.clientWidth - 140), h: 120,
+      align:"left",
+      bg:"#000000", bgAlpha:0
+    });
+
+    document.getElementById("addBody").onclick = () => addText({
+      text:"Your business is real. Your work is solid.\nNow let your online presence match that.",
+      fontSize: 28,
+      fontWeight: 700,
+      x: 70, y: 260, w: Math.min(650, paper.clientWidth - 140), h: 150,
+      align:"left",
+      bg:"#000000", bgAlpha:0
+    });
+
+    document.getElementById("addButton").onclick = () => addButton({});
+
+    document.getElementById("addRect").onclick = () => addShape("rect",{});
+    document.getElementById("addCircle").onclick = () => addShape("circle",{ w: 220, h: 220, x: Math.max(40, paper.clientWidth - 280), y: 220 });
+
+    // ===== Image upload =====
+    document.getElementById("imgUpload").addEventListener("change", (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => addImage(reader.result, {});
+      reader.readAsDataURL(f);
+      e.target.value = "";
+    });
+
+    // ===== Grid / Guides =====
+    toggleGrid.onclick = () => paper.classList.toggle("show-grid");
+    showGuides.addEventListener("change", ()=> {
+      paper.classList.toggle("show-guides", showGuides.checked);
+    });
+
+    // ===== Presets =====
+    function applyPreset(p){
+      bgColor.value = p.bg;
+      paper.style.background = p.bg;
+
+      clearAll();
+
+      addShape("rect", { x: 40, y: 40, w: Math.max(240, paper.clientWidth - 80), h: 220, fill: p.accent, alpha: 0.18, border: p.accent, borderW: 1, radius: 18 });
+      addShape("circle", { x: Math.max(40, paper.clientWidth - 280), y: 210, w: 240, h: 240, fill: p.accent2, alpha: 0.18, border: p.accent2, borderW: 1 });
+
+      addText({ x: 70, y: 90, w: Math.min(600, paper.clientWidth - 140), h: 120, text: p.headline, fontSize: 62, fontWeight: 900, color: p.text, align:"left", bg:"#000000", bgAlpha:0 });
+      addText({ x: 70, y: 240, w: Math.min(620, paper.clientWidth - 140), h: 150, text: p.body, fontSize: 28, fontWeight: 700, color: p.text, align:"left", bg:"#000000", bgAlpha:0 });
+
+      addText({ x: 70, y: 420, w: Math.min(650, paper.clientWidth - 140), h: 70, text: p.bullets, fontSize: 22, fontWeight: 700, color: p.muted, align:"left", bg:"#000000", bgAlpha:0 });
+
+      addButton({ x: 70, y: Math.max(70, paper.clientHeight - 220), w: Math.min(520, paper.clientWidth - 140), h: 86, text: p.cta, fontSize: 30, fontWeight: 900, color: p.bg, align:"center", bg: p.accent, bgAlpha: 1 });
+
+      addText({ x: 70, y: Math.max(70, paper.clientHeight - 120), w: Math.min(650, paper.clientWidth - 140), h: 70, text: p.footer, fontSize: 18, fontWeight: 700, color: p.muted, align:"left", bg:"#000000", bgAlpha:0 });
+
+      selectedId = null;
+      updateEditPanel();
+      render();
+      setStatus("Preset applied", "Ready");
+    }
+
+    document.getElementById("presetBusiness").onclick = () => applyPreset({
+      bg:"#0b1220", text:"#ffffff", muted:"#cbd5e1",
+      accent:"#60a5fa", accent2:"#a78bfa",
+      headline:"Logic Lab",
+      body:"A clean website. No nonsense.\nMake your business easy to find online.",
+      bullets:"• Websites • Landing Pages • WhatsApp Booking\n• Fast delivery • Mobile-first • Professional",
+      cta:"WhatsApp: 062 388 1570",
+      footer:"Tell us your business name + what you need. We'll handle the rest."
+    });
+
+    document.getElementById("presetLuxe").onclick = () => applyPreset({
+      bg:"#070a12", text:"#fff7ed", muted:"#e2e8f0",
+      accent:"#d4af37", accent2:"#f5d06f",
+      headline:"Premium Brand",
+      body:"Luxury look. Clean layout.\nDesigned to sell without talking too much.",
+      bullets:"• Premium Flyer • Menu • Price List\n• Social Media Posters • Print-ready",
+      cta:"Book Now: 062 388 1570",
+      footer:"High-end design that looks expensive."
+    });
+
+    document.getElementById("presetClean").onclick = () => applyPreset({
+      bg:"#f8fafc", text:"#0b1220", muted:"#334155",
+      accent:"#2563eb", accent2:"#0ea5e9",
+      headline:"Your Business",
+      body:"Simple. Clear. Professional.\nMade to get customers to contact you.",
+      bullets:"• Clean design • Clear pricing • Strong call-to-action",
+      cta:"Contact: 062 388 1570",
+      footer:"Export as PNG and post it anywhere."
+    });
+
+    // ===== Arrange / Align =====
+    document.getElementById("bringFront").onclick = () => {
+      const el = getSelected(); if(!el) return;
+      el.z = ++zCounter; render(); setStatus("Arranged", "Bring Front");
+    };
+
+    document.getElementById("sendBack").onclick = () => {
+      const el = getSelected(); if(!el) return;
+      el.z = 1;
+      elements = elements.sort((a,b)=>a.z-b.z).map((e,i)=>({ ...e, z:i+1 }));
+      zCounter = elements.length + 1;
+      render(); setStatus("Arranged", "Send Back");
+    };
+
+    document.getElementById("alignLeft").onclick = () => {
+      const el = getSelected(); if(!el) return;
+      el.x = 20; render(); updateEditPanel(false);
+    };
+    document.getElementById("alignCenter").onclick = () => {
+      const el = getSelected(); if(!el) return;
+      el.x = Math.round((paper.clientWidth - el.w)/2);
+      render(); updateEditPanel(false);
+    };
+    document.getElementById("alignRight").onclick = () => {
+      const el = getSelected(); if(!el) return;
+      el.x = Math.round(paper.clientWidth - el.w - 20);
+      render(); updateEditPanel(false);
+    };
+
+    // ===== Delete / Duplicate =====
+    function removeSelected(){
+      if(!selectedId) return;
+      elements = elements.filter(e=>e.id !== selectedId);
+      selectedId = null;
+      render();
+      updateEditPanel();
+      setStatus("Deleted", "Ready");
+    }
+
+    function duplicateSelected(){
+      const el = getSelected(); if(!el) return;
+      const copy = JSON.parse(JSON.stringify(el));
+      copy.id = uid();
+      copy.x = clamp(copy.x + 20, 0, paper.clientWidth - 10);
+      copy.y = clamp(copy.y + 20, 0, paper.clientHeight - 10);
+      copy.z = ++zCounter;
+      elements.push(copy);
+      render();
+      select(copy.id);
+      setStatus("Duplicated", "Ready");
+    }
+
+    document.getElementById("deleteEl").onclick = removeSelected;
+    document.getElementById("duplicateEl").onclick = duplicateSelected;
+
+    // ===== Keyboard shortcuts =====
+    window.addEventListener("keydown", (e)=>{
+      const el = getSelected();
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+
+      if(mod && e.key.toLowerCase() === "d"){
+        e.preventDefault();
+        duplicateSelected();
+        return;
+      }
+      if(e.key === "Delete" || e.key === "Backspace"){
+        if(selectedId){
+          e.preventDefault();
+          removeSelected();
+        }
+        return;
+      }
+      if(!el) return;
+
+      const step = e.shiftKey ? 10 : 2;
+      if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){
+        e.preventDefault();
+        if(e.key==="ArrowLeft") el.x = clamp(el.x - step, 0, paper.clientWidth-10);
+        if(e.key==="ArrowRight") el.x = clamp(el.x + step, 0, paper.clientWidth-10);
+        if(e.key==="ArrowUp") el.y = clamp(el.y - step, 0, paper.clientHeight-10);
+        if(e.key==="ArrowDown") el.y = clamp(el.y + step, 0, paper.clientHeight-10);
+        render();
+        updateEditPanel(false);
+      }
+    });
+
+    // ===== Zoom =====
+    zoom.addEventListener("input", ()=>{
+      const z = Number(zoom.value) / 100;
+      paper.style.transform = `scale(${z})`;
+      zoomLabel.textContent = `${zoom.value}%`;
+    });
+    paper.style.transform = "scale(1)";
+
+    // ===== Background =====
+    bgColor.addEventListener("input", ()=> paper.style.background = bgColor.value);
+
+    // ===== Size preset UI =====
+    function initSizeDropdown(){
+      const order = ["a4","letter","a5","half","quarter","postcard4x6","postcard6x9","rack35","rack367"];
+      for(const key of order){
+        const p = SIZE_PRESETS[key];
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = p.label;
+        sizePreset.appendChild(opt);
+      }
+      sizePreset.value = canvasPresetKey;
+    }
+
+    function onCanvasSettingsChange(){
+      const presetKey = sizePreset.value;
+      const landscape = (orientation.value === "landscape");
+      const scale = !!scaleLayout.checked;
+      applyCanvasSize({ presetKey, landscape, scale });
+    }
+
+    sizePreset.addEventListener("change", onCanvasSettingsChange);
+    orientation.addEventListener("change", onCanvasSettingsChange);
+    scaleLayout.addEventListener("change", ()=> setStatus("Scale layout", scaleLayout.checked ? "ON" : "OFF"));
+
+    // ===== Export PNG with DPI scaling =====
+    async function exportToPng(){
+      const exportDpiVal = Number(exportDpi.value) || 300;
+      const scale = exportDpiVal / EDIT_DPI;
+
+      setStatus("Exporting...", `PNG @ ${exportDpiVal} DPI`);
+
+      const clone = paper.cloneNode(true);
+      clone.classList.remove("show-grid");
+      clone.classList.remove("show-guides");
+      clone.querySelectorAll(".gridOverlay").forEach(n=>n.remove());
+      clone.querySelectorAll(".guides").forEach(n=>n.remove());
+      clone.querySelectorAll(".item").forEach(n=>n.classList.remove("selected"));
+
+      const w = paper.clientWidth;
+      const h = paper.clientHeight;
+      const outW = Math.round(w * scale);
+      const outH = Math.round(h * scale);
+
+      const serializer = new XMLSerializer();
+      const html = serializer.serializeToString(clone);
+
+      // We render the original-size DOM, then scale it up inside the SVG.
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml"
+                 style="transform: scale(${scale}); transform-origin: top left; width:${w}px; height:${h}px;">
+              ${html}
+            </div>
+          </foreignObject>
+        </svg>
+      `;
+
+      const svgBlob = new Blob([svg], {type:"image/svg+xml;charset=utf-8"});
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = outW;
+        canvas.height = outH;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob((blob)=>{
+          if(!blob){
+            setStatus("Export failed", "Try Chrome");
+            alert("Export failed in this browser. Try Chrome.");
+            return;
+          }
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `flyer_${canvasPresetKey}_${canvasLandscape ? "land" : "port"}_${exportDpiVal}dpi.png`;
+          a.click();
+          setStatus("Exported", a.download);
+        }, "image/png");
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        setStatus("Export failed", "Try Chrome");
+        alert("Export failed in this browser. Try Chrome.");
+      };
+      img.src = url;
+    }
+    document.getElementById("exportPng").onclick = exportToPng;
+
+    // ===== Save / Load JSON (includes size + orientation) =====
+    function toJSON(){
+      return JSON.stringify({
+        version: 2,
+        editDpi: EDIT_DPI,
+        presetKey: canvasPresetKey,
+        landscape: canvasLandscape,
+        background: bgColor.value,
+        showGuides: !!showGuides.checked,
+        elements
+      }, null, 2);
+    }
+
+    function download(filename, text){
+      const blob = new Blob([text], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    document.getElementById("downloadJson").onclick = () => {
+      download("flyer.json", toJSON());
+      setStatus("Saved", "flyer.json downloaded");
+    };
+
+    document.getElementById("uploadJsonBtn").onclick = () => {
+      document.getElementById("uploadJson").click();
+    };
+
+    document.getElementById("uploadJson").addEventListener("change", (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+          if(!data || !Array.isArray(data.elements)) throw new Error("Invalid file");
+
+          // restore canvas settings
+          canvasPresetKey = data.presetKey && SIZE_PRESETS[data.presetKey] ? data.presetKey : "a4";
+          canvasLandscape = !!data.landscape;
+
+          sizePreset.value = canvasPresetKey;
+          orientation.value = canvasLandscape ? "landscape" : "portrait";
+
+          bgColor.value = data.background || "#0b1220";
+          paper.style.background = bgColor.value;
+
+          elements = data.elements;
+          zCounter = elements.reduce((m,x)=>Math.max(m, x.z||1), 1);
+
+          showGuides.checked = !!data.showGuides;
+          paper.classList.toggle("show-guides", showGuides.checked);
+
+          applyCanvasSize({ presetKey: canvasPresetKey, landscape: canvasLandscape, scale: false });
+
+          selectedId = null;
+          render();
+          updateEditPanel();
+          setStatus("Loaded", "JSON applied");
+        }catch(err){
+          alert("Invalid JSON file.");
+        }
+      };
+      reader.readAsText(f);
+      e.target.value = "";
+    });
+
+    // ===== Init =====
+    initSizeDropdown();
+
+    // default size: A4 portrait (96dpi)
+    sizePreset.value = "a4";
+    orientation.value = "portrait";
+    applyCanvasSize({ presetKey: "a4", landscape: false, scale: false });
+
+    // default start: business preset
+    document.getElementById("presetBusiness").click();
+  </script>
+</body>
+</html>
