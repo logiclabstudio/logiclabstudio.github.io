@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Digital Flyer Maker</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Digital Flyer Maker Pro</title>
   <style>
     :root{
       --bg:#0b0f19;
@@ -13,8 +13,10 @@
       --text:#e5e7eb;
       --line:rgba(255,255,255,.12);
       --accent:#60a5fa;
+      --accent2:#a78bfa;
       --danger:#fb7185;
       --ok:#22c55e;
+      --warn:#fbbf24;
       --radius:16px;
       --shadow: 0 16px 50px rgba(0,0,0,.45);
     }
@@ -23,14 +25,33 @@
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 800px at 20% 10%, rgba(96,165,250,.18), transparent 60%),
-                  radial-gradient(900px 700px at 90% 20%, rgba(167,139,250,.14), transparent 55%),
-                  linear-gradient(180deg, #070a12, var(--bg));
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(96,165,250,.18), transparent 60%),
+        radial-gradient(900px 700px at 90% 20%, rgba(167,139,250,.14), transparent 55%),
+        linear-gradient(180deg, #070a12, var(--bg));
       color:var(--text);
     }
+
+    /* ===== Print-to-PDF mode =====
+       We use window.print() with @page size injected via JS.
+       UI is hidden, canvas fills the page, margins set to 0. */
+    @media print {
+      body{ background:#fff !important; }
+      .panel, .topbar, .status{ display:none !important; }
+      .app{ display:block !important; padding:0 !important; }
+      .canvasWrap{ border:none !important; box-shadow:none !important; }
+      .stage{ padding:0 !important; overflow:visible !important; }
+      .paper{
+        transform:none !important;
+        box-shadow:none !important;
+        border:none !important;
+        border-radius:0 !important;
+      }
+    }
+
     .app{
       display:grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns: 420px 1fr;
       gap:16px;
       padding:16px;
       height:100%;
@@ -55,7 +76,32 @@
       border:1px solid var(--line); color:var(--muted); background: rgba(255,255,255,.03);
       white-space:nowrap;
     }
-    .group{margin-top:12px; padding:12px; border:1px solid var(--line); border-radius:14px; background: rgba(17,24,39,.55)}
+    .tabs{
+      display:flex; gap:10px; margin-top:12px;
+    }
+    .tab{
+      flex:1;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      cursor:pointer;
+      font-weight:700;
+      text-align:center;
+    }
+    .tab.active{
+      color:var(--text);
+      border-color: rgba(96,165,250,.45);
+      background: linear-gradient(180deg, rgba(96,165,250,.18), rgba(96,165,250,.08));
+    }
+    .group{
+      margin-top:12px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background: rgba(17,24,39,.55)
+    }
     .group h2{margin:0 0 10px; font-size:12px; color:#cbd5e1; letter-spacing:.35px}
     label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
     input[type="text"], input[type="number"], textarea, select{
@@ -76,7 +122,6 @@
       border-radius:12px;
       padding:4px;
     }
-    input[type="checkbox"]{transform: translateY(1px);}
     .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
     .row3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
     .inline{
@@ -93,14 +138,17 @@
       background: rgba(255,255,255,.06);
       border:1px solid var(--line);
       color:var(--text);
-      font-weight:600;
+      font-weight:700;
       letter-spacing:.2px;
     }
     button:hover{border-color: rgba(255,255,255,.22)}
     .primary{background: linear-gradient(180deg, rgba(96,165,250,.22), rgba(96,165,250,.12)); border-color: rgba(96,165,250,.35)}
     .danger{background: rgba(251,113,133,.12); border-color: rgba(251,113,133,.35)}
     .ok{background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.35)}
+    .warn{background: rgba(251,191,36,.10); border-color: rgba(251,191,36,.35)}
     .hint{font-size:12px; color:var(--muted); line-height:1.35}
+    .divider{height:1px; background:var(--line); margin:12px 0}
+
     .canvasWrap{
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border:1px solid var(--line);
@@ -128,6 +176,7 @@
       border-radius:999px;
       background: rgba(255,255,255,.03)
     }
+
     .stage{
       flex:1;
       display:flex;
@@ -135,10 +184,13 @@
       justify-content:center;
       padding:16px;
       overflow:auto;
+      background:
+        linear-gradient(0deg, rgba(255,255,255,.03), rgba(255,255,255,.03)),
+        repeating-conic-gradient(from 45deg, rgba(255,255,255,.03) 0 25%, transparent 0 50%) 0/28px 28px;
     }
+
     .paper{
       position:relative;
-      /* size is set dynamically via JS (px based on editing DPI) */
       width: 794px;
       height:1123px;
       background:#0b1220;
@@ -159,6 +211,7 @@
       display:none;
     }
     .paper.show-grid .gridOverlay{display:block}
+
     .guides{
       pointer-events:none;
       position:absolute; inset:0;
@@ -171,6 +224,26 @@
       border-radius:10px;
     }
     .guide-safe{ border-style: solid; border-color: rgba(96,165,250,.28); }
+
+    .centerGuides{
+      pointer-events:none;
+      position:absolute; inset:0;
+      display:none;
+    }
+    .paper.show-centers .centerGuides{display:block}
+    .centerGuides::before,
+    .centerGuides::after{
+      content:"";
+      position:absolute;
+      background: rgba(167,139,250,.25);
+    }
+    .centerGuides::before{ /* vertical */
+      width:2px; top:0; bottom:0; left:50%; transform: translateX(-1px);
+    }
+    .centerGuides::after{ /* horizontal */
+      height:2px; left:0; right:0; top:50%; transform: translateY(-1px);
+    }
+
     .item{
       position:absolute;
       left:80px; top:80px;
@@ -180,6 +253,8 @@
       border-radius:10px;
     }
     .item.selected{border-color: rgba(96,165,250,.7); box-shadow: 0 0 0 3px rgba(96,165,250,.18)}
+    .item.locked{opacity:.9}
+    .item.hidden{display:none}
     .item .content{
       width:100%; height:100%;
       border-radius:10px;
@@ -193,7 +268,6 @@
       font-weight:700;
     }
     .shape{ width:100%; height:100%; }
-    .shape.rect{border-radius:12px}
     .handle{
       position:absolute;
       width:12px; height:12px;
@@ -211,8 +285,7 @@
       display:block;
       border-radius:10px;
     }
-    .small{font-size:11px}
-    .divider{height:1px; background:var(--line); margin:12px 0}
+
     .status{
       padding:10px 12px;
       border-top:1px solid var(--line);
@@ -221,7 +294,58 @@
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
       background: rgba(15,23,42,.55);
     }
+
     .zoom{ width:140px; }
+
+    /* Layers list */
+    .layersList{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:8px;
+    }
+    .layerRow{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .layerRow.active{
+      border-color: rgba(96,165,250,.5);
+      background: rgba(96,165,250,.10);
+    }
+    .layerTitle{
+      display:flex; flex-direction:column; gap:2px;
+      min-width:0;
+    }
+    .layerTitle .name{
+      font-weight:800; font-size:12px; color:var(--text);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .layerTitle .meta{
+      font-size:11px; color:var(--muted);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .layerBtns{
+      display:flex; gap:6px;
+    }
+    .iconBtn{
+      width:34px; height:34px;
+      display:grid; place-items:center;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      cursor:pointer;
+    }
+    .iconBtn:hover{border-color: rgba(255,255,255,.22)}
+    .iconBtn svg{width:16px; height:16px; opacity:.9}
+    .iconBtn.danger{border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.10)}
+    .iconBtn.warn{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.10)}
+    .iconBtn.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10)}
   </style>
 </head>
 <body>
@@ -229,224 +353,305 @@
     <!-- LEFT PANEL -->
     <aside class="panel">
       <div class="title panel-inner">
-        <h1>Digital Flyer Maker</h1>
+        <h1>Digital Flyer Maker Pro</h1>
         <div class="badge" id="badgeSize">A4 • 96DPI Edit</div>
       </div>
 
       <div class="panel-inner">
-        <div class="group">
-          <h2>Canvas</h2>
-
-          <label>Flyer Size</label>
-          <select id="sizePreset"></select>
-
-          <div class="row">
-            <div>
-              <label>Orientation</label>
-              <select id="orientation">
-                <option value="portrait">Portrait</option>
-                <option value="landscape">Landscape</option>
-              </select>
-            </div>
-            <div>
-              <label>Background Color</label>
-              <input id="bgColor" type="color" value="#0b1220">
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="inline">
-              <input id="scaleLayout" type="checkbox" checked />
-              <label for="scaleLayout" style="margin:0;color:var(--text)">Scale layout when resizing</label>
-            </div>
-            <div class="inline">
-              <input id="showGuides" type="checkbox" />
-              <label for="showGuides" style="margin:0;color:var(--text)">Show print guides</label>
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Show Grid</label>
-              <button id="toggleGrid" class="primary" type="button">Toggle</button>
-            </div>
-            <div>
-              <label>Export DPI</label>
-              <select id="exportDpi">
-                <option value="96">96 (Web)</option>
-                <option value="150">150 (Print)</option>
-                <option value="300" selected>300 (Pro Print)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <label>Preset</label>
-          <div class="btns">
-            <button type="button" class="primary" id="presetBusiness">Business (Black/Blue)</button>
-            <button type="button" id="presetLuxe">Luxe (Black/Gold)</button>
-            <button type="button" id="presetClean">Clean (Light)</button>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="btns">
-            <button type="button" class="ok" id="exportPng">Export PNG</button>
-            <button type="button" id="downloadJson">Save JSON</button>
-            <button type="button" id="uploadJsonBtn">Load JSON</button>
-            <input id="uploadJson" type="file" accept="application/json" hidden>
-          </div>
-
-          <p class="hint small" style="margin:10px 0 0">
-            Tips: Click an element to edit. Drag to move. Drag the corner handle to resize.
-            <br/>Shortcuts: <b>Del</b> delete • <b>Ctrl/Cmd + D</b> duplicate • Arrow keys nudge • <b>Shift</b> = faster.
-          </p>
+        <div class="tabs">
+          <div class="tab active" id="tabDesign">Design</div>
+          <div class="tab" id="tabLayers">Layers</div>
         </div>
 
-        <div class="group">
-          <h2>Add Elements</h2>
-          <div class="btns">
-            <button type="button" class="primary" id="addHeadline">Add Headline</button>
-            <button type="button" id="addBody">Add Text</button>
-            <button type="button" id="addButton">Add CTA Button</button>
-            <button type="button" id="addRect">Add Rectangle</button>
-            <button type="button" id="addCircle">Add Circle</button>
-          </div>
+        <!-- DESIGN TAB -->
+        <div id="designTab">
+          <div class="group">
+            <h2>Canvas</h2>
 
-          <label>Upload Image / Logo</label>
-          <input id="imgUpload" type="file" accept="image/*" />
-          <p class="hint small" style="margin:8px 0 0">Uploads stay local in your browser.</p>
-        </div>
-
-        <div class="group">
-          <h2>Selected Element</h2>
-
-          <div id="noSelection" class="hint">Select something on the flyer to edit its style.</div>
-
-          <div id="editPanel" style="display:none">
-            <label>Type</label>
-            <input id="elType" type="text" disabled />
+            <label>Flyer Size</label>
+            <select id="sizePreset"></select>
 
             <div class="row">
               <div>
-                <label>X</label>
-                <input id="posX" type="number" />
+                <label>Orientation</label>
+                <select id="orientation">
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
               </div>
               <div>
-                <label>Y</label>
-                <input id="posY" type="number" />
+                <label>Background Color</label>
+                <input id="bgColor" type="color" value="#0b1220">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="inline">
+                <input id="scaleLayout" type="checkbox" checked />
+                <label for="scaleLayout" style="margin:0;color:var(--text)">Scale layout when resizing</label>
+              </div>
+              <div class="inline">
+                <input id="snapToGrid" type="checkbox" checked />
+                <label for="snapToGrid" style="margin:0;color:var(--text)">Snap to grid (10px)</label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="inline">
+                <input id="showGuides" type="checkbox" />
+                <label for="showGuides" style="margin:0;color:var(--text)">Show print guides</label>
+              </div>
+              <div class="inline">
+                <input id="showCenters" type="checkbox" />
+                <label for="showCenters" style="margin:0;color:var(--text)">Show center lines</label>
               </div>
             </div>
 
             <div class="row">
               <div>
-                <label>Width</label>
-                <input id="sizeW" type="number" />
+                <label>Show Grid</label>
+                <button id="toggleGrid" class="primary" type="button">Toggle</button>
               </div>
               <div>
-                <label>Height</label>
-                <input id="sizeH" type="number" />
+                <label>Export DPI</label>
+                <select id="exportDpi">
+                  <option value="96">96 (Web)</option>
+                  <option value="150">150 (Print)</option>
+                  <option value="300" selected>300 (Pro Print)</option>
+                </select>
               </div>
-            </div>
-
-            <div id="textControls">
-              <label>Text</label>
-              <textarea id="textValue"></textarea>
-
-              <div class="row">
-                <div>
-                  <label>Font Size</label>
-                  <input id="fontSize" type="number" min="8" max="160" />
-                </div>
-                <div>
-                  <label>Weight</label>
-                  <select id="fontWeight">
-                    <option value="400">400</option>
-                    <option value="600">600</option>
-                    <option value="700" selected>700</option>
-                    <option value="800">800</option>
-                    <option value="900">900</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="row">
-                <div>
-                  <label>Text Color</label>
-                  <input id="textColor" type="color" value="#ffffff">
-                </div>
-                <div>
-                  <label>Align</label>
-                  <select id="textAlign">
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
-              </div>
-
-              <label>Background (Text Box)</label>
-              <input id="textBg" type="color" value="#000000">
-              <label>Background Opacity</label>
-              <input id="textBgAlpha" type="number" min="0" max="1" step="0.05" value="0">
-              <p class="hint small">Set opacity to 0 for transparent text background.</p>
-            </div>
-
-            <div id="shapeControls">
-              <div class="row">
-                <div>
-                  <label>Fill</label>
-                  <input id="shapeFill" type="color" value="#60a5fa">
-                </div>
-                <div>
-                  <label>Opacity</label>
-                  <input id="shapeAlpha" type="number" min="0" max="1" step="0.05" value="0.25">
-                </div>
-              </div>
-              <div class="row">
-                <div>
-                  <label>Border</label>
-                  <input id="shapeBorder" type="color" value="#60a5fa">
-                </div>
-                <div>
-                  <label>Border Width</label>
-                  <input id="shapeBorderW" type="number" min="0" max="20" value="1">
-                </div>
-              </div>
-              <label>Corner Radius (Rect)</label>
-              <input id="shapeRadius" type="number" min="0" max="80" value="12">
-            </div>
-
-            <div id="imageControls">
-              <label>Image Fit</label>
-              <select id="imgFit">
-                <option value="cover">Cover</option>
-                <option value="contain">Contain</option>
-              </select>
-              <label>Corner Radius</label>
-              <input id="imgRadius" type="number" min="0" max="80" value="10">
             </div>
 
             <div class="divider"></div>
 
-            <label>Arrange</label>
+            <label>Templates</label>
             <div class="btns">
-              <button type="button" id="bringFront">Bring Front</button>
-              <button type="button" id="sendBack">Send Back</button>
-              <button type="button" id="alignLeft">Align Left</button>
-              <button type="button" id="alignCenter">Align Center</button>
-              <button type="button" id="alignRight">Align Right</button>
+              <button type="button" class="primary" id="tplBusiness">Business Offer</button>
+              <button type="button" id="tplSalon">Salon / Barber</button>
+              <button type="button" id="tplEvent">Event Night</button>
+              <button type="button" id="tplRestaurant">Restaurant Promo</button>
             </div>
 
             <div class="divider"></div>
 
             <div class="btns">
-              <button type="button" class="danger" id="deleteEl">Delete</button>
-              <button type="button" id="duplicateEl">Duplicate</button>
+              <button type="button" class="ok" id="exportPng">Export PNG</button>
+              <button type="button" class="primary" id="exportPdf">Export PDF</button>
+              <button type="button" id="downloadJson">Save JSON</button>
+              <button type="button" id="uploadJsonBtn">Load JSON</button>
+              <input id="uploadJson" type="file" accept="application/json" hidden>
+            </div>
+
+            <p class="hint" style="margin:10px 0 0">
+              Shortcuts: <b>Del</b> delete • <b>Ctrl/Cmd + D</b> duplicate • Arrow keys nudge • <b>Shift</b> = faster.
+              <br/>PDF export uses your browser print dialog → choose “Save as PDF”.
+            </p>
+          </div>
+
+          <div class="group">
+            <h2>Add Elements</h2>
+            <div class="btns">
+              <button type="button" class="primary" id="addHeadline">Add Headline</button>
+              <button type="button" id="addBody">Add Text</button>
+              <button type="button" id="addCta">Add CTA Button</button>
+              <button type="button" id="addRect">Add Rectangle</button>
+              <button type="button" id="addCircle">Add Circle</button>
+            </div>
+
+            <label>Upload Image / Logo</label>
+            <input id="imgUpload" type="file" accept="image/*" />
+            <p class="hint" style="margin:8px 0 0">Uploads stay local in your browser.</p>
+          </div>
+
+          <div class="group">
+            <h2>Selected Element</h2>
+
+            <div id="noSelection" class="hint">Select something on the flyer to edit its style.</div>
+
+            <div id="editPanel" style="display:none">
+              <label>Name</label>
+              <input id="elName" type="text" placeholder="Layer name (optional)"/>
+
+              <label>Type</label>
+              <input id="elType" type="text" disabled />
+
+              <div class="row">
+                <div>
+                  <label>X</label>
+                  <input id="posX" type="number" />
+                </div>
+                <div>
+                  <label>Y</label>
+                  <input id="posY" type="number" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <label>Width</label>
+                  <input id="sizeW" type="number" />
+                </div>
+                <div>
+                  <label>Height</label>
+                  <input id="sizeH" type="number" />
+                </div>
+              </div>
+
+              <div id="textControls">
+                <label>Text</label>
+                <textarea id="textValue"></textarea>
+
+                <div class="row3">
+                  <div>
+                    <label>Font</label>
+                    <select id="fontFamily">
+                      <option value="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" selected>System Sans</option>
+                      <option value="Georgia, 'Times New Roman', Times, serif">Serif</option>
+                      <option value="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace">Mono</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Size</label>
+                    <input id="fontSize" type="number" min="8" max="220" />
+                  </div>
+                  <div>
+                    <label>Weight</label>
+                    <select id="fontWeight">
+                      <option value="400">400</option>
+                      <option value="600">600</option>
+                      <option value="700" selected>700</option>
+                      <option value="800">800</option>
+                      <option value="900">900</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row3">
+                  <div>
+                    <label>Text Color</label>
+                    <input id="textColor" type="color" value="#ffffff">
+                  </div>
+                  <div>
+                    <label>Align</label>
+                    <select id="textAlign">
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Line Height</label>
+                    <input id="lineHeight" type="number" min="0.8" max="2.4" step="0.05" value="1.2">
+                  </div>
+                </div>
+
+                <div class="row3">
+                  <div>
+                    <label>Letter Spacing</label>
+                    <input id="letterSpacing" type="number" min="-2" max="10" step="0.25" value="0">
+                  </div>
+                  <div>
+                    <label>Padding</label>
+                    <input id="textPad" type="number" min="0" max="60" step="1" value="12">
+                  </div>
+                  <div>
+                    <label>BG Opacity</label>
+                    <input id="textBgAlpha" type="number" min="0" max="1" step="0.05" value="0">
+                  </div>
+                </div>
+
+                <label>Background (Text Box)</label>
+                <input id="textBg" type="color" value="#000000">
+              </div>
+
+              <div id="shapeControls">
+                <div class="row3">
+                  <div>
+                    <label>Fill</label>
+                    <input id="shapeFill" type="color" value="#60a5fa">
+                  </div>
+                  <div>
+                    <label>Opacity</label>
+                    <input id="shapeAlpha" type="number" min="0" max="1" step="0.05" value="0.25">
+                  </div>
+                  <div>
+                    <label>Border Width</label>
+                    <input id="shapeBorderW" type="number" min="0" max="20" value="1">
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label>Border</label>
+                    <input id="shapeBorder" type="color" value="#60a5fa">
+                  </div>
+                  <div>
+                    <label>Corner Radius (Rect)</label>
+                    <input id="shapeRadius" type="number" min="0" max="120" value="12">
+                  </div>
+                </div>
+              </div>
+
+              <div id="imageControls">
+                <div class="row">
+                  <div>
+                    <label>Image Fit</label>
+                    <select id="imgFit">
+                      <option value="cover">Cover</option>
+                      <option value="contain">Contain</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Corner Radius</label>
+                    <input id="imgRadius" type="number" min="0" max="120" value="10">
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <label>Arrange</label>
+              <div class="btns">
+                <button type="button" id="bringFront">Bring Front</button>
+                <button type="button" id="sendBack">Send Back</button>
+                <button type="button" id="alignLeft">Align Left</button>
+                <button type="button" id="alignCenter">Align Center</button>
+                <button type="button" id="alignRight">Align Right</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="btns">
+                <button type="button" class="danger" id="deleteEl">Delete</button>
+                <button type="button" id="duplicateEl">Duplicate</button>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- LAYERS TAB -->
+        <div id="layersTab" style="display:none">
+          <div class="group">
+            <h2>Layers</h2>
+            <div class="hint">Top = front. Use the icons to hide/lock, or move layers up/down.</div>
+            <div class="layersList" id="layersList"></div>
+            <div class="divider"></div>
+            <div class="btns">
+              <button type="button" class="warn" id="moveUp">Move Up</button>
+              <button type="button" class="warn" id="moveDown">Move Down</button>
+              <button type="button" class="danger" id="deleteLayer">Delete</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <h2>Quick Actions</h2>
+            <div class="btns">
+              <button type="button" id="selectTop">Select Top Layer</button>
+              <button type="button" id="selectBottom">Select Bottom Layer</button>
+              <button type="button" class="danger" id="clearAll">Clear Canvas</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </aside>
 
@@ -456,7 +661,7 @@
         <div class="left">
           <span class="kbd" id="topSize">A4</span>
           <span class="kbd" id="topPx">794×1123 px</span>
-          <span class="kbd">Click • Drag • Resize</span>
+          <span class="kbd">Snap + Guides + PDF</span>
         </div>
         <div class="right">
           <span class="kbd">Zoom</span>
@@ -465,9 +670,10 @@
         </div>
       </div>
 
-      <div class="stage" id="stage">
+      <div class="stage">
         <div class="paper" id="paper">
           <div class="gridOverlay"></div>
+          <div class="centerGuides"></div>
           <div class="guides">
             <div class="guide-bleed" id="guideBleed"></div>
             <div class="guide-safe" id="guideSafe"></div>
@@ -509,7 +715,7 @@
       rack367:   { label: "Rack card (3.67×8.5 in)", wIn: 3.67, hIn: 8.5 },
     };
 
-    // ===== Core DOM =====
+    // ===== DOM =====
     const paper = document.getElementById("paper");
     const bgColor = document.getElementById("bgColor");
     const toggleGrid = document.getElementById("toggleGrid");
@@ -526,58 +732,95 @@
     const scaleLayout = document.getElementById("scaleLayout");
     const exportDpi = document.getElementById("exportDpi");
     const showGuides = document.getElementById("showGuides");
+    const showCenters = document.getElementById("showCenters");
+    const snapToGrid = document.getElementById("snapToGrid");
     const guideBleed = document.getElementById("guideBleed");
     const guideSafe = document.getElementById("guideSafe");
 
-    // ===== App state =====
-    const EDIT_DPI = 96;             // keep editing stable
-    const BLEED_IN = 0.125;          // 1/8 inch
-    const SAFE_IN = 0.25;            // 1/4 inch
+    const layersList = document.getElementById("layersList");
+
+    // Tabs
+    const tabDesign = document.getElementById("tabDesign");
+    const tabLayers = document.getElementById("tabLayers");
+    const designTab = document.getElementById("designTab");
+    const layersTab = document.getElementById("layersTab");
+
+    // Selected edit
+    const noSelection = document.getElementById("noSelection");
+    const editPanel = document.getElementById("editPanel");
+    const elName = document.getElementById("elName");
+    const elType = document.getElementById("elType");
+    const posX = document.getElementById("posX");
+    const posY = document.getElementById("posY");
+    const sizeW = document.getElementById("sizeW");
+    const sizeH = document.getElementById("sizeH");
+
+    const textControls = document.getElementById("textControls");
+    const textValue = document.getElementById("textValue");
+    const fontFamily = document.getElementById("fontFamily");
+    const fontSize = document.getElementById("fontSize");
+    const fontWeight = document.getElementById("fontWeight");
+    const textColor = document.getElementById("textColor");
+    const textAlign = document.getElementById("textAlign");
+    const lineHeight = document.getElementById("lineHeight");
+    const letterSpacing = document.getElementById("letterSpacing");
+    const textPad = document.getElementById("textPad");
+    const textBg = document.getElementById("textBg");
+    const textBgAlpha = document.getElementById("textBgAlpha");
+
+    const shapeControls = document.getElementById("shapeControls");
+    const shapeFill = document.getElementById("shapeFill");
+    const shapeAlpha = document.getElementById("shapeAlpha");
+    const shapeBorder = document.getElementById("shapeBorder");
+    const shapeBorderW = document.getElementById("shapeBorderW");
+    const shapeRadius = document.getElementById("shapeRadius");
+
+    const imageControls = document.getElementById("imageControls");
+    const imgFit = document.getElementById("imgFit");
+    const imgRadius = document.getElementById("imgRadius");
+
+    // ===== State =====
+    const EDIT_DPI = 96;
+    const BLEED_IN = 0.125;
+    const SAFE_IN  = 0.25;
+    const SNAP = 10;
 
     let canvasPresetKey = "a4";
     let canvasLandscape = false;
 
     let elements = [];
     let selectedId = null;
-    let drag = null;    // {id, startX, startY, elX, elY}
-    let resize = null;  // {id, startX, startY, w, h}
+    let drag = null;
+    let resize = null;
     let zCounter = 1;
 
     // ===== Helpers =====
-    function setStatus(left, right){
-      statusLeft.textContent = left;
-      statusRight.textContent = right;
-    }
-    function getSelected(){
-      return elements.find(e=>e.id === selectedId) || null;
-    }
+    function setStatus(left, right){ statusLeft.textContent = left; statusRight.textContent = right; }
+    function getSelected(){ return elements.find(e=>e.id===selectedId) || null; }
 
     function currentCanvasInches(){
       const p = SIZE_PRESETS[canvasPresetKey] || SIZE_PRESETS.a4;
       let wIn = p.wIn, hIn = p.hIn;
       if(canvasLandscape) [wIn,hIn] = [hIn,wIn];
-      return { wIn, hIn, label: p.label.split(" (")[0] };
+      return { wIn, hIn, base: p.label.split(" (")[0] };
     }
     function currentCanvasPx(){
       const { wIn, hIn } = currentCanvasInches();
       return { wPx: inchesToPx(wIn, EDIT_DPI), hPx: inchesToPx(hIn, EDIT_DPI) };
     }
+    function snap(n){ return snapToGrid.checked ? Math.round(n / SNAP) * SNAP : n; }
 
     function updateSizeLabels(){
-      const p = SIZE_PRESETS[canvasPresetKey] || SIZE_PRESETS.a4;
-      const base = p.label.split(" (")[0];
       const { wPx, hPx } = currentCanvasPx();
-      const { wIn, hIn } = currentCanvasInches();
+      const { base } = currentCanvasInches();
       badgeSize.textContent = `${base} • ${canvasLandscape ? "Landscape" : "Portrait"} • 96DPI Edit`;
       topSize.textContent = `${base} (${canvasLandscape ? "Land" : "Port"})`;
       topPx.textContent = `${wPx}×${hPx} px`;
-      // print guides
+
       const bleedPx = inchesToPx(BLEED_IN, EDIT_DPI);
-      const safePx  = inchesToPx(SAFE_IN, EDIT_DPI);
+      const safePx  = inchesToPx(SAFE_IN,  EDIT_DPI);
       guideBleed.style.inset = `${bleedPx}px`;
       guideSafe.style.inset  = `${safePx}px`;
-      guideBleed.title = `Bleed: ${BLEED_IN}"`;
-      guideSafe.title  = `Safe margin: ${SAFE_IN}"`;
     }
 
     function applyCanvasSize({presetKey, landscape, scale}){
@@ -588,7 +831,6 @@
       canvasLandscape = landscape;
 
       const { wPx, hPx } = currentCanvasPx();
-
       paper.style.width  = wPx + "px";
       paper.style.height = hPx + "px";
 
@@ -602,35 +844,71 @@
         }
       }
 
-      // clamp inside bounds
       for(const el of elements){
         el.x = clamp(el.x, 0, wPx - 10);
         el.y = clamp(el.y, 0, hPx - 10);
         el.w = clamp(el.w, 30, wPx - el.x);
         el.h = clamp(el.h, 24, hPx - el.y);
-        if(el.type === "text") el.fontSize = clamp(el.fontSize, 8, 240);
+        if(el.type === "text") el.fontSize = clamp(el.fontSize, 8, 260);
       }
 
       updateSizeLabels();
       render();
-      updateEditPanel(false);
+      updateEditPanel();
+      renderLayers();
       setStatus("Canvas resized", `${wPx}×${hPx}px`);
     }
 
-    // ===== Element creation =====
+    // ===== Print page size injection for PDF =====
+    function setPrintPageSizeCss(widthIn, heightIn){
+      const css = `@page { size: ${widthIn}in ${heightIn}in; margin: 0; }`;
+      let tag = document.getElementById("printPageSize");
+      if(!tag){
+        tag = document.createElement("style");
+        tag.id = "printPageSize";
+        document.head.appendChild(tag);
+      }
+      tag.textContent = css;
+    }
+
+    function exportPdf(){
+      const { wIn, hIn } = currentCanvasInches();
+      setPrintPageSizeCss(wIn, hIn);
+
+      const gridWas = paper.classList.contains("show-grid");
+      const guidesWas = paper.classList.contains("show-guides");
+      const centersWas = paper.classList.contains("show-centers");
+      paper.classList.remove("show-grid","show-guides","show-centers");
+
+      setStatus("Export PDF", "Use Save as PDF");
+      window.print();
+
+      paper.classList.toggle("show-grid", gridWas);
+      paper.classList.toggle("show-guides", guidesWas);
+      paper.classList.toggle("show-centers", centersWas);
+    }
+
+    // ===== Elements =====
     function addText(opts={}){
       const id = uid();
       const el = {
         id,
-        type: "text",
+        name: opts.name ?? "Text",
+        hidden:false,
+        locked:false,
+        type:"text",
         x: opts.x ?? 70,
         y: opts.y ?? 90,
         w: opts.w ?? 520,
         h: opts.h ?? 90,
         z: ++zCounter,
         text: opts.text ?? "Your Headline Here",
+        fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
         fontSize: opts.fontSize ?? 54,
         fontWeight: opts.fontWeight ?? 800,
+        lineHeight: opts.lineHeight ?? 1.2,
+        letterSpacing: opts.letterSpacing ?? 0,
+        pad: opts.pad ?? 12,
         color: opts.color ?? "#ffffff",
         align: opts.align ?? "left",
         bg: opts.bg ?? "#000000",
@@ -639,13 +917,17 @@
       elements.push(el);
       render();
       select(id);
+      renderLayers();
     }
 
     function addShape(kind="rect", opts={}){
       const id = uid();
       const el = {
         id,
-        type: "shape",
+        name: opts.name ?? (kind === "circle" ? "Circle" : "Rectangle"),
+        hidden:false,
+        locked:false,
+        type:"shape",
         kind,
         x: opts.x ?? 60,
         y: opts.y ?? 60,
@@ -661,21 +943,29 @@
       elements.push(el);
       render();
       select(id);
+      renderLayers();
     }
 
     function addButton(opts={}){
       const id = uid();
       const el = {
         id,
-        type: "text",
+        name: opts.name ?? "CTA Button",
+        hidden:false,
+        locked:false,
+        type:"text",
         x: opts.x ?? 70,
-        y: opts.y ?? (paper.clientHeight ? Math.max(70, paper.clientHeight - 220) : 860),
-        w: opts.w ?? 420,
-        h: opts.h ?? 80,
+        y: opts.y ?? Math.max(70, paper.clientHeight - 220),
+        w: opts.w ?? 520,
+        h: opts.h ?? 86,
         z: ++zCounter,
         text: opts.text ?? "WhatsApp: 062 388 1570",
-        fontSize: opts.fontSize ?? 28,
+        fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+        fontSize: opts.fontSize ?? 30,
         fontWeight: opts.fontWeight ?? 900,
+        lineHeight: opts.lineHeight ?? 1.05,
+        letterSpacing: opts.letterSpacing ?? 0,
+        pad: opts.pad ?? 14,
         color: opts.color ?? "#0b1220",
         align: opts.align ?? "center",
         bg: opts.bg ?? "#60a5fa",
@@ -684,34 +974,30 @@
       elements.push(el);
       render();
       select(id);
+      renderLayers();
     }
 
     function addImage(dataUrl, opts={}){
       const id = uid();
       const el = {
         id,
-        type: "image",
-        x: opts.x ?? 520,
-        y: opts.y ?? 240,
-        w: opts.w ?? 220,
-        h: opts.h ?? 220,
+        name: opts.name ?? "Image",
+        hidden:false,
+        locked:false,
+        type:"image",
+        x: opts.x ?? Math.max(40, paper.clientWidth - 280),
+        y: opts.y ?? 220,
+        w: opts.w ?? 240,
+        h: opts.h ?? 240,
         z: ++zCounter,
         src: dataUrl,
         fit: opts.fit ?? "cover",
-        radius: opts.radius ?? 10
+        radius: opts.radius ?? 12
       };
       elements.push(el);
       render();
       select(id);
-    }
-
-    function clearAll(){
-      elements = [];
-      selectedId = null;
-      zCounter = 1;
-      render();
-      updateEditPanel();
-      setStatus("No selection", "Cleared");
+      renderLayers();
     }
 
     // ===== Rendering =====
@@ -731,6 +1017,8 @@
         node.style.height = el.h + "px";
         node.style.zIndex = el.z;
 
+        if(el.hidden) node.classList.add("hidden");
+        if(el.locked) node.classList.add("locked");
         if(el.id === selectedId) node.classList.add("selected");
 
         const content = document.createElement("div");
@@ -740,8 +1028,12 @@
           const t = document.createElement("div");
           t.className = "textBox";
           t.textContent = el.text;
+          t.style.fontFamily = el.fontFamily || "ui-sans-serif, system-ui";
           t.style.fontSize = el.fontSize + "px";
           t.style.fontWeight = el.fontWeight;
+          t.style.lineHeight = String(el.lineHeight ?? 1.2);
+          t.style.letterSpacing = (el.letterSpacing ?? 0) + "px";
+          t.style.padding = (el.pad ?? 12) + "px";
           t.style.color = el.color;
           t.style.textAlign = el.align;
           t.style.background = rgba(el.bg, el.bgAlpha);
@@ -755,7 +1047,7 @@
 
         if(el.type === "shape"){
           const s = document.createElement("div");
-          s.className = "shape " + (el.kind === "circle" ? "circle" : "rect");
+          s.className = "shape";
           s.style.background = rgba(el.fill, el.alpha);
           s.style.border = `${el.borderW}px solid ${rgba(el.border, 1)}`;
           s.style.width = "100%";
@@ -785,6 +1077,13 @@
         node.appendChild(handle);
 
         node.addEventListener("mousedown", (e) => {
+          if(el.hidden) return;
+          if(el.locked){
+            // allow selecting locked, but no drag/resize
+            select(el.id);
+            return;
+          }
+
           const isHandle = e.target.classList.contains("handle");
           if(isHandle){
             e.preventDefault();
@@ -801,9 +1100,11 @@
       }
 
       paper.onmousedown = (e) => {
-        if(e.target === paper || e.target.classList.contains("gridOverlay") || e.target.classList.contains("guides") || e.target.classList.contains("guide-bleed") || e.target.classList.contains("guide-safe")){
+        const tgt = e.target;
+        if(tgt === paper || tgt.classList.contains("gridOverlay") || tgt.classList.contains("guides") || tgt.classList.contains("guide-bleed") || tgt.classList.contains("guide-safe") || tgt.classList.contains("centerGuides")){
           selectedId = null;
           updateEditPanel();
+          renderLayers();
           render();
           setStatus("No selection", "Ready");
         }
@@ -813,12 +1114,13 @@
     function select(id){
       selectedId = id;
       updateEditPanel();
+      renderLayers();
       render();
       const el = getSelected();
-      if(el) setStatus(`${el.type.toUpperCase()} selected`, `x:${Math.round(el.x)} y:${Math.round(el.y)} w:${Math.round(el.w)} h:${Math.round(el.h)}`);
+      if(el) setStatus(`${el.type.toUpperCase()} selected`, el.name || "");
     }
 
-    // ===== Dragging / Resizing =====
+    // ===== Drag / Resize =====
     function startDrag(e, id){
       const el = elements.find(x=>x.id===id);
       if(!el) return;
@@ -832,10 +1134,10 @@
       if(!el) return;
       const dx = e.clientX - drag.startX;
       const dy = e.clientY - drag.startY;
-      el.x = clamp(drag.elX + dx, 0, paper.clientWidth - 10);
-      el.y = clamp(drag.elY + dy, 0, paper.clientHeight - 10);
+      el.x = snap(clamp(drag.elX + dx, 0, paper.clientWidth - 10));
+      el.y = snap(clamp(drag.elY + dy, 0, paper.clientHeight - 10));
       render();
-      updateEditPanel(false);
+      updateEditPanelQuiet();
       setStatus("Moving", `x:${Math.round(el.x)} y:${Math.round(el.y)}`);
     }
     function onDragEnd(){
@@ -843,6 +1145,7 @@
       window.removeEventListener("mousemove", onDragMove);
       const el = getSelected();
       if(el) setStatus(`${el.type.toUpperCase()} selected`, "Moved");
+      renderLayers();
     }
 
     function startResize(e, id){
@@ -858,10 +1161,10 @@
       if(!el) return;
       const dx = e.clientX - resize.startX;
       const dy = e.clientY - resize.startY;
-      el.w = clamp(resize.w + dx, 30, paper.clientWidth - el.x);
-      el.h = clamp(resize.h + dy, 24, paper.clientHeight - el.y);
+      el.w = snap(clamp(resize.w + dx, 30, paper.clientWidth - el.x));
+      el.h = snap(clamp(resize.h + dy, 24, paper.clientHeight - el.y));
       render();
-      updateEditPanel(false);
+      updateEditPanelQuiet();
       setStatus("Resizing", `w:${Math.round(el.w)} h:${Math.round(el.h)}`);
     }
     function onResizeEnd(){
@@ -869,37 +1172,10 @@
       window.removeEventListener("mousemove", onResizeMove);
       const el = getSelected();
       if(el) setStatus(`${el.type.toUpperCase()} selected`, "Resized");
+      renderLayers();
     }
 
-    // ===== Controls =====
-    const noSelection = document.getElementById("noSelection");
-    const editPanel = document.getElementById("editPanel");
-    const elType = document.getElementById("elType");
-    const posX = document.getElementById("posX");
-    const posY = document.getElementById("posY");
-    const sizeW = document.getElementById("sizeW");
-    const sizeH = document.getElementById("sizeH");
-
-    const textControls = document.getElementById("textControls");
-    const textValue = document.getElementById("textValue");
-    const fontSize = document.getElementById("fontSize");
-    const fontWeight = document.getElementById("fontWeight");
-    const textColor = document.getElementById("textColor");
-    const textAlign = document.getElementById("textAlign");
-    const textBg = document.getElementById("textBg");
-    const textBgAlpha = document.getElementById("textBgAlpha");
-
-    const shapeControls = document.getElementById("shapeControls");
-    const shapeFill = document.getElementById("shapeFill");
-    const shapeAlpha = document.getElementById("shapeAlpha");
-    const shapeBorder = document.getElementById("shapeBorder");
-    const shapeBorderW = document.getElementById("shapeBorderW");
-    const shapeRadius = document.getElementById("shapeRadius");
-
-    const imageControls = document.getElementById("imageControls");
-    const imgFit = document.getElementById("imgFit");
-    const imgRadius = document.getElementById("imgRadius");
-
+    // ===== Edit Panel =====
     function updateEditPanel(){
       const el = getSelected();
       if(!el){
@@ -910,26 +1186,31 @@
       noSelection.style.display = "none";
       editPanel.style.display = "block";
 
+      elName.value = el.name || "";
       elType.value = el.type + (el.type==="shape" ? ` (${el.kind})` : "");
+
       posX.value = Math.round(el.x);
       posY.value = Math.round(el.y);
       sizeW.value = Math.round(el.w);
       sizeH.value = Math.round(el.h);
 
-      textControls.style.display = (el.type === "text") ? "block" : "none";
+      textControls.style.display  = (el.type === "text") ? "block" : "none";
       shapeControls.style.display = (el.type === "shape") ? "block" : "none";
       imageControls.style.display = (el.type === "image") ? "block" : "none";
 
       if(el.type === "text"){
         textValue.value = el.text;
+        fontFamily.value = el.fontFamily || fontFamily.value;
         fontSize.value = Math.round(el.fontSize);
         fontWeight.value = String(el.fontWeight);
+        lineHeight.value = el.lineHeight ?? 1.2;
+        letterSpacing.value = el.letterSpacing ?? 0;
+        textPad.value = el.pad ?? 12;
         textColor.value = el.color;
         textAlign.value = el.align;
         textBg.value = el.bg;
         textBgAlpha.value = el.bgAlpha;
       }
-
       if(el.type === "shape"){
         shapeFill.value = el.fill;
         shapeAlpha.value = el.alpha;
@@ -937,14 +1218,13 @@
         shapeBorderW.value = el.borderW;
         shapeRadius.value = el.radius ?? 12;
       }
-
       if(el.type === "image"){
         imgFit.value = el.fit || "cover";
-        imgRadius.value = el.radius ?? 10;
+        imgRadius.value = el.radius ?? 12;
       }
     }
 
-    function updateEditPanelQuiet(){ /* keep inputs in sync while dragging */
+    function updateEditPanelQuiet(){
       const el = getSelected();
       if(!el) return;
       posX.value = Math.round(el.x);
@@ -959,264 +1239,337 @@
         if(!el) return;
         fn(el);
         render();
+        renderLayers();
         updateEditPanelQuiet();
       });
     }
 
-    bindInput(posX, (el)=> el.x = clamp(Number(posX.value)||0, 0, paper.clientWidth-10));
-    bindInput(posY, (el)=> el.y = clamp(Number(posY.value)||0, 0, paper.clientHeight-10));
-    bindInput(sizeW, (el)=> el.w = clamp(Number(sizeW.value)||50, 30, paper.clientWidth - el.x));
-    bindInput(sizeH, (el)=> el.h = clamp(Number(sizeH.value)||30, 24, paper.clientHeight - el.y));
+    // name
+    elName.addEventListener("input", ()=>{
+      const el = getSelected(); if(!el) return;
+      el.name = elName.value;
+      renderLayers();
+      setStatus("Renamed", el.name || "");
+    });
 
+    bindInput(posX, (el)=> el.x = snap(clamp(Number(posX.value)||0, 0, paper.clientWidth-10)));
+    bindInput(posY, (el)=> el.y = snap(clamp(Number(posY.value)||0, 0, paper.clientHeight-10)));
+    bindInput(sizeW, (el)=> el.w = snap(clamp(Number(sizeW.value)||50, 30, paper.clientWidth - el.x)));
+    bindInput(sizeH, (el)=> el.h = snap(clamp(Number(sizeH.value)||30, 24, paper.clientHeight - el.y)));
+
+    // text
     bindInput(textValue, (el)=> el.text = textValue.value);
-    bindInput(fontSize, (el)=> el.fontSize = clamp(Number(fontSize.value)||16, 8, 240));
+    bindInput(fontFamily, (el)=> el.fontFamily = fontFamily.value);
+    bindInput(fontSize, (el)=> el.fontSize = clamp(Number(fontSize.value)||16, 8, 260));
     bindInput(fontWeight, (el)=> el.fontWeight = Number(fontWeight.value)||700);
+    bindInput(lineHeight, (el)=> el.lineHeight = clamp(Number(lineHeight.value)||1.2, 0.8, 2.4));
+    bindInput(letterSpacing, (el)=> el.letterSpacing = clamp(Number(letterSpacing.value)||0, -2, 10));
+    bindInput(textPad, (el)=> el.pad = clamp(Number(textPad.value)||12, 0, 60));
     bindInput(textColor, (el)=> el.color = textColor.value);
     bindInput(textAlign, (el)=> el.align = textAlign.value);
     bindInput(textBg, (el)=> el.bg = textBg.value);
     bindInput(textBgAlpha, (el)=> el.bgAlpha = clamp(Number(textBgAlpha.value)||0, 0, 1));
 
+    // shape
     bindInput(shapeFill, (el)=> el.fill = shapeFill.value);
     bindInput(shapeAlpha, (el)=> el.alpha = clamp(Number(shapeAlpha.value)||0, 0, 1));
     bindInput(shapeBorder, (el)=> el.border = shapeBorder.value);
     bindInput(shapeBorderW, (el)=> el.borderW = clamp(Number(shapeBorderW.value)||0, 0, 30));
-    bindInput(shapeRadius, (el)=> el.radius = clamp(Number(shapeRadius.value)||0, 0, 120));
+    bindInput(shapeRadius, (el)=> el.radius = clamp(Number(shapeRadius.value)||0, 0, 160));
 
+    // image
     bindInput(imgFit, (el)=> el.fit = imgFit.value);
-    bindInput(imgRadius, (el)=> el.radius = clamp(Number(imgRadius.value)||0, 0, 120));
+    bindInput(imgRadius, (el)=> el.radius = clamp(Number(imgRadius.value)||0, 0, 160));
 
-    // Keep edit panel synced during drag/resize
-    function updateEditPanel(push){
-      // shim for existing calls
-      const el = getSelected();
-      if(!el){
-        noSelection.style.display = "block";
-        editPanel.style.display = "none";
-        return;
+    // ===== Layers UI =====
+    function icon(svg){ return svg; }
+    const ICON_EYE = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`);
+    const ICON_EYE_OFF = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4"/><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c6.5 0 10 8 10 8a18.2 18.2 0 0 1-3.4 4.7"/><path d="M6.1 6.1C3.4 8.2 2 12 2 12s3.5 8 10 8a10.5 10.5 0 0 0 4.2-.9"/></svg>`);
+    const ICON_LOCK = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`);
+    const ICON_UNLOCK = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>`);
+    const ICON_UP = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`);
+    const ICON_DOWN = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`);
+
+    function renderLayers(){
+      // Show top (front) first
+      const sorted = [...elements].sort((a,b)=>b.z-a.z);
+      layersList.innerHTML = "";
+
+      for(const el of sorted){
+        const row = document.createElement("div");
+        row.className = "layerRow" + (el.id===selectedId ? " active" : "");
+        row.onclick = () => select(el.id);
+
+        const title = document.createElement("div");
+        title.className = "layerTitle";
+        const nm = document.createElement("div");
+        nm.className = "name";
+        nm.textContent = el.name || (el.type==="shape" ? (el.kind==="circle"?"Circle":"Rectangle") : el.type);
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `${el.type}${el.type==="shape" ? `/${el.kind}` : ""} • z:${el.z}` + (el.hidden ? " • hidden" : "") + (el.locked ? " • locked" : "");
+        title.appendChild(nm);
+        title.appendChild(meta);
+
+        const btns = document.createElement("div");
+        btns.className = "layerBtns";
+
+        const eye = document.createElement("div");
+        eye.className = "iconBtn";
+        eye.innerHTML = el.hidden ? ICON_EYE_OFF : ICON_EYE;
+        eye.title = el.hidden ? "Show" : "Hide";
+        eye.onclick = (ev)=>{
+          ev.stopPropagation();
+          el.hidden = !el.hidden;
+          if(el.hidden && el.id===selectedId){ selectedId=null; updateEditPanel(); }
+          render();
+          renderLayers();
+        };
+
+        const lock = document.createElement("div");
+        lock.className = "iconBtn";
+        lock.innerHTML = el.locked ? ICON_LOCK : ICON_UNLOCK;
+        lock.title = el.locked ? "Unlock" : "Lock";
+        lock.onclick = (ev)=>{
+          ev.stopPropagation();
+          el.locked = !el.locked;
+          render();
+          renderLayers();
+        };
+
+        const up = document.createElement("div");
+        up.className = "iconBtn warn";
+        up.innerHTML = ICON_UP;
+        up.title = "Move Up";
+        up.onclick = (ev)=>{ ev.stopPropagation(); moveLayer(el.id, +1); };
+
+        const down = document.createElement("div");
+        down.className = "iconBtn warn";
+        down.innerHTML = ICON_DOWN;
+        down.title = "Move Down";
+        down.onclick = (ev)=>{ ev.stopPropagation(); moveLayer(el.id, -1); };
+
+        btns.appendChild(eye);
+        btns.appendChild(lock);
+        btns.appendChild(up);
+        btns.appendChild(down);
+
+        row.appendChild(title);
+        row.appendChild(btns);
+        layersList.appendChild(row);
       }
-      noSelection.style.display = "none";
-      editPanel.style.display = "block";
-      updateEditPanelQuiet();
-      elType.value = el.type + (el.type==="shape" ? ` (${el.kind})` : "");
-      if(el.type === "text"){
-        textValue.value = el.text;
-        fontSize.value = Math.round(el.fontSize);
-        fontWeight.value = String(el.fontWeight);
-        textColor.value = el.color;
-        textAlign.value = el.align;
-        textBg.value = el.bg;
-        textBgAlpha.value = el.bgAlpha;
-      }
-      if(el.type === "shape"){
-        shapeFill.value = el.fill;
-        shapeAlpha.value = el.alpha;
-        shapeBorder.value = el.border;
-        shapeBorderW.value = el.borderW;
-        shapeRadius.value = el.radius ?? 12;
-      }
-      if(el.type === "image"){
-        imgFit.value = el.fit || "cover";
-        imgRadius.value = el.radius ?? 10;
-      }
-      textControls.style.display = (el.type === "text") ? "block" : "none";
-      shapeControls.style.display = (el.type === "shape") ? "block" : "none";
-      imageControls.style.display = (el.type === "image") ? "block" : "none";
     }
 
-    // ===== Add buttons =====
-    document.getElementById("addHeadline").onclick = () => addText({
-      text:"Your Business Name",
-      fontSize: 62,
-      fontWeight: 900,
-      x: 70, y: 110, w: Math.min(650, paper.clientWidth - 140), h: 120,
-      align:"left",
-      bg:"#000000", bgAlpha:0
-    });
-
-    document.getElementById("addBody").onclick = () => addText({
-      text:"Your business is real. Your work is solid.\nNow let your online presence match that.",
-      fontSize: 28,
-      fontWeight: 700,
-      x: 70, y: 260, w: Math.min(650, paper.clientWidth - 140), h: 150,
-      align:"left",
-      bg:"#000000", bgAlpha:0
-    });
-
-    document.getElementById("addButton").onclick = () => addButton({});
-
-    document.getElementById("addRect").onclick = () => addShape("rect",{});
-    document.getElementById("addCircle").onclick = () => addShape("circle",{ w: 220, h: 220, x: Math.max(40, paper.clientWidth - 280), y: 220 });
-
-    // ===== Image upload =====
-    document.getElementById("imgUpload").addEventListener("change", (e)=>{
-      const f = e.target.files?.[0];
-      if(!f) return;
-      const reader = new FileReader();
-      reader.onload = () => addImage(reader.result, {});
-      reader.readAsDataURL(f);
-      e.target.value = "";
-    });
-
-    // ===== Grid / Guides =====
-    toggleGrid.onclick = () => paper.classList.toggle("show-grid");
-    showGuides.addEventListener("change", ()=> {
-      paper.classList.toggle("show-guides", showGuides.checked);
-    });
-
-    // ===== Presets =====
-    function applyPreset(p){
-      bgColor.value = p.bg;
-      paper.style.background = p.bg;
-
-      clearAll();
-
-      addShape("rect", { x: 40, y: 40, w: Math.max(240, paper.clientWidth - 80), h: 220, fill: p.accent, alpha: 0.18, border: p.accent, borderW: 1, radius: 18 });
-      addShape("circle", { x: Math.max(40, paper.clientWidth - 280), y: 210, w: 240, h: 240, fill: p.accent2, alpha: 0.18, border: p.accent2, borderW: 1 });
-
-      addText({ x: 70, y: 90, w: Math.min(600, paper.clientWidth - 140), h: 120, text: p.headline, fontSize: 62, fontWeight: 900, color: p.text, align:"left", bg:"#000000", bgAlpha:0 });
-      addText({ x: 70, y: 240, w: Math.min(620, paper.clientWidth - 140), h: 150, text: p.body, fontSize: 28, fontWeight: 700, color: p.text, align:"left", bg:"#000000", bgAlpha:0 });
-
-      addText({ x: 70, y: 420, w: Math.min(650, paper.clientWidth - 140), h: 70, text: p.bullets, fontSize: 22, fontWeight: 700, color: p.muted, align:"left", bg:"#000000", bgAlpha:0 });
-
-      addButton({ x: 70, y: Math.max(70, paper.clientHeight - 220), w: Math.min(520, paper.clientWidth - 140), h: 86, text: p.cta, fontSize: 30, fontWeight: 900, color: p.bg, align:"center", bg: p.accent, bgAlpha: 1 });
-
-      addText({ x: 70, y: Math.max(70, paper.clientHeight - 120), w: Math.min(650, paper.clientWidth - 140), h: 70, text: p.footer, fontSize: 18, fontWeight: 700, color: p.muted, align:"left", bg:"#000000", bgAlpha:0 });
-
-      selectedId = null;
-      updateEditPanel();
-      render();
-      setStatus("Preset applied", "Ready");
-    }
-
-    document.getElementById("presetBusiness").onclick = () => applyPreset({
-      bg:"#0b1220", text:"#ffffff", muted:"#cbd5e1",
-      accent:"#60a5fa", accent2:"#a78bfa",
-      headline:"Logic Lab",
-      body:"A clean website. No nonsense.\nMake your business easy to find online.",
-      bullets:"• Websites • Landing Pages • WhatsApp Booking\n• Fast delivery • Mobile-first • Professional",
-      cta:"WhatsApp: 062 388 1570",
-      footer:"Tell us your business name + what you need. We'll handle the rest."
-    });
-
-    document.getElementById("presetLuxe").onclick = () => applyPreset({
-      bg:"#070a12", text:"#fff7ed", muted:"#e2e8f0",
-      accent:"#d4af37", accent2:"#f5d06f",
-      headline:"Premium Brand",
-      body:"Luxury look. Clean layout.\nDesigned to sell without talking too much.",
-      bullets:"• Premium Flyer • Menu • Price List\n• Social Media Posters • Print-ready",
-      cta:"Book Now: 062 388 1570",
-      footer:"High-end design that looks expensive."
-    });
-
-    document.getElementById("presetClean").onclick = () => applyPreset({
-      bg:"#f8fafc", text:"#0b1220", muted:"#334155",
-      accent:"#2563eb", accent2:"#0ea5e9",
-      headline:"Your Business",
-      body:"Simple. Clear. Professional.\nMade to get customers to contact you.",
-      bullets:"• Clean design • Clear pricing • Strong call-to-action",
-      cta:"Contact: 062 388 1570",
-      footer:"Export as PNG and post it anywhere."
-    });
-
-    // ===== Arrange / Align =====
-    document.getElementById("bringFront").onclick = () => {
-      const el = getSelected(); if(!el) return;
-      el.z = ++zCounter; render(); setStatus("Arranged", "Bring Front");
-    };
-
-    document.getElementById("sendBack").onclick = () => {
-      const el = getSelected(); if(!el) return;
-      el.z = 1;
+    function normalizeZ(){
+      // keep stable
       elements = elements.sort((a,b)=>a.z-b.z).map((e,i)=>({ ...e, z:i+1 }));
       zCounter = elements.length + 1;
-      render(); setStatus("Arranged", "Send Back");
-    };
+    }
 
-    document.getElementById("alignLeft").onclick = () => {
-      const el = getSelected(); if(!el) return;
-      el.x = 20; render(); updateEditPanel(false);
-    };
-    document.getElementById("alignCenter").onclick = () => {
-      const el = getSelected(); if(!el) return;
-      el.x = Math.round((paper.clientWidth - el.w)/2);
-      render(); updateEditPanel(false);
-    };
-    document.getElementById("alignRight").onclick = () => {
-      const el = getSelected(); if(!el) return;
-      el.x = Math.round(paper.clientWidth - el.w - 20);
-      render(); updateEditPanel(false);
-    };
+    function moveLayer(id, dir){
+      // dir +1 = forward (higher z), -1 = backward
+      normalizeZ();
+      const idx = elements.findIndex(e=>e.id===id);
+      if(idx<0) return;
+      const swapIdx = dir>0 ? Math.min(elements.length-1, idx+1) : Math.max(0, idx-1);
+      if(swapIdx === idx) return;
+      const tmp = elements[idx].z;
+      elements[idx].z = elements[swapIdx].z;
+      elements[swapIdx].z = tmp;
+      render();
+      renderLayers();
+    }
 
-    // ===== Delete / Duplicate =====
-    function removeSelected(){
-      if(!selectedId) return;
-      elements = elements.filter(e=>e.id !== selectedId);
+// ===== Export PNG (scaled by DPI) — FIXED (inject CSS into foreignObject) =====
+async function exportToPng(){
+  const exportDpiVal = Number(exportDpi.value) || 300;
+  const scale = exportDpiVal / EDIT_DPI;
+
+  setStatus("Exporting...", `PNG @ ${exportDpiVal} DPI`);
+
+  // Clone paper
+  const clone = paper.cloneNode(true);
+  clone.classList.remove("show-grid","show-guides","show-centers");
+  clone.querySelectorAll(".gridOverlay,.guides,.centerGuides").forEach(n=>n.remove());
+  clone.querySelectorAll(".item").forEach(n=>n.classList.remove("selected"));
+
+  // Inline background so it survives in the SVG
+  clone.style.background = bgColor.value;
+
+  const w = paper.clientWidth;
+  const h = paper.clientHeight;
+  const outW = Math.round(w * scale);
+  const outH = Math.round(h * scale);
+
+  // Pull CSS from all <style> tags in this page
+  const cssText = Array.from(document.querySelectorAll("style"))
+    .map(s => s.textContent || "")
+    .join("\n");
+
+  const serializer = new XMLSerializer();
+  const html = serializer.serializeToString(clone);
+
+  // Build SVG
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml"
+         style="width:${w}px;height:${h}px;transform:scale(${scale});transform-origin:top left;overflow:hidden;">
+      <style>${cssText}</style>
+      ${html}
+    </div>
+  </foreignObject>
+</svg>`.trim();
+
+  const svgBlob = new Blob([svg], { type:"image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = outW;
+    canvas.height = outH;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob((blob) => {
+      if(!blob){
+        setStatus("Export failed", "Canvas toBlob returned null");
+        alert("Export failed. Try Chrome or export PDF instead.");
+        return;
+      }
+
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `flyer_${canvasPresetKey}_${canvasLandscape ? "land" : "port"}_${exportDpiVal}dpi.png`;
+      a.click();
+
+      setStatus("Exported", a.download);
+    }, "image/png");
+  };
+
+  img.onerror = (e) => {
+    URL.revokeObjectURL(url);
+    console.error("SVG->IMG error:", e);
+    setStatus("Export failed", "SVG render blocked");
+    alert("Export failed: SVG render blocked. If you opened this using file://, run it using a local server.");
+  };
+
+  img.src = url;
+}
+
+
+    // ===== Save/Load =====
+    function toJSON(){
+      return JSON.stringify({
+        version: 3,
+        editDpi: EDIT_DPI,
+        presetKey: canvasPresetKey,
+        landscape: canvasLandscape,
+        background: bgColor.value,
+        showGuides: !!showGuides.checked,
+        showCenters: !!showCenters.checked,
+        snapToGrid: !!snapToGrid.checked,
+        elements
+      }, null, 2);
+    }
+    function download(filename, text){
+      const blob = new Blob([text], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    // ===== Templates (professional defaults) =====
+    function clearAll(){
+      elements = [];
       selectedId = null;
+      zCounter = 1;
       render();
+      renderLayers();
       updateEditPanel();
-      setStatus("Deleted", "Ready");
+      setStatus("Cleared", "Ready");
     }
 
-    function duplicateSelected(){
-      const el = getSelected(); if(!el) return;
-      const copy = JSON.parse(JSON.stringify(el));
-      copy.id = uid();
-      copy.x = clamp(copy.x + 20, 0, paper.clientWidth - 10);
-      copy.y = clamp(copy.y + 20, 0, paper.clientHeight - 10);
-      copy.z = ++zCounter;
-      elements.push(copy);
-      render();
-      select(copy.id);
-      setStatus("Duplicated", "Ready");
+    function tplBusiness(){
+      bgColor.value = "#0b1220";
+      paper.style.background = bgColor.value;
+      clearAll();
+
+      addShape("rect",{name:"Top panel", x:40,y:40,w:paper.clientWidth-80,h:230, fill:"#60a5fa", alpha:.14, border:"#60a5fa", borderW:1, radius:20});
+      addShape("rect",{name:"Footer bar", x:40,y:paper.clientHeight-170,w:paper.clientWidth-80,h:120, fill:"#a78bfa", alpha:.10, border:"#a78bfa", borderW:1, radius:20});
+      addShape("circle",{name:"Accent circle", x:paper.clientWidth-290, y:210, w:250,h:250, fill:"#a78bfa", alpha:.12, border:"#a78bfa", borderW:1});
+
+      addText({name:"Brand", x:70,y:90,w:paper.clientWidth-140,h:110, text:"Logic Lab", fontSize:74, fontWeight:900, color:"#ffffff"});
+      addText({name:"Subheadline", x:70,y:200,w:paper.clientWidth-140,h:90, text:"Websites that make customers find you.", fontSize:30, fontWeight:800, color:"#e5e7eb"});
+      addText({name:"Body", x:70,y:320,w:paper.clientWidth-140,h:160, text:"Your business is real. Your work is solid.\nNow let your online presence match that.", fontSize:28, fontWeight:700, color:"#ffffff", lineHeight:1.25});
+      addText({name:"Bullets", x:70,y:500,w:paper.clientWidth-140,h:120, text:"• Fast, mobile-first websites\n• WhatsApp booking / enquiry\n• Clean design. No fluff.", fontSize:22, fontWeight:700, color:"#cbd5e1", lineHeight:1.35});
+      addButton({name:"CTA", x:70, y:paper.clientHeight-145, w:Math.min(560, paper.clientWidth-140), h:86, text:"WhatsApp: 062 388 1570", bg:"#60a5fa", color:"#0b1220"});
+      addText({name:"Footer note", x:70,y:paper.clientHeight-60,w:paper.clientWidth-140,h:50, text:"Tell us your business name + what you need. We’ll handle the rest.", fontSize:16, fontWeight:700, color:"#cbd5e1"});
+      selectedId=null; render(); renderLayers(); updateEditPanel();
     }
 
-    document.getElementById("deleteEl").onclick = removeSelected;
-    document.getElementById("duplicateEl").onclick = duplicateSelected;
+    function tplSalon(){
+      bgColor.value = "#070a12";
+      paper.style.background = bgColor.value;
+      clearAll();
 
-    // ===== Keyboard shortcuts =====
-    window.addEventListener("keydown", (e)=>{
-      const el = getSelected();
-      const isMac = navigator.platform.toLowerCase().includes("mac");
-      const mod = isMac ? e.metaKey : e.ctrlKey;
+      addShape("rect",{name:"Gold header", x:40,y:40,w:paper.clientWidth-80,h:220, fill:"#d4af37", alpha:.12, border:"#d4af37", borderW:1, radius:20});
+      addShape("rect",{name:"Price panel", x:40,y:320,w:paper.clientWidth-80,h:360, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
+      addShape("rect",{name:"Footer strip", x:40,y:paper.clientHeight-160,w:paper.clientWidth-80,h:110, fill:"#d4af37", alpha:.12, border:"#d4af37", borderW:1, radius:20});
 
-      if(mod && e.key.toLowerCase() === "d"){
-        e.preventDefault();
-        duplicateSelected();
-        return;
-      }
-      if(e.key === "Delete" || e.key === "Backspace"){
-        if(selectedId){
-          e.preventDefault();
-          removeSelected();
-        }
-        return;
-      }
-      if(!el) return;
+      addText({name:"Salon name", x:70,y:90,w:paper.clientWidth-140,h:110, text:"Modern Salon", fontSize:66, fontWeight:900, color:"#fff7ed"});
+      addText({name:"Hook", x:70,y:200,w:paper.clientWidth-140,h:80, text:"Clean cuts. Fresh look. Confidence.", fontSize:26, fontWeight:800, color:"#e2e8f0"});
 
-      const step = e.shiftKey ? 10 : 2;
-      if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){
-        e.preventDefault();
-        if(e.key==="ArrowLeft") el.x = clamp(el.x - step, 0, paper.clientWidth-10);
-        if(e.key==="ArrowRight") el.x = clamp(el.x + step, 0, paper.clientWidth-10);
-        if(e.key==="ArrowUp") el.y = clamp(el.y - step, 0, paper.clientHeight-10);
-        if(e.key==="ArrowDown") el.y = clamp(el.y + step, 0, paper.clientHeight-10);
-        render();
-        updateEditPanel(false);
-      }
-    });
+      addText({name:"Prices", x:70,y:350,w:paper.clientWidth-140,h:300,
+        text:"PRICE LIST\n\n• Fade + Line-up  —  R80\n• Beard Trim      —  R50\n• Wash + Cut      —  R100\n• Ladies Styling  —  From R150\n\nWalk-ins welcome • Book via WhatsApp",
+        fontSize:22, fontWeight:700, color:"#e2e8f0", lineHeight:1.4, bg:"#000000", bgAlpha:0
+      });
 
-    // ===== Zoom =====
-    zoom.addEventListener("input", ()=>{
-      const z = Number(zoom.value) / 100;
-      paper.style.transform = `scale(${z})`;
-      zoomLabel.textContent = `${zoom.value}%`;
-    });
-    paper.style.transform = "scale(1)";
+      addButton({name:"CTA", x:70,y:paper.clientHeight-140,w:Math.min(560, paper.clientWidth-140),h:86, text:"Book on WhatsApp: 062 388 1570", bg:"#d4af37", color:"#070a12"});
+      selectedId=null; render(); renderLayers(); updateEditPanel();
+    }
 
-    // ===== Background =====
-    bgColor.addEventListener("input", ()=> paper.style.background = bgColor.value);
+    function tplEvent(){
+      bgColor.value = "#0b1220";
+      paper.style.background = bgColor.value;
+      clearAll();
 
-    // ===== Size preset UI =====
+      addShape("rect",{name:"Hero", x:40,y:40,w:paper.clientWidth-80,h:300, fill:"#a78bfa", alpha:.12, border:"#a78bfa", borderW:1, radius:20});
+      addShape("circle",{name:"Glow", x:paper.clientWidth-300,y:80,w:260,h:260, fill:"#60a5fa", alpha:.10, border:"#60a5fa", borderW:1});
+      addText({name:"Title", x:70,y:90,w:paper.clientWidth-140,h:130, text:"SATURDAY NIGHT\nLIVE DJ", fontSize:64, fontWeight:900, color:"#ffffff", lineHeight:1.0});
+      addText({name:"Details", x:70,y:220,w:paper.clientWidth-140,h:120, text:"Doors 7PM • Entry R50\nDress code: Clean & fresh", fontSize:26, fontWeight:800, color:"#e2e8f0", lineHeight:1.25});
+      addShape("rect",{name:"Info panel", x:40,y:380,w:paper.clientWidth-80,h:420, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
+      addText({name:"Venue", x:70,y:420,w:paper.clientWidth-140,h:320, text:"VENUE\n\nSky Lounge\n123 Main Road\n\nFEATURES\n• Drinks specials\n• Photo booth\n• VIP tables (limited)\n\nCall/WhatsApp to book a table.", fontSize:22, fontWeight:700, color:"#cbd5e1", lineHeight:1.5});
+      addButton({name:"CTA", x:70,y:paper.clientHeight-145,w:Math.min(560, paper.clientWidth-140),h:86, text:"Book: 062 388 1570", bg:"#60a5fa", color:"#0b1220"});
+      selectedId=null; render(); renderLayers(); updateEditPanel();
+    }
+
+    function tplRestaurant(){
+      bgColor.value = "#070a12";
+      paper.style.background = bgColor.value;
+      clearAll();
+
+      addShape("rect",{name:"Top", x:40,y:40,w:paper.clientWidth-80,h:220, fill:"#22c55e", alpha:.10, border:"#22c55e", borderW:1, radius:20});
+      addText({name:"Restaurant", x:70,y:95,w:paper.clientWidth-140,h:110, text:"Tasty Kitchen", fontSize:70, fontWeight:900, color:"#ffffff"});
+      addText({name:"Offer", x:70,y:200,w:paper.clientWidth-140,h:80, text:"Lunch Special • Today Only", fontSize:26, fontWeight:800, color:"#e2e8f0"});
+
+      addShape("rect",{name:"Menu box", x:40,y:300,w:paper.clientWidth-80,h:520, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
+      addText({name:"Menu", x:70,y:340,w:paper.clientWidth-140,h:430,
+        text:"SPECIALS\n\n• Chicken & Chips — R55\n• Beef Burger — R60\n• Kota Deluxe — R50\n• 2x Wings + Chips — R45\n\nFree delivery for orders over R200",
+        fontSize:24, fontWeight:800, color:"#e2e8f0", lineHeight:1.45
+      });
+
+      addButton({name:"CTA", x:70,y:paper.clientHeight-145,w:Math.min(560, paper.clientWidth-140),h:86, text:"Order on WhatsApp: 062 388 1570", bg:"#22c55e", color:"#070a12"});
+      selectedId=null; render(); renderLayers(); updateEditPanel();
+    }
+
+    // ===== Hook up UI =====
     function initSizeDropdown(){
       const order = ["a4","letter","a5","half","quarter","postcard4x6","postcard6x9","rack35","rack367"];
       for(const key of order){
@@ -1236,139 +1589,81 @@
       applyCanvasSize({ presetKey, landscape, scale });
     }
 
-    sizePreset.addEventListener("change", onCanvasSettingsChange);
-    orientation.addEventListener("change", onCanvasSettingsChange);
-    scaleLayout.addEventListener("change", ()=> setStatus("Scale layout", scaleLayout.checked ? "ON" : "OFF"));
-
-    // ===== Export PNG with DPI scaling =====
-    async function exportToPng(){
-      const exportDpiVal = Number(exportDpi.value) || 300;
-      const scale = exportDpiVal / EDIT_DPI;
-
-      setStatus("Exporting...", `PNG @ ${exportDpiVal} DPI`);
-
-      const clone = paper.cloneNode(true);
-      clone.classList.remove("show-grid");
-      clone.classList.remove("show-guides");
-      clone.querySelectorAll(".gridOverlay").forEach(n=>n.remove());
-      clone.querySelectorAll(".guides").forEach(n=>n.remove());
-      clone.querySelectorAll(".item").forEach(n=>n.classList.remove("selected"));
-
-      const w = paper.clientWidth;
-      const h = paper.clientHeight;
-      const outW = Math.round(w * scale);
-      const outH = Math.round(h * scale);
-
-      const serializer = new XMLSerializer();
-      const html = serializer.serializeToString(clone);
-
-      // We render the original-size DOM, then scale it up inside the SVG.
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}">
-          <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml"
-                 style="transform: scale(${scale}); transform-origin: top left; width:${w}px; height:${h}px;">
-              ${html}
-            </div>
-          </foreignObject>
-        </svg>
-      `;
-
-      const svgBlob = new Blob([svg], {type:"image/svg+xml;charset=utf-8"});
-      const url = URL.createObjectURL(svgBlob);
-
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = outW;
-        canvas.height = outH;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-
-        URL.revokeObjectURL(url);
-
-        canvas.toBlob((blob)=>{
-          if(!blob){
-            setStatus("Export failed", "Try Chrome");
-            alert("Export failed in this browser. Try Chrome.");
-            return;
-          }
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = `flyer_${canvasPresetKey}_${canvasLandscape ? "land" : "port"}_${exportDpiVal}dpi.png`;
-          a.click();
-          setStatus("Exported", a.download);
-        }, "image/png");
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        setStatus("Export failed", "Try Chrome");
-        alert("Export failed in this browser. Try Chrome.");
-      };
-      img.src = url;
+    // Tabs
+    function setTab(which){
+      const design = (which === "design");
+      tabDesign.classList.toggle("active", design);
+      tabLayers.classList.toggle("active", !design);
+      designTab.style.display = design ? "block" : "none";
+      layersTab.style.display = design ? "none" : "block";
     }
+    tabDesign.onclick = ()=>setTab("design");
+    tabLayers.onclick = ()=>setTab("layers");
+
+    // Buttons
+    document.getElementById("addHeadline").onclick = () => addText({
+      name:"Headline",
+      text:"Your Business Name",
+      fontSize: 62,
+      fontWeight: 900,
+      x: 70, y: 110, w: Math.min(650, paper.clientWidth - 140), h: 120,
+      align:"left",
+      bg:"#000000", bgAlpha:0
+    });
+    document.getElementById("addBody").onclick = () => addText({
+      name:"Text",
+      text:"Your business is real. Your work is solid.\nNow let your online presence match that.",
+      fontSize: 28,
+      fontWeight: 700,
+      x: 70, y: 260, w: Math.min(650, paper.clientWidth - 140), h: 150,
+      align:"left",
+      bg:"#000000", bgAlpha:0
+    });
+    document.getElementById("addCta").onclick = () => addButton({});
+    document.getElementById("addRect").onclick = () => addShape("rect",{});
+    document.getElementById("addCircle").onclick = () => addShape("circle",{ w: 220, h: 220, x: Math.max(40, paper.clientWidth - 280), y: 220 });
+
+    document.getElementById("tplBusiness").onclick = tplBusiness;
+    document.getElementById("tplSalon").onclick = tplSalon;
+    document.getElementById("tplEvent").onclick = tplEvent;
+    document.getElementById("tplRestaurant").onclick = tplRestaurant;
+
     document.getElementById("exportPng").onclick = exportToPng;
+    document.getElementById("exportPdf").onclick = exportPdf;
 
-    // ===== Save / Load JSON (includes size + orientation) =====
-    function toJSON(){
-      return JSON.stringify({
-        version: 2,
-        editDpi: EDIT_DPI,
-        presetKey: canvasPresetKey,
-        landscape: canvasLandscape,
-        background: bgColor.value,
-        showGuides: !!showGuides.checked,
-        elements
-      }, null, 2);
-    }
-
-    function download(filename, text){
-      const blob = new Blob([text], {type:"application/json"});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-    }
-
-    document.getElementById("downloadJson").onclick = () => {
-      download("flyer.json", toJSON());
-      setStatus("Saved", "flyer.json downloaded");
-    };
-
-    document.getElementById("uploadJsonBtn").onclick = () => {
-      document.getElementById("uploadJson").click();
-    };
+    document.getElementById("downloadJson").onclick = ()=>{ download("flyer.json", toJSON()); setStatus("Saved", "flyer.json downloaded"); };
+    document.getElementById("uploadJsonBtn").onclick = ()=> document.getElementById("uploadJson").click();
 
     document.getElementById("uploadJson").addEventListener("change", (e)=>{
       const f = e.target.files?.[0];
       if(!f) return;
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = ()=>{
         try{
           const data = JSON.parse(reader.result);
-          if(!data || !Array.isArray(data.elements)) throw new Error("Invalid file");
-
-          // restore canvas settings
-          canvasPresetKey = data.presetKey && SIZE_PRESETS[data.presetKey] ? data.presetKey : "a4";
+          if(!data || !Array.isArray(data.elements)) throw new Error("Invalid");
+          canvasPresetKey = (data.presetKey && SIZE_PRESETS[data.presetKey]) ? data.presetKey : "a4";
           canvasLandscape = !!data.landscape;
-
           sizePreset.value = canvasPresetKey;
           orientation.value = canvasLandscape ? "landscape" : "portrait";
 
           bgColor.value = data.background || "#0b1220";
           paper.style.background = bgColor.value;
 
+          showGuides.checked = !!data.showGuides;
+          showCenters.checked = !!data.showCenters;
+          snapToGrid.checked = data.snapToGrid !== false;
+
+          paper.classList.toggle("show-guides", showGuides.checked);
+          paper.classList.toggle("show-centers", showCenters.checked);
+
           elements = data.elements;
           zCounter = elements.reduce((m,x)=>Math.max(m, x.z||1), 1);
 
-          showGuides.checked = !!data.showGuides;
-          paper.classList.toggle("show-guides", showGuides.checked);
+          applyCanvasSize({ presetKey: canvasPresetKey, landscape: canvasLandscape, scale:false });
 
-          applyCanvasSize({ presetKey: canvasPresetKey, landscape: canvasLandscape, scale: false });
-
-          selectedId = null;
-          render();
-          updateEditPanel();
+          selectedId=null;
+          render(); renderLayers(); updateEditPanel();
           setStatus("Loaded", "JSON applied");
         }catch(err){
           alert("Invalid JSON file.");
@@ -1378,16 +1673,180 @@
       e.target.value = "";
     });
 
+    document.getElementById("imgUpload").addEventListener("change", (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=> addImage(reader.result, {});
+      reader.readAsDataURL(f);
+      e.target.value = "";
+    });
+
+    // Grid / Guides / Centers
+    toggleGrid.onclick = ()=> paper.classList.toggle("show-grid");
+    showGuides.addEventListener("change", ()=> paper.classList.toggle("show-guides", showGuides.checked));
+    showCenters.addEventListener("change", ()=> paper.classList.toggle("show-centers", showCenters.checked));
+
+    // Size + orientation
+    sizePreset.addEventListener("change", onCanvasSettingsChange);
+    orientation.addEventListener("change", onCanvasSettingsChange);
+
+    // Zoom
+    zoom.addEventListener("input", ()=>{
+      const z = Number(zoom.value) / 100;
+      paper.style.transform = `scale(${z})`;
+      zoomLabel.textContent = `${zoom.value}%`;
+    });
+
+    // Background
+    bgColor.addEventListener("input", ()=> paper.style.background = bgColor.value);
+
+    // Arrange/Align
+    document.getElementById("bringFront").onclick = ()=>{
+      const el = getSelected(); if(!el) return;
+      el.z = ++zCounter;
+      render(); renderLayers();
+      setStatus("Arranged", "Bring Front");
+    };
+    document.getElementById("sendBack").onclick = ()=>{
+      const el = getSelected(); if(!el) return;
+      el.z = 1;
+      normalizeZ();
+      render(); renderLayers();
+      setStatus("Arranged", "Send Back");
+    };
+    document.getElementById("alignLeft").onclick = ()=>{
+      const el = getSelected(); if(!el) return;
+      el.x = snap(20);
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+    document.getElementById("alignCenter").onclick = ()=>{
+      const el = getSelected(); if(!el) return;
+      el.x = snap(Math.round((paper.clientWidth - el.w)/2));
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+    document.getElementById("alignRight").onclick = ()=>{
+      const el = getSelected(); if(!el) return;
+      el.x = snap(Math.round(paper.clientWidth - el.w - 20));
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+
+    function removeSelected(){
+      if(!selectedId) return;
+      elements = elements.filter(e=>e.id !== selectedId);
+      selectedId = null;
+      render(); renderLayers(); updateEditPanel();
+      setStatus("Deleted", "Ready");
+    }
+    function duplicateSelected(){
+      const el = getSelected(); if(!el) return;
+      const copy = JSON.parse(JSON.stringify(el));
+      copy.id = uid();
+      copy.x = clamp(copy.x + 20, 0, paper.clientWidth - 10);
+      copy.y = clamp(copy.y + 20, 0, paper.clientHeight - 10);
+      copy.z = ++zCounter;
+      elements.push(copy);
+      render();
+      select(copy.id);
+      renderLayers();
+      setStatus("Duplicated", "Ready");
+    }
+    document.getElementById("deleteEl").onclick = removeSelected;
+    document.getElementById("duplicateEl").onclick = duplicateSelected;
+
+    // Layer tab quick actions
+    document.getElementById("moveUp").onclick = ()=> selectedId && moveLayer(selectedId, +1);
+    document.getElementById("moveDown").onclick = ()=> selectedId && moveLayer(selectedId, -1);
+    document.getElementById("deleteLayer").onclick = removeSelected;
+    document.getElementById("selectTop").onclick = ()=>{
+      const sorted = [...elements].sort((a,b)=>b.z-a.z);
+      if(sorted[0]) select(sorted[0].id);
+    };
+    document.getElementById("selectBottom").onclick = ()=>{
+      const sorted = [...elements].sort((a,b)=>a.z-a.z);
+      if(sorted[0]) select(sorted[0].id);
+    };
+    document.getElementById("clearAll").onclick = clearAll;
+
+    // Keyboard shortcuts (FIXED: Backspace edits text only, not delete box)
+window.addEventListener("keydown", (e) => {
+  // If user is typing in any form field, do NOT run canvas shortcuts
+  const t = e.target;
+  const typing =
+    t &&
+    (t.tagName === "INPUT" ||
+     t.tagName === "TEXTAREA" ||
+     t.tagName === "SELECT" ||
+     t.isContentEditable);
+
+  if (typing) return;
+
+  const el = getSelected();
+  const isMac = navigator.platform.toLowerCase().includes("mac");
+  const mod = isMac ? e.metaKey : e.ctrlKey;
+
+  // Duplicate: Ctrl/Cmd + D
+  if (mod && e.key.toLowerCase() === "d") {
+    e.preventDefault();
+    duplicateSelected();
+    return;
+  }
+
+  // Delete element ONLY with the Delete key (NOT Backspace)
+  if (e.key === "Delete") {
+    if (selectedId) {
+      e.preventDefault();
+      removeSelected();
+    }
+    return;
+  }
+
+  // Move with arrows
+  if (!el || el.locked) return;
+
+  const step = e.shiftKey ? 10 : 2;
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+    e.preventDefault();
+    if (e.key === "ArrowLeft")  el.x = snap(clamp(el.x - step, 0, paper.clientWidth - 10));
+    if (e.key === "ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth - 10));
+    if (e.key === "ArrowUp")    el.y = snap(clamp(el.y - step, 0, paper.clientHeight - 10));
+    if (e.key === "ArrowDown")  el.y = snap(clamp(el.y + step, 0, paper.clientHeight - 10));
+    render();
+    updateEditPanelQuiet();
+    renderLayers();
+  }
+});
+
+
     // ===== Init =====
     initSizeDropdown();
-
-    // default size: A4 portrait (96dpi)
     sizePreset.value = "a4";
     orientation.value = "portrait";
-    applyCanvasSize({ presetKey: "a4", landscape: false, scale: false });
+    canvasPresetKey = "a4";
+    canvasLandscape = false;
 
-    // default start: business preset
-    document.getElementById("presetBusiness").click();
+    paper.style.transform = "scale(1)";
+    zoom.value = 100;
+    zoomLabel.textContent = "100%";
+
+    // Apply size and guides
+    paper.classList.toggle("show-guides", false);
+    paper.classList.toggle("show-centers", false);
+
+    applyCanvasSize({ presetKey:"a4", landscape:false, scale:false });
+    updateSizeLabels();
+
+    // default template
+    tplBusiness();
+
+    // also update guide inset now
+    updateSizeLabels();
+
+    // show guides if toggled
+    showGuides.addEventListener("change", ()=> updateSizeLabels());
+
+    // initial render layers
+    renderLayers();
   </script>
 </body>
 </html>
