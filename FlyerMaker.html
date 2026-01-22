@@ -32,15 +32,13 @@
       color:var(--text);
     }
 
-    /* ===== Print-to-PDF mode =====
-       We use window.print() with @page size injected via JS.
-       UI is hidden, canvas fills the page, margins set to 0. */
+    /* Print-to-PDF mode */
     @media print {
       body{ background:#fff !important; }
       .panel, .topbar, .status{ display:none !important; }
       .app{ display:block !important; padding:0 !important; }
       .canvasWrap{ border:none !important; box-shadow:none !important; }
-      .stage{ padding:0 !important; overflow:visible !important; }
+      .stage{ padding:0 !important; overflow:visible !important; background:#fff !important; }
       .paper{
         transform:none !important;
         box-shadow:none !important;
@@ -76,18 +74,14 @@
       border:1px solid var(--line); color:var(--muted); background: rgba(255,255,255,.03);
       white-space:nowrap;
     }
-    .tabs{
-      display:flex; gap:10px; margin-top:12px;
-    }
+    .tabs{display:flex; gap:10px; margin-top:12px;}
     .tab{
-      flex:1;
-      padding:10px 12px;
-      border-radius:12px;
+      flex:1; padding:10px 12px; border-radius:12px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.03);
       color:var(--muted);
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       text-align:center;
     }
     .tab.active{
@@ -138,7 +132,7 @@
       background: rgba(255,255,255,.06);
       border:1px solid var(--line);
       color:var(--text);
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.2px;
     }
     button:hover{border-color: rgba(255,255,255,.22)}
@@ -212,57 +206,29 @@
     }
     .paper.show-grid .gridOverlay{display:block}
 
-    .guides{
-      pointer-events:none;
-      position:absolute; inset:0;
-      display:none;
-    }
+    .guides{pointer-events:none; position:absolute; inset:0; display:none;}
     .paper.show-guides .guides{display:block}
-    .guide-bleed, .guide-safe{
-      position:absolute; inset:0;
-      border:2px dashed rgba(255,255,255,.22);
-      border-radius:10px;
-    }
+    .guide-bleed, .guide-safe{position:absolute; inset:0; border:2px dashed rgba(255,255,255,.22); border-radius:10px;}
     .guide-safe{ border-style: solid; border-color: rgba(96,165,250,.28); }
 
-    .centerGuides{
-      pointer-events:none;
-      position:absolute; inset:0;
-      display:none;
-    }
+    .centerGuides{pointer-events:none; position:absolute; inset:0; display:none;}
     .paper.show-centers .centerGuides{display:block}
-    .centerGuides::before,
-    .centerGuides::after{
-      content:"";
-      position:absolute;
-      background: rgba(167,139,250,.25);
-    }
-    .centerGuides::before{ /* vertical */
-      width:2px; top:0; bottom:0; left:50%; transform: translateX(-1px);
-    }
-    .centerGuides::after{ /* horizontal */
-      height:2px; left:0; right:0; top:50%; transform: translateY(-1px);
-    }
+    .centerGuides::before,.centerGuides::after{content:""; position:absolute; background: rgba(167,139,250,.25);}
+    .centerGuides::before{width:2px; top:0; bottom:0; left:50%; transform: translateX(-1px);}
+    .centerGuides::after{height:2px; left:0; right:0; top:50%; transform: translateY(-1px);}
 
     .item{
       position:absolute;
-      left:80px; top:80px;
       min-width: 40px; min-height: 28px;
       user-select:none;
       border:1px solid transparent;
       border-radius:10px;
     }
     .item.selected{border-color: rgba(96,165,250,.7); box-shadow: 0 0 0 3px rgba(96,165,250,.18)}
-    .item.locked{opacity:.9}
     .item.hidden{display:none}
-    .item .content{
-      width:100%; height:100%;
-      border-radius:10px;
-      overflow:hidden;
-    }
+    .item .content{width:100%; height:100%; border-radius:10px; overflow:hidden;}
     .textBox{
       padding:10px 12px;
-      color:#fff;
       white-space:pre-wrap;
       line-height:1.2;
       font-weight:700;
@@ -279,12 +245,7 @@
       display:none;
     }
     .item.selected .handle{display:block}
-    .img{
-      width:100%; height:100%;
-      object-fit:cover;
-      display:block;
-      border-radius:10px;
-    }
+    .img{width:100%; height:100%; object-fit:cover; display:block; border-radius:10px;}
 
     .status{
       padding:10px 12px;
@@ -294,45 +255,26 @@
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
       background: rgba(15,23,42,.55);
     }
-
     .zoom{ width:140px; }
 
     /* Layers list */
-    .layersList{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-top:8px;
-    }
+    .layersList{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
     .layerRow{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:10px;
-      align-items:center;
-      padding:10px;
-      border-radius:12px;
+      display:grid; grid-template-columns: 1fr auto;
+      gap:10px; align-items:center;
+      padding:10px; border-radius:12px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.03);
+      cursor:pointer;
     }
     .layerRow.active{
       border-color: rgba(96,165,250,.5);
       background: rgba(96,165,250,.10);
     }
-    .layerTitle{
-      display:flex; flex-direction:column; gap:2px;
-      min-width:0;
-    }
-    .layerTitle .name{
-      font-weight:800; font-size:12px; color:var(--text);
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .layerTitle .meta{
-      font-size:11px; color:var(--muted);
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .layerBtns{
-      display:flex; gap:6px;
-    }
+    .layerTitle{display:flex; flex-direction:column; gap:2px; min-width:0;}
+    .layerTitle .name{font-weight:900; font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .layerTitle .meta{font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .layerBtns{display:flex; gap:6px;}
     .iconBtn{
       width:34px; height:34px;
       display:grid; place-items:center;
@@ -343,9 +285,7 @@
     }
     .iconBtn:hover{border-color: rgba(255,255,255,.22)}
     .iconBtn svg{width:16px; height:16px; opacity:.9}
-    .iconBtn.danger{border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.10)}
     .iconBtn.warn{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.10)}
-    .iconBtn.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10)}
   </style>
 </head>
 <body>
@@ -424,16 +364,6 @@
 
             <div class="divider"></div>
 
-            <label>Templates</label>
-            <div class="btns">
-              <button type="button" class="primary" id="tplBusiness">Business Offer</button>
-              <button type="button" id="tplSalon">Salon / Barber</button>
-              <button type="button" id="tplEvent">Event Night</button>
-              <button type="button" id="tplRestaurant">Restaurant Promo</button>
-            </div>
-
-            <div class="divider"></div>
-
             <div class="btns">
               <button type="button" class="ok" id="exportPng">Export PNG</button>
               <button type="button" class="primary" id="exportPdf">Export PDF</button>
@@ -443,17 +373,15 @@
             </div>
 
             <p class="hint" style="margin:10px 0 0">
-              Shortcuts: <b>Del</b> delete • <b>Ctrl/Cmd + D</b> duplicate • Arrow keys nudge • <b>Shift</b> = faster.
-              <br/>PDF export uses your browser print dialog → choose “Save as PDF”.
+              PDF export opens the print dialog. Choose “Save as PDF”.
             </p>
           </div>
 
           <div class="group">
             <h2>Add Elements</h2>
             <div class="btns">
-              <button type="button" class="primary" id="addHeadline">Add Headline</button>
-              <button type="button" id="addBody">Add Text</button>
-              <button type="button" id="addCta">Add CTA Button</button>
+              <button type="button" class="primary" id="addText">Add Text</button>
+              <button type="button" id="addCta">Add Button</button>
               <button type="button" id="addRect">Add Rectangle</button>
               <button type="button" id="addCircle">Add Circle</button>
             </div>
@@ -466,7 +394,7 @@
           <div class="group">
             <h2>Selected Element</h2>
 
-            <div id="noSelection" class="hint">Select something on the flyer to edit its style.</div>
+            <div id="noSelection" class="hint">Select something on the flyer to edit.</div>
 
             <div id="editPanel" style="display:none">
               <label>Name</label>
@@ -632,21 +560,13 @@
         <div id="layersTab" style="display:none">
           <div class="group">
             <h2>Layers</h2>
-            <div class="hint">Top = front. Use the icons to hide/lock, or move layers up/down.</div>
+            <div class="hint">Top = front.</div>
             <div class="layersList" id="layersList"></div>
             <div class="divider"></div>
             <div class="btns">
               <button type="button" class="warn" id="moveUp">Move Up</button>
               <button type="button" class="warn" id="moveDown">Move Down</button>
               <button type="button" class="danger" id="deleteLayer">Delete</button>
-            </div>
-          </div>
-
-          <div class="group">
-            <h2>Quick Actions</h2>
-            <div class="btns">
-              <button type="button" id="selectTop">Select Top Layer</button>
-              <button type="button" id="selectBottom">Select Bottom Layer</button>
               <button type="button" class="danger" id="clearAll">Clear Canvas</button>
             </div>
           </div>
@@ -661,7 +581,6 @@
         <div class="left">
           <span class="kbd" id="topSize">A4</span>
           <span class="kbd" id="topPx">794×1123 px</span>
-          <span class="kbd">Snap + Guides + PDF</span>
         </div>
         <div class="right">
           <span class="kbd">Zoom</span>
@@ -797,6 +716,7 @@
     // ===== Helpers =====
     function setStatus(left, right){ statusLeft.textContent = left; statusRight.textContent = right; }
     function getSelected(){ return elements.find(e=>e.id===selectedId) || null; }
+    function snap(n){ return snapToGrid.checked ? Math.round(n / SNAP) * SNAP : n; }
 
     function currentCanvasInches(){
       const p = SIZE_PRESETS[canvasPresetKey] || SIZE_PRESETS.a4;
@@ -808,8 +728,6 @@
       const { wIn, hIn } = currentCanvasInches();
       return { wPx: inchesToPx(wIn, EDIT_DPI), hPx: inchesToPx(hIn, EDIT_DPI) };
     }
-    function snap(n){ return snapToGrid.checked ? Math.round(n / SNAP) * SNAP : n; }
-
     function updateSizeLabels(){
       const { wPx, hPx } = currentCanvasPx();
       const { base } = currentCanvasInches();
@@ -834,7 +752,7 @@
       paper.style.width  = wPx + "px";
       paper.style.height = hPx + "px";
 
-      if(scale && oldW && oldH){
+      if(scale && oldW && oldH && elements.length){
         const sx = wPx / oldW;
         const sy = hPx / oldH;
         const sFont = Math.min(sx, sy);
@@ -854,12 +772,12 @@
 
       updateSizeLabels();
       render();
-      updateEditPanel();
       renderLayers();
+      updateEditPanel();
       setStatus("Canvas resized", `${wPx}×${hPx}px`);
     }
 
-    // ===== Print page size injection for PDF =====
+    // ===== PDF sizing injection =====
     function setPrintPageSizeCss(widthIn, heightIn){
       const css = `@page { size: ${widthIn}in ${heightIn}in; margin: 0; }`;
       let tag = document.getElementById("printPageSize");
@@ -870,7 +788,6 @@
       }
       tag.textContent = css;
     }
-
     function exportPdf(){
       const { wIn, hIn } = currentCanvasInches();
       setPrintPageSizeCss(wIn, hIn);
@@ -880,7 +797,7 @@
       const centersWas = paper.classList.contains("show-centers");
       paper.classList.remove("show-grid","show-guides","show-centers");
 
-      setStatus("Export PDF", "Use Save as PDF");
+      setStatus("Export PDF", "Save as PDF");
       window.print();
 
       paper.classList.toggle("show-grid", gridWas);
@@ -895,17 +812,16 @@
         id,
         name: opts.name ?? "Text",
         hidden:false,
-        locked:false,
         type:"text",
         x: opts.x ?? 70,
         y: opts.y ?? 90,
         w: opts.w ?? 520,
         h: opts.h ?? 90,
         z: ++zCounter,
-        text: opts.text ?? "Your Headline Here",
+        text: opts.text ?? "",                 // <-- blank by default
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
-        fontSize: opts.fontSize ?? 54,
-        fontWeight: opts.fontWeight ?? 800,
+        fontSize: opts.fontSize ?? 36,
+        fontWeight: opts.fontWeight ?? 700,
         lineHeight: opts.lineHeight ?? 1.2,
         letterSpacing: opts.letterSpacing ?? 0,
         pad: opts.pad ?? 12,
@@ -918,6 +834,8 @@
       render();
       select(id);
       renderLayers();
+      // put cursor in textarea immediately
+      setTimeout(()=>{ if(document.activeElement){}; textValue?.focus(); }, 0);
     }
 
     function addShape(kind="rect", opts={}){
@@ -926,7 +844,6 @@
         id,
         name: opts.name ?? (kind === "circle" ? "Circle" : "Rectangle"),
         hidden:false,
-        locked:false,
         type:"shape",
         kind,
         x: opts.x ?? 60,
@@ -950,18 +867,17 @@
       const id = uid();
       const el = {
         id,
-        name: opts.name ?? "CTA Button",
+        name: opts.name ?? "Button",
         hidden:false,
-        locked:false,
         type:"text",
         x: opts.x ?? 70,
         y: opts.y ?? Math.max(70, paper.clientHeight - 220),
         w: opts.w ?? 520,
         h: opts.h ?? 86,
         z: ++zCounter,
-        text: opts.text ?? "WhatsApp: 062 388 1570",
+        text: opts.text ?? "",                 // <-- blank by default
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
-        fontSize: opts.fontSize ?? 30,
+        fontSize: opts.fontSize ?? 28,
         fontWeight: opts.fontWeight ?? 900,
         lineHeight: opts.lineHeight ?? 1.05,
         letterSpacing: opts.letterSpacing ?? 0,
@@ -975,6 +891,7 @@
       render();
       select(id);
       renderLayers();
+      setTimeout(()=>{ textValue?.focus(); }, 0);
     }
 
     function addImage(dataUrl, opts={}){
@@ -983,7 +900,6 @@
         id,
         name: opts.name ?? "Image",
         hidden:false,
-        locked:false,
         type:"image",
         x: opts.x ?? Math.max(40, paper.clientWidth - 280),
         y: opts.y ?? 220,
@@ -1000,13 +916,22 @@
       renderLayers();
     }
 
-    // ===== Rendering =====
+    function clearAll(){
+      elements = [];
+      selectedId = null;
+      zCounter = 1;
+      render();
+      renderLayers();
+      updateEditPanel();
+      setStatus("Canvas cleared", "Ready");
+    }
+
+    // ===== Render =====
     function render(){
       paper.querySelectorAll(".item").forEach(n=>n.remove());
       paper.style.background = bgColor.value;
 
       const sorted = [...elements].sort((a,b)=>a.z-b.z);
-
       for(const el of sorted){
         const node = document.createElement("div");
         node.className = "item";
@@ -1018,7 +943,6 @@
         node.style.zIndex = el.z;
 
         if(el.hidden) node.classList.add("hidden");
-        if(el.locked) node.classList.add("locked");
         if(el.id === selectedId) node.classList.add("selected");
 
         const content = document.createElement("div");
@@ -1027,11 +951,11 @@
         if(el.type === "text"){
           const t = document.createElement("div");
           t.className = "textBox";
-          t.textContent = el.text;
-          t.style.fontFamily = el.fontFamily || "ui-sans-serif, system-ui";
+          t.textContent = el.text || ""; // blank allowed
+          t.style.fontFamily = el.fontFamily;
           t.style.fontSize = el.fontSize + "px";
           t.style.fontWeight = el.fontWeight;
-          t.style.lineHeight = String(el.lineHeight ?? 1.2);
+          t.style.lineHeight = String(el.lineHeight);
           t.style.letterSpacing = (el.letterSpacing ?? 0) + "px";
           t.style.padding = (el.pad ?? 12) + "px";
           t.style.color = el.color;
@@ -1052,11 +976,7 @@
           s.style.border = `${el.borderW}px solid ${rgba(el.border, 1)}`;
           s.style.width = "100%";
           s.style.height = "100%";
-          if(el.kind === "circle"){
-            s.style.borderRadius = "999px";
-          } else {
-            s.style.borderRadius = (el.radius ?? 12) + "px";
-          }
+          s.style.borderRadius = el.kind === "circle" ? "999px" : (el.radius ?? 12) + "px";
           content.appendChild(s);
         }
 
@@ -1065,25 +985,18 @@
           img.className = "img";
           img.src = el.src;
           img.style.objectFit = el.fit || "cover";
-          img.style.borderRadius = (el.radius ?? 10) + "px";
+          img.style.borderRadius = (el.radius ?? 12) + "px";
           content.appendChild(img);
         }
 
         const handle = document.createElement("div");
         handle.className = "handle";
         handle.title = "Resize";
-
         node.appendChild(content);
         node.appendChild(handle);
 
         node.addEventListener("mousedown", (e) => {
           if(el.hidden) return;
-          if(el.locked){
-            // allow selecting locked, but no drag/resize
-            select(el.id);
-            return;
-          }
-
           const isHandle = e.target.classList.contains("handle");
           if(isHandle){
             e.preventDefault();
@@ -1100,8 +1013,8 @@
       }
 
       paper.onmousedown = (e) => {
-        const tgt = e.target;
-        if(tgt === paper || tgt.classList.contains("gridOverlay") || tgt.classList.contains("guides") || tgt.classList.contains("guide-bleed") || tgt.classList.contains("guide-safe") || tgt.classList.contains("centerGuides")){
+        const t = e.target;
+        if(t === paper || t.classList.contains("gridOverlay") || t.classList.contains("guides") || t.classList.contains("guide-bleed") || t.classList.contains("guide-safe") || t.classList.contains("centerGuides")){
           selectedId = null;
           updateEditPanel();
           renderLayers();
@@ -1117,10 +1030,10 @@
       renderLayers();
       render();
       const el = getSelected();
-      if(el) setStatus(`${el.type.toUpperCase()} selected`, el.name || "");
+      if(el) setStatus("Selected", el.name || "");
     }
 
-    // ===== Drag / Resize =====
+    // ===== Drag/Resize =====
     function startDrag(e, id){
       const el = elements.find(x=>x.id===id);
       if(!el) return;
@@ -1143,9 +1056,8 @@
     function onDragEnd(){
       drag = null;
       window.removeEventListener("mousemove", onDragMove);
-      const el = getSelected();
-      if(el) setStatus(`${el.type.toUpperCase()} selected`, "Moved");
       renderLayers();
+      setStatus("Moved", "Ready");
     }
 
     function startResize(e, id){
@@ -1170,12 +1082,11 @@
     function onResizeEnd(){
       resize = null;
       window.removeEventListener("mousemove", onResizeMove);
-      const el = getSelected();
-      if(el) setStatus(`${el.type.toUpperCase()} selected`, "Resized");
       renderLayers();
+      setStatus("Resized", "Ready");
     }
 
-    // ===== Edit Panel =====
+    // ===== Edit panel =====
     function updateEditPanel(){
       const el = getSelected();
       if(!el){
@@ -1199,7 +1110,7 @@
       imageControls.style.display = (el.type === "image") ? "block" : "none";
 
       if(el.type === "text"){
-        textValue.value = el.text;
+        textValue.value = el.text ?? "";
         fontFamily.value = el.fontFamily || fontFamily.value;
         fontSize.value = Math.round(el.fontSize);
         fontWeight.value = String(el.fontWeight);
@@ -1223,7 +1134,6 @@
         imgRadius.value = el.radius ?? 12;
       }
     }
-
     function updateEditPanelQuiet(){
       const el = getSelected();
       if(!el) return;
@@ -1232,7 +1142,6 @@
       sizeW.value = Math.round(el.w);
       sizeH.value = Math.round(el.h);
     }
-
     function bindInput(input, fn){
       input.addEventListener("input", () => {
         const el = getSelected();
@@ -1249,7 +1158,6 @@
       const el = getSelected(); if(!el) return;
       el.name = elName.value;
       renderLayers();
-      setStatus("Renamed", el.name || "");
     });
 
     bindInput(posX, (el)=> el.x = snap(clamp(Number(posX.value)||0, 0, paper.clientWidth-10)));
@@ -1281,33 +1189,44 @@
     bindInput(imgFit, (el)=> el.fit = imgFit.value);
     bindInput(imgRadius, (el)=> el.radius = clamp(Number(imgRadius.value)||0, 0, 160));
 
-    // ===== Layers UI =====
-    function icon(svg){ return svg; }
-    const ICON_EYE = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`);
-    const ICON_EYE_OFF = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4"/><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c6.5 0 10 8 10 8a18.2 18.2 0 0 1-3.4 4.7"/><path d="M6.1 6.1C3.4 8.2 2 12 2 12s3.5 8 10 8a10.5 10.5 0 0 0 4.2-.9"/></svg>`);
-    const ICON_LOCK = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`);
-    const ICON_UNLOCK = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>`);
-    const ICON_UP = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`);
-    const ICON_DOWN = icon(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`);
+    // ===== Layers =====
+    const ICON_EYE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const ICON_EYE_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4"/><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c6.5 0 10 8 10 8a18.2 18.2 0 0 1-3.4 4.7"/><path d="M6.1 6.1C3.4 8.2 2 12 2 12s3.5 8 10 8a10.5 10.5 0 0 0 4.2-.9"/></svg>`;
+    const ICON_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`;
+    const ICON_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`;
 
+    function normalizeZ(){
+      elements = elements.sort((a,b)=>a.z-b.z).map((e,i)=>({ ...e, z:i+1 }));
+      zCounter = elements.length + 1;
+    }
+    function moveLayer(id, dir){
+      normalizeZ();
+      const idx = elements.findIndex(e=>e.id===id);
+      if(idx<0) return;
+      const swapIdx = dir>0 ? Math.min(elements.length-1, idx+1) : Math.max(0, idx-1);
+      if(swapIdx === idx) return;
+      const tmp = elements[idx].z;
+      elements[idx].z = elements[swapIdx].z;
+      elements[swapIdx].z = tmp;
+      render();
+      renderLayers();
+    }
     function renderLayers(){
-      // Show top (front) first
       const sorted = [...elements].sort((a,b)=>b.z-a.z);
       layersList.innerHTML = "";
-
       for(const el of sorted){
         const row = document.createElement("div");
         row.className = "layerRow" + (el.id===selectedId ? " active" : "");
-        row.onclick = () => select(el.id);
+        row.onclick = ()=> select(el.id);
 
         const title = document.createElement("div");
         title.className = "layerTitle";
         const nm = document.createElement("div");
         nm.className = "name";
-        nm.textContent = el.name || (el.type==="shape" ? (el.kind==="circle"?"Circle":"Rectangle") : el.type);
+        nm.textContent = el.name || el.type;
         const meta = document.createElement("div");
         meta.className = "meta";
-        meta.textContent = `${el.type}${el.type==="shape" ? `/${el.kind}` : ""} • z:${el.z}` + (el.hidden ? " • hidden" : "") + (el.locked ? " • locked" : "");
+        meta.textContent = `${el.type}${el.type==="shape" ? `/${el.kind}` : ""} • z:${el.z}` + (el.hidden ? " • hidden" : "");
         title.appendChild(nm);
         title.appendChild(meta);
 
@@ -1322,19 +1241,7 @@
           ev.stopPropagation();
           el.hidden = !el.hidden;
           if(el.hidden && el.id===selectedId){ selectedId=null; updateEditPanel(); }
-          render();
-          renderLayers();
-        };
-
-        const lock = document.createElement("div");
-        lock.className = "iconBtn";
-        lock.innerHTML = el.locked ? ICON_LOCK : ICON_UNLOCK;
-        lock.title = el.locked ? "Unlock" : "Lock";
-        lock.onclick = (ev)=>{
-          ev.stopPropagation();
-          el.locked = !el.locked;
-          render();
-          renderLayers();
+          render(); renderLayers();
         };
 
         const up = document.createElement("div");
@@ -1350,7 +1257,6 @@
         down.onclick = (ev)=>{ ev.stopPropagation(); moveLayer(el.id, -1); };
 
         btns.appendChild(eye);
-        btns.appendChild(lock);
         btns.appendChild(up);
         btns.appendChild(down);
 
@@ -1360,113 +1266,74 @@
       }
     }
 
-    function normalizeZ(){
-      // keep stable
-      elements = elements.sort((a,b)=>a.z-b.z).map((e,i)=>({ ...e, z:i+1 }));
-      zCounter = elements.length + 1;
+    // ===== Export PNG =====
+    async function exportToPng(){
+      const exportDpiVal = Number(exportDpi.value) || 300;
+      const scale = exportDpiVal / EDIT_DPI;
+
+      setStatus("Exporting...", `PNG @ ${exportDpiVal} DPI`);
+
+      const clone = paper.cloneNode(true);
+      clone.classList.remove("show-grid","show-guides","show-centers");
+      clone.querySelectorAll(".gridOverlay,.guides,.centerGuides").forEach(n=>n.remove());
+      clone.querySelectorAll(".item").forEach(n=>n.classList.remove("selected"));
+
+      const w = paper.clientWidth;
+      const h = paper.clientHeight;
+      const outW = Math.round(w * scale);
+      const outH = Math.round(h * scale);
+
+      const serializer = new XMLSerializer();
+      const html = serializer.serializeToString(clone);
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml"
+                 style="transform: scale(${scale}); transform-origin: top left; width:${w}px; height:${h}px;">
+              ${html}
+            </div>
+          </foreignObject>
+        </svg>
+      `;
+
+      const svgBlob = new Blob([svg], {type:"image/svg+xml;charset=utf-8"});
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = outW;
+        canvas.height = outH;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob((blob)=>{
+          if(!blob){
+            setStatus("Export failed", "Try Chrome");
+            alert("Export failed in this browser. Try Chrome.");
+            return;
+          }
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `flyer_${canvasPresetKey}_${canvasLandscape ? "land" : "port"}_${exportDpiVal}dpi.png`;
+          a.click();
+          setStatus("Exported", a.download);
+        }, "image/png");
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        setStatus("Export failed", "Try Chrome");
+        alert("Export failed in this browser. Try Chrome.");
+      };
+      img.src = url;
     }
-
-    function moveLayer(id, dir){
-      // dir +1 = forward (higher z), -1 = backward
-      normalizeZ();
-      const idx = elements.findIndex(e=>e.id===id);
-      if(idx<0) return;
-      const swapIdx = dir>0 ? Math.min(elements.length-1, idx+1) : Math.max(0, idx-1);
-      if(swapIdx === idx) return;
-      const tmp = elements[idx].z;
-      elements[idx].z = elements[swapIdx].z;
-      elements[swapIdx].z = tmp;
-      render();
-      renderLayers();
-    }
-
-// ===== Export PNG (scaled by DPI) — FIXED (inject CSS into foreignObject) =====
-async function exportToPng(){
-  const exportDpiVal = Number(exportDpi.value) || 300;
-  const scale = exportDpiVal / EDIT_DPI;
-
-  setStatus("Exporting...", `PNG @ ${exportDpiVal} DPI`);
-
-  // Clone paper
-  const clone = paper.cloneNode(true);
-  clone.classList.remove("show-grid","show-guides","show-centers");
-  clone.querySelectorAll(".gridOverlay,.guides,.centerGuides").forEach(n=>n.remove());
-  clone.querySelectorAll(".item").forEach(n=>n.classList.remove("selected"));
-
-  // Inline background so it survives in the SVG
-  clone.style.background = bgColor.value;
-
-  const w = paper.clientWidth;
-  const h = paper.clientHeight;
-  const outW = Math.round(w * scale);
-  const outH = Math.round(h * scale);
-
-  // Pull CSS from all <style> tags in this page
-  const cssText = Array.from(document.querySelectorAll("style"))
-    .map(s => s.textContent || "")
-    .join("\n");
-
-  const serializer = new XMLSerializer();
-  const html = serializer.serializeToString(clone);
-
-  // Build SVG
-  const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}">
-  <foreignObject width="100%" height="100%">
-    <div xmlns="http://www.w3.org/1999/xhtml"
-         style="width:${w}px;height:${h}px;transform:scale(${scale});transform-origin:top left;overflow:hidden;">
-      <style>${cssText}</style>
-      ${html}
-    </div>
-  </foreignObject>
-</svg>`.trim();
-
-  const svgBlob = new Blob([svg], { type:"image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(svgBlob);
-
-  const img = new Image();
-
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = outW;
-    canvas.height = outH;
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-
-    URL.revokeObjectURL(url);
-
-    canvas.toBlob((blob) => {
-      if(!blob){
-        setStatus("Export failed", "Canvas toBlob returned null");
-        alert("Export failed. Try Chrome or export PDF instead.");
-        return;
-      }
-
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `flyer_${canvasPresetKey}_${canvasLandscape ? "land" : "port"}_${exportDpiVal}dpi.png`;
-      a.click();
-
-      setStatus("Exported", a.download);
-    }, "image/png");
-  };
-
-  img.onerror = (e) => {
-    URL.revokeObjectURL(url);
-    console.error("SVG->IMG error:", e);
-    setStatus("Export failed", "SVG render blocked");
-    alert("Export failed: SVG render blocked. If you opened this using file://, run it using a local server.");
-  };
-
-  img.src = url;
-}
-
 
     // ===== Save/Load =====
     function toJSON(){
       return JSON.stringify({
-        version: 3,
+        version: 4,
         editDpi: EDIT_DPI,
         presetKey: canvasPresetKey,
         landscape: canvasLandscape,
@@ -1485,91 +1352,7 @@ async function exportToPng(){
       a.click();
     }
 
-    // ===== Templates (professional defaults) =====
-    function clearAll(){
-      elements = [];
-      selectedId = null;
-      zCounter = 1;
-      render();
-      renderLayers();
-      updateEditPanel();
-      setStatus("Cleared", "Ready");
-    }
-
-    function tplBusiness(){
-      bgColor.value = "#0b1220";
-      paper.style.background = bgColor.value;
-      clearAll();
-
-      addShape("rect",{name:"Top panel", x:40,y:40,w:paper.clientWidth-80,h:230, fill:"#60a5fa", alpha:.14, border:"#60a5fa", borderW:1, radius:20});
-      addShape("rect",{name:"Footer bar", x:40,y:paper.clientHeight-170,w:paper.clientWidth-80,h:120, fill:"#a78bfa", alpha:.10, border:"#a78bfa", borderW:1, radius:20});
-      addShape("circle",{name:"Accent circle", x:paper.clientWidth-290, y:210, w:250,h:250, fill:"#a78bfa", alpha:.12, border:"#a78bfa", borderW:1});
-
-      addText({name:"Brand", x:70,y:90,w:paper.clientWidth-140,h:110, text:"Logic Lab", fontSize:74, fontWeight:900, color:"#ffffff"});
-      addText({name:"Subheadline", x:70,y:200,w:paper.clientWidth-140,h:90, text:"Websites that make customers find you.", fontSize:30, fontWeight:800, color:"#e5e7eb"});
-      addText({name:"Body", x:70,y:320,w:paper.clientWidth-140,h:160, text:"Your business is real. Your work is solid.\nNow let your online presence match that.", fontSize:28, fontWeight:700, color:"#ffffff", lineHeight:1.25});
-      addText({name:"Bullets", x:70,y:500,w:paper.clientWidth-140,h:120, text:"• Fast, mobile-first websites\n• WhatsApp booking / enquiry\n• Clean design. No fluff.", fontSize:22, fontWeight:700, color:"#cbd5e1", lineHeight:1.35});
-      addButton({name:"CTA", x:70, y:paper.clientHeight-145, w:Math.min(560, paper.clientWidth-140), h:86, text:"WhatsApp: 062 388 1570", bg:"#60a5fa", color:"#0b1220"});
-      addText({name:"Footer note", x:70,y:paper.clientHeight-60,w:paper.clientWidth-140,h:50, text:"Tell us your business name + what you need. We’ll handle the rest.", fontSize:16, fontWeight:700, color:"#cbd5e1"});
-      selectedId=null; render(); renderLayers(); updateEditPanel();
-    }
-
-    function tplSalon(){
-      bgColor.value = "#070a12";
-      paper.style.background = bgColor.value;
-      clearAll();
-
-      addShape("rect",{name:"Gold header", x:40,y:40,w:paper.clientWidth-80,h:220, fill:"#d4af37", alpha:.12, border:"#d4af37", borderW:1, radius:20});
-      addShape("rect",{name:"Price panel", x:40,y:320,w:paper.clientWidth-80,h:360, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
-      addShape("rect",{name:"Footer strip", x:40,y:paper.clientHeight-160,w:paper.clientWidth-80,h:110, fill:"#d4af37", alpha:.12, border:"#d4af37", borderW:1, radius:20});
-
-      addText({name:"Salon name", x:70,y:90,w:paper.clientWidth-140,h:110, text:"Modern Salon", fontSize:66, fontWeight:900, color:"#fff7ed"});
-      addText({name:"Hook", x:70,y:200,w:paper.clientWidth-140,h:80, text:"Clean cuts. Fresh look. Confidence.", fontSize:26, fontWeight:800, color:"#e2e8f0"});
-
-      addText({name:"Prices", x:70,y:350,w:paper.clientWidth-140,h:300,
-        text:"PRICE LIST\n\n• Fade + Line-up  —  R80\n• Beard Trim      —  R50\n• Wash + Cut      —  R100\n• Ladies Styling  —  From R150\n\nWalk-ins welcome • Book via WhatsApp",
-        fontSize:22, fontWeight:700, color:"#e2e8f0", lineHeight:1.4, bg:"#000000", bgAlpha:0
-      });
-
-      addButton({name:"CTA", x:70,y:paper.clientHeight-140,w:Math.min(560, paper.clientWidth-140),h:86, text:"Book on WhatsApp: 062 388 1570", bg:"#d4af37", color:"#070a12"});
-      selectedId=null; render(); renderLayers(); updateEditPanel();
-    }
-
-    function tplEvent(){
-      bgColor.value = "#0b1220";
-      paper.style.background = bgColor.value;
-      clearAll();
-
-      addShape("rect",{name:"Hero", x:40,y:40,w:paper.clientWidth-80,h:300, fill:"#a78bfa", alpha:.12, border:"#a78bfa", borderW:1, radius:20});
-      addShape("circle",{name:"Glow", x:paper.clientWidth-300,y:80,w:260,h:260, fill:"#60a5fa", alpha:.10, border:"#60a5fa", borderW:1});
-      addText({name:"Title", x:70,y:90,w:paper.clientWidth-140,h:130, text:"SATURDAY NIGHT\nLIVE DJ", fontSize:64, fontWeight:900, color:"#ffffff", lineHeight:1.0});
-      addText({name:"Details", x:70,y:220,w:paper.clientWidth-140,h:120, text:"Doors 7PM • Entry R50\nDress code: Clean & fresh", fontSize:26, fontWeight:800, color:"#e2e8f0", lineHeight:1.25});
-      addShape("rect",{name:"Info panel", x:40,y:380,w:paper.clientWidth-80,h:420, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
-      addText({name:"Venue", x:70,y:420,w:paper.clientWidth-140,h:320, text:"VENUE\n\nSky Lounge\n123 Main Road\n\nFEATURES\n• Drinks specials\n• Photo booth\n• VIP tables (limited)\n\nCall/WhatsApp to book a table.", fontSize:22, fontWeight:700, color:"#cbd5e1", lineHeight:1.5});
-      addButton({name:"CTA", x:70,y:paper.clientHeight-145,w:Math.min(560, paper.clientWidth-140),h:86, text:"Book: 062 388 1570", bg:"#60a5fa", color:"#0b1220"});
-      selectedId=null; render(); renderLayers(); updateEditPanel();
-    }
-
-    function tplRestaurant(){
-      bgColor.value = "#070a12";
-      paper.style.background = bgColor.value;
-      clearAll();
-
-      addShape("rect",{name:"Top", x:40,y:40,w:paper.clientWidth-80,h:220, fill:"#22c55e", alpha:.10, border:"#22c55e", borderW:1, radius:20});
-      addText({name:"Restaurant", x:70,y:95,w:paper.clientWidth-140,h:110, text:"Tasty Kitchen", fontSize:70, fontWeight:900, color:"#ffffff"});
-      addText({name:"Offer", x:70,y:200,w:paper.clientWidth-140,h:80, text:"Lunch Special • Today Only", fontSize:26, fontWeight:800, color:"#e2e8f0"});
-
-      addShape("rect",{name:"Menu box", x:40,y:300,w:paper.clientWidth-80,h:520, fill:"#ffffff", alpha:.05, border:"#ffffff", borderW:1, radius:20});
-      addText({name:"Menu", x:70,y:340,w:paper.clientWidth-140,h:430,
-        text:"SPECIALS\n\n• Chicken & Chips — R55\n• Beef Burger — R60\n• Kota Deluxe — R50\n• 2x Wings + Chips — R45\n\nFree delivery for orders over R200",
-        fontSize:24, fontWeight:800, color:"#e2e8f0", lineHeight:1.45
-      });
-
-      addButton({name:"CTA", x:70,y:paper.clientHeight-145,w:Math.min(560, paper.clientWidth-140),h:86, text:"Order on WhatsApp: 062 388 1570", bg:"#22c55e", color:"#070a12"});
-      selectedId=null; render(); renderLayers(); updateEditPanel();
-    }
-
-    // ===== Hook up UI =====
+    // ===== UI wiring =====
     function initSizeDropdown(){
       const order = ["a4","letter","a5","half","quarter","postcard4x6","postcard6x9","rack35","rack367"];
       for(const key of order){
@@ -1581,7 +1364,6 @@ async function exportToPng(){
       }
       sizePreset.value = canvasPresetKey;
     }
-
     function onCanvasSettingsChange(){
       const presetKey = sizePreset.value;
       const landscape = (orientation.value === "landscape");
@@ -1601,32 +1383,10 @@ async function exportToPng(){
     tabLayers.onclick = ()=>setTab("layers");
 
     // Buttons
-    document.getElementById("addHeadline").onclick = () => addText({
-      name:"Headline",
-      text:"Your Business Name",
-      fontSize: 62,
-      fontWeight: 900,
-      x: 70, y: 110, w: Math.min(650, paper.clientWidth - 140), h: 120,
-      align:"left",
-      bg:"#000000", bgAlpha:0
-    });
-    document.getElementById("addBody").onclick = () => addText({
-      name:"Text",
-      text:"Your business is real. Your work is solid.\nNow let your online presence match that.",
-      fontSize: 28,
-      fontWeight: 700,
-      x: 70, y: 260, w: Math.min(650, paper.clientWidth - 140), h: 150,
-      align:"left",
-      bg:"#000000", bgAlpha:0
-    });
-    document.getElementById("addCta").onclick = () => addButton({});
+    document.getElementById("addText").onclick = () => addText({ name:"Text", x:70, y:90, w:520, h:90 });
+    document.getElementById("addCta").onclick = () => addButton({ name:"Button" });
     document.getElementById("addRect").onclick = () => addShape("rect",{});
-    document.getElementById("addCircle").onclick = () => addShape("circle",{ w: 220, h: 220, x: Math.max(40, paper.clientWidth - 280), y: 220 });
-
-    document.getElementById("tplBusiness").onclick = tplBusiness;
-    document.getElementById("tplSalon").onclick = tplSalon;
-    document.getElementById("tplEvent").onclick = tplEvent;
-    document.getElementById("tplRestaurant").onclick = tplRestaurant;
+    document.getElementById("addCircle").onclick = () => addShape("circle",{ w:220, h:220, x:Math.max(40, paper.clientWidth - 280), y:220 });
 
     document.getElementById("exportPng").onclick = exportToPng;
     document.getElementById("exportPdf").onclick = exportPdf;
@@ -1706,14 +1466,12 @@ async function exportToPng(){
       const el = getSelected(); if(!el) return;
       el.z = ++zCounter;
       render(); renderLayers();
-      setStatus("Arranged", "Bring Front");
     };
     document.getElementById("sendBack").onclick = ()=>{
       const el = getSelected(); if(!el) return;
       el.z = 1;
       normalizeZ();
       render(); renderLayers();
-      setStatus("Arranged", "Send Back");
     };
     document.getElementById("alignLeft").onclick = ()=>{
       const el = getSelected(); if(!el) return;
@@ -1736,7 +1494,6 @@ async function exportToPng(){
       elements = elements.filter(e=>e.id !== selectedId);
       selectedId = null;
       render(); renderLayers(); updateEditPanel();
-      setStatus("Deleted", "Ready");
     }
     function duplicateSelected(){
       const el = getSelected(); if(!el) return;
@@ -1749,77 +1506,53 @@ async function exportToPng(){
       render();
       select(copy.id);
       renderLayers();
-      setStatus("Duplicated", "Ready");
     }
     document.getElementById("deleteEl").onclick = removeSelected;
     document.getElementById("duplicateEl").onclick = duplicateSelected;
 
-    // Layer tab quick actions
+    // Layer actions
     document.getElementById("moveUp").onclick = ()=> selectedId && moveLayer(selectedId, +1);
     document.getElementById("moveDown").onclick = ()=> selectedId && moveLayer(selectedId, -1);
     document.getElementById("deleteLayer").onclick = removeSelected;
-    document.getElementById("selectTop").onclick = ()=>{
-      const sorted = [...elements].sort((a,b)=>b.z-a.z);
-      if(sorted[0]) select(sorted[0].id);
-    };
-    document.getElementById("selectBottom").onclick = ()=>{
-      const sorted = [...elements].sort((a,b)=>a.z-a.z);
-      if(sorted[0]) select(sorted[0].id);
-    };
     document.getElementById("clearAll").onclick = clearAll;
 
-    // Keyboard shortcuts (FIXED: Backspace edits text only, not delete box)
-window.addEventListener("keydown", (e) => {
-  // If user is typing in any form field, do NOT run canvas shortcuts
-  const t = e.target;
-  const typing =
-    t &&
-    (t.tagName === "INPUT" ||
-     t.tagName === "TEXTAREA" ||
-     t.tagName === "SELECT" ||
-     t.isContentEditable);
+    // Shortcuts
+    window.addEventListener("keydown", (e)=>{
+      const el = getSelected();
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
 
-  if (typing) return;
+      if(mod && e.key.toLowerCase() === "d"){
+        e.preventDefault();
+        duplicateSelected();
+        return;
+      }
+      if(e.key === "Delete" || e.key === "Backspace"){
+        if(selectedId){
+          e.preventDefault();
+          removeSelected();
+        }
+        return;
+      }
+      if(!el) return;
 
-  const el = getSelected();
-  const isMac = navigator.platform.toLowerCase().includes("mac");
-  const mod = isMac ? e.metaKey : e.ctrlKey;
-
-  // Duplicate: Ctrl/Cmd + D
-  if (mod && e.key.toLowerCase() === "d") {
-    e.preventDefault();
-    duplicateSelected();
-    return;
-  }
-
-  // Delete element ONLY with the Delete key (NOT Backspace)
-  if (e.key === "Delete") {
-    if (selectedId) {
-      e.preventDefault();
-      removeSelected();
-    }
-    return;
-  }
-
-  // Move with arrows
-  if (!el || el.locked) return;
-
-  const step = e.shiftKey ? 10 : 2;
-  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
-    e.preventDefault();
-    if (e.key === "ArrowLeft")  el.x = snap(clamp(el.x - step, 0, paper.clientWidth - 10));
-    if (e.key === "ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth - 10));
-    if (e.key === "ArrowUp")    el.y = snap(clamp(el.y - step, 0, paper.clientHeight - 10));
-    if (e.key === "ArrowDown")  el.y = snap(clamp(el.y + step, 0, paper.clientHeight - 10));
-    render();
-    updateEditPanelQuiet();
-    renderLayers();
-  }
-});
-
+      const step = e.shiftKey ? 10 : 2;
+      if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){
+        e.preventDefault();
+        if(e.key==="ArrowLeft") el.x = snap(clamp(el.x - step, 0, paper.clientWidth-10));
+        if(e.key==="ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth-10));
+        if(e.key==="ArrowUp") el.y = snap(clamp(el.y - step, 0, paper.clientHeight-10));
+        if(e.key==="ArrowDown") el.y = snap(clamp(el.y + step, 0, paper.clientHeight-10));
+        render();
+        updateEditPanelQuiet();
+        renderLayers();
+      }
+    });
 
     // ===== Init =====
     initSizeDropdown();
+
+    // default canvas A4 portrait
     sizePreset.value = "a4";
     orientation.value = "portrait";
     canvasPresetKey = "a4";
@@ -1829,24 +1562,13 @@ window.addEventListener("keydown", (e) => {
     zoom.value = 100;
     zoomLabel.textContent = "100%";
 
-    // Apply size and guides
     paper.classList.toggle("show-guides", false);
     paper.classList.toggle("show-centers", false);
 
     applyCanvasSize({ presetKey:"a4", landscape:false, scale:false });
-    updateSizeLabels();
 
-    // default template
-    tplBusiness();
-
-    // also update guide inset now
-    updateSizeLabels();
-
-    // show guides if toggled
-    showGuides.addEventListener("change", ()=> updateSizeLabels());
-
-    // initial render layers
-    renderLayers();
+    // IMPORTANT: start BLANK
+    clearAll();
   </script>
 </body>
 </html>
