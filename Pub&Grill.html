@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#1a0f0a" />
+  <title>Iron & Oak Pub + Grill</title>
+  <meta name="description" content="A bold, wood-themed pub & grill demo website with menu, specials, events, gallery, and WhatsApp bookings." />
+
+  <!-- Fonts: Bold serif for headings + clean sans for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Deep browns + wood */
+      --bg:#0f0a07;
+      --bg2:#140c08;
+      --card: rgba(20,12,8,.78);
+      --soft: rgba(255,255,255,.06);
+      --line: rgba(255,255,255,.10);
+      --text:#f4efe9;
+      --muted:#c7b8aa;
+      --brand:#d2a86b;    /* warm gold */
+      --brand2:#b86a3a;   /* copper */
+      --ok:#22c55e;
+      --radius: 18px;
+      --shadow: 0 22px 55px rgba(0,0,0,.55);
+      --max: 1180px;
+
+      --heading: "Playfair Display", ui-serif, Georgia, serif;
+      --body: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--body);
+      color: var(--text);
+      background:
+        radial-gradient(900px 520px at 15% 15%, rgba(210,168,107,.16), transparent 60%),
+        radial-gradient(900px 520px at 85% 20%, rgba(184,106,58,.12), transparent 60%),
+        radial-gradient(800px 520px at 30% 90%, rgba(210,168,107,.07), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.5;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    img{ max-width:100%; display:block; }
+    .container{ width:100%; max-width: var(--max); margin:0 auto; padding: 0 18px; }
+
+    /* Top bar (bold + simple) */
+    .topbar{
+      position: sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(15,10,7,.70);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 0;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
+    }
+    .logo{
+      width:38px; height:38px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(135deg, rgba(210,168,107,.95), rgba(184,106,58,.92));
+      box-shadow: 0 18px 40px rgba(0,0,0,.55);
+      position:relative;
+      overflow:hidden;
+    }
+    .brand-name{ font-family: var(--heading); font-weight: 800; letter-spacing:.2px; }
+    .brand-sub{ font-size:12px; color: var(--muted); margin-top:-2px; }
+
+    nav{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .navlink{
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 10px;
+      border:1px solid transparent;
+    }
+    .navlink:hover{
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255,255,255,.04);
+    }
+
+    .cta{ display:flex; gap:10px; align-items:center; }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 13px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
+    .btn.primary{
+      border-color: rgba(210,168,107,.35);
+      background: linear-gradient(135deg, rgba(210,168,107,.22), rgba(184,106,58,.14));
+    }
+
+    /* Full-width hero with wood texture + big grill image */
+    .hero{
+      position: relative;
+      width: 100%;
+      overflow:hidden;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:0;
+      /* wood texture + grill image with smoke */
+      background-image:
+        linear-gradient(to bottom, rgba(15,10,7,.55), rgba(15,10,7,.92)),
+        url("https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=2200&q=70");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.05) contrast(1.05);
+      transform: scale(1.02);
+    }
+    .hero::after{
+      content:"";
+      position:absolute; inset:0;
+      /* subtle woodgrain overlay */
+      background-image:
+        radial-gradient(1200px 600px at 20% 20%, rgba(210,168,107,.20), transparent 60%),
+        repeating-linear-gradient(90deg,
+          rgba(255,255,255,.035) 0px,
+          rgba(255,255,255,.035) 2px,
+          rgba(0,0,0,0) 8px,
+          rgba(0,0,0,0) 14px
+        );
+      mix-blend-mode: overlay;
+      opacity:.35;
+      pointer-events:none;
+    }
+
+    .hero-inner{
+      position: relative;
+      padding: 64px 0 44px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items:end;
+    }
+
+    .hero-card{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(20,12,8,.72);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .hero-left{ padding: 22px; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .dot{
+      width:8px; height:8px;
+      border-radius:50%;
+      background: var(--ok);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+    }
+
+    h1{
+      font-family: var(--heading);
+      margin: 12px 0 10px;
+      line-height:1.03;
+      font-size: clamp(32px, 4.6vw, 54px);
+      letter-spacing:-.5px;
+    }
+    .lead{
+      margin: 0 0 18px;
+      color: rgba(244,239,233,.86);
+      font-size: 15px;
+      max-width: 62ch;
+    }
+
+    /* Clear CTA: Menu | Book | Call (bold + simple) */
+    .hero-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .hero-actions .btn{ padding: 12px 14px; }
+
+    .meta{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 16px; }
+
+    .hero-right{
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .special-box{
+      border-radius: 16px;
+      border: 1px solid rgba(210,168,107,.22);
+      background: linear-gradient(135deg, rgba(210,168,107,.16), rgba(184,106,58,.10));
+      padding: 14px;
+    }
+    .special-box .k{ font-size:12px; color: var(--muted); }
+    .special-box .v{ font-family: var(--heading); font-size: 18px; margin-top: 6px; }
+
+    /* Sections (no clutter) */
+    section{ padding: 22px 0; }
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      margin: 6px 0 12px;
+    }
+    .section-title h2{
+      font-family: var(--heading);
+      margin:0;
+      font-size: 22px;
+      letter-spacing:-.2px;
+    }
+    .section-title p{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 70ch;
+    }
+
+    .grid{ display:grid; gap: 12px; }
+    .grid.cols-3{ grid-template-columns: repeat(3, 1fr); }
+    .grid.cols-2{ grid-template-columns: repeat(2, 1fr); }
+
+    .card{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(20,12,8,.70);
+      box-shadow: 0 14px 30px rgba(0,0,0,.40);
+      padding: 16px;
+    }
+    .card h3{
+      font-family: var(--heading);
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    .card p{ margin:0; color: var(--muted); font-size: 13px; }
+
+    .tagrow{ display:flex; flex-wrap:wrap; gap:8px; margin-top: 10px; }
+    .tag{
+      font-size: 12px;
+      color: rgba(244,239,233,.92);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    /* Menu */
+    #menu .wrap{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(20,12,8,.72);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .menu-wrap{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .menu-item{
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .menu-item strong{ font-size: 13px; }
+    .menu-item span{ color: var(--muted); font-size: 12px; display:block; margin-top:2px; }
+    .price{ font-weight:800; white-space:nowrap; color: rgba(244,239,233,.95); }
+
+    .special{
+      border:1px solid rgba(210,168,107,.26);
+      background: linear-gradient(135deg, rgba(210,168,107,.10), rgba(184,106,58,.08));
+    }
+
+    /* Gallery */
+    .gallery{ display:grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
+    .shot{
+      grid-column: span 4;
+      height: 170px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      overflow:hidden;
+      position:relative;
+      background: rgba(255,255,255,.03);
+    }
+    .shot img{ width:100%; height:100%; object-fit:cover; filter:saturate(1.05) contrast(1.05); transform:scale(1.02); transition: transform .25s ease; }
+    .shot:hover img{ transform: scale(1.06); }
+    .shot .cap{
+      position:absolute; left:10px; bottom:10px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.40);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Contact */
+    .contact{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .map{
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+      min-height: 320px;
+    }
+    iframe{ width:100%; height:100%; border:0; }
+
+    footer{ border-top: 1px solid var(--line); padding: 16px 0 26px; color: var(--muted); font-size: 12px; }
+    .foot{ display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap:wrap; }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .grid.cols-3{ grid-template-columns: 1fr; }
+      .grid.cols-2{ grid-template-columns: 1fr; }
+      .menu-wrap{ grid-template-columns: 1fr; }
+      .contact{ grid-template-columns: 1fr; }
+      .shot{ grid-column: span 6; }
+      nav{ display:none; }
+    }
+    @media (max-width: 520px){
+      .shot{ grid-column: span 12; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container">
+      <div class="topbar-inner">
+        <a class="brand" href="#home" aria-label="Home">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="brand-name">Iron & Oak</div>
+            <div class="brand-sub">Pub + Grill • Live Sports • Good Food</div>
+          </div>
+        </a>
+
+        <nav aria-label="Primary navigation">
+          <a class="navlink" href="#menu">Menu</a>
+          <a class="navlink" href="#specials">Specials</a>
+          <a class="navlink" href="#events">Events</a>
+          <a class="navlink" href="#gallery">Gallery</a>
+          <a class="navlink" href="#location">Location</a>
+        </nav>
+
+        <div class="cta" aria-label="Primary actions">
+          <a class="btn" href="tel:+27110000000" title="Call">Call</a>
+          <a class="btn primary" id="waTop" href="#" title="Book">Book a Table</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- FULL-WIDTH HERO -->
+  <main id="home" class="hero">
+    <div class="container hero-inner">
+      <div class="hero-grid">
+        <div class="hero-card hero-left">
+          <div class="pill"><span class="dot"></span> Open today • Kitchen until late</div>
+          <h1>Pub classics.<br/>Grill smoke. Big flavor.</h1>
+          <p class="lead">
+            A straight-to-the-point pub & grill experience: burgers, ribs, wings, cold drinks, and live sports — no clutter, no fluff.
+          </p>
+
+          <!-- Clear CTA: Menu | Book | Call -->
+          <div class="hero-actions" aria-label="Hero actions">
+            <a class="btn primary" href="#menu">Menu</a>
+            <a class="btn" id="waHeroBook" href="#">Book a Table</a>
+            <a class="btn" href="tel:+27110000000">Call</a>
+          </div>
+
+          <div class="meta">
+            <span class="pill">📍 Main Street, Your Town</span>
+            <span class="pill">🕒 Mon–Thu 12:00–23:00 • Fri–Sun 12:00–02:00</span>
+            <span class="pill">⚽ Live Sports • 🔥 Grill • 🎧 Weekends</span>
+          </div>
+        </div>
+
+        <div class="hero-card hero-right">
+          <div class="special-box">
+            <div class="k">Weekend Special</div>
+            <div class="v">2x Burgers + Fries • R199</div>
+            <div class="tagrow" style="margin-top:10px;">
+              <span class="tag">Happy Hour 16:00–18:00</span>
+              <span class="tag">Walk-ins welcome</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding:14px;">
+            <h3 style="margin:0 0 6px;">Fast Bookings</h3>
+            <p>Tap WhatsApp and send: name • date • time • guests.</p>
+            <div style="height:10px"></div>
+            <a class="btn primary" id="waQuick" href="#">WhatsApp Booking</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="container">
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>🔥 Signature Grill</h3>
+          <p>Ribs, wings, burgers, steaks — cooked properly, seasoned right.</p>
+          <div class="tagrow"><span class="tag">Ribs</span><span class="tag">Wings</span><span class="tag">Steak</span></div>
+        </div>
+        <div class="card">
+          <h3>🍺 Cold Drinks</h3>
+          <p>Local favorites, cocktails, and table specials that move.</p>
+          <div class="tagrow"><span class="tag">Beer</span><span class="tag">Cocktails</span><span class="tag">Buckets</span></div>
+        </div>
+        <div class="card">
+          <h3>⚽ Live Sports</h3>
+          <p>Big-screen games with sound on. Arrive early for seats.</p>
+          <div class="tagrow"><span class="tag">Big Screens</span><span class="tag">Sound On</span><span class="tag">Platter Deals</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>Menu Highlights</h2>
+          <p>Simple. Bold. What people actually order.</p>
+        </div>
+        <a class="btn" id="waMenu" href="#">Order / Book (WhatsApp)</a>
+      </div>
+
+      <div class="wrap">
+        <div class="menu-wrap">
+          <div>
+            <h3 style="margin:0 0 10px; font-family:var(--heading);">Grill & Mains</h3>
+
+            <div class="menu-item">
+              <div>
+                <strong>Classic Beef Burger</strong>
+                <span>Cheddar, pickles, house sauce • fries</span>
+              </div>
+              <div class="price">R89</div>
+            </div>
+
+            <div class="menu-item">
+              <div>
+                <strong>Sticky BBQ Ribs (Half Rack)</strong>
+                <span>Smoked BBQ glaze • fries + slaw</span>
+              </div>
+              <div class="price">R149</div>
+            </div>
+
+            <div class="menu-item special">
+              <div>
+                <strong>Wings (10)</strong>
+                <span>Hot, BBQ, or peri-peri • ranch dip</span>
+              </div>
+              <div class="price">R99</div>
+            </div>
+
+            <div class="menu-item">
+              <div>
+                <strong>Grilled T-Bone</strong>
+                <span>250g • fries + side salad</span>
+              </div>
+              <div class="price">R179</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:0 0 10px; font-family:var(--heading);">Sharing & Sides</h3>
+
+            <div class="menu-item">
+              <div>
+                <strong>Loaded Fries</strong>
+                <span>Cheese sauce, jalapeños, bacon bits</span>
+              </div>
+              <div class="price">R69</div>
+            </div>
+
+            <div class="menu-item">
+              <div>
+                <strong>Platter for Two</strong>
+                <span>Ribs, wings, sausage, fries, slaw</span>
+              </div>
+              <div class="price">R249</div>
+            </div>
+
+            <div class="menu-item special">
+              <div>
+                <strong>Bucket Deal</strong>
+                <span>6 beers + wings basket (selected)</span>
+              </div>
+              <div class="price">R199</div>
+            </div>
+
+            <div class="menu-item">
+              <div>
+                <strong>Onion Rings</strong>
+                <span>Crispy, salted, house dip</span>
+              </div>
+              <div class="price">R39</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px; color:var(--muted); font-size:12px;">
+          * Demo prices/items — swap to match the real pub.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIALS -->
+  <section id="specials">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>Weekly Specials</h2>
+          <p>Offers that bring people in. Keep it consistent every week.</p>
+        </div>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Mon: Burger Night</h3>
+          <p>Any burger + fries • <b>R79</b> (from 17:00)</p>
+          <div class="tagrow"><span class="tag">Walk-ins welcome</span></div>
+        </div>
+        <div class="card">
+          <h3>Wed: Wing Wednesday</h3>
+          <p>Wings (10) + drink • <b>R99</b></p>
+          <div class="tagrow"><span class="tag">Hot / BBQ / Peri</span></div>
+        </div>
+        <div class="card">
+          <h3>Fri: Happy Hour</h3>
+          <p>Selected drinks • <b>16:00–18:00</b></p>
+          <div class="tagrow"><span class="tag">Buckets available</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="events">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>Events</h2>
+          <p>Simple promos: DJ nights, match screenings, birthdays.</p>
+        </div>
+        <a class="btn" id="waEvents" href="#">Host an Event</a>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>🎧 Saturday DJ Night</h3>
+          <p>From 20:00 • Table bookings recommended.</p>
+          <div class="tagrow"><span class="tag">R&B • Amapiano • House</span><span class="tag">Dress clean</span></div>
+        </div>
+        <div class="card">
+          <h3>⚽ Big Match Screenings</h3>
+          <p>Sound on • arrive early • platter specials.</p>
+          <div class="tagrow"><span class="tag">Sound On</span><span class="tag">Platter Specials</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>Gallery</h2>
+          <p>Demo photos (Unsplash). Replace with real photos for trust.</p>
+        </div>
+      </div>
+
+      <div class="gallery">
+        <a class="shot" href="#" aria-label="View photo 1">
+          <img alt="Burgers" src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Burgers</span>
+        </a>
+        <a class="shot" href="#" aria-label="View photo 2">
+          <img alt="Ribs" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Ribs</span>
+        </a>
+        <a class="shot" href="#" aria-label="View photo 3">
+          <img alt="Wings" src="https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Wings</span>
+        </a>
+        <a class="shot" href="#" aria-label="View photo 4">
+          <img alt="Drinks" src="https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Drinks</span>
+        </a>
+        <a class="shot" href="#" aria-label="View photo 5">
+          <img alt="Grill" src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Grill</span>
+        </a>
+        <a class="shot" href="#" aria-label="View photo 6">
+          <img alt="Vibes" src="https://images.unsplash.com/photo-1529692236671-f1d1a1399d94?auto=format&fit=crop&w=1400&q=70">
+          <span class="cap">Vibes</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION / CONTACT -->
+  <section id="location">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>Location & Bookings</h2>
+          <p>Set the real address + number + map embed.</p>
+        </div>
+      </div>
+
+      <div class="contact">
+        <div class="card">
+          <h3>Contact</h3>
+          <p style="margin-top:6px;">
+            📍 <b>Main Street, Your Town</b><br/>
+            🕒 Mon–Thu 12:00–23:00 • Fri–Sun 12:00–02:00<br/>
+            ☎️ <a href="tel:+27110000000" style="text-decoration:underline;">+27 11 000 0000</a><br/>
+            💬 <a id="waContact" href="#" style="text-decoration:underline;">Book on WhatsApp</a>
+          </p>
+
+          <div style="height:12px"></div>
+
+          <h3>Quick Booking</h3>
+          <p>Send: name • date • time • guests.</p>
+          <div style="height:10px"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" id="waBook" href="#">Book a Table</a>
+            <a class="btn" id="waBirthday" href="#">Birthday / Private Event</a>
+          </div>
+
+          <div style="margin-top:12px; color:var(--muted); font-size:12px;">
+            Keep this page simple. This is where conversions happen.
+          </div>
+        </div>
+
+        <div class="map" aria-label="Map">
+          <iframe
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Johannesburg%20South%20Africa&output=embed">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="foot">
+        <div>© <span id="year"></span> Iron & Oak Pub + Grill • Demo site</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="navlink" href="#menu">Menu</a>
+          <a class="navlink" href="#events">Events</a>
+          <a class="navlink" href="#location">Location</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Update year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // WhatsApp config
+    const WHATSAPP_NUMBER = "27623881570"; // change this (no + sign). Example: 27623881570
+    const PLACE_NAME = "Iron & Oak Pub + Grill";
+
+    function waLink(message){
+      const text = encodeURIComponent(message);
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+    }
+
+    const links = [
+      ["waTop", `Hi ${PLACE_NAME}, I’d like to book a table. Name: ____  Date: ____  Time: ____  Guests: ____`],
+      ["waHeroBook", `Hi ${PLACE_NAME}, I’d like to book a table. Name: ____  Date: ____  Time: ____  Guests: ____`],
+      ["waQuick", `Hi ${PLACE_NAME}, I’d like to book a table. Name: ____  Date: ____  Time: ____  Guests: ____`],
+      ["waMenu", `Hi ${PLACE_NAME}, can I order / book? I’m interested in: ____`],
+      ["waEvents", `Hi ${PLACE_NAME}, I want to host an event. Type: ____  Date: ____  Guests: ____`],
+      ["waContact", `Hi ${PLACE_NAME}, I’d like to book a table. Name: ____  Date: ____  Time: ____  Guests: ____`],
+      ["waBook", `Hi ${PLACE_NAME}, I’d like to book a table. Name: ____  Date: ____  Time: ____  Guests: ____`],
+      ["waBirthday", `Hi ${PLACE_NAME}, I want to book for a birthday/private event. Date: ____  Guests: ____  Budget: ____`],
+    ];
+
+    links.forEach(([id, msg]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.href = waLink(msg);
+      el.target = "_blank";
+      el.rel = "noopener";
+    });
+  </script>
+</body>
+</html>
