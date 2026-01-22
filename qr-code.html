@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Logic Lab  QR Code</title>
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(17,24,39,.72);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --blue:#60a5fa;
+      --blue2:#38bdf8;
+      --ring: rgba(96,165,250,.35);
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius: 20px;
+      --max: 980px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(56,189,248,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(96,165,250,.16), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 16px;
+    }
+    .wrap{
+      width:100%;
+      max-width:var(--max);
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+    @media (max-width: 860px){ .wrap{grid-template-columns:1fr} }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(600px 260px at 20% 10%, rgba(96,165,250,.18), transparent 55%),
+        radial-gradient(600px 260px at 80% 0%, rgba(56,189,248,.16), transparent 55%);
+      pointer-events:none;
+    }
+    .inner{position:relative; padding:26px}
+
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      box-shadow: 0 0 0 4px rgba(56,189,248,.10);
+    }
+    h1{
+      margin:14px 0 8px;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height:1.05;
+      letter-spacing:-.02em;
+    }
+    p{ margin:0; color: var(--muted); font-size: 16px; line-height:1.6; }
+
+    .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; align-items:center;}
+    .input{
+      flex:1 1 320px;
+      padding:12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      border-radius: 14px; padding: 12px 16px;
+      font-weight: 800;
+      display:inline-flex; align-items:center; gap:10px;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:active{transform: translateY(1px)}
+    .primary{
+      color:#06101f;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      box-shadow: 0 10px 24px rgba(56,189,248,.22);
+    }
+    .ghost{
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    /* QR */
+    .qrBox{
+      margin-top:18px;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .qrCard{
+      width: 260px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    #qrcode{
+      width: 220px;
+      height: 220px;
+      margin: 0 auto;
+      background: #fff; /* keep white for scanning */
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px;
+    }
+    .hint{
+      font-size: 13px;
+      color: rgba(148,163,184,.9);
+      margin-top:10px;
+      text-align:center;
+    }
+
+    /* Right side */
+    .side h2{margin:0 0 10px; font-size:18px;}
+    .list{margin:0; padding:0; list-style:none; display:grid; gap:10px;}
+    .item{
+      padding:12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+    }
+    .item span{color: var(--muted); font-size: 13px}
+    .small{font-size:12px;color:rgba(148,163,184,.85);margin-top:12px}
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="inner">
+        <div class="badge"><span class="dot"></span><span>QR Code Generator</span></div>
+        <h1>Logic Lab Studio QR</h1>
+        <p>Scan the code or download it as an image.</p>
+
+        <div class="row">
+          <input class="input" id="urlInput" value="https://logiclabstudio.github.io/" />
+          <button class="btn primary" id="makeBtn" type="button">Generate QR</button>
+          <button class="btn ghost" id="downloadBtn" type="button">Download PNG</button>
+        </div>
+
+        <div class="qrBox">
+          <div class="qrCard">
+            <div id="qrcode" aria-label="QR code"></div>
+            <div class="hint" id="status">Ready.</div>
+          </div>
+
+          <div style="flex:1; min-width:220px">
+            <p style="margin-bottom:10px">
+              Tip: keep the QR on a white background for best scanning.  
+              This one is made correctly.
+            </p>
+            <div class="small">
+              If you print it: use at least <b>3–4 cm</b> size and don’t stretch it.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card side">
+      <div class="inner">
+        <h2>Quick options</h2>
+        <ul class="list">
+          <li class="item"><strong>Website</strong><span>Link to your homepage</span></li>
+          <li class="item"><strong>WhatsApp</strong><span>Direct chat link</span></li>
+          <li class="item"><strong>Maps</strong><span>Location link</span></li>
+        </ul>
+
+        <div class="small">
+          Want a WhatsApp QR too? Use a link like:
+          <br><br>
+          <code style="display:block;background:rgba(0,0,0,.25);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.10);color:#e5e7eb;">
+https://wa.me/27623881570
+          </code>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- QR library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script>
+    const urlInput = document.getElementById("urlInput");
+    const makeBtn = document.getElementById("makeBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const statusEl = document.getElementById("status");
+    const qrEl = document.getElementById("qrcode");
+
+    let qr;
+
+    function renderQR() {
+      const text = (urlInput.value || "").trim();
+      if (!text) {
+        statusEl.textContent = "Enter a link first.";
+        return;
+      }
+
+      // Clear previous QR
+      qrEl.innerHTML = "";
+      qr = new QRCode(qrEl, {
+        text,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      statusEl.textContent = "QR generated ✅";
+    }
+
+    function downloadPNG() {
+      // qrcodejs creates either an <img> or <canvas> depending on browser
+      const img = qrEl.querySelector("img");
+      const canvas = qrEl.querySelector("canvas");
+
+      let dataUrl = "";
+      if (canvas) dataUrl = canvas.toDataURL("image/png");
+      else if (img) dataUrl = img.src;
+
+      if (!dataUrl) {
+        statusEl.textContent = "Generate a QR first.";
+        return;
+      }
+
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "logic-lab-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      statusEl.textContent = "Downloaded ✅";
+    }
+
+    makeBtn.addEventListener("click", renderQR);
+    downloadBtn.addEventListener("click", downloadPNG);
+
+    // Auto-generate on load
+    renderQR();
+  </script>
+</body>
+</html>
