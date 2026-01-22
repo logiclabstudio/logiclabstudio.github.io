@@ -1517,37 +1517,55 @@
     document.getElementById("clearAll").onclick = clearAll;
 
     // Shortcuts
-    window.addEventListener("keydown", (e)=>{
-      const el = getSelected();
-      const isMac = navigator.platform.toLowerCase().includes("mac");
-      const mod = isMac ? e.metaKey : e.ctrlKey;
+// Keyboard shortcuts (FIXED: Backspace edits text only, not delete box)
+window.addEventListener("keydown", (e) => {
+  // If user is typing in any form field, do NOT run canvas shortcuts
+  const t = e.target;
+  const typing =
+    t &&
+    (t.tagName === "INPUT" ||
+     t.tagName === "TEXTAREA" ||
+     t.tagName === "SELECT" ||
+     t.isContentEditable);
 
-      if(mod && e.key.toLowerCase() === "d"){
-        e.preventDefault();
-        duplicateSelected();
-        return;
-      }
-      if(e.key === "Delete" || e.key === "Backspace"){
-        if(selectedId){
-          e.preventDefault();
-          removeSelected();
-        }
-        return;
-      }
-      if(!el) return;
+  if (typing) return;
 
-      const step = e.shiftKey ? 10 : 2;
-      if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key)){
-        e.preventDefault();
-        if(e.key==="ArrowLeft") el.x = snap(clamp(el.x - step, 0, paper.clientWidth-10));
-        if(e.key==="ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth-10));
-        if(e.key==="ArrowUp") el.y = snap(clamp(el.y - step, 0, paper.clientHeight-10));
-        if(e.key==="ArrowDown") el.y = snap(clamp(el.y + step, 0, paper.clientHeight-10));
-        render();
-        updateEditPanelQuiet();
-        renderLayers();
-      }
-    });
+  const el = getSelected();
+  const isMac = navigator.platform.toLowerCase().includes("mac");
+  const mod = isMac ? e.metaKey : e.ctrlKey;
+
+  // Duplicate: Ctrl/Cmd + D
+  if (mod && e.key.toLowerCase() === "d") {
+    e.preventDefault();
+    duplicateSelected();
+    return;
+  }
+
+  // Delete element ONLY with the Delete key (NOT Backspace)
+  if (e.key === "Delete") {
+    if (selectedId) {
+      e.preventDefault();
+      removeSelected();
+    }
+    return;
+  }
+
+  // Move with arrows
+  if (!el || el.locked) return;
+
+  const step = e.shiftKey ? 10 : 2;
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+    e.preventDefault();
+    if (e.key === "ArrowLeft")  el.x = snap(clamp(el.x - step, 0, paper.clientWidth - 10));
+    if (e.key === "ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth - 10));
+    if (e.key === "ArrowUp")    el.y = snap(clamp(el.y - step, 0, paper.clientHeight - 10));
+    if (e.key === "ArrowDown")  el.y = snap(clamp(el.y + step, 0, paper.clientHeight - 10));
+    render();
+    updateEditPanelQuiet();
+    renderLayers();
+  }
+});
+
 
     // ===== Init =====
     initSizeDropdown();
