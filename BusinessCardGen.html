@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Business Card Generator</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#0f172a;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --line:rgba(255,255,255,.12);
+      --accent:#60a5fa;
+      --accent2:#a78bfa;
+
+      /* Card theme (editable) */
+      --cardBg1:#0b1020;
+      --cardBg2:#111827;
+      --cardText:#e5e7eb;
+      --cardMuted:#b6c2d6;
+      --cardAccent:#60a5fa;
+      --cardBorder:rgba(255,255,255,.12);
+
+      --radius:16px;
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(96,165,250,.25), transparent 55%),
+                  radial-gradient(900px 600px at 110% 10%, rgba(167,139,250,.20), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:20px;
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns: 1fr; }
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel header{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      background: rgba(255,255,255,.03);
+    }
+    .panel header .title{
+      display:flex;flex-direction:column;gap:2px;
+    }
+    .panel header h1{
+      font-size:14px;margin:0;font-weight:800;letter-spacing:.2px;
+    }
+    .panel header p{
+      margin:0;font-size:12px;color:var(--muted);
+    }
+    .content{padding:14px 16px;}
+    .grid{display:grid;gap:10px;}
+    .row{display:grid;grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 520px){ .row{grid-template-columns:1fr;} }
+
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;}
+    input[type="text"], input[type="email"], input[type="url"], input[type="tel"], select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(17,24,39,.55);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="color"]{
+      width:100%;
+      height:40px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: transparent;
+      padding:0;
+    }
+    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+    button{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-weight:700;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22);}
+    button:active{transform: translateY(1px);}
+    .primary{
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.88));
+      border-color: rgba(255,255,255,.18);
+      color:#081025;
+    }
+
+    .toggle{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(17,24,39,.35);
+    }
+    .toggle input{transform: scale(1.1);}
+    .hint{font-size:12px;color:var(--muted);line-height:1.35;margin-top:8px;}
+    .divider{height:1px;background: var(--line); margin:12px 0;}
+
+    /* Preview area */
+    .previewWrap{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .previewTop{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .canvasRow{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+
+    /* canvas container gives nice shadow */
+    .cardFrame{
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+    .cardFrame h3{
+      margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+    canvas{
+      display:block;
+      border-radius: 14px;
+      background: transparent;
+      max-width: 100%;
+      height: auto;
+    }
+    .smallNote{
+      font-size:12px;color:var(--muted);
+    }
+    .kbd{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-weight:800;
+      font-size:12px;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Controls -->
+    <section class="panel">
+      <header>
+        <div class="title">
+          <h1>Business Card Generator</h1>
+          <p>Design → export PNG (print-ready)</p>
+        </div>
+        <span class="badge">Drag logo on the card</span>
+      </header>
+
+      <div class="content">
+        <div class="grid">
+          <div class="row">
+            <div>
+              <label>Card size</label>
+              <select id="size">
+                <option value="us">US 3.5 × 2 in</option>
+                <option value="eu">85 × 55 mm</option>
+              </select>
+            </div>
+            <div>
+              <label>DPI (export quality)</label>
+              <select id="dpi">
+                <option value="300">300 (print)</option>
+                <option value="200">200</option>
+                <option value="150">150</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div>
+              <label>Company</label>
+              <input id="company" type="text" value="Logic Lab" />
+            </div>
+            <div>
+              <label>Tagline</label>
+              <input id="tagline" type="text" value="Software Development Studio" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Name</label>
+              <input id="name" type="text" value="Timmy Mokge" />
+            </div>
+            <div>
+              <label>Title</label>
+              <input id="title" type="text" value="Junior Software Developer" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Phone</label>
+              <input id="phone" type="tel" value="+27 62 388 1570" />
+            </div>
+            <div>
+              <label>Email</label>
+              <input id="email" type="email" value="hello@yourdomain.com" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Website</label>
+              <input id="website" type="url" value="logiclabstudio.github.io" />
+            </div>
+            <div>
+              <label>Address</label>
+              <input id="address" type="text" value="Johannesburg, South Africa" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Logo (PNG/JPG)</label>
+              <input id="logo" type="file" accept="image/*" />
+            </div>
+            <div>
+              <label>Font</label>
+              <select id="font">
+                <option value="system">System</option>
+                <option value="inter">Inter-like</option>
+                <option value="mono">Mono</option>
+                <option value="serif">Serif</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div>
+              <label>Background 1</label>
+              <input id="bg1" type="color" value="#0b1020" />
+            </div>
+            <div>
+              <label>Background 2</label>
+              <input id="bg2" type="color" value="#111827" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Accent</label>
+              <input id="accent" type="color" value="#60a5fa" />
+            </div>
+            <div>
+              <label>Text</label>
+              <input id="text" type="color" value="#e5e7eb" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="toggle">
+              <input id="guides" type="checkbox" checked />
+              <div>
+                <div style="font-weight:800">Show print guides</div>
+                <div class="smallNote">Bleed + safe area</div>
+              </div>
+            </div>
+            <div class="toggle">
+              <input id="backSide" type="checkbox" />
+              <div>
+                <div style="font-weight:800">Enable back side</div>
+                <div class="smallNote">Simple logo + tagline</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="primary" id="downloadFront">Download Front PNG</button>
+            <button id="downloadBack">Download Back PNG</button>
+            <button id="reset">Reset</button>
+          </div>
+
+          <div class="hint">
+            Tips: Drag the logo. Hold <span class="kbd">Shift</span> while dragging to move faster.
+            Use 300 DPI for print shops. If you need PDF later, tell me and I’ll add it.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview -->
+    <section class="panel">
+      <header>
+        <div class="title">
+          <h1>Preview</h1>
+          <p>Front + (optional) back</p>
+        </div>
+        <span class="badge" id="dimLabel">—</span>
+      </header>
+
+      <div class="previewWrap">
+        <div class="previewTop">
+          <div class="smallNote">Export uses your selected DPI (actual pixels), preview is scaled.</div>
+          <div class="smallNote">Logo position is saved per session.</div>
+        </div>
+
+        <div class="canvasRow">
+          <div class="cardFrame">
+            <h3>Front</h3>
+            <canvas id="front"></canvas>
+          </div>
+
+          <div class="cardFrame">
+            <h3>Back</h3>
+            <canvas id="back"></canvas>
+            <div class="smallNote" style="margin-top:8px;">Turn on “Enable back side” to export.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  // Card physical sizes
+  const SIZES = {
+    us: { w_in: 3.5, h_in: 2.0, label: "US 3.5×2 in" },
+    eu: { w_in: 3.346, h_in: 2.165, label: "85×55 mm" } // mm → in
+  };
+
+  // Guides (typical): 1/8" bleed, 1/8" safe inset
+  const BLEED_IN = 0.125; // 3.175mm
+  const SAFE_IN  = 0.125;
+
+  const els = {
+    size: document.getElementById("size"),
+    dpi: document.getElementById("dpi"),
+    company: document.getElementById("company"),
+    tagline: document.getElementById("tagline"),
+    name: document.getElementById("name"),
+    title: document.getElementById("title"),
+    phone: document.getElementById("phone"),
+    email: document.getElementById("email"),
+    website: document.getElementById("website"),
+    address: document.getElementById("address"),
+    logo: document.getElementById("logo"),
+    font: document.getElementById("font"),
+    bg1: document.getElementById("bg1"),
+    bg2: document.getElementById("bg2"),
+    accent: document.getElementById("accent"),
+    text: document.getElementById("text"),
+    guides: document.getElementById("guides"),
+    backSide: document.getElementById("backSide"),
+    downloadFront: document.getElementById("downloadFront"),
+    downloadBack: document.getElementById("downloadBack"),
+    reset: document.getElementById("reset"),
+    dimLabel: document.getElementById("dimLabel"),
+    frontCanvas: document.getElementById("front"),
+    backCanvas: document.getElementById("back"),
+  };
+
+  // State
+  const state = {
+    logoImg: null,
+    logoPos: { x: 0.72, y: 0.22 }, // relative
+    logoScale: 0.22, // relative width (fraction of card width)
+    dragging: false,
+    dragOff: { x: 0, y: 0 }
+  };
+
+  // Try restore saved logo position
+  const saved = localStorage.getItem("bc_logo_pos");
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      if (p && typeof p.x === "number" && typeof p.y === "number") state.logoPos = p;
+    } catch {}
+  }
+
+  function fontStack(kind){
+    switch(kind){
+      case "inter": return "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      case "mono": return "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
+      case "serif": return "ui-serif, Georgia, 'Times New Roman', Times, serif";
+      default: return "system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    }
+  }
+
+  function px(inches, dpi){ return Math.round(inches * dpi); }
+
+  function setupCanvases(){
+    const size = SIZES[els.size.value];
+    const dpi = +els.dpi.value;
+
+    const w = px(size.w_in + 2*BLEED_IN, dpi);
+    const h = px(size.h_in + 2*BLEED_IN, dpi);
+
+    els.frontCanvas.width = w;
+    els.frontCanvas.height = h;
+    els.backCanvas.width = w;
+    els.backCanvas.height = h;
+
+    els.dimLabel.textContent = `${size.label} @ ${dpi} DPI (${w}×${h}px incl. bleed)`;
+  }
+
+  function roundedRect(ctx, x, y, w, h, r){
+    const rr = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+rr, y);
+    ctx.arcTo(x+w, y, x+w, y+h, rr);
+    ctx.arcTo(x+w, y+h, x, y+h, rr);
+    ctx.arcTo(x, y+h, x, y, rr);
+    ctx.arcTo(x, y, x+w, y, rr);
+    ctx.closePath();
+  }
+
+  function linearGradient(ctx, w, h, c1, c2){
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, c1);
+    g.addColorStop(1, c2);
+    return g;
+  }
+
+  function drawGuides(ctx, w, h, dpi){
+    if(!els.guides.checked) return;
+
+    // bleed border (full canvas) + trim box + safe box
+    const bleed = px(BLEED_IN, dpi);
+    const safe = px(SAFE_IN, dpi);
+
+    // Trim box (inside bleed)
+    ctx.save();
+    ctx.setLineDash([10, 8]);
+    ctx.strokeStyle = "rgba(255,255,255,.35)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bleed, bleed, w-2*bleed, h-2*bleed);
+
+    // Safe box
+    ctx.setLineDash([8, 8]);
+    ctx.strokeStyle = "rgba(96,165,250,.55)";
+    ctx.strokeRect(bleed+safe, bleed+safe, w-2*(bleed+safe), h-2*(bleed+safe));
+
+    // Labels
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.font = `bold ${Math.max(18, Math.round(w*0.018))}px ${fontStack("system")}`;
+    ctx.fillText("TRIM", bleed+10, bleed+24);
+    ctx.fillStyle = "rgba(96,165,250,.85)";
+    ctx.fillText("SAFE", bleed+safe+10, bleed+safe+24);
+    ctx.restore();
+  }
+
+  function drawFront(){
+    const c = els.frontCanvas;
+    const ctx = c.getContext("2d");
+    const dpi = +els.dpi.value;
+    const size = SIZES[els.size.value];
+    const w = c.width, h = c.height;
+
+    // Base
+    ctx.clearRect(0,0,w,h);
+
+    // Background
+    ctx.save();
+    ctx.fillStyle = linearGradient(ctx, w, h, els.bg1.value, els.bg2.value);
+    ctx.fillRect(0,0,w,h);
+
+    // Soft blobs
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = els.accent.value;
+    ctx.beginPath();
+    ctx.ellipse(w*0.15, h*0.2, w*0.35, h*0.25, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = els.accent.value;
+    ctx.beginPath();
+    ctx.ellipse(w*0.92, h*0.85, w*0.42, h*0.32, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Accent line
+    ctx.save();
+    ctx.globalAlpha = 0.95;
+    ctx.strokeStyle = els.accent.value;
+    ctx.lineWidth = Math.max(6, Math.round(w*0.012));
+    ctx.beginPath();
+    ctx.moveTo(w*0.08, h*0.18);
+    ctx.lineTo(w*0.52, h*0.18);
+    ctx.stroke();
+    ctx.restore();
+
+    const bleed = px(BLEED_IN, dpi);
+    const safe = px(SAFE_IN, dpi);
+    const sx = bleed + safe;
+    const sy = bleed + safe;
+    const sw = w - 2*(bleed + safe);
+    const sh = h - 2*(bleed + safe);
+
+    const font = fontStack(els.font.value);
+
+    // Company + tagline (top-left)
+    ctx.save();
+    ctx.fillStyle = els.text.value;
+    ctx.font = `800 ${Math.round(sw*0.07)}px ${font}`;
+    ctx.fillText(els.company.value || "Company", sx, sy + sh*0.18);
+
+    ctx.fillStyle = "rgba(229,231,235,.82)";
+    ctx.font = `600 ${Math.round(sw*0.035)}px ${font}`;
+    ctx.fillText(els.tagline.value || "", sx, sy + sh*0.28);
+    ctx.restore();
+
+    // Name + title (mid-left)
+    ctx.save();
+    ctx.fillStyle = els.text.value;
+    ctx.font = `900 ${Math.round(sw*0.075)}px ${font}`;
+    ctx.fillText(els.name.value || "Your Name", sx, sy + sh*0.55);
+
+    ctx.fillStyle = "rgba(229,231,235,.80)";
+    ctx.font = `700 ${Math.round(sw*0.04)}px ${font}`;
+    ctx.fillText(els.title.value || "Your Title", sx, sy + sh*0.64);
+    ctx.restore();
+
+    // Contact list (bottom-left)
+    const items = [
+      ["PHONE", els.phone.value],
+      ["EMAIL", els.email.value],
+      ["WEB", els.website.value],
+      ["ADDR", els.address.value]
+    ].filter(x => (x[1]||"").trim().length);
+
+    ctx.save();
+    const baseY = sy + sh*0.73;
+    const lineH = Math.round(sh*0.075);
+    ctx.font = `800 ${Math.round(sw*0.028)}px ${font}`;
+    items.forEach((it, i) => {
+      const y = baseY + i*lineH;
+      // label pill
+      const label = it[0];
+      const val = it[1];
+
+      const padX = Math.round(sw*0.018);
+      const pillH = Math.round(sw*0.05);
+      const labelW = ctx.measureText(label).width + padX*2;
+
+      ctx.save();
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = "rgba(255,255,255,.08)";
+      roundedRect(ctx, sx, y - pillH + 6, labelW, pillH, 999);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.fillStyle = els.accent.value;
+      ctx.fillText(label, sx + padX, y);
+
+      ctx.fillStyle = "rgba(229,231,235,.86)";
+      ctx.font = `700 ${Math.round(sw*0.032)}px ${font}`;
+      ctx.fillText(val, sx + labelW + Math.round(sw*0.02), y);
+      ctx.font = `800 ${Math.round(sw*0.028)}px ${font}`;
+    });
+    ctx.restore();
+
+    // Logo (draggable)
+    if (state.logoImg){
+      const img = state.logoImg;
+      const targetW = w * state.logoScale;
+      const aspect = img.width / img.height;
+      const targetH = targetW / aspect;
+
+      const cx = w * state.logoPos.x;
+      const cy = h * state.logoPos.y;
+      const x = cx - targetW/2;
+      const y = cy - targetH/2;
+
+      // soft logo plate
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = "rgba(0,0,0,.25)";
+      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, 18);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = "rgba(255,255,255,.12)";
+      ctx.lineWidth = 2;
+      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, 18);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.drawImage(img, x, y, targetW, targetH);
+    } else {
+      // placeholder mark
+      ctx.save();
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = "rgba(255,255,255,.12)";
+      const r = Math.min(w,h)*0.08;
+      ctx.beginPath();
+      ctx.arc(w*0.78, h*0.28, r, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = els.accent.value;
+      ctx.font = `900 ${Math.round(r*0.7)}px ${font}`;
+      ctx.fillText("LL", w*0.78 - r*0.55, h*0.28 + r*0.25);
+      ctx.restore();
+    }
+
+    drawGuides(ctx, w, h, dpi);
+    drawBack(); // keep back synced
+  }
+
+  function drawBack(){
+    const c = els.backCanvas;
+    const ctx = c.getContext("2d");
+    const dpi = +els.dpi.value;
+    const w = c.width, h = c.height;
+
+    ctx.clearRect(0,0,w,h);
+
+    // Background
+    ctx.fillStyle = linearGradient(ctx, w, h, els.bg2.value, els.bg1.value);
+    ctx.fillRect(0,0,w,h);
+
+    // Center card mark
+    const font = fontStack(els.font.value);
+
+    // Accent ring
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = els.accent.value;
+    ctx.lineWidth = Math.max(8, Math.round(w*0.016));
+    ctx.beginPath();
+    ctx.arc(w*0.5, h*0.45, Math.min(w,h)*0.18, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    // Logo or initials
+    if (state.logoImg){
+      const img = state.logoImg;
+      const maxW = w*0.32;
+      const aspect = img.width / img.height;
+      const hh = maxW / aspect;
+      ctx.drawImage(img, w*0.5 - maxW/2, h*0.45 - hh/2, maxW, hh);
+    } else {
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,.14)";
+      ctx.beginPath();
+      ctx.arc(w*0.5, h*0.45, Math.min(w,h)*0.14, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = els.text.value;
+      ctx.font = `900 ${Math.round(w*0.09)}px ${font}`;
+      ctx.textAlign = "center";
+      ctx.fillText("LOGO", w*0.5, h*0.47);
+      ctx.textAlign = "left";
+      ctx.restore();
+    }
+
+    // Company + tagline
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.fillStyle = els.text.value;
+    ctx.font = `900 ${Math.round(w*0.06)}px ${font}`;
+    ctx.fillText(els.company.value || "Company", w*0.5, h*0.72);
+
+    ctx.fillStyle = "rgba(229,231,235,.82)";
+    ctx.font = `700 ${Math.round(w*0.028)}px ${font}`;
+    ctx.fillText(els.tagline.value || "Tagline", w*0.5, h*0.80);
+
+    // Website
+    ctx.fillStyle = els.accent.value;
+    ctx.font = `800 ${Math.round(w*0.03)}px ${font}`;
+    ctx.fillText((els.website.value || "").trim(), w*0.5, h*0.88);
+    ctx.restore();
+
+    drawGuides(ctx, w, h, dpi);
+
+    // Disable visual emphasis if not enabled
+    if (!els.backSide.checked){
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,.55)";
+      ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = "rgba(255,255,255,.82)";
+      ctx.font = `800 ${Math.round(w*0.04)}px ${fontStack("system")}`;
+      ctx.textAlign = "center";
+      ctx.fillText("Back side disabled", w/2, h/2);
+      ctx.textAlign = "left";
+      ctx.restore();
+    }
+  }
+
+  function downloadCanvas(canvas, filename){
+    const a = document.createElement("a");
+    a.download = filename;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  }
+
+  // Logo upload
+  els.logo.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const img = new Image();
+    img.onload = () => {
+      state.logoImg = img;
+      drawFront();
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  // Inputs -> redraw
+  const inputs = ["size","dpi","company","tagline","name","title","phone","email","website","address","font","bg1","bg2","accent","text","guides","backSide"];
+  inputs.forEach(id => {
+    els[id].addEventListener("input", () => {
+      if (id === "size" || id === "dpi") setupCanvases();
+      drawFront();
+    });
+    els[id].addEventListener("change", () => {
+      if (id === "size" || id === "dpi") setupCanvases();
+      drawFront();
+    });
+  });
+
+  // Drag logo on front canvas
+  function getMousePos(evt){
+    const rect = els.frontCanvas.getBoundingClientRect();
+    const x = (evt.clientX - rect.left) * (els.frontCanvas.width / rect.width);
+    const y = (evt.clientY - rect.top) * (els.frontCanvas.height / rect.height);
+    return {x,y};
+  }
+  function isOverLogo(mx, my){
+    if(!state.logoImg) return false;
+    const w = els.frontCanvas.width, h = els.frontCanvas.height;
+    const img = state.logoImg;
+    const targetW = w * state.logoScale;
+    const aspect = img.width / img.height;
+    const targetH = targetW / aspect;
+    const cx = w * state.logoPos.x;
+    const cy = h * state.logoPos.y;
+    const x = cx - targetW/2;
+    const y = cy - targetH/2;
+    return mx >= x-16 && mx <= x+targetW+16 && my >= y-16 && my <= y+targetH+16;
+  }
+
+  els.frontCanvas.addEventListener("mousedown", (e) => {
+    const p = getMousePos(e);
+    if (!isOverLogo(p.x, p.y)) return;
+    state.dragging = true;
+
+    const w = els.frontCanvas.width, h = els.frontCanvas.height;
+    state.dragOff.x = (p.x / w) - state.logoPos.x;
+    state.dragOff.y = (p.y / h) - state.logoPos.y;
+  });
+  window.addEventListener("mousemove", (e) => {
+    if(!state.dragging) return;
+    const rect = els.frontCanvas.getBoundingClientRect();
+    const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if(!inside) return;
+
+    const p = getMousePos(e);
+    const w = els.frontCanvas.width, h = els.frontCanvas.height;
+
+    const speed = e.shiftKey ? 1.8 : 1.0;
+    const nx = (p.x / w) - state.dragOff.x;
+    const ny = (p.y / h) - state.dragOff.y;
+
+    // clamp to canvas
+    state.logoPos.x = Math.max(0.05, Math.min(0.95, state.logoPos.x + (nx - state.logoPos.x) * 0.35 * speed));
+    state.logoPos.y = Math.max(0.05, Math.min(0.95, state.logoPos.y + (ny - state.logoPos.y) * 0.35 * speed));
+
+    localStorage.setItem("bc_logo_pos", JSON.stringify(state.logoPos));
+    drawFront();
+  });
+  window.addEventListener("mouseup", () => { state.dragging = false; });
+
+  // Mouse wheel to resize logo
+  els.frontCanvas.addEventListener("wheel", (e) => {
+    if(!state.logoImg) return;
+    const p = getMousePos(e);
+    if(!isOverLogo(p.x, p.y)) return;
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+    state.logoScale = Math.max(0.10, Math.min(0.42, state.logoScale + delta * 0.015));
+    drawFront();
+  }, { passive: false });
+
+  // Downloads
+  els.downloadFront.addEventListener("click", () => {
+    downloadCanvas(els.frontCanvas, "business-card-front.png");
+  });
+
+  els.downloadBack.addEventListener("click", () => {
+    if(!els.backSide.checked){
+      alert("Enable back side first (toggle on the left).");
+      return;
+    }
+    downloadCanvas(els.backCanvas, "business-card-back.png");
+  });
+
+  els.reset.addEventListener("click", () => {
+    // reset simple defaults
+    els.size.value = "us";
+    els.dpi.value = "300";
+    els.company.value = "Logic Lab";
+    els.tagline.value = "Software Development Studio";
+    els.name.value = "Timmy Mokge";
+    els.title.value = "Junior Software Developer";
+    els.phone.value = "+27 62 388 1570";
+    els.email.value = "hello@yourdomain.com";
+    els.website.value = "logiclabstudio.github.io";
+    els.address.value = "Johannesburg, South Africa";
+    els.font.value = "system";
+    els.bg1.value = "#0b1020";
+    els.bg2.value = "#111827";
+    els.accent.value = "#60a5fa";
+    els.text.value = "#e5e7eb";
+    els.guides.checked = true;
+    els.backSide.checked = false;
+
+    state.logoImg = null;
+    state.logoPos = { x: 0.72, y: 0.22 };
+    state.logoScale = 0.22;
+    localStorage.removeItem("bc_logo_pos");
+    els.logo.value = "";
+    setupCanvases();
+    drawFront();
+  });
+
+  // Init
+  setupCanvases();
+  drawFront();
+})();
+</script>
+</body>
+</html>
