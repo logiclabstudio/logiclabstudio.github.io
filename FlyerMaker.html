@@ -286,6 +286,67 @@
     .iconBtn:hover{border-color: rgba(255,255,255,.22)}
     .iconBtn svg{width:16px; height:16px; opacity:.9}
     .iconBtn.warn{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.10)}
+
+    /* =========================
+       Mobile / Tablet Responsive
+       ========================= */
+    @media (max-width: 980px){
+      .app{
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: 100dvh;
+        padding: 10px;
+        gap: 10px;
+      }
+      aside.panel{
+        max-height: 42dvh;
+        overflow: auto;
+      }
+      .canvasWrap{
+        min-width: 0; /* IMPORTANT: stop forced overflow */
+      }
+      .topbar{
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .stage{
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 640px){
+      .app{
+        padding: 8px;
+        gap: 8px;
+      }
+      aside.panel{
+        max-height: 48dvh;
+      }
+      .row{ grid-template-columns: 1fr; }
+      .row3{ grid-template-columns: 1fr; }
+
+      .tabs{ gap: 8px; }
+      .tab{ padding: 9px 10px; font-size: 12px; }
+
+      button{
+        padding: 10px 10px;
+        width: 100%;
+      }
+      .btns{ gap: 8px; }
+      .btns button{ width: 100%; }
+
+      .zoom{ width: 120px; }
+
+      .stage{
+        overflow: auto;
+      }
+    }
+
+    /* Touch improvements */
+    @media (pointer: coarse){
+      .item{ touch-action: none; } /* prevents page scrolling while dragging */
+    }
   </style>
 </head>
 <body>
@@ -777,6 +838,30 @@
       setStatus("Canvas resized", `${wPx}×${hPx}px`);
     }
 
+    // ===== Auto-fit to screen (mobile friendly) =====
+    function autoFitToScreen(force=false){
+      if(!force && window.matchMedia("(min-width: 981px)").matches) return;
+
+      const wrap = document.querySelector(".stage");
+      if(!wrap) return;
+
+      const maxW = wrap.clientWidth - 24;
+      const maxH = wrap.clientHeight - 24;
+
+      const w = paper.clientWidth || 1;
+      const h = paper.clientHeight || 1;
+
+      const scaleW = maxW / w;
+      const scaleH = maxH / h;
+
+      const z = clamp(Math.min(scaleW, scaleH, 1), 0.4, 1);
+      const pct = Math.round(z * 100);
+
+      paper.style.transform = `scale(${z})`;
+      zoom.value = pct;
+      zoomLabel.textContent = `${pct}%`;
+    }
+
     // ===== PDF sizing injection =====
     function setPrintPageSizeCss(widthIn, heightIn){
       const css = `@page { size: ${widthIn}in ${heightIn}in; margin: 0; }`;
@@ -818,7 +903,7 @@
         w: opts.w ?? 520,
         h: opts.h ?? 90,
         z: ++zCounter,
-        text: opts.text ?? "",                 // <-- blank by default
+        text: opts.text ?? "",
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
         fontSize: opts.fontSize ?? 36,
         fontWeight: opts.fontWeight ?? 700,
@@ -834,8 +919,7 @@
       render();
       select(id);
       renderLayers();
-      // put cursor in textarea immediately
-      setTimeout(()=>{ if(document.activeElement){}; textValue?.focus(); }, 0);
+      setTimeout(()=>{ textValue?.focus(); }, 0);
     }
 
     function addShape(kind="rect", opts={}){
@@ -875,7 +959,7 @@
         w: opts.w ?? 520,
         h: opts.h ?? 86,
         z: ++zCounter,
-        text: opts.text ?? "",                 // <-- blank by default
+        text: opts.text ?? "",
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
         fontSize: opts.fontSize ?? 28,
         fontWeight: opts.fontWeight ?? 900,
@@ -951,7 +1035,7 @@
         if(el.type === "text"){
           const t = document.createElement("div");
           t.className = "textBox";
-          t.textContent = el.text || ""; // blank allowed
+          t.textContent = el.text || "";
           t.style.fontFamily = el.fontFamily;
           t.style.fontSize = el.fontSize + "px";
           t.style.fontWeight = el.fontWeight;
@@ -1369,6 +1453,7 @@
       const landscape = (orientation.value === "landscape");
       const scale = !!scaleLayout.checked;
       applyCanvasSize({ presetKey, landscape, scale });
+      autoFitToScreen();
     }
 
     // Tabs
@@ -1425,6 +1510,8 @@
           selectedId=null;
           render(); renderLayers(); updateEditPanel();
           setStatus("Loaded", "JSON applied");
+
+          autoFitToScreen();
         }catch(err){
           alert("Invalid JSON file.");
         }
@@ -1451,7 +1538,7 @@
     sizePreset.addEventListener("change", onCanvasSettingsChange);
     orientation.addEventListener("change", onCanvasSettingsChange);
 
-    // Zoom
+    // Zoom (manual overrides)
     zoom.addEventListener("input", ()=>{
       const z = Number(zoom.value) / 100;
       paper.style.transform = `scale(${z})`;
@@ -1494,6 +1581,7 @@
       elements = elements.filter(e=>e.id !== selectedId);
       selectedId = null;
       render(); renderLayers(); updateEditPanel();
+      setStatus("Deleted", "Ready");
     }
     function duplicateSelected(){
       const el = getSelected(); if(!el) return;
@@ -1506,6 +1594,7 @@
       render();
       select(copy.id);
       renderLayers();
+      setStatus("Duplicated", "Ready");
     }
     document.getElementById("deleteEl").onclick = removeSelected;
     document.getElementById("duplicateEl").onclick = duplicateSelected;
@@ -1516,56 +1605,53 @@
     document.getElementById("deleteLayer").onclick = removeSelected;
     document.getElementById("clearAll").onclick = clearAll;
 
-    // Shortcuts
-// Keyboard shortcuts (FIXED: Backspace edits text only, not delete box)
-window.addEventListener("keydown", (e) => {
-  // If user is typing in any form field, do NOT run canvas shortcuts
-  const t = e.target;
-  const typing =
-    t &&
-    (t.tagName === "INPUT" ||
-     t.tagName === "TEXTAREA" ||
-     t.tagName === "SELECT" ||
-     t.isContentEditable);
+    // Shortcuts (Backspace does NOT delete)
+    window.addEventListener("keydown", (e) => {
+      const t = e.target;
+      const typing =
+        t &&
+        (t.tagName === "INPUT" ||
+         t.tagName === "TEXTAREA" ||
+         t.tagName === "SELECT" ||
+         t.isContentEditable);
 
-  if (typing) return;
+      if (typing) return;
 
-  const el = getSelected();
-  const isMac = navigator.platform.toLowerCase().includes("mac");
-  const mod = isMac ? e.metaKey : e.ctrlKey;
+      const el = getSelected();
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
 
-  // Duplicate: Ctrl/Cmd + D
-  if (mod && e.key.toLowerCase() === "d") {
-    e.preventDefault();
-    duplicateSelected();
-    return;
-  }
+      // Duplicate: Ctrl/Cmd + D
+      if (mod && e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        duplicateSelected();
+        return;
+      }
 
-  // Delete element ONLY with the Delete key (NOT Backspace)
-  if (e.key === "Delete") {
-    if (selectedId) {
-      e.preventDefault();
-      removeSelected();
-    }
-    return;
-  }
+      // Delete element ONLY with Delete key
+      if (e.key === "Delete") {
+        if (selectedId) {
+          e.preventDefault();
+          removeSelected();
+        }
+        return;
+      }
 
-  // Move with arrows
-  if (!el || el.locked) return;
+      if (!el) return;
 
-  const step = e.shiftKey ? 10 : 2;
-  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
-    e.preventDefault();
-    if (e.key === "ArrowLeft")  el.x = snap(clamp(el.x - step, 0, paper.clientWidth - 10));
-    if (e.key === "ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth - 10));
-    if (e.key === "ArrowUp")    el.y = snap(clamp(el.y - step, 0, paper.clientHeight - 10));
-    if (e.key === "ArrowDown")  el.y = snap(clamp(el.y + step, 0, paper.clientHeight - 10));
-    render();
-    updateEditPanelQuiet();
-    renderLayers();
-  }
-});
-
+      // Move with arrows (Shift = bigger)
+      const step = e.shiftKey ? 10 : 2;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+        e.preventDefault();
+        if (e.key === "ArrowLeft")  el.x = snap(clamp(el.x - step, 0, paper.clientWidth - 10));
+        if (e.key === "ArrowRight") el.x = snap(clamp(el.x + step, 0, paper.clientWidth - 10));
+        if (e.key === "ArrowUp")    el.y = snap(clamp(el.y - step, 0, paper.clientHeight - 10));
+        if (e.key === "ArrowDown")  el.y = snap(clamp(el.y + step, 0, paper.clientHeight - 10));
+        render();
+        updateEditPanelQuiet();
+        renderLayers();
+      }
+    });
 
     // ===== Init =====
     initSizeDropdown();
@@ -1587,6 +1673,11 @@ window.addEventListener("keydown", (e) => {
 
     // IMPORTANT: start BLANK
     clearAll();
+
+    // Auto-fit on load for small screens, and keep fitting on resize/orientation change
+    autoFitToScreen();
+    window.addEventListener("resize", ()=> autoFitToScreen());
+    window.addEventListener("orientationchange", ()=> setTimeout(()=>autoFitToScreen(true), 150));
   </script>
 </body>
 </html>
