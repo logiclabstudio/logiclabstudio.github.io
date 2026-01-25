@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Grace Community Church | Welcome Home</title>
+  <meta name="description" content="A warm, modern demo church website with Word of the Day, events, sermons, prayer requests, and plan-a-visit." />
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.09);
+      --text:#e9edf5;
+      --muted:#a6b2c7;
+      --line: rgba(255,255,255,.14);
+      --brand:#60a5fa;
+      --brand2:#a78bfa;
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius: 18px;
+      --max: 1120px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(96,165,250,.22), transparent 55%),
+        radial-gradient(900px 700px at 90% 0%, rgba(167,139,250,.18), transparent 45%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+    .container{max-width:var(--max); margin:0 auto; padding:0 18px}
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 13px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Header */
+    header{
+      position: sticky; top:0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(7,10,18,.65);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 0;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.35), transparent 70%),
+        linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+      box-shadow: 0 12px 30px rgba(96,165,250,.22);
+      border: 1px solid rgba(255,255,255,.22);
+      position: relative;
+      overflow:hidden;
+    }
+    .logo:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(22px 22px at 70% 20%, rgba(255,255,255,.35), transparent 65%),
+        radial-gradient(10px 10px at 45% 55%, rgba(255,255,255,.35), transparent 70%);
+      opacity:.7;
+    }
+    .brand small{display:block; font-weight:600; color: var(--muted); letter-spacing:0; margin-top:2px}
+    nav ul{list-style:none; display:flex; gap:16px; padding:0; margin:0; align-items:center}
+    nav a{
+      font-size:14px; color: var(--muted);
+      padding:10px 10px; border-radius:10px;
+      border:1px solid transparent;
+      transition: .2s ease;
+    }
+    nav a:hover{color:var(--text); background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.10)}
+    .ctaRow{display:flex; gap:10px; align-items:center}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition: .2s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
+    .btn.primary{
+      border-color: rgba(96,165,250,.45);
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.85));
+      box-shadow: 0 18px 42px rgba(96,165,250,.22);
+    }
+    .btn.primary:hover{filter: brightness(1.05)}
+    .btn.ghost{
+      background: transparent;
+      border-color: rgba(255,255,255,.14);
+      color: var(--muted);
+      box-shadow:none;
+    }
+
+    .menuBtn{display:none}
+    @media (max-width: 880px){
+      nav{display:none}
+      .menuBtn{display:inline-flex}
+      .mobileNav{
+        display:none;
+        padding: 12px 0 18px;
+      }
+      .mobileNav.open{display:block}
+      .mobileNav a{
+        display:block;
+        padding: 12px 12px;
+        color: var(--muted);
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 14px;
+        background: rgba(255,255,255,.04);
+        margin-top: 10px;
+      }
+      .mobileNav a:hover{color: var(--text)}
+    }
+
+    /* Hero */
+    .hero{padding: 34px 0 18px}
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.3fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns: 1fr; }
+    }
+    .heroCard{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(900px 220px at 30% 0%, rgba(96,165,250,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      padding: 22px;
+      overflow:hidden;
+      position:relative;
+    }
+    .heroCard:after{
+      content:"";
+      position:absolute;
+      width: 420px; height: 420px;
+      right:-220px; top:-240px;
+      background: radial-gradient(circle at 30% 30%, rgba(167,139,250,.35), transparent 60%);
+      filter: blur(6px);
+      opacity:.85;
+    }
+    .hero h1{
+      font-size: clamp(28px, 3.8vw, 44px);
+      line-height: 1.08;
+      margin: 12px 0 10px;
+      letter-spacing: -0.5px;
+    }
+    .hero p{color: var(--muted); font-size: 15.5px; line-height:1.6; margin: 0 0 16px}
+    .heroActions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px}
+    .meta{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .meta .pill{background: rgba(255,255,255,.03)}
+    .sideStack{display:grid; gap: 18px}
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 14px 40px rgba(0,0,0,.38);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding: 16px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .cardHeader h3{margin:0; font-size: 16px}
+    .cardHeader span{color: var(--muted); font-size: 12.5px}
+    .cardBody{padding: 14px 16px 16px}
+    .kicker{color: var(--muted); font-size: 13px; margin-bottom: 10px}
+    .bigWord{
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: .3px;
+      margin: 0 0 6px;
+    }
+    .definition{color: var(--muted); line-height:1.55; font-size: 14px; margin:0}
+    .verse{margin: 12px 0 0; padding: 12px; border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18);
+      color: var(--text); line-height:1.55; font-size: 14px
+    }
+    .verse small{display:block; color: var(--muted); margin-top:8px; font-size: 12.5px}
+    .miniActions{display:flex; gap:10px; margin-top: 12px; flex-wrap:wrap}
+
+    /* Sections */
+    section{padding: 18px 0}
+    .sectionTitle{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap: 12px; margin: 18px 0 12px;
+    }
+    .sectionTitle h2{margin:0; font-size: 20px}
+    .sectionTitle p{margin:0; color: var(--muted); font-size: 13.5px}
+
+    .grid3{display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px}
+    .grid2{display:grid; grid-template-columns: repeat(2, 1fr); gap: 14px}
+    @media (max-width: 980px){ .grid3{grid-template-columns: 1fr} .grid2{grid-template-columns: 1fr} }
+
+    .infoCard{
+      padding: 16px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 40px rgba(0,0,0,.30);
+    }
+    .infoCard h4{margin:0 0 6px; font-size: 16px}
+    .infoCard p{margin:0; color: var(--muted); font-size: 14px; line-height:1.55}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size: 12px; color: var(--muted);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      padding: 7px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background: var(--brand)}
+    .dot.ok{background: var(--ok)}
+    .dot.warn{background: var(--warn)}
+
+    /* Sermons */
+    .sermonCard{
+      padding: 16px;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(600px 220px at 10% 0%, rgba(96,165,250,.15), transparent 55%),
+        rgba(255,255,255,.05);
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+    }
+    .sermonTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .sermonCard h4{margin:0 0 6px; font-size: 16px}
+    .sermonCard p{margin:0; color: var(--muted); font-size: 14px; line-height:1.55}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top: 12px}
+    .chip{
+      font-size: 12px; color: var(--muted);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+      padding: 6px 10px; border-radius: 999px;
+    }
+
+    /* Forms */
+    form{display:grid; gap: 10px; margin-top: 12px}
+    input, textarea, select{
+      width:100%;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 12px 12px;
+      color: var(--text);
+      outline:none;
+      font-size: 14px;
+    }
+    textarea{min-height: 110px; resize: vertical}
+    label{font-size: 13px; color: var(--muted)}
+    .formRow{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    @media (max-width: 980px){ .formRow{grid-template-columns: 1fr} }
+
+    /* Footer */
+    footer{
+      margin-top: 22px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      padding: 26px 0 18px;
+    }
+    .footerGrid{
+      display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 980px){ .footerGrid{grid-template-columns: 1fr} }
+    .fine{color: var(--muted); font-size: 12.5px; margin-top: 12px}
+
+    /* Utility */
+    .right{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap}
+    .muted{color: var(--muted)}
+    .spacer{height: 4px}
+    .toast{
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.65);
+      border: 1px solid rgba(255,255,255,.16);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      display:none;
+      z-index: 99;
+      backdrop-filter: blur(12px);
+      font-size: 13.5px;
+    }
+    .toast.show{display:block; animation: pop .2s ease}
+    @keyframes pop{from{transform:translateX(-50%) translateY(8px); opacity:.3} to{transform:translateX(-50%) translateY(0); opacity:1}}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Go to top">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            Grace Community Church
+            <small>Welcome home • Sundays at 9:00 & 11:00</small>
+          </div>
+        </a>
+
+        <nav aria-label="Primary navigation">
+          <ul>
+            <li><a href="#visit">Plan a Visit</a></li>
+            <li><a href="#word">Word of the Day</a></li>
+            <li><a href="#sermons">Sermons</a></li>
+            <li><a href="#events">Events</a></li>
+            <li><a href="#give">Give</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="ctaRow">
+          <a class="btn ghost" href="#prayer">Prayer Request</a>
+          <a class="btn primary" href="#visit">Plan a Visit</a>
+          <button class="btn menuBtn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileNav">Menu</button>
+        </div>
+      </div>
+
+      <div class="mobileNav" id="mobileNav" aria-label="Mobile navigation">
+        <a href="#visit">Plan a Visit</a>
+        <a href="#word">Word of the Day</a>
+        <a href="#sermons">Sermons</a>
+        <a href="#events">Events</a>
+        <a href="#give">Give</a>
+        <a href="#prayer">Prayer Request</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="container hero">
+      <div class="heroGrid">
+        <div class="heroCard">
+          <span class="pill">📍 12 Example Street, Your City • ☎️ (012) 345 6789 • 💬 WhatsApp available</span>
+          <h1>A modern church website that makes it easy to visit, belong, and grow.</h1>
+          <p>
+            This is a demo layout you can customize. It highlights the essentials: service times, Word of the Day,
+            sermons, events, giving, and prayer requests — all in one clean place.
+          </p>
+
+          <div class="heroActions">
+            <a class="btn primary" href="#visit">Plan a Visit</a>
+            <a class="btn" href="#sermons">Watch Sermons</a>
+            <a class="btn" href="#events">See Events</a>
+            <a class="btn ghost" href="#give">Give Online</a>
+          </div>
+
+          <div class="meta">
+            <span class="pill">⏰ Sundays: 9:00 • 11:00</span>
+            <span class="pill">🧒 Kids Church: 9:00 • 11:00</span>
+            <span class="pill">🎶 Worship Night: Fridays 19:00</span>
+            <span class="pill">🤝 Small Groups: Weekdays</span>
+          </div>
+
+          <div class="spacer"></div>
+          <div class="grid3" style="margin-top:16px">
+            <div class="infoCard">
+              <div class="badge"><span class="dot ok"></span> New here?</div>
+              <h4>What to expect</h4>
+              <p>Friendly welcome, powerful worship, practical teaching, and a place for your whole family.</p>
+            </div>
+            <div class="infoCard">
+              <div class="badge"><span class="dot"></span> Need help?</div>
+              <h4>Pastoral care</h4>
+              <p>Hospital visits, counseling referrals, and support groups. Reach out — you’re not alone.</p>
+            </div>
+            <div class="infoCard">
+              <div class="badge"><span class="dot warn"></span> Get connected</div>
+              <h4>Join a group</h4>
+              <p>Faith grows in community. Find a small group or ministry team that fits you.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sideStack">
+          <div class="card" id="word">
+            <div class="cardHeader">
+              <div>
+                <h3>Word of the Day</h3>
+                <span id="wordDate">Today</span>
+              </div>
+              <button class="btn ghost" id="shuffleWord" type="button">New Word</button>
+            </div>
+            <div class="cardBody">
+              <div class="kicker">Grow your faith — one word at a time.</div>
+              <div class="bigWord" id="dailyWord">Grace</div>
+              <p class="definition" id="dailyDefinition">
+                God’s unearned kindness and love — freely given, not deserved.
+              </p>
+              <div class="verse" id="dailyVerse">
+                “My grace is sufficient for you, for my power is made perfect in weakness.”
+                <small>2 Corinthians 12:9</small>
+              </div>
+              <div class="miniActions">
+                <a class="btn" href="#prayer">Ask for Prayer</a>
+                <a class="btn primary" href="#visit">Plan a Visit</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="cardHeader">
+              <div>
+                <h3>Verse of the Day</h3>
+                <span>Tap to refresh</span>
+              </div>
+              <button class="btn ghost" id="refreshVerse" type="button">Refresh</button>
+            </div>
+            <div class="cardBody">
+              <div class="verse" id="votdText">
+                “The Lord is my shepherd; I shall not want.”
+                <small>Psalm 23:1</small>
+              </div>
+              <div class="kicker" style="margin-top:10px">
+                Tip: you can replace this with a live API later (or your own weekly verse list).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="visit">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Plan a Visit</h2>
+            <p>Make first-time visits simple. Location, time, and what to expect.</p>
+          </div>
+          <div class="right">
+            <a class="btn" href="#contact">Get Directions</a>
+            <a class="btn primary" href="#prayer">Talk to a Pastor</a>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Service Times</div>
+            <h4>Sunday Worship</h4>
+            <p><b>09:00</b> — Family Service (Kids Church available)</p>
+            <p><b>11:00</b> — Worship + Teaching</p>
+            <p class="muted" style="margin-top:10px">Arrive 15 minutes early for parking + coffee.</p>
+          </div>
+
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> What to Expect</div>
+            <h4>Come as you are</h4>
+            <p>Dress is casual. Services run ~75 minutes. We have a welcoming team to guide you.</p>
+            <div class="chips">
+              <span class="chip">Parking assistance</span>
+              <span class="chip">Kids check-in</span>
+              <span class="chip">Coffee & welcome area</span>
+              <span class="chip">Prayer team</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sermons">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Sermons</h2>
+            <p>Highlight latest messages with quick watch/listen buttons.</p>
+          </div>
+          <div class="right">
+            <a class="btn" href="#">YouTube Channel</a>
+            <a class="btn ghost" href="#">Podcast</a>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="sermonCard">
+            <div class="sermonTop">
+              <div>
+                <h4>Living With Purpose</h4>
+                <p>How to walk daily in faith with practical steps.</p>
+              </div>
+              <span class="chip">30 min</span>
+            </div>
+            <div class="chips">
+              <span class="chip">Faith</span><span class="chip">Growth</span><span class="chip">Discipleship</span>
+            </div>
+            <div class="miniActions">
+              <a class="btn primary" href="#">Watch</a>
+              <a class="btn" href="#">Notes</a>
+              <a class="btn ghost" href="#">Share</a>
+            </div>
+          </div>
+
+          <div class="sermonCard">
+            <div class="sermonTop">
+              <div>
+                <h4>Grace Over Guilt</h4>
+                <p>What God’s grace means for your everyday life.</p>
+              </div>
+              <span class="chip">42 min</span>
+            </div>
+            <div class="chips">
+              <span class="chip">Grace</span><span class="chip">Freedom</span><span class="chip">Hope</span>
+            </div>
+            <div class="miniActions">
+              <a class="btn primary" href="#">Watch</a>
+              <a class="btn" href="#">Notes</a>
+              <a class="btn ghost" href="#">Share</a>
+            </div>
+          </div>
+
+          <div class="sermonCard">
+            <div class="sermonTop">
+              <div>
+                <h4>Prayer That Changes Things</h4>
+                <p>Building a consistent prayer life without burnout.</p>
+              </div>
+              <span class="chip">36 min</span>
+            </div>
+            <div class="chips">
+              <span class="chip">Prayer</span><span class="chip">Discipline</span><span class="chip">Peace</span>
+            </div>
+            <div class="miniActions">
+              <a class="btn primary" href="#">Watch</a>
+              <a class="btn" href="#">Notes</a>
+              <a class="btn ghost" href="#">Share</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="events">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Events</h2>
+            <p>Keep it updated. People check this before they visit.</p>
+          </div>
+          <div class="right">
+            <a class="btn" href="#">Full Calendar</a>
+            <a class="btn ghost" href="#contact">Ask a Question</a>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> This Week</div>
+            <h4>Prayer & Worship Night</h4>
+            <p><b>Friday</b> • 19:00 • Main Hall</p>
+            <p class="muted" style="margin-top:10px">Bring a friend. Childcare available on request.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Community</div>
+            <h4>Food Drive</h4>
+            <p><b>Saturday</b> • 10:00 • Outreach Center</p>
+            <p class="muted" style="margin-top:10px">Donate non-perishables or volunteer to pack parcels.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot warn"></span> New Series</div>
+            <h4>Starting Fresh</h4>
+            <p><b>Sunday</b> • 09:00 & 11:00 • Sanctuary</p>
+            <p class="muted" style="margin-top:10px">A 4-week series on renewal, purpose, and peace.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="prayer">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Prayer Requests</h2>
+            <p>Let people reach your prayer team quickly and respectfully.</p>
+          </div>
+          <div class="right">
+            <a class="btn" href="#contact">Emergency Contact</a>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Confidential</div>
+            <h4>Send a request</h4>
+            <p>Your message goes to the prayer team. You can choose if it’s private or shareable.</p>
+
+            <form id="prayerForm">
+              <div class="formRow">
+                <div>
+                  <label for="name">Name</label>
+                  <input id="name" name="name" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="contactInfo">Contact (optional)</label>
+                  <input id="contactInfo" name="contactInfo" placeholder="Phone or email" />
+                </div>
+              </div>
+
+              <div class="formRow">
+                <div>
+                  <label for="privacy">Privacy</label>
+                  <select id="privacy" name="privacy">
+                    <option value="private">Private (prayer team only)</option>
+                    <option value="shareable">Shareable (in prayer meeting)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="category">Category</label>
+                  <select id="category" name="category">
+                    <option>Health</option>
+                    <option>Family</option>
+                    <option>Work / Finances</option>
+                    <option>Spiritual Growth</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="request">Prayer request</label>
+                <textarea id="request" name="request" placeholder="Type your request..." required></textarea>
+              </div>
+
+              <button class="btn primary" type="submit">Submit Request</button>
+              <p class="muted" style="margin:0; font-size:12.5px">Demo mode: this form doesn’t send emails. I can wire it to EmailJS / Formspree / Firebase.</p>
+            </form>
+          </div>
+
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Pastoral Care</div>
+            <h4>Need to talk to someone?</h4>
+            <p>Offer clear contact routes: WhatsApp, phone, and a short “what happens next” explanation.</p>
+
+            <div class="miniActions" style="margin-top:14px">
+              <a class="btn primary" id="whatsBtn" href="#">WhatsApp</a>
+              <a class="btn" id="callBtn" href="#">Call</a>
+              <a class="btn ghost" href="#contact">Email</a>
+            </div>
+
+            <div class="verse" style="margin-top:14px">
+              “Cast all your anxiety on Him because He cares for you.”
+              <small>1 Peter 5:7</small>
+            </div>
+
+            <div style="margin-top:12px" class="muted">
+              <b>Recommended:</b> add “Counseling”, “Support Groups”, and “Crisis Help” pages if your church offers them.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="give">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Give Online</h2>
+            <p>Simple, secure giving. Clear options and transparency.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Tithes</div>
+            <h4>Regular giving</h4>
+            <p>Support the mission consistently with monthly or weekly giving.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn primary" href="#">Give Now</a>
+              <a class="btn ghost" href="#">Bank Details</a>
+            </div>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Offerings</div>
+            <h4>One-time support</h4>
+            <p>Help fund events, outreach, and community projects.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn primary" href="#">Give Now</a>
+              <a class="btn ghost" href="#">Transparency</a>
+            </div>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot warn"></span> Outreach</div>
+            <h4>Community care</h4>
+            <p>Direct contributions towards food parcels, youth programs, and support.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn primary" href="#">Donate</a>
+              <a class="btn ghost" href="#">Volunteer</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ministries">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Ministries</h2>
+            <p>Make it easy for people to join teams and groups.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Kids</div>
+            <h4>Kids Church</h4>
+            <p>Safe check-in, age groups, and fun lessons every Sunday.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Youth</div>
+            <h4>Youth Nights</h4>
+            <p>Weekly meetups, mentorship, and community for teens.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot warn"></span> Worship</div>
+            <h4>Music Team</h4>
+            <p>Join worship, media, or sound — training available.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="newsletter">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Stay Updated</h2>
+            <p>Announcements, events, and weekly encouragement.</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Weekly Updates</div>
+            <h4>Newsletter signup</h4>
+            <p>Get a short email every week (not spam). Includes Word of the Week, events, and prayer topics.</p>
+
+            <form id="newsForm">
+              <div class="formRow">
+                <div>
+                  <label for="newsName">Name</label>
+                  <input id="newsName" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="newsEmail">Email</label>
+                  <input id="newsEmail" type="email" placeholder="you@email.com" required />
+                </div>
+              </div>
+              <button class="btn primary" type="submit">Subscribe</button>
+              <p class="muted" style="margin:0; font-size:12.5px">Demo mode: I can connect this to Mailchimp / Brevo / Firebase.</p>
+            </form>
+          </div>
+
+          <div class="infoCard" id="contact">
+            <div class="badge"><span class="dot"></span> Contact</div>
+            <h4>Reach us</h4>
+            <p><b>Phone:</b> (012) 345 6789</p>
+            <p><b>Email:</b> hello@gracechurch.demo</p>
+            <p><b>Address:</b> 12 Example Street, Your City</p>
+            <p class="muted" style="margin-top:10px">Recommended: embed a real Google Map + parking entrance photo.</p>
+
+            <div class="miniActions" style="margin-top:14px">
+              <a class="btn" href="#" id="mapsBtn">Open Maps</a>
+              <a class="btn primary" href="#" id="emailBtn">Email</a>
+              <a class="btn ghost" href="#top">Back to top</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footerGrid">
+          <div>
+            <div class="brand" style="margin-bottom:10px">
+              <div class="logo" aria-hidden="true"></div>
+              <div>
+                Grace Community Church
+                <small class="muted">Faith • Community • Growth</small>
+              </div>
+            </div>
+            <p class="muted" style="line-height:1.6; margin:0">
+              Demo site for a church. Replace the content with your church name, location,
+              social links, livestream, and real giving/prayer tools.
+            </p>
+            <div class="fine">© <span id="year"></span> Grace Community Church (Demo). All rights reserved.</div>
+          </div>
+
+          <div>
+            <h4 style="margin:0 0 10px">Quick Links</h4>
+            <div class="muted" style="display:grid; gap:10px">
+              <a href="#visit">Plan a Visit</a>
+              <a href="#sermons">Sermons</a>
+              <a href="#events">Events</a>
+              <a href="#give">Give Online</a>
+              <a href="#prayer">Prayer Requests</a>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin:0 0 10px">Recommendations</h4>
+            <div class="muted" style="display:grid; gap:10px">
+              <span>✅ Livestream page (YouTube embed)</span>
+              <span>✅ Volunteer sign-up</span>
+              <span>✅ Small group directory</span>
+              <span>✅ Staff page + church beliefs</span>
+              <span>✅ Accessibility + privacy policy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast">Saved ✅ (demo)</div>
+
+  <script>
+    // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileNav = document.getElementById("mobileNav");
+    if (menuBtn){
+      menuBtn.addEventListener("click", () => {
+        const open = mobileNav.classList.toggle("open");
+        menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+
+    // Smooth close mobile nav after click
+    mobileNav?.querySelectorAll("a").forEach(a=>{
+      a.addEventListener("click", ()=>{
+        mobileNav.classList.remove("open");
+        menuBtn?.setAttribute("aria-expanded","false");
+      });
+    });
+
+    // Word of the Day (local list)
+    const words = [
+      { word:"Grace", def:"God’s unearned kindness and love — freely given, not deserved.", verse:"“My grace is sufficient for you, for my power is made perfect in weakness.”", ref:"2 Corinthians 12:9" },
+      { word:"Faith", def:"Trusting God even when you can’t see the full picture.", verse:"“Now faith is confidence in what we hope for and assurance about what we do not see.”", ref:"Hebrews 11:1" },
+      { word:"Peace", def:"A steady calm that comes from God, not circumstances.", verse:"“And the peace of God… will guard your hearts and your minds in Christ Jesus.”", ref:"Philippians 4:7" },
+      { word:"Hope", def:"Confident expectation rooted in God’s promises.", verse:"“May the God of hope fill you with all joy and peace as you trust in him…”", ref:"Romans 15:13" },
+      { word:"Mercy", def:"God’s compassion that withholds what we deserve.", verse:"“Because of the Lord’s great love we are not consumed… his mercies are new every morning.”", ref:"Lamentations 3:22–23" },
+      { word:"Love", def:"Choosing to care, serve, and sacrifice — like Jesus.", verse:"“We love because he first loved us.”", ref:"1 John 4:19" },
+      { word:"Wisdom", def:"Knowing the right thing to do — and doing it.", verse:"“If any of you lacks wisdom, you should ask God…”", ref:"James 1:5" }
+    ];
+
+    const verses = [
+      { t:"“The Lord is my shepherd; I shall not want.”", r:"Psalm 23:1" },
+      { t:"“Be strong and courageous… for the Lord your God will be with you wherever you go.”", r:"Joshua 1:9" },
+      { t:"“Come to me… and I will give you rest.”", r:"Matthew 11:28" },
+      { t:"“God is our refuge and strength, an ever-present help in trouble.”", r:"Psalm 46:1" },
+      { t:"“Let all that you do be done in love.”", r:"1 Corinthians 16:14" },
+      { t:"“Trust in the Lord with all your heart…”", r:"Proverbs 3:5–6" }
+    ];
+
+    const dailyWordEl = document.getElementById("dailyWord");
+    const dailyDefEl = document.getElementById("dailyDefinition");
+    const dailyVerseEl = document.getElementById("dailyVerse");
+    const wordDateEl = document.getElementById("wordDate");
+
+    function dayIndex(seedMod){
+      // Stable daily index based on UTC date (prevents timezone flip issues)
+      const d = new Date();
+      const key = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+      const idx = (Math.floor(key / 86400000) + (seedMod || 0)) % words.length;
+      return idx;
+    }
+
+    function renderWord(idx){
+      const w = words[idx];
+      dailyWordEl.textContent = w.word;
+      dailyDefEl.textContent = w.def;
+      dailyVerseEl.innerHTML = `${w.verse}<small>${w.ref}</small>`;
+      const d = new Date();
+      wordDateEl.textContent = d.toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"short", day:"numeric" });
+    }
+
+    // Default word for the day
+    renderWord(dayIndex(0));
+
+    // Shuffle word (demo)
+    document.getElementById("shuffleWord")?.addEventListener("click", ()=>{
+      const random = Math.floor(Math.random() * words.length);
+      renderWord(random);
+    });
+
+    // Verse of the day
+    const votd = document.getElementById("votdText");
+    function renderVerse(){
+      const pick = verses[Math.floor(Math.random() * verses.length)];
+      votd.innerHTML = `${pick.t}<small>${pick.r}</small>`;
+    }
+    document.getElementById("refreshVerse")?.addEventListener("click", renderVerse);
+
+    // Demo “submit” handling
+    const toast = document.getElementById("toast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>toast.classList.remove("show"), 2200);
+    }
+
+    document.getElementById("prayerForm")?.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      showToast("Prayer request received ✅ (demo)");
+      e.target.reset();
+    });
+
+    document.getElementById("newsForm")?.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      showToast("Subscribed ✅ (demo)");
+      e.target.reset();
+    });
+
+    // Contact buttons (replace with real details)
+    const WHATSAPP = "27620000000"; // TODO: change
+    const PHONE = "0123456789";     // TODO: change
+    const EMAIL = "hello@gracechurch.demo";
+    const ADDRESS = "12 Example Street, Your City";
+
+    document.getElementById("whatsBtn")?.setAttribute("href", `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi, I’d like prayer / info about the church.")}`);
+    document.getElementById("callBtn")?.setAttribute("href", `tel:${PHONE}`);
+    document.getElementById("emailBtn")?.setAttribute("href", `mailto:${EMAIL}?subject=${encodeURIComponent("Church enquiry")}&body=${encodeURIComponent("Hi, I have a question about...")}`);
+    document.getElementById("mapsBtn")?.setAttribute("href", `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`);
+
+    // Footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

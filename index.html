@@ -87,9 +87,7 @@
       transition: background .2s ease, color .2s ease;
     }
     .navlinks a:hover{background: rgba(148,163,184,.10)}
-
     .actions{display:flex; align-items:center; gap:10px}
-
     .btn{
       display:inline-flex; align-items:center; justify-content:center;
       gap:10px;
@@ -113,7 +111,6 @@
       color: #ffffff;
       text-shadow: 0 1px 2px rgba(0,0,0,.25);
     }
-
     .hamburger{display:none}
 
     /* Hero */
@@ -154,7 +151,6 @@
     }
     .hero-cta{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
     .hero-cta .btn{padding:13px 16px}
-
     .trust{
       margin-top:18px;
       display:flex; flex-wrap:wrap; gap:10px;
@@ -178,7 +174,6 @@
       position:relative;
       min-height: 420px;
     }
-
     .hero-card:before{
       content:"";
       position:absolute; inset:-2px;
@@ -187,7 +182,6 @@
                   radial-gradient(520px 320px at 40% 90%, rgba(34,197,94,.12), transparent 60%);
       pointer-events:none;
     }
-
     .mock{
       position:absolute; inset:18px;
       border-radius: 18px;
@@ -195,7 +189,6 @@
       background: rgba(11,15,25,.55);
       overflow:hidden;
     }
-
     .mock-top{
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 14px;
@@ -207,16 +200,13 @@
     .c:nth-child(1){background: rgba(239,68,68,.65)}
     .c:nth-child(2){background: rgba(245,158,11,.65)}
     .c:nth-child(3){background: rgba(34,197,94,.65)}
-
     .mock-title{font-size:13px; color: rgba(229,231,235,.85); font-weight:700}
-
     .mock-body{
       padding:14px;
       display:grid;
       gap:12px;
       grid-template-columns: 1fr;
     }
-
     .mini{
       border:1px solid rgba(148,163,184,.12);
       border-radius: 14px;
@@ -225,13 +215,11 @@
     }
     .mini h3{margin:0 0 6px; font-size:14px; letter-spacing:-.2px}
     .mini p{margin:0; color: rgba(148,163,184,.92); font-size:13px}
-
     .row{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:10px;
     }
-
     .tag{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px;
@@ -288,7 +276,6 @@
       margin-bottom:12px;
     }
     .icon svg{width:22px; height:22px; fill:none; stroke: rgba(229,231,235,.9); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-
     .card h3{margin:0 0 8px; font-size:16px; letter-spacing:-.2px}
     .card p{margin:0; color: rgba(148,163,184,.95); font-size:14px}
 
@@ -312,6 +299,117 @@
     .check svg{width:14px; height:14px; fill:none; stroke: rgba(229,231,235,.9); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
     .li b{display:block; margin-bottom:2px}
     .li span{color: rgba(148,163,184,.95); font-size:13px}
+
+    /* QR section (NEW) */
+    .qr-wrap{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(148,163,184,.16);
+      background:
+        radial-gradient(720px 360px at 10% 0%, rgba(96,165,250,.22), transparent 60%),
+        radial-gradient(720px 360px at 95% 30%, rgba(167,139,250,.18), transparent 60%),
+        rgba(17,24,39,.55);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      overflow:hidden;
+      position:relative;
+    }
+    .qr-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    .qr-kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border:1px solid rgba(148,163,184,.16);
+      border-radius:999px;
+      background: rgba(11,15,25,.40);
+      font-weight:800;
+      font-size:13px;
+      width:fit-content;
+      color: rgba(229,231,235,.95);
+    }
+    .qr-title{
+      margin:12px 0 10px;
+      font-size: clamp(26px, 3.4vw, 38px);
+      line-height:1.08;
+      letter-spacing:-.7px;
+    }
+    .qr-sub{
+      margin:0 0 14px;
+      color: rgba(148,163,184,.95);
+      font-size:15px;
+      max-width: 62ch;
+    }
+    .qr-cta{
+      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+      margin-top: 10px;
+    }
+    .qr-pills{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:14px;
+      color: rgba(148,163,184,.92);
+      font-weight:700;
+      font-size:13px;
+    }
+    .qr-pill{
+      padding:8px 10px;
+      border:1px solid rgba(148,163,184,.14);
+      border-radius:999px;
+      background: rgba(11,15,25,.35);
+    }
+    .qr-side{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(148,163,184,.14);
+      background: rgba(11,15,25,.40);
+      padding: 16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .qr-side:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(420px 220px at 20% 10%, rgba(34,197,94,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .qr-demo{
+      border-radius: 18px;
+      border:1px solid rgba(148,163,184,.12);
+      background: rgba(17,24,39,.45);
+      padding: 14px;
+      position:relative;
+      z-index:1;
+    }
+    .qr-demo h3{margin:0 0 6px; font-size:15px; letter-spacing:-.2px}
+    .qr-demo p{margin:0; color: rgba(148,163,184,.95); font-size:13px}
+    .qr-uses{
+      display:grid; gap:10px;
+      position:relative; z-index:1;
+    }
+    .qr-mini{
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(148,163,184,.12);
+      background: rgba(17,24,39,.40);
+    }
+    .qr-ic{
+      width:34px; height:34px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.20);
+      flex: 0 0 auto;
+      margin-top:1px;
+    }
+    .qr-ic svg{width:18px;height:18px; fill:none; stroke: rgba(229,231,235,.92); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+    .qr-mini b{display:block; margin-bottom:2px}
+    .qr-mini span{color: rgba(148,163,184,.95); font-size:13px}
 
     /* Pricing */
     .pricing{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;}
@@ -344,7 +442,6 @@
     .money{display:flex; align-items:baseline; gap:8px; margin:0 0 14px}
     .money strong{font-size:34px; letter-spacing:-.8px}
     .money em{font-style:normal; color: rgba(148,163,184,.95); font-weight:700}
-
     .divider{height:1px; background: rgba(148,163,184,.12); margin:14px 0}
 
     /* CTA */
@@ -396,6 +493,7 @@
       .section-head{flex-direction:column; align-items:flex-start}
       .footer-grid{grid-template-columns: 1fr;}
       .footlinks{justify-content:flex-start}
+      .qr-grid{grid-template-columns: 1fr;}
     }
     @media (max-width: 720px){
       .navlinks{display:none}
@@ -420,6 +518,7 @@
           <a href="#services">Services</a>
           <a href="#process">Process</a>
           <a href="#work">Work</a>
+          <a href="#qr">QR Generator</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
         </nav>
@@ -560,6 +659,73 @@
         </div>
       </section>
 
+      <!-- NEW: QR Generator Section (separate + aggressive sales copy) -->
+      <section id="qr">
+        <div class="section-head">
+          <div>
+            <h2>QR Code Generator</h2>
+            <p>Stop losing customers to “type the link later”. Put one scan between them and your business.</p>
+          </div>
+          <a class="btn" href="#work">See templates</a>
+        </div>
+
+        <div class="qr-wrap">
+          <div class="qr-grid">
+            <div style="position:relative; z-index:1">
+              <div class="qr-kicker"><span class="dot" aria-hidden="true"></span>Free tool • Instant results • No signup</div>
+              <h3 class="qr-title">Turn any link into a “SCAN ME” that gets you calls, orders, and foot traffic.</h3>
+              <p class="qr-sub">
+                Customers are lazy. Good. Make it easy for them.
+                One QR code can open your WhatsApp, your Google Maps location, your menu, your website, your payment link — whatever makes you money.
+                Print it on flyers, posters, business cards, packaging, even your shop window.
+              </p>
+
+              <div class="qr-cta">
+                <a class="btn primary" href="qr-code.html">Open the QR Generator</a>
+                <a class="btn" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab%20%E2%9C%8B%0A%0AI%20want%20a%20QR%20code%20setup%20for%20my%20business.%0A%0AWhat%20link%20should%20it%20open%3A%0AWhere%20will%20I%20use%20it%20(flyers%2Fmenu%2Fwindow%2Fcards)%3A%0A" target="_blank" rel="noreferrer">Help me set it up</a>
+              </div>
+
+              <div class="qr-pills" aria-label="Best uses">
+                <span class="qr-pill">📞 WhatsApp “Chat Now”</span>
+                <span class="qr-pill">📍 Google Maps directions</span>
+                <span class="qr-pill">📋 Menu / price list</span>
+                <span class="qr-pill">🌐 Website / landing page</span>
+                <span class="qr-pill">💳 Payment link</span>
+                <span class="qr-pill">📲 App download</span>
+              </div>
+            </div>
+
+            <aside class="qr-side" aria-label="QR generator benefits">
+              <div class="qr-demo">
+                <h3>What happens when they scan?</h3>
+                <p>They land exactly where you want — zero typing, zero confusion, zero excuses.</p>
+              </div>
+
+              <div class="qr-uses">
+                <div class="qr-mini">
+                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h2v2h-2z"/><path d="M18 14h2v6h-6v-2"/></svg></span>
+                  <div><b>Instant, clean codes</b><span>Fast generation that looks sharp on print.</span></div>
+                </div>
+                <div class="qr-mini">
+                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 17l-5-5"/><path d="M12 17l5-5"/><path d="M12 4v13"/></svg></span>
+                  <div><b>Perfect for marketing</b><span>Flyers, posters, business cards, stickers, packaging.</span></div>
+                </div>
+                <div class="qr-mini">
+                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M12 3v18"/></svg></span>
+                  <div><b>Works for any link</b><span>WhatsApp, Maps, menus, sites, payments, socials.</span></div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+              <div class="small" style="position:relative; z-index:1">
+                <b>Pro move:</b> Put your QR on every physical thing customers touch.
+                You’re basically turning paper into a clickable button.
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
       <section id="work">
         <div class="section-head">
           <div>
@@ -591,16 +757,17 @@
             <p class="small"><b>Best for:</b> New businesses, pop-ups, small teams.</p>
           </a>
 
-          <a class="card" href="qr-code.html">
-            <h3>Free QR Code Generator</h3>
-            <p>
-              Want to make it easier for customers to find you, save your number, or open your menu?
-              Generate a QR code in seconds — free.
-            </p>
-            <div class="divider"></div>
-            <p class="small"><b>Perfect for:</b> Flyers, business cards, WhatsApp links, Google Maps, menus.</p>
-          </a>
+          <!-- QR card removed from templates on purpose -->
+        </div>
 
+        <div class="divider"></div>
+
+        <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap">
+          <div>
+            <h3 style="margin:0 0 6px">Need a QR built into your website too?</h3>
+            <p style="margin:0; color: rgba(148,163,184,.95)">We can add a “Scan to WhatsApp / Menu / Map” section to your site so customers convert faster.</p>
+          </div>
+          <a class="btn primary" href="#qr">Open QR Generator</a>
         </div>
       </section>
 
@@ -719,6 +886,7 @@
             <a href="#services">Services</a>
             <a href="#process">Process</a>
             <a href="#work">Work</a>
+            <a href="#qr">QR Generator</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
@@ -783,6 +951,7 @@
           <a class="li" href="#services"><div><b>Services</b><span>What we build</span></div></a>
           <a class="li" href="#process"><div><b>Process</b><span>How we deliver</span></div></a>
           <a class="li" href="#work"><div><b>Work</b><span>Examples</span></div></a>
+          <a class="li" href="#qr"><div><b>QR Generator</b><span>Sell more with one scan</span></div></a>
           <a class="li" href="#pricing"><div><b>Pricing</b><span>Packages</span></div></a>
           <a class="li" href="#faq"><div><b>FAQ</b><span>Quick answers</span></div></a>
         </div>
@@ -804,13 +973,14 @@
     const menuBackdrop = $('#menuBackdrop');
 
     function openModal(){
+      if(!backdrop) return;
       backdrop.style.display = 'flex';
       setTimeout(() => $('#name')?.focus(), 0);
     }
-    function closeModal(){ backdrop.style.display = 'none'; }
+    function closeModal(){ if(backdrop) backdrop.style.display = 'none'; }
 
-    function openMenu(){ menuBackdrop.style.display = 'flex'; }
-    function closeMenu(){ menuBackdrop.style.display = 'none'; }
+    function openMenu(){ if(menuBackdrop) menuBackdrop.style.display = 'flex'; }
+    function closeMenu(){ if(menuBackdrop) menuBackdrop.style.display = 'none'; }
 
     // Wire up open buttons if they exist
     ['#openContact', '#openContact2', '#openContact3', '#openContact4'].forEach(id => {
@@ -834,7 +1004,7 @@
       }
     });
 
-    // ===== WhatsApp helpers (UPDATED) =====
+    // ===== WhatsApp helpers =====
     const WHATSAPP_NUMBER = '27623881570'; // digits only
 
     function openWhatsAppWithPlan(plan){
@@ -873,7 +1043,7 @@
       });
     });
 
-    // Contact form -> generate WhatsApp message (kept)
+    // Contact form -> generate WhatsApp message
     $('#contactForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = $('#name')?.value?.trim() || '';
@@ -901,6 +1071,8 @@
       a.addEventListener('click', (e) => {
         const href = a.getAttribute('href');
         if(!href || href === '#') return;
+        // Only handle in-page anchors
+        if(!href.startsWith('#')) return;
         const target = document.querySelector(href);
         if(!target) return;
         e.preventDefault();
