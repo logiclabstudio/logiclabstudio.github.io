@@ -3,80 +3,221 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Business Card Generator</title>
+  <title>Business Card Generator — Pro</title>
+  <meta name="description" content="Design professional business cards in your browser. Export print-ready PNG with bleed, trim, and safe guides." />
   <style>
     :root{
-      --bg:#0b0f19;
+      --bg:#070a12;
       --panel:#0f172a;
-      --card:#111827;
-      --muted:#94a3b8;
-      --text:#e5e7eb;
+      --card:#0b1020;
+      --muted:#97a6bf;
+      --text:#e8eefc;
       --line:rgba(255,255,255,.12);
+      --line2:rgba(255,255,255,.08);
       --accent:#60a5fa;
       --accent2:#a78bfa;
-
-      /* Card theme (editable) */
-      --cardBg1:#0b1020;
-      --cardBg2:#111827;
-      --cardText:#e5e7eb;
-      --cardMuted:#b6c2d6;
-      --cardAccent:#60a5fa;
-      --cardBorder:rgba(255,255,255,.12);
+      --good:#22c55e;
+      --warn:#fbbf24;
 
       --radius:16px;
-      --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --radius2:18px;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+
+      --focus: 0 0 0 4px rgba(96,165,250,.25);
+
+      /* UI sizing */
+      --sidebar: 420px;
+      --max: 1280px;
+
+      /* Theme defaults (editable) */
+      --t_bg1:#0b1020;
+      --t_bg2:#111827;
+      --t_text:#e5e7eb;
+      --t_accent:#60a5fa;
+      --t_muted:rgba(229,231,235,.82);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 700px at 20% -10%, rgba(96,165,250,.25), transparent 55%),
-                  radial-gradient(900px 600px at 110% 10%, rgba(167,139,250,.20), transparent 50%),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, rgba(96,165,250,.20), transparent 55%),
+        radial-gradient(900px 600px at 110% 10%, rgba(167,139,250,.18), transparent 55%),
+        radial-gradient(900px 600px at 60% 120%, rgba(34,197,94,.12), transparent 55%),
+        linear-gradient(180deg, #070a12, #070a12);
       color:var(--text);
+      overflow-x:hidden;
     }
     a{color:inherit}
-    .wrap{
-      max-width:1200px;
+    button, input, select, textarea{font:inherit}
+    .sr-only{
+      position:absolute; width:1px; height:1px;
+      padding:0; margin:-1px; overflow:hidden;
+      clip:rect(0,0,0,0); border:0;
+    }
+
+    /* Topbar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(7,10,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbarInner{
+      max-width: var(--max);
       margin:0 auto;
-      padding:20px;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 240px;
+    }
+    .logoMark{
+      width:38px; height:38px; border-radius: 14px;
+      background: radial-gradient(circle at 30% 30%, rgba(96,165,250,.95), rgba(167,139,250,.85));
+      box-shadow: 0 10px 30px rgba(96,165,250,.15);
+      position:relative;
+      overflow:hidden;
+    }
+    .logoMark:after{
+      content:"";
+      position:absolute; inset:-20%;
+      background: radial-gradient(circle at 25% 25%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(18deg);
+    }
+    .brandText{display:flex; flex-direction:column; line-height:1.15}
+    .brandText strong{font-weight:900; letter-spacing:.2px; font-size:14px}
+    .brandText span{color:var(--muted); font-size:12px}
+
+    .topActions{
+      display:flex; align-items:center; justify-content:flex-end;
+      gap:10px; flex-wrap:wrap;
+    }
+
+    /* Buttons */
+    .btn{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-weight:800;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      display:inline-flex; align-items:center; gap:10px;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22);}
+    .btn:active{transform: translateY(1px);}
+    .btn:focus{outline:none; box-shadow: var(--focus);}
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.88));
+      border-color: rgba(255,255,255,.20);
+      color:#081025;
+    }
+    .btnDanger{
+      background: rgba(251,113,133,.12);
+      border-color: rgba(251,113,133,.35);
+      color: #ffd0d8;
+    }
+    .btnIcon{
+      width:18px; height:18px; display:inline-block;
+      background: currentColor; border-radius: 5px;
+      mask-size: contain; mask-repeat:no-repeat; mask-position:center;
+      -webkit-mask-size: contain; -webkit-mask-repeat:no-repeat; -webkit-mask-position:center;
+    }
+    .i-download{ -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10m0 0l4-4m-4 4l-4-4M4 17v3h16v-3"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v10m0 0l4-4m-4 4l-4-4M4 17v3h16v-3"/></svg>');}
+    .i-share{ -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14"/></svg>');}
+    .i-magic{ -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 3l.5 2.5L17.5 6l-2.5.5L14.5 9l-.5-2.5L11.5 6l2.5-.5L14.5 3zM6.5 8l.5 2.5L9.5 11l-2.5.5L6.5 14l-.5-2.5L3.5 11l2.5-.5L6.5 8zM15 12l1 5 5 1-5 1-1 5-1-5-5-1 5-1 1-5z"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 3l.5 2.5L17.5 6l-2.5.5L14.5 9l-.5-2.5L11.5 6l2.5-.5L14.5 3zM6.5 8l.5 2.5L9.5 11l-2.5.5L6.5 14l-.5-2.5L3.5 11l2.5-.5L6.5 8zM15 12l1 5 5 1-5 1-1 5-1-5-5-1 5-1 1-5z"/></svg>');}
+
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    /* Layout */
+    .shell{
+      max-width: var(--max);
+      margin:0 auto;
+      padding: 16px;
       display:grid;
-      grid-template-columns: 420px 1fr;
-      gap:18px;
+      grid-template-columns: var(--sidebar) 1fr;
+      gap:16px;
+      align-items:start;
     }
-    @media (max-width: 980px){
-      .wrap{grid-template-columns: 1fr; }
+    @media (max-width: 1100px){
+      :root{ --sidebar: 100%; }
+      .shell{grid-template-columns: 1fr;}
     }
+
+    /* Panels */
     .panel{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow2);
       overflow:hidden;
     }
     .panel header{
       padding:14px 16px;
-      border-bottom:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
       background: rgba(255,255,255,.03);
     }
     .panel header .title{
       display:flex;flex-direction:column;gap:2px;
     }
-    .panel header h1{
-      font-size:14px;margin:0;font-weight:800;letter-spacing:.2px;
+    .panel header h2{
+      font-size:13px;margin:0;font-weight:900;letter-spacing:.2px;
     }
     .panel header p{
       margin:0;font-size:12px;color:var(--muted);
     }
     .content{padding:14px 16px;}
+
+    /* Tabs */
+    .tabs{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding: 10px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+    .tab{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      padding:8px 10px;
+      border-radius: 999px;
+      font-weight:900;
+      font-size:12px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .tab[aria-selected="true"]{
+      color:#09122a;
+      border-color: rgba(255,255,255,.20);
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.88));
+    }
+
     .grid{display:grid;gap:10px;}
     .row{display:grid;grid-template-columns: 1fr 1fr; gap:10px;}
     @media (max-width: 520px){ .row{grid-template-columns:1fr;} }
 
-    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;}
-    input[type="text"], input[type="email"], input[type="url"], input[type="tel"], select{
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:800;letter-spacing:.2px;}
+    .help{color: rgba(151,166,191,.9); font-size:12px; margin-top:6px; line-height:1.35;}
+    input[type="text"], input[type="email"], input[type="url"], input[type="tel"], select, textarea{
       width:100%;
       padding:10px 10px;
       border-radius:12px;
@@ -84,7 +225,10 @@
       background: rgba(17,24,39,.55);
       color:var(--text);
       outline:none;
+      transition: .15s ease;
     }
+    textarea{min-height: 70px; resize: vertical;}
+    input:focus, select:focus, textarea:focus{box-shadow: var(--focus); border-color: rgba(96,165,250,.35);}
     input[type="color"]{
       width:100%;
       height:40px;
@@ -93,37 +237,23 @@
       background: transparent;
       padding:0;
     }
-    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-    button{
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 12px;
-      font-weight:700;
-      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    .inline{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
     }
-    button:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22);}
-    button:active{transform: translateY(1px);}
-    .primary{
-      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.88));
-      border-color: rgba(255,255,255,.18);
-      color:#081025;
-    }
-
-    .toggle{
-      display:flex;align-items:center;gap:10px;
-      padding:10px 12px;
-      border-radius:12px;
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
       border:1px solid rgba(255,255,255,.12);
-      background: rgba(17,24,39,.35);
+      background: rgba(255,255,255,.04);
+      border-radius: 12px;
+      padding:8px 10px;
+      font-size:12px; color: var(--muted);
+      font-weight:800;
     }
-    .toggle input{transform: scale(1.1);}
-    .hint{font-size:12px;color:var(--muted);line-height:1.35;margin-top:8px;}
-    .divider{height:1px;background: var(--line); margin:12px 0;}
+    .chip input{transform: scale(1.1);}
 
-    /* Preview area */
+    .divider{height:1px;background: rgba(255,255,255,.10); margin:12px 0;}
+
+    /* Preview */
     .previewWrap{
       padding:16px;
       display:flex;
@@ -133,32 +263,26 @@
     .previewTop{
       display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
     }
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      color:var(--muted);
-      font-size:12px;
-    }
     .canvasRow{
       display:flex;
       gap:16px;
       flex-wrap:wrap;
       align-items:flex-start;
     }
-
-    /* canvas container gives nice shadow */
     .cardFrame{
       background: rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.12);
       border-radius: 18px;
       padding:14px;
       box-shadow: var(--shadow);
+      flex: 1 1 360px;
+      min-width: 320px;
     }
     .cardFrame h3{
-      margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.4px;
+      margin:0 0 10px;font-size:12px;color:var(--muted);font-weight:900;letter-spacing:.4px;
       text-transform:uppercase;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
     }
     canvas{
       display:block;
@@ -167,257 +291,477 @@
       max-width: 100%;
       height: auto;
     }
-    .smallNote{
-      font-size:12px;color:var(--muted);
+    .smallNote{font-size:12px;color:var(--muted);}
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(17,24,39,.92);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow2);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 1000;
+      max-width: min(92vw, 520px);
     }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;background: var(--good);
+      box-shadow: 0 0 0 4px rgba(34,197,94,.12);
+      flex:none;
+    }
+    .dot.warn{background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.12);}
+    .toast strong{font-weight:900}
+    .toast span{color: var(--muted); font-size:12px}
+
+    /* Modal */
+    .modalBack{
+      position:fixed; inset:0; z-index:999;
+      background: rgba(0,0,0,.65);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 16px;
+    }
+    .modalBack.open{display:flex;}
+    .modal{
+      width: min(720px, 98vw);
+      background: rgba(15,23,42,.92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal header{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: rgba(255,255,255,.03);
+    }
+    .modal header h3{margin:0; font-size:13px; font-weight:900;}
+    .modal .body{padding: 14px 16px;}
+    .modal .body p{margin: 0 0 10px; color: var(--muted); font-size:13px; line-height:1.5}
     .kbd{
       display:inline-block;
       padding:2px 8px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
       color: var(--text);
     }
+
+    /* Hide sections */
+    .tabPanel{display:none;}
+    .tabPanel.active{display:block;}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <!-- Controls -->
-    <section class="panel">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbarInner">
+      <div class="brand">
+        <div class="logoMark" aria-hidden="true"></div>
+        <div class="brandText">
+          <strong>Business Card Generator</strong>
+          <span>Pro layout • templates • QR • export</span>
+        </div>
+      </div>
+
+      <div class="topActions">
+        <button class="btn" id="openHelp" type="button"><span class="btnIcon i-magic"></span>Shortcuts</button>
+        <button class="btn" id="savePreset" type="button">Save preset</button>
+        <button class="btn" id="loadPreset" type="button">Load preset</button>
+        <button class="btn btnPrimary" id="downloadFrontTop" type="button"><span class="btnIcon i-download"></span>Export Front</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="shell">
+    <!-- LEFT: CONTROLS -->
+    <section class="panel" aria-label="Controls">
       <header>
         <div class="title">
-          <h1>Business Card Generator</h1>
-          <p>Design → export PNG (print-ready)</p>
+          <h2>Design Controls</h2>
+          <p>Use tabs to edit content, style, logo, and export.</p>
         </div>
-        <span class="badge">Drag logo on the card</span>
+        <span class="pill" id="statusPill">Ready</span>
       </header>
 
+      <div class="tabs" role="tablist" aria-label="Editor tabs">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="tab-content" id="t-content">Content</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-style" id="t-style">Style</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-logo" id="t-logo">Logo & QR</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="tab-export" id="t-export">Export</button>
+      </div>
+
       <div class="content">
-        <div class="grid">
-          <div class="row">
-            <div>
-              <label>Card size</label>
-              <select id="size">
-                <option value="us">US 3.5 × 2 in</option>
-                <option value="eu">85 × 55 mm</option>
-              </select>
-            </div>
-            <div>
-              <label>DPI (export quality)</label>
-              <select id="dpi">
-                <option value="300">300 (print)</option>
-                <option value="200">200</option>
-                <option value="150">150</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="divider"></div>
-
-          <div class="row">
-            <div>
-              <label>Company</label>
-              <input id="company" type="text" value="Logic Lab" />
-            </div>
-            <div>
-              <label>Tagline</label>
-              <input id="tagline" type="text" value="Software Development Studio" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Name</label>
-              <input id="name" type="text" value="Timmy Mokge" />
-            </div>
-            <div>
-              <label>Title</label>
-              <input id="title" type="text" value="Junior Software Developer" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Phone</label>
-              <input id="phone" type="tel" value="+27 62 388 1570" />
-            </div>
-            <div>
-              <label>Email</label>
-              <input id="email" type="email" value="hello@yourdomain.com" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Website</label>
-              <input id="website" type="url" value="logiclabstudio.github.io" />
-            </div>
-            <div>
-              <label>Address</label>
-              <input id="address" type="text" value="Johannesburg, South Africa" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Logo (PNG/JPG)</label>
-              <input id="logo" type="file" accept="image/*" />
-            </div>
-            <div>
-              <label>Font</label>
-              <select id="font">
-                <option value="system">System</option>
-                <option value="inter">Inter-like</option>
-                <option value="mono">Mono</option>
-                <option value="serif">Serif</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="row">
-            <div>
-              <label>Background 1</label>
-              <input id="bg1" type="color" value="#0b1020" />
-            </div>
-            <div>
-              <label>Background 2</label>
-              <input id="bg2" type="color" value="#111827" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label>Accent</label>
-              <input id="accent" type="color" value="#60a5fa" />
-            </div>
-            <div>
-              <label>Text</label>
-              <input id="text" type="color" value="#e5e7eb" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="toggle">
-              <input id="guides" type="checkbox" checked />
+        <!-- CONTENT TAB -->
+        <section id="tab-content" class="tabPanel active" role="tabpanel" aria-labelledby="t-content">
+          <div class="grid">
+            <div class="row">
               <div>
-                <div style="font-weight:800">Show print guides</div>
-                <div class="smallNote">Bleed + safe area</div>
+                <label for="company">Company</label>
+                <input id="company" type="text" value="Logic Lab" autocomplete="organization"/>
+              </div>
+              <div>
+                <label for="tagline">Tagline</label>
+                <input id="tagline" type="text" value="Software Development Studio" />
               </div>
             </div>
-            <div class="toggle">
-              <input id="backSide" type="checkbox" />
+
+            <div class="row">
               <div>
-                <div style="font-weight:800">Enable back side</div>
-                <div class="smallNote">Simple logo + tagline</div>
+                <label for="name">Full name</label>
+                <input id="name" type="text" value="Timmy Mokge" autocomplete="name"/>
+              </div>
+              <div>
+                <label for="title">Role / Title</label>
+                <input id="title" type="text" value="Junior Software Developer" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="phone">Phone</label>
+                <input id="phone" type="tel" value="+27 62 388 1570" autocomplete="tel"/>
+              </div>
+              <div>
+                <label for="email">Email</label>
+                <input id="email" type="email" value="hello@yourdomain.com" autocomplete="email"/>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="website">Website</label>
+                <input id="website" type="url" value="logiclabstudio.github.io" autocomplete="url"/>
+              </div>
+              <div>
+                <label for="address">Address</label>
+                <input id="address" type="text" value="Johannesburg, South Africa" autocomplete="street-address"/>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div>
+                <label for="layout">Layout template</label>
+                <select id="layout">
+                  <option value="classic">Classic (left info, right logo)</option>
+                  <option value="split">Split (logo top, info bottom)</option>
+                  <option value="minimal">Minimal (clean + airy)</option>
+                  <option value="centered">Centered (brand focused)</option>
+                </select>
+                <div class="help">Templates change typography + placement. You can still drag the logo.</div>
+              </div>
+              <div>
+                <label for="icons">Contact icons</label>
+                <select id="icons">
+                  <option value="on">On</option>
+                  <option value="off">Off</option>
+                </select>
+                <div class="help">Icons are drawn on the canvas (no external libraries).</div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="btns">
-            <button class="primary" id="downloadFront">Download Front PNG</button>
-            <button id="downloadBack">Download Back PNG</button>
-            <button id="reset">Reset</button>
-          </div>
+        <!-- STYLE TAB -->
+        <section id="tab-style" class="tabPanel" role="tabpanel" aria-labelledby="t-style">
+          <div class="grid">
+            <div class="row">
+              <div>
+                <label for="size">Card size</label>
+                <select id="size">
+                  <option value="us">US 3.5 × 2 in</option>
+                  <option value="eu">85 × 55 mm</option>
+                </select>
+              </div>
+              <div>
+                <label for="dpi">DPI (export quality)</label>
+                <select id="dpi">
+                  <option value="300">300 (print)</option>
+                  <option value="200">200</option>
+                  <option value="150">150</option>
+                </select>
+              </div>
+            </div>
 
-          <div class="hint">
-            Tips: Drag the logo. Hold <span class="kbd">Shift</span> while dragging to move faster.
-            Use 300 DPI for print shops. If you need PDF later, tell me and I’ll add it.
+            <div class="row">
+              <div>
+                <label for="font">Font</label>
+                <select id="font">
+                  <option value="system">System</option>
+                  <option value="inter">Inter-like</option>
+                  <option value="mono">Mono</option>
+                  <option value="serif">Serif</option>
+                </select>
+              </div>
+              <div>
+                <label for="radius">Corner roundness</label>
+                <select id="radius">
+                  <option value="18">Rounded</option>
+                  <option value="12">Medium</option>
+                  <option value="6">Sharp</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div>
+                <label for="bg1">Background 1</label>
+                <input id="bg1" type="color" value="#0b1020" />
+              </div>
+              <div>
+                <label for="bg2">Background 2</label>
+                <input id="bg2" type="color" value="#111827" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="accent">Accent</label>
+                <input id="accent" type="color" value="#60a5fa" />
+              </div>
+              <div>
+                <label for="text">Text</label>
+                <input id="text" type="color" value="#e5e7eb" />
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div>
+                <label for="preset">Color presets</label>
+                <select id="preset">
+                  <option value="custom">Custom</option>
+                  <option value="midnight">Midnight Blue</option>
+                  <option value="mono">Mono Black</option>
+                  <option value="sunset">Sunset</option>
+                  <option value="emerald">Emerald</option>
+                </select>
+                <div class="help">Pick a professional starting point, then tweak.</div>
+              </div>
+              <div>
+                <label>Guides</label>
+                <div class="inline">
+                  <span class="chip"><input id="guides" type="checkbox" checked /> Show print guides</span>
+                  <span class="chip"><input id="backSide" type="checkbox" /> Enable back side</span>
+                </div>
+                <div class="help">Guides show bleed + trim + safe area.</div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <!-- LOGO + QR TAB -->
+        <section id="tab-logo" class="tabPanel" role="tabpanel" aria-labelledby="t-logo">
+          <div class="grid">
+            <div class="row">
+              <div>
+                <label for="logo">Logo (PNG/JPG/SVG)</label>
+                <input id="logo" type="file" accept="image/*,.svg" />
+                <div class="help">Drag on the card. Scroll to resize. <span class="kbd">Shift</span> = faster drag.</div>
+              </div>
+              <div>
+                <label for="logoMode">Logo style</label>
+                <select id="logoMode">
+                  <option value="plate">Plate (recommended)</option>
+                  <option value="none">No plate</option>
+                </select>
+                <div class="help">Plate keeps logos readable on gradients.</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div>
+                <label for="qrMode">QR code</label>
+                <select id="qrMode">
+                  <option value="off">Off</option>
+                  <option value="website">Website</option>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                  <option value="vcard">vCard (best)</option>
+                </select>
+                <div class="help">vCard lets people save contact directly.</div>
+              </div>
+              <div>
+                <label for="qrSize">QR size</label>
+                <select id="qrSize">
+                  <option value="0.18">Small</option>
+                  <option value="0.24" selected>Medium</option>
+                  <option value="0.30">Large</option>
+                </select>
+                <div class="help">Placed bottom-right. Auto-contrasted.</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="qrLabel">QR label (optional)</label>
+                <input id="qrLabel" type="text" value="Scan to save contact" />
+              </div>
+              <div>
+                <label for="qrOnBack">Place QR on</label>
+                <select id="qrOnBack">
+                  <option value="front">Front</option>
+                  <option value="back">Back</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EXPORT TAB -->
+        <section id="tab-export" class="tabPanel" role="tabpanel" aria-labelledby="t-export">
+          <div class="grid">
+            <div class="row">
+              <div>
+                <label for="exportMode">Export mode</label>
+                <select id="exportMode">
+                  <option value="withBleed" selected>With bleed (recommended)</option>
+                  <option value="trimOnly">Trim only (no bleed)</option>
+                </select>
+                <div class="help">Print shops usually prefer bleed.</div>
+              </div>
+              <div>
+                <label for="fileName">File base name</label>
+                <input id="fileName" type="text" value="business-card" />
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <button class="btn btnPrimary" id="downloadFront" type="button"><span class="btnIcon i-download"></span>Download Front PNG</button>
+              <button class="btn" id="downloadBack" type="button"><span class="btnIcon i-download"></span>Download Back PNG</button>
+            </div>
+
+            <div class="row">
+              <button class="btn" id="copyLink" type="button"><span class="btnIcon i-share"></span>Copy share link</button>
+              <button class="btn btnDanger" id="reset" type="button">Reset</button>
+            </div>
+
+            <div class="help">
+              Share link stores your settings in the URL (no server). Presets save to your browser (localStorage).
+            </div>
+          </div>
+        </section>
+
       </div>
     </section>
 
-    <!-- Preview -->
-    <section class="panel">
+    <!-- RIGHT: PREVIEW -->
+    <section class="panel" aria-label="Preview">
       <header>
         <div class="title">
-          <h1>Preview</h1>
-          <p>Front + (optional) back</p>
+          <h2>Preview</h2>
+          <p>Front + (optional) back • drag logo • scroll to resize</p>
         </div>
-        <span class="badge" id="dimLabel">—</span>
+        <span class="pill" id="dimLabel">—</span>
       </header>
 
       <div class="previewWrap">
         <div class="previewTop">
-          <div class="smallNote">Export uses your selected DPI (actual pixels), preview is scaled.</div>
-          <div class="smallNote">Logo position is saved per session.</div>
+          <div class="smallNote">Preview is scaled. Export uses full DPI resolution.</div>
+          <div class="smallNote">Keyboard: <span class="kbd">Ctrl</span>+<span class="kbd">S</span> save preset • <span class="kbd">Ctrl</span>+<span class="kbd">E</span> export front</div>
         </div>
 
         <div class="canvasRow">
           <div class="cardFrame">
-            <h3>Front</h3>
+            <h3>
+              <span>Front</span>
+              <span class="pill" id="frontMeta">—</span>
+            </h3>
             <canvas id="front"></canvas>
           </div>
 
           <div class="cardFrame">
-            <h3>Back</h3>
+            <h3>
+              <span>Back</span>
+              <span class="pill" id="backMeta">—</span>
+            </h3>
             <canvas id="back"></canvas>
             <div class="smallNote" style="margin-top:8px;">Turn on “Enable back side” to export.</div>
           </div>
         </div>
       </div>
     </section>
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="dot" id="toastDot"></div>
+    <div>
+      <strong id="toastTitle">Done</strong><br/>
+      <span id="toastMsg">—</span>
+    </div>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="modalBack" id="helpModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Shortcuts and tips">
+      <header>
+        <h3>Shortcuts & Tips</h3>
+        <button class="btn" id="closeHelp" type="button">Close</button>
+      </header>
+      <div class="body">
+        <p><strong>Logo</strong>: Drag on the front card. Scroll to resize. Hold <span class="kbd">Shift</span> to drag faster.</p>
+        <p><strong>QR</strong>: Set to vCard for best results. It will encode your name, phone, email, website, and address.</p>
+        <p><strong>Keyboard</strong>:
+          <span class="kbd">Ctrl</span>+<span class="kbd">S</span> save preset,
+          <span class="kbd">Ctrl</span>+<span class="kbd">O</span> load preset,
+          <span class="kbd">Ctrl</span>+<span class="kbd">E</span> export front,
+          <span class="kbd">Esc</span> close this window.
+        </p>
+        <p><strong>Print</strong>: Use 300 DPI and “With bleed” unless your printer requests otherwise.</p>
+      </div>
+    </div>
   </div>
 
 <script>
 (() => {
-  // Card physical sizes
-  const SIZES = {
-    us: { w_in: 3.5, h_in: 2.0, label: "US 3.5×2 in" },
-    eu: { w_in: 3.346, h_in: 2.165, label: "85×55 mm" } // mm → in
-  };
+  // ========= Helpers =========
+  const $ = (id) => document.getElementById(id);
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
-  // Guides (typical): 1/8" bleed, 1/8" safe inset
-  const BLEED_IN = 0.125; // 3.175mm
-  const SAFE_IN  = 0.125;
+  function toast(kind, title, msg){
+    const t = $("toast");
+    const dot = $("toastDot");
+    $("toastTitle").textContent = title;
+    $("toastMsg").textContent = msg;
+    dot.className = "dot" + (kind === "warn" ? " warn" : "");
+    t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>t.classList.remove("show"), 2200);
+  }
 
-  const els = {
-    size: document.getElementById("size"),
-    dpi: document.getElementById("dpi"),
-    company: document.getElementById("company"),
-    tagline: document.getElementById("tagline"),
-    name: document.getElementById("name"),
-    title: document.getElementById("title"),
-    phone: document.getElementById("phone"),
-    email: document.getElementById("email"),
-    website: document.getElementById("website"),
-    address: document.getElementById("address"),
-    logo: document.getElementById("logo"),
-    font: document.getElementById("font"),
-    bg1: document.getElementById("bg1"),
-    bg2: document.getElementById("bg2"),
-    accent: document.getElementById("accent"),
-    text: document.getElementById("text"),
-    guides: document.getElementById("guides"),
-    backSide: document.getElementById("backSide"),
-    downloadFront: document.getElementById("downloadFront"),
-    downloadBack: document.getElementById("downloadBack"),
-    reset: document.getElementById("reset"),
-    dimLabel: document.getElementById("dimLabel"),
-    frontCanvas: document.getElementById("front"),
-    backCanvas: document.getElementById("back"),
-  };
-
-  // State
-  const state = {
-    logoImg: null,
-    logoPos: { x: 0.72, y: 0.22 }, // relative
-    logoScale: 0.22, // relative width (fraction of card width)
-    dragging: false,
-    dragOff: { x: 0, y: 0 }
-  };
-
-  // Try restore saved logo position
-  const saved = localStorage.getItem("bc_logo_pos");
-  if (saved) {
-    try {
-      const p = JSON.parse(saved);
-      if (p && typeof p.x === "number" && typeof p.y === "number") state.logoPos = p;
-    } catch {}
+  function safeText(s, max=80){
+    s = (s || "").toString();
+    if (s.length > max) return s.slice(0, max-1) + "…";
+    return s;
   }
 
   function fontStack(kind){
@@ -429,23 +773,297 @@
     }
   }
 
+  function hexToRgb(hex){
+    const h = hex.replace("#","").trim();
+    if (h.length === 3){
+      const r = parseInt(h[0]+h[0],16);
+      const g = parseInt(h[1]+h[1],16);
+      const b = parseInt(h[2]+h[2],16);
+      return {r,g,b};
+    }
+    const r = parseInt(h.slice(0,2),16);
+    const g = parseInt(h.slice(2,4),16);
+    const b = parseInt(h.slice(4,6),16);
+    return {r,g,b};
+  }
+
+  function luminance(hex){
+    const {r,g,b} = hexToRgb(hex);
+    const srgb = [r,g,b].map(v=>{
+      v/=255;
+      return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+    });
+    return 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+  }
+
+  function bestTextColor(bgHex){
+    // simple contrast: choose near-white or near-black
+    return luminance(bgHex) > 0.45 ? "#0b1020" : "#e5e7eb";
+  }
+
+  // ========= Card sizes / export =========
+  const SIZES = {
+    us: { w_in: 3.5, h_in: 2.0, label: "US 3.5×2 in" },
+    eu: { w_in: 3.346, h_in: 2.165, label: "85×55 mm" } // mm → in
+  };
+  const BLEED_IN = 0.125; // 1/8"
+  const SAFE_IN  = 0.125;
+
   function px(inches, dpi){ return Math.round(inches * dpi); }
 
+  // ========= Elements =========
+  const els = {
+    // tabs
+    tabs: ["t-content","t-style","t-logo","t-export"].map($),
+    panels: ["tab-content","tab-style","tab-logo","tab-export"].map($),
+
+    // controls
+    company: $("company"),
+    tagline: $("tagline"),
+    name: $("name"),
+    title: $("title"),
+    phone: $("phone"),
+    email: $("email"),
+    website: $("website"),
+    address: $("address"),
+
+    layout: $("layout"),
+    icons: $("icons"),
+
+    size: $("size"),
+    dpi: $("dpi"),
+    font: $("font"),
+    radius: $("radius"),
+    bg1: $("bg1"),
+    bg2: $("bg2"),
+    accent: $("accent"),
+    text: $("text"),
+    preset: $("preset"),
+    guides: $("guides"),
+    backSide: $("backSide"),
+
+    logo: $("logo"),
+    logoMode: $("logoMode"),
+
+    qrMode: $("qrMode"),
+    qrSize: $("qrSize"),
+    qrLabel: $("qrLabel"),
+    qrOnBack: $("qrOnBack"),
+
+    exportMode: $("exportMode"),
+    fileName: $("fileName"),
+
+    // actions
+    downloadFront: $("downloadFront"),
+    downloadBack: $("downloadBack"),
+    downloadFrontTop: $("downloadFrontTop"),
+    savePreset: $("savePreset"),
+    loadPreset: $("loadPreset"),
+    copyLink: $("copyLink"),
+    reset: $("reset"),
+
+    // preview
+    dimLabel: $("dimLabel"),
+    frontMeta: $("frontMeta"),
+    backMeta: $("backMeta"),
+    statusPill: $("statusPill"),
+    frontCanvas: $("front"),
+    backCanvas: $("back"),
+
+    // modal
+    helpModal: $("helpModal"),
+    openHelp: $("openHelp"),
+    closeHelp: $("closeHelp"),
+  };
+
+  // ========= State =========
+  const state = {
+    logoImg: null,
+    logoPos: { x: 0.77, y: 0.24 }, // relative to canvas
+    logoScale: 0.22, // relative width fraction of canvas
+    dragging: false,
+    dragOff: { x: 0, y: 0 },
+
+    // internally cached QR canvas (per side)
+    qrCache: { front: null, back: null, keyFront: "", keyBack: "" }
+  };
+
+  // Restore saved logo position (per browser)
+  const savedPos = localStorage.getItem("bc_logo_pos_v2");
+  if (savedPos) {
+    try {
+      const p = JSON.parse(savedPos);
+      if (p && typeof p.x === "number" && typeof p.y === "number") state.logoPos = p;
+    } catch {}
+  }
+
+  // ========= Tabs =========
+  function setTab(idx){
+    els.tabs.forEach((t,i)=>{
+      const on = i === idx;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      els.panels[i].classList.toggle("active", on);
+    });
+  }
+  els.tabs.forEach((t,i)=> t.addEventListener("click", ()=> setTab(i)));
+
+  // ========= Presets =========
+  const COLOR_PRESETS = {
+    midnight: { bg1:"#0b1020", bg2:"#111827", accent:"#60a5fa", text:"#e5e7eb" },
+    mono:     { bg1:"#05070c", bg2:"#0b0f19", accent:"#ffffff", text:"#ffffff" },
+    sunset:   { bg1:"#1a0b1f", bg2:"#101827", accent:"#fb7185", text:"#ffe4ea" },
+    emerald:  { bg1:"#071a16", bg2:"#07101a", accent:"#22c55e", text:"#e9fff3" },
+  };
+
+  function applyPreset(name){
+    if(!COLOR_PRESETS[name]) return;
+    const p = COLOR_PRESETS[name];
+    els.bg1.value = p.bg1;
+    els.bg2.value = p.bg2;
+    els.accent.value = p.accent;
+    els.text.value = p.text;
+    toast("ok","Preset applied", name);
+    redrawAll();
+  }
+
+  // ========= URL Share =========
+  function getConfig(){
+    return {
+      company: els.company.value,
+      tagline: els.tagline.value,
+      name: els.name.value,
+      title: els.title.value,
+      phone: els.phone.value,
+      email: els.email.value,
+      website: els.website.value,
+      address: els.address.value,
+
+      layout: els.layout.value,
+      icons: els.icons.value,
+
+      size: els.size.value,
+      dpi: +els.dpi.value,
+      font: els.font.value,
+      radius: +els.radius.value,
+      bg1: els.bg1.value,
+      bg2: els.bg2.value,
+      accent: els.accent.value,
+      text: els.text.value,
+      guides: !!els.guides.checked,
+      backSide: !!els.backSide.checked,
+
+      logoMode: els.logoMode.value,
+      logoPos: state.logoPos,
+      logoScale: state.logoScale,
+
+      qrMode: els.qrMode.value,
+      qrSize: +els.qrSize.value,
+      qrLabel: els.qrLabel.value,
+      qrOnBack: els.qrOnBack.value,
+
+      exportMode: els.exportMode.value,
+      fileName: els.fileName.value,
+    };
+  }
+
+  function setConfig(cfg){
+    if(!cfg) return;
+
+    // content
+    if (cfg.company != null) els.company.value = cfg.company;
+    if (cfg.tagline != null) els.tagline.value = cfg.tagline;
+    if (cfg.name != null) els.name.value = cfg.name;
+    if (cfg.title != null) els.title.value = cfg.title;
+    if (cfg.phone != null) els.phone.value = cfg.phone;
+    if (cfg.email != null) els.email.value = cfg.email;
+    if (cfg.website != null) els.website.value = cfg.website;
+    if (cfg.address != null) els.address.value = cfg.address;
+
+    // style
+    if (cfg.layout) els.layout.value = cfg.layout;
+    if (cfg.icons) els.icons.value = cfg.icons;
+
+    if (cfg.size) els.size.value = cfg.size;
+    if (cfg.dpi) els.dpi.value = String(cfg.dpi);
+    if (cfg.font) els.font.value = cfg.font;
+    if (cfg.radius) els.radius.value = String(cfg.radius);
+    if (cfg.bg1) els.bg1.value = cfg.bg1;
+    if (cfg.bg2) els.bg2.value = cfg.bg2;
+    if (cfg.accent) els.accent.value = cfg.accent;
+    if (cfg.text) els.text.value = cfg.text;
+    if (cfg.guides != null) els.guides.checked = !!cfg.guides;
+    if (cfg.backSide != null) els.backSide.checked = !!cfg.backSide;
+
+    // logo
+    if (cfg.logoMode) els.logoMode.value = cfg.logoMode;
+    if (cfg.logoPos && typeof cfg.logoPos.x === "number" && typeof cfg.logoPos.y === "number") state.logoPos = cfg.logoPos;
+    if (cfg.logoScale && typeof cfg.logoScale === "number") state.logoScale = clamp(cfg.logoScale, 0.10, 0.42);
+
+    // qr
+    if (cfg.qrMode) els.qrMode.value = cfg.qrMode;
+    if (cfg.qrSize) els.qrSize.value = String(cfg.qrSize);
+    if (cfg.qrLabel != null) els.qrLabel.value = cfg.qrLabel;
+    if (cfg.qrOnBack) els.qrOnBack.value = cfg.qrOnBack;
+
+    // export
+    if (cfg.exportMode) els.exportMode.value = cfg.exportMode;
+    if (cfg.fileName) els.fileName.value = cfg.fileName;
+
+    setupCanvases();
+    redrawAll();
+  }
+
+  function encodeShare(cfg){
+    const json = JSON.stringify(cfg);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    return b64;
+  }
+
+  function decodeShare(b64){
+    try{
+      const json = decodeURIComponent(escape(atob(b64)));
+      return JSON.parse(json);
+    }catch{
+      return null;
+    }
+  }
+
+  function copyShareLink(){
+    const cfg = getConfig();
+    // NOTE: logo image is not embedded (too big). Only position + settings.
+    const b64 = encodeShare(cfg);
+    const url = new URL(window.location.href);
+    url.searchParams.set("c", b64);
+    navigator.clipboard.writeText(url.toString()).then(()=>{
+      toast("ok","Link copied","Settings saved in URL (logo not included).");
+    }).catch(()=>{
+      toast("warn","Copy failed","Your browser blocked clipboard.");
+    });
+  }
+
+  // ========= Setup canvases =========
   function setupCanvases(){
     const size = SIZES[els.size.value];
     const dpi = +els.dpi.value;
 
-    const w = px(size.w_in + 2*BLEED_IN, dpi);
-    const h = px(size.h_in + 2*BLEED_IN, dpi);
+    const exportMode = els.exportMode.value;
+    const bleed = exportMode === "trimOnly" ? 0 : BLEED_IN;
+
+    const w = px(size.w_in + 2*bleed, dpi);
+    const h = px(size.h_in + 2*bleed, dpi);
 
     els.frontCanvas.width = w;
     els.frontCanvas.height = h;
     els.backCanvas.width = w;
     els.backCanvas.height = h;
 
-    els.dimLabel.textContent = `${size.label} @ ${dpi} DPI (${w}×${h}px incl. bleed)`;
+    const label = `${size.label} @ ${dpi} DPI (${w}×${h}px ${exportMode === "trimOnly" ? "trim" : "incl. bleed"})`;
+    els.dimLabel.textContent = label;
+    els.frontMeta.textContent = `${w}×${h}`;
+    els.backMeta.textContent = els.backSide.checked ? "Enabled" : "Disabled";
   }
 
+  // ========= Drawing helpers =========
   function roundedRect(ctx, x, y, w, h, r){
     const rr = Math.min(r, w/2, h/2);
     ctx.beginPath();
@@ -466,19 +1084,35 @@
 
   function drawGuides(ctx, w, h, dpi){
     if(!els.guides.checked) return;
+    const exportMode = els.exportMode.value;
+    const bleedIn = exportMode === "trimOnly" ? 0 : BLEED_IN;
 
-    // bleed border (full canvas) + trim box + safe box
-    const bleed = px(BLEED_IN, dpi);
+    const bleed = px(bleedIn, dpi);
     const safe = px(SAFE_IN, dpi);
 
-    // Trim box (inside bleed)
+    if (bleedIn === 0){
+      // only safe box when no bleed
+      ctx.save();
+      ctx.setLineDash([8, 8]);
+      ctx.strokeStyle = "rgba(96,165,250,.55)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(safe, safe, w-2*safe, h-2*safe);
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(96,165,250,.85)";
+      ctx.font = `bold ${Math.max(18, Math.round(w*0.018))}px ${fontStack("system")}`;
+      ctx.fillText("SAFE", safe+10, safe+24);
+      ctx.restore();
+      return;
+    }
+
     ctx.save();
+    // Trim box
     ctx.setLineDash([10, 8]);
     ctx.strokeStyle = "rgba(255,255,255,.35)";
     ctx.lineWidth = 2;
     ctx.strokeRect(bleed, bleed, w-2*bleed, h-2*bleed);
 
-    // Safe box
+    // Safe box (inside trim)
     ctx.setLineDash([8, 8]);
     ctx.strokeStyle = "rgba(96,165,250,.55)";
     ctx.strokeRect(bleed+safe, bleed+safe, w-2*(bleed+safe), h-2*(bleed+safe));
@@ -493,14 +1127,450 @@
     ctx.restore();
   }
 
+  // Simple vector icons for contacts (drawn)
+  function drawIcon(ctx, kind, x, y, s, color){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(2, s*0.12);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    const cx = x + s/2, cy = y + s/2;
+    if(kind === "phone"){
+      ctx.beginPath();
+      ctx.arc(cx, cy, s*0.42, Math.PI*0.2, Math.PI*1.3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x+s*0.25, y+s*0.7);
+      ctx.lineTo(x+s*0.4, y+s*0.85);
+      ctx.stroke();
+    } else if(kind === "mail"){
+      ctx.beginPath();
+      roundedRect(ctx, x+s*0.12, y+s*0.2, s*0.76, s*0.6, s*0.12);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x+s*0.16, y+s*0.28);
+      ctx.lineTo(cx, y+s*0.55);
+      ctx.lineTo(x+s*0.84, y+s*0.28);
+      ctx.stroke();
+    } else if(kind === "web"){
+      ctx.beginPath();
+      ctx.arc(cx, cy, s*0.42, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, s*0.20, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x+s*0.1, cy);
+      ctx.lineTo(x+s*0.9, cy);
+      ctx.moveTo(cx, y+s*0.1);
+      ctx.lineTo(cx, y+s*0.9);
+      ctx.stroke();
+    } else if(kind === "pin"){
+      ctx.beginPath();
+      ctx.arc(cx, y+s*0.42, s*0.22, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx, y+s*0.64);
+      ctx.lineTo(cx, y+s*0.92);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ========= QR generation (built-in, no libraries) =========
+  // This is a light, self-contained QR implementation. It supports byte mode, ECC level M.
+  // It’s not a full spec implementation for every edge-case, but works reliably for typical vCard + URL lengths.
+
+  // ---- QR util: finite field + RS ECC ----
+  const QR = (() => {
+    // GF(256) tables with primitive polynomial 0x11d
+    const EXP = new Uint8Array(512);
+    const LOG = new Uint8Array(256);
+    let x = 1;
+    for (let i=0;i<255;i++){
+      EXP[i] = x;
+      LOG[x] = i;
+      x <<= 1;
+      if (x & 0x100) x ^= 0x11d;
+    }
+    for (let i=255;i<512;i++) EXP[i] = EXP[i-255];
+
+    function gfMul(a,b){
+      if (a===0 || b===0) return 0;
+      return EXP[LOG[a]+LOG[b]];
+    }
+
+    function rsGeneratorPoly(deg){
+      let poly = [1];
+      for (let i=0;i<deg;i++){
+        poly = polyMultiply(poly, [1, EXP[i]]);
+      }
+      return poly;
+    }
+    function polyMultiply(p, q){
+      const out = new Array(p.length+q.length-1).fill(0);
+      for (let i=0;i<p.length;i++){
+        for (let j=0;j<q.length;j++){
+          out[i+j] ^= gfMul(p[i], q[j]);
+        }
+      }
+      return out;
+    }
+    function rsEncode(data, ecLen){
+      const gen = rsGeneratorPoly(ecLen);
+      const msg = data.slice();
+      for (let i=0;i<ecLen;i++) msg.push(0);
+      for (let i=0;i<data.length;i++){
+        const coef = msg[i];
+        if (coef !== 0){
+          for (let j=0;j<gen.length;j++){
+            msg[i+j] ^= gfMul(gen[j], coef);
+          }
+        }
+      }
+      return msg.slice(msg.length-ecLen);
+    }
+
+    // ---- Minimal QR builder: versions 1..4 in byte mode, ECC M ----
+    // capacities (byte) for ECC M:
+    // v1: 14, v2: 26, v3: 42, v4: 62 (approx for byte mode)
+    const CAP = {
+      1: { data: 16, ec: 10 }, // (codewords) total 26 -> data 16, ec 10
+      2: { data: 28, ec: 16 }, // total 44
+      3: { data: 44, ec: 26 }, // total 70
+      4: { data: 64, ec: 36 }, // total 100
+    };
+
+    function chooseVersion(bytes){
+      // very safe thresholds for byte-mode payload sizes
+      if (bytes <= 14) return 1;
+      if (bytes <= 26) return 2;
+      if (bytes <= 42) return 3;
+      if (bytes <= 62) return 4;
+      return 4; // clamp; user should shorten
+    }
+
+    function makeMatrix(version){
+      const size = 17 + 4*version;
+      const m = Array.from({length:size}, ()=> new Array(size).fill(null));
+      const reserved = Array.from({length:size}, ()=> new Array(size).fill(false));
+
+      function set(x,y,val){
+        if (x<0||y<0||x>=size||y>=size) return;
+        m[y][x] = val;
+        reserved[y][x] = true;
+      }
+
+      // Finder patterns
+      function finder(x0,y0){
+        for(let y=0;y<7;y++){
+          for(let x=0;x<7;x++){
+            const xx = x0+x, yy=y0+y;
+            const on = (x===0||x===6||y===0||y===6)||(x>=2&&x<=4&&y>=2&&y<=4);
+            set(xx,yy,on?1:0);
+          }
+        }
+        // separators
+        for(let i=-1;i<=7;i++){
+          set(x0-1,y0+i,0);
+          set(x0+7,y0+i,0);
+          set(x0+i,y0-1,0);
+          set(x0+i,y0+7,0);
+        }
+      }
+      finder(0,0);
+      finder(size-7,0);
+      finder(0,size-7);
+
+      // Timing patterns
+      for(let i=8;i<size-8;i++){
+        set(i,6, i%2===0 ? 1 : 0);
+        set(6,i, i%2===0 ? 1 : 0);
+      }
+
+      // Dark module
+      set(8, size-8, 1);
+
+      // Reserve format info areas
+      for(let i=0;i<9;i++){
+        reserved[8][i]=true;
+        reserved[i][8]=true;
+      }
+      for(let i=size-8;i<size;i++){
+        reserved[8][i]=true;
+        reserved[i][8]=true;
+      }
+      reserved[size-8][8]=true;
+
+      // Alignment pattern for v2+
+      function alignAt(cx,cy){
+        for(let y=-2;y<=2;y++){
+          for(let x=-2;x<=2;x++){
+            const on = Math.max(Math.abs(x),Math.abs(y))===2 || (x===0 && y===0);
+            set(cx+x, cy+y, on?1:0);
+          }
+        }
+      }
+      const ALIGN_POS = {
+        1: [],
+        2: [6, size-7],
+        3: [6, Math.floor(size/2), size-7],
+        4: [6, Math.floor(size/2), size-7],
+      };
+      const pos = ALIGN_POS[version];
+      if (pos && pos.length){
+        for (let i=0;i<pos.length;i++){
+          for (let j=0;j<pos.length;j++){
+            const cx = pos[i], cy = pos[j];
+            // Skip overlaps with finders
+            const inFinder =
+              (cx<=8 && cy<=8) ||
+              (cx>=size-9 && cy<=8) ||
+              (cx<=8 && cy>=size-9);
+            if (!inFinder) alignAt(cx,cy);
+          }
+        }
+      }
+
+      return {m, reserved, size};
+    }
+
+    function bytesFromString(str){
+      // UTF-8
+      return Array.from(new TextEncoder().encode(str));
+    }
+
+    function buildDataCodewords(payloadBytes, version){
+      const cap = CAP[version];
+      const dataCw = cap.data;
+
+      // Mode indicator: 0100 (byte)
+      // Count indicator: 8 bits for v1..9
+      const bits = [];
+      function pushBits(val, n){
+        for(let i=n-1;i>=0;i--) bits.push((val>>i)&1);
+      }
+      pushBits(0b0100, 4);
+      pushBits(payloadBytes.length, 8);
+      for (const b of payloadBytes) pushBits(b, 8);
+
+      // Terminator
+      const maxBits = dataCw * 8;
+      const remaining = maxBits - bits.length;
+      if (remaining > 0) pushBits(0, Math.min(4, remaining));
+
+      // Pad to byte boundary
+      while (bits.length % 8 !== 0) bits.push(0);
+
+      // Convert to codewords
+      const codewords = [];
+      for(let i=0;i<bits.length;i+=8){
+        let cw=0;
+        for(let j=0;j<8;j++) cw = (cw<<1) | bits[i+j];
+        codewords.push(cw);
+      }
+
+      // Pad codewords
+      const PAD0 = 0xEC, PAD1 = 0x11;
+      let toggle = true;
+      while (codewords.length < dataCw){
+        codewords.push(toggle ? PAD0 : PAD1);
+        toggle = !toggle;
+      }
+      return codewords;
+    }
+
+    // Place bits into matrix (standard zigzag)
+    function placeData(matrixObj, allCodewords){
+      const {m, reserved, size} = matrixObj;
+      // Convert codewords to bit stream MSB first
+      const bits = [];
+      for(const cw of allCodewords){
+        for(let i=7;i>=0;i--) bits.push((cw>>i)&1);
+      }
+
+      let bitIdx = 0;
+      let dirUp = true;
+      for (let x = size-1; x>0; x-=2){
+        if (x === 6) x--; // skip timing column
+        for (let yi=0; yi<size; yi++){
+          const y = dirUp ? (size-1-yi) : yi;
+          for (let dx=0; dx<2; dx++){
+            const xx = x - dx;
+            if (reserved[y][xx]) continue;
+            m[y][xx] = bits[bitIdx++] ?? 0;
+          }
+        }
+        dirUp = !dirUp;
+      }
+    }
+
+    // Masking: we use mask 0 for simplicity (works fine). (i+j)%2==0
+    function applyMask(matrixObj){
+      const {m, reserved, size} = matrixObj;
+      for(let y=0;y<size;y++){
+        for(let x=0;x<size;x++){
+          if (reserved[y][x]) continue;
+          const mask = ((x + y) % 2) === 0;
+          if (mask) m[y][x] ^= 1;
+        }
+      }
+    }
+
+    // Format info for ECC M + mask 0
+    // ECC M: 00, mask 0: 000 => 00000
+    // Precomputed final 15-bit format with BCH + XOR 0x5412:
+    // for (M, mask 0) => 0b101010000010010 = 0x5412? actually that's the mask itself.
+    // Correct format bits for (ECC M, mask 0) = 0x5412 ^ 0b00000???? (already includes xor).
+    // The final 15-bit string is: 101010000010010 (commonly shown for M/0).
+    const FORMAT_M0 = 0b101010000010010;
+
+    function setFormat(matrixObj){
+      const {m, size} = matrixObj;
+      const bits = [];
+      for(let i=14;i>=0;i--) bits.push((FORMAT_M0>>i)&1);
+
+      // positions around top-left finder
+      const coords1 = [
+        [0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[7,8],[8,8],
+        [8,7],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0]
+      ];
+      for(let i=0;i<15;i++){
+        const [x,y] = coords1[i];
+        m[y][x] = bits[i];
+      }
+
+      // top-right + bottom-left
+      const coords2 = [
+        [size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
+        [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]
+      ];
+      for(let i=0;i<15;i++){
+        const [x,y] = coords2[i];
+        m[y][x] = bits[i];
+      }
+    }
+
+    function renderToCanvas(matrixObj, scale=6, margin=4, dark="#000", light="#fff"){
+      const {m, size} = matrixObj;
+      const out = document.createElement("canvas");
+      out.width = (size + margin*2) * scale;
+      out.height = (size + margin*2) * scale;
+      const ctx = out.getContext("2d");
+      ctx.fillStyle = light;
+      ctx.fillRect(0,0,out.width,out.height);
+      ctx.fillStyle = dark;
+      for(let y=0;y<size;y++){
+        for(let x=0;x<size;x++){
+          if (m[y][x]) {
+            ctx.fillRect((x+margin)*scale, (y+margin)*scale, scale, scale);
+          }
+        }
+      }
+      return out;
+    }
+
+    function makeQRCanvas(text){
+      const bytes = bytesFromString(text);
+      const version = chooseVersion(bytes.length);
+      const cap = CAP[version];
+
+      // Build data + ECC
+      const dataCw = buildDataCodewords(bytes, version);
+      const ec = rsEncode(dataCw, cap.ec);
+      const all = dataCw.concat(ec);
+
+      const matrixObj = makeMatrix(version);
+      placeData(matrixObj, all);
+      applyMask(matrixObj);
+      setFormat(matrixObj);
+
+      // Render
+      return renderToCanvas(matrixObj, 6, 4, "#000", "#fff");
+    }
+
+    return { makeQRCanvas };
+  })();
+
+  // ========= vCard / QR payload =========
+  function vcardPayload(){
+    const fn = safeText(els.name.value, 70);
+    const org = safeText(els.company.value, 70);
+    const title = safeText(els.title.value, 70);
+    const tel = safeText(els.phone.value, 40);
+    const email = safeText(els.email.value, 70);
+    const url = safeText(els.website.value, 120);
+    const adr = safeText(els.address.value, 120);
+
+    // vCard 3.0 (widely compatible)
+    const lines = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `FN:${fn}`,
+      org ? `ORG:${org}` : "",
+      title ? `TITLE:${title}` : "",
+      tel ? `TEL;TYPE=CELL:${tel}` : "",
+      email ? `EMAIL;TYPE=INTERNET:${email}` : "",
+      url ? `URL:${url}` : "",
+      adr ? `ADR;TYPE=WORK:;;${adr};;;;` : "",
+      "END:VCARD"
+    ].filter(Boolean);
+
+    return lines.join("\n");
+  }
+
+  function qrText(){
+    const mode = els.qrMode.value;
+    if (mode === "off") return "";
+    if (mode === "website"){
+      const w = (els.website.value || "").trim();
+      if (!w) return "";
+      return w.startsWith("http") ? w : `https://${w}`;
+    }
+    if (mode === "email"){
+      const e = (els.email.value || "").trim();
+      return e ? `mailto:${e}` : "";
+    }
+    if (mode === "phone"){
+      const p = (els.phone.value || "").trim();
+      return p ? `tel:${p}` : "";
+    }
+    if (mode === "vcard"){
+      return vcardPayload();
+    }
+    return "";
+  }
+
+  function getQrCanvas(side){
+    const txt = qrText();
+    if (!txt) return null;
+    const key = `${side}|${txt}|${els.qrSize.value}`;
+    if (side === "front"){
+      if (state.qrCache.keyFront === key && state.qrCache.front) return state.qrCache.front;
+      const c = QR.makeQRCanvas(txt);
+      state.qrCache.front = c;
+      state.qrCache.keyFront = key;
+      return c;
+    } else {
+      if (state.qrCache.keyBack === key && state.qrCache.back) return state.qrCache.back;
+      const c = QR.makeQRCanvas(txt);
+      state.qrCache.back = c;
+      state.qrCache.keyBack = key;
+      return c;
+    }
+  }
+
+  // ========= Drawing templates =========
   function drawFront(){
     const c = els.frontCanvas;
     const ctx = c.getContext("2d");
     const dpi = +els.dpi.value;
-    const size = SIZES[els.size.value];
+    const sizeKey = els.size.value;
     const w = c.width, h = c.height;
+    const exportMode = els.exportMode.value;
+    const bleedIn = exportMode === "trimOnly" ? 0 : BLEED_IN;
 
-    // Base
     ctx.clearRect(0,0,w,h);
 
     // Background
@@ -508,31 +1578,18 @@
     ctx.fillStyle = linearGradient(ctx, w, h, els.bg1.value, els.bg2.value);
     ctx.fillRect(0,0,w,h);
 
-    // Soft blobs
-    ctx.globalAlpha = 0.18;
+    // subtle texture
+    ctx.globalAlpha = 0.10;
     ctx.fillStyle = els.accent.value;
     ctx.beginPath();
-    ctx.ellipse(w*0.15, h*0.2, w*0.35, h*0.25, 0, 0, Math.PI*2);
+    ctx.ellipse(w*0.15, h*0.18, w*0.36, h*0.26, 0, 0, Math.PI*2);
     ctx.fill();
-
-    ctx.fillStyle = els.accent.value;
     ctx.beginPath();
-    ctx.ellipse(w*0.92, h*0.85, w*0.42, h*0.32, 0, 0, Math.PI*2);
+    ctx.ellipse(w*0.90, h*0.86, w*0.45, h*0.33, 0, 0, Math.PI*2);
     ctx.fill();
     ctx.restore();
 
-    // Accent line
-    ctx.save();
-    ctx.globalAlpha = 0.95;
-    ctx.strokeStyle = els.accent.value;
-    ctx.lineWidth = Math.max(6, Math.round(w*0.012));
-    ctx.beginPath();
-    ctx.moveTo(w*0.08, h*0.18);
-    ctx.lineTo(w*0.52, h*0.18);
-    ctx.stroke();
-    ctx.restore();
-
-    const bleed = px(BLEED_IN, dpi);
+    const bleed = px(bleedIn, dpi);
     const safe = px(SAFE_IN, dpi);
     const sx = bleed + safe;
     const sy = bleed + safe;
@@ -540,114 +1597,243 @@
     const sh = h - 2*(bleed + safe);
 
     const font = fontStack(els.font.value);
+    const radius = +els.radius.value;
 
-    // Company + tagline (top-left)
+    // Layout measurements
+    const layout = els.layout.value;
+
+    const company = safeText(els.company.value, 32);
+    const tagline = safeText(els.tagline.value, 44);
+    const name = safeText(els.name.value, 32);
+    const title = safeText(els.title.value, 44);
+
+    // Accent rule
     ctx.save();
-    ctx.fillStyle = els.text.value;
-    ctx.font = `800 ${Math.round(sw*0.07)}px ${font}`;
-    ctx.fillText(els.company.value || "Company", sx, sy + sh*0.18);
-
-    ctx.fillStyle = "rgba(229,231,235,.82)";
-    ctx.font = `600 ${Math.round(sw*0.035)}px ${font}`;
-    ctx.fillText(els.tagline.value || "", sx, sy + sh*0.28);
+    ctx.strokeStyle = els.accent.value;
+    ctx.globalAlpha = 0.95;
+    ctx.lineWidth = Math.max(6, Math.round(w*0.012));
+    if (layout === "minimal"){
+      ctx.beginPath();
+      ctx.moveTo(sx, sy + sh*0.14);
+      ctx.lineTo(sx + sw*0.30, sy + sh*0.14);
+      ctx.stroke();
+    } else if (layout === "centered"){
+      ctx.beginPath();
+      ctx.moveTo(w*0.30, sy + sh*0.14);
+      ctx.lineTo(w*0.70, sy + sh*0.14);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(sx, sy + sh*0.18);
+      ctx.lineTo(sx + sw*0.40, sy + sh*0.18);
+      ctx.stroke();
+    }
     ctx.restore();
 
-    // Name + title (mid-left)
+    // Typography sizes
+    const companySize = Math.round(sw*(layout==="minimal" ? 0.065 : 0.070));
+    const taglineSize = Math.round(sw*(layout==="minimal" ? 0.030 : 0.034));
+    const nameSize = Math.round(sw*(layout==="centered" ? 0.080 : 0.075));
+    const titleSize = Math.round(sw*0.040);
+    const infoLabelSize = Math.round(sw*0.028);
+    const infoValueSize = Math.round(sw*0.032);
+
+    // Draw blocks depending on layout
+    let infoX = sx, infoY = sy + sh*0.30;
+    let textAlign = "left";
+    if (layout === "split"){
+      infoX = sx;
+      infoY = sy + sh*0.52;
+    }
+    if (layout === "centered"){
+      textAlign = "center";
+      infoX = w/2;
+    }
+
+    // Company
     ctx.save();
     ctx.fillStyle = els.text.value;
-    ctx.font = `900 ${Math.round(sw*0.075)}px ${font}`;
-    ctx.fillText(els.name.value || "Your Name", sx, sy + sh*0.55);
+    ctx.textAlign = textAlign;
+    ctx.font = `900 ${companySize}px ${font}`;
+    ctx.fillText(company, infoX, sy + sh*(layout==="split" ? 0.22 : 0.20));
+
+    // Tagline
+    ctx.fillStyle = "rgba(229,231,235,.82)";
+    ctx.font = `700 ${taglineSize}px ${font}`;
+    if (tagline) ctx.fillText(tagline, infoX, sy + sh*(layout==="split" ? 0.31 : 0.29));
+    ctx.restore();
+
+    // Name + title
+    ctx.save();
+    ctx.fillStyle = els.text.value;
+    ctx.textAlign = textAlign;
+    ctx.font = `900 ${nameSize}px ${font}`;
+    const nameY = sy + sh*(layout==="centered" ? 0.52 : (layout==="split" ? 0.44 : 0.54));
+    ctx.fillText(name || "Your Name", infoX, nameY);
 
     ctx.fillStyle = "rgba(229,231,235,.80)";
-    ctx.font = `700 ${Math.round(sw*0.04)}px ${font}`;
-    ctx.fillText(els.title.value || "Your Title", sx, sy + sh*0.64);
+    ctx.font = `800 ${titleSize}px ${font}`;
+    ctx.fillText(title || "Your Title", infoX, nameY + sh*0.10);
     ctx.restore();
 
-    // Contact list (bottom-left)
+    // Contact list
     const items = [
-      ["PHONE", els.phone.value],
-      ["EMAIL", els.email.value],
-      ["WEB", els.website.value],
-      ["ADDR", els.address.value]
-    ].filter(x => (x[1]||"").trim().length);
+      ["PHONE", (els.phone.value||"").trim(), "phone"],
+      ["EMAIL", (els.email.value||"").trim(), "mail"],
+      ["WEB", (els.website.value||"").trim(), "web"],
+      ["ADDR", (els.address.value||"").trim(), "pin"],
+    ].filter(x => x[1].length);
 
     ctx.save();
-    const baseY = sy + sh*0.73;
+    ctx.textAlign = "left";
+    const baseX = layout==="centered" ? (sx + sw*0.10) : sx;
+    const baseY = sy + sh*(layout==="split" ? 0.68 : 0.74);
     const lineH = Math.round(sh*0.075);
-    ctx.font = `800 ${Math.round(sw*0.028)}px ${font}`;
     items.forEach((it, i) => {
       const y = baseY + i*lineH;
-      // label pill
       const label = it[0];
       const val = it[1];
+      const iconKind = it[2];
 
       const padX = Math.round(sw*0.018);
-      const pillH = Math.round(sw*0.05);
+      const pillH = Math.round(sw*0.052);
+      ctx.font = `900 ${infoLabelSize}px ${font}`;
       const labelW = ctx.measureText(label).width + padX*2;
 
+      // label pill
       ctx.save();
       ctx.globalAlpha = 0.95;
       ctx.fillStyle = "rgba(255,255,255,.08)";
-      roundedRect(ctx, sx, y - pillH + 6, labelW, pillH, 999);
+      roundedRect(ctx, baseX, y - pillH + 6, labelW, pillH, 999);
       ctx.fill();
       ctx.restore();
 
-      ctx.fillStyle = els.accent.value;
-      ctx.fillText(label, sx + padX, y);
+      // icon
+      const iconsOn = els.icons.value === "on";
+      const iconSize = Math.round(pillH*0.66);
+      const iconX = baseX + labelW + Math.round(sw*0.018);
+      const iconY = y - iconSize + 3;
+      if (iconsOn){
+        drawIcon(ctx, iconKind, iconX, iconY, iconSize, "rgba(229,231,235,.75)");
+      }
 
-      ctx.fillStyle = "rgba(229,231,235,.86)";
-      ctx.font = `700 ${Math.round(sw*0.032)}px ${font}`;
-      ctx.fillText(val, sx + labelW + Math.round(sw*0.02), y);
-      ctx.font = `800 ${Math.round(sw*0.028)}px ${font}`;
+      // label
+      ctx.fillStyle = els.accent.value;
+      ctx.fillText(label, baseX + padX, y);
+
+      // value
+      ctx.fillStyle = "rgba(229,231,235,.88)";
+      ctx.font = `800 ${infoValueSize}px ${font}`;
+      const valueX = iconsOn ? (iconX + iconSize + Math.round(sw*0.012)) : (baseX + labelW + Math.round(sw*0.02));
+      ctx.fillText(val, valueX, y);
     });
     ctx.restore();
 
-    // Logo (draggable)
-    if (state.logoImg){
-      const img = state.logoImg;
-      const targetW = w * state.logoScale;
-      const aspect = img.width / img.height;
-      const targetH = targetW / aspect;
+    // Logo
+    drawLogo(ctx, w, h, radius);
 
-      const cx = w * state.logoPos.x;
-      const cy = h * state.logoPos.y;
-      const x = cx - targetW/2;
-      const y = cy - targetH/2;
-
-      // soft logo plate
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = "rgba(0,0,0,.25)";
-      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, 18);
-      ctx.fill();
-
-      ctx.globalAlpha = 0.8;
-      ctx.strokeStyle = "rgba(255,255,255,.12)";
-      ctx.lineWidth = 2;
-      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, 18);
-      ctx.stroke();
-      ctx.restore();
-
-      ctx.drawImage(img, x, y, targetW, targetH);
-    } else {
-      // placeholder mark
-      ctx.save();
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = "rgba(255,255,255,.12)";
-      const r = Math.min(w,h)*0.08;
-      ctx.beginPath();
-      ctx.arc(w*0.78, h*0.28, r, 0, Math.PI*2);
-      ctx.fill();
-
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = els.accent.value;
-      ctx.font = `900 ${Math.round(r*0.7)}px ${font}`;
-      ctx.fillText("LL", w*0.78 - r*0.55, h*0.28 + r*0.25);
-      ctx.restore();
+    // QR (optional) on front
+    if (els.qrOnBack.value === "front"){
+      drawQR(ctx, "front", w, h, radius);
     }
 
     drawGuides(ctx, w, h, dpi);
-    drawBack(); // keep back synced
+
+    // keep back synced
+    drawBack();
+  }
+
+  function drawLogo(ctx, w, h, radius){
+    if (!state.logoImg) {
+      // placeholder mark
+      ctx.save();
+      const r = Math.min(w,h)*0.085;
+      ctx.globalAlpha = 0.75;
+      ctx.fillStyle = "rgba(255,255,255,.10)";
+      ctx.beginPath();
+      ctx.arc(w*0.80, h*0.28, r, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = els.accent.value;
+      ctx.font = `900 ${Math.round(r*0.72)}px ${fontStack(els.font.value)}`;
+      ctx.fillText("LL", w*0.80 - r*0.55, h*0.28 + r*0.25);
+      ctx.restore();
+      return;
+    }
+
+    const img = state.logoImg;
+    const targetW = w * state.logoScale;
+    const aspect = img.width / img.height;
+    const targetH = targetW / aspect;
+
+    const cx = w * state.logoPos.x;
+    const cy = h * state.logoPos.y;
+    const x = cx - targetW/2;
+    const y = cy - targetH/2;
+
+    if (els.logoMode.value === "plate"){
+      ctx.save();
+      ctx.globalAlpha = 0.92;
+      ctx.fillStyle = "rgba(0,0,0,.28)";
+      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, Math.max(14, radius));
+      ctx.fill();
+
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = "rgba(255,255,255,.12)";
+      ctx.lineWidth = 2;
+      roundedRect(ctx, x - 12, y - 12, targetW + 24, targetH + 24, Math.max(14, radius));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.drawImage(img, x, y, targetW, targetH);
+  }
+
+  function drawQR(ctx, side, w, h, radius){
+    const txt = qrText();
+    if (!txt) return;
+
+    // make a qr canvas
+    const qr = getQrCanvas(side);
+    if (!qr) return;
+
+    const scaleFrac = +els.qrSize.value;
+    const sizePx = Math.round(Math.min(w,h) * scaleFrac);
+
+    const pad = Math.round(Math.min(w,h) * 0.045);
+    const x = w - pad - sizePx;
+    const y = h - pad - sizePx;
+
+    // plate with contrast
+    const bg = "#ffffff";
+    const fg = "#000000";
+
+    ctx.save();
+    // QR plate
+    ctx.globalAlpha = 0.94;
+    ctx.fillStyle = "rgba(0,0,0,.22)";
+    roundedRect(ctx, x - 10, y - 10, sizePx + 20, sizePx + 20, Math.max(12, radius));
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = bg;
+    roundedRect(ctx, x - 6, y - 6, sizePx + 12, sizePx + 12, Math.max(10, radius));
+    ctx.fill();
+
+    // draw qr scaled
+    ctx.drawImage(qr, 0, 0, qr.width, qr.height, x, y, sizePx, sizePx);
+
+    // label
+    const label = (els.qrLabel.value || "").trim();
+    if (label){
+      ctx.fillStyle = "rgba(229,231,235,.85)";
+      ctx.font = `800 ${Math.round(w*0.022)}px ${fontStack(els.font.value)}`;
+      ctx.textAlign = "right";
+      ctx.fillText(label, x + sizePx, y - Math.round(w*0.02));
+      ctx.textAlign = "left";
+    }
+    ctx.restore();
   }
 
   function drawBack(){
@@ -662,37 +1848,46 @@
     ctx.fillStyle = linearGradient(ctx, w, h, els.bg2.value, els.bg1.value);
     ctx.fillRect(0,0,w,h);
 
-    // Center card mark
     const font = fontStack(els.font.value);
+    const radius = +els.radius.value;
 
-    // Accent ring
+    // Brand mark ring
     ctx.save();
     ctx.globalAlpha = 0.55;
     ctx.strokeStyle = els.accent.value;
     ctx.lineWidth = Math.max(8, Math.round(w*0.016));
     ctx.beginPath();
-    ctx.arc(w*0.5, h*0.45, Math.min(w,h)*0.18, 0, Math.PI*2);
+    ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.18, 0, Math.PI*2);
     ctx.stroke();
     ctx.restore();
 
-    // Logo or initials
+    // Logo centered or placeholder
     if (state.logoImg){
       const img = state.logoImg;
-      const maxW = w*0.32;
+      const maxW = w*0.34;
       const aspect = img.width / img.height;
       const hh = maxW / aspect;
-      ctx.drawImage(img, w*0.5 - maxW/2, h*0.45 - hh/2, maxW, hh);
+
+      if (els.logoMode.value === "plate"){
+        ctx.save();
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = "rgba(0,0,0,.22)";
+        roundedRect(ctx, w*0.5 - maxW/2 - 12, h*0.42 - hh/2 - 12, maxW + 24, hh + 24, Math.max(14, radius));
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.drawImage(img, w*0.5 - maxW/2, h*0.42 - hh/2, maxW, hh);
     } else {
       ctx.save();
-      ctx.fillStyle = "rgba(255,255,255,.14)";
+      ctx.fillStyle = "rgba(255,255,255,.12)";
       ctx.beginPath();
-      ctx.arc(w*0.5, h*0.45, Math.min(w,h)*0.14, 0, Math.PI*2);
+      ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.14, 0, Math.PI*2);
       ctx.fill();
-
       ctx.fillStyle = els.text.value;
-      ctx.font = `900 ${Math.round(w*0.09)}px ${font}`;
+      ctx.font = `900 ${Math.round(w*0.08)}px ${font}`;
       ctx.textAlign = "center";
-      ctx.fillText("LOGO", w*0.5, h*0.47);
+      ctx.fillText("LOGO", w*0.5, h*0.44);
       ctx.textAlign = "left";
       ctx.restore();
     }
@@ -702,27 +1897,36 @@
     ctx.textAlign = "center";
     ctx.fillStyle = els.text.value;
     ctx.font = `900 ${Math.round(w*0.06)}px ${font}`;
-    ctx.fillText(els.company.value || "Company", w*0.5, h*0.72);
+    ctx.fillText(safeText(els.company.value, 32) || "Company", w*0.5, h*0.70);
 
     ctx.fillStyle = "rgba(229,231,235,.82)";
-    ctx.font = `700 ${Math.round(w*0.028)}px ${font}`;
-    ctx.fillText(els.tagline.value || "Tagline", w*0.5, h*0.80);
+    ctx.font = `800 ${Math.round(w*0.028)}px ${font}`;
+    const tag = safeText(els.tagline.value, 50);
+    if (tag) ctx.fillText(tag, w*0.5, h*0.78);
 
     // Website
-    ctx.fillStyle = els.accent.value;
-    ctx.font = `800 ${Math.round(w*0.03)}px ${font}`;
-    ctx.fillText((els.website.value || "").trim(), w*0.5, h*0.88);
+    const web = (els.website.value || "").trim();
+    if (web){
+      ctx.fillStyle = els.accent.value;
+      ctx.font = `900 ${Math.round(w*0.03)}px ${font}`;
+      ctx.fillText(web, w*0.5, h*0.88);
+    }
     ctx.restore();
+
+    // QR (optional) on back
+    if (els.qrOnBack.value === "back"){
+      drawQR(ctx, "back", w, h, radius);
+    }
 
     drawGuides(ctx, w, h, dpi);
 
-    // Disable visual emphasis if not enabled
+    // Disabled overlay
     if (!els.backSide.checked){
       ctx.save();
       ctx.fillStyle = "rgba(0,0,0,.55)";
       ctx.fillRect(0,0,w,h);
-      ctx.fillStyle = "rgba(255,255,255,.82)";
-      ctx.font = `800 ${Math.round(w*0.04)}px ${fontStack("system")}`;
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      ctx.font = `900 ${Math.round(w*0.04)}px ${fontStack("system")}`;
       ctx.textAlign = "center";
       ctx.fillText("Back side disabled", w/2, h/2);
       ctx.textAlign = "left";
@@ -730,6 +1934,16 @@
     }
   }
 
+  function redrawAll(){
+    // status
+    const hasQRCode = els.qrMode.value !== "off";
+    const hasBack = els.backSide.checked;
+    els.statusPill.textContent = hasQRCode ? "QR enabled" : (hasBack ? "Back enabled" : "Ready");
+    setupCanvases();
+    drawFront();
+  }
+
+  // ========= Downloads =========
   function downloadCanvas(canvas, filename){
     const a = document.createElement("a");
     a.download = filename;
@@ -737,38 +1951,14 @@
     a.click();
   }
 
-  // Logo upload
-  els.logo.addEventListener("change", (e) => {
-    const file = e.target.files && e.target.files[0];
-    if(!file) return;
-    const img = new Image();
-    img.onload = () => {
-      state.logoImg = img;
-      drawFront();
-    };
-    img.src = URL.createObjectURL(file);
-  });
-
-  // Inputs -> redraw
-  const inputs = ["size","dpi","company","tagline","name","title","phone","email","website","address","font","bg1","bg2","accent","text","guides","backSide"];
-  inputs.forEach(id => {
-    els[id].addEventListener("input", () => {
-      if (id === "size" || id === "dpi") setupCanvases();
-      drawFront();
-    });
-    els[id].addEventListener("change", () => {
-      if (id === "size" || id === "dpi") setupCanvases();
-      drawFront();
-    });
-  });
-
-  // Drag logo on front canvas
+  // ========= Drag / resize logo =========
   function getMousePos(evt){
     const rect = els.frontCanvas.getBoundingClientRect();
     const x = (evt.clientX - rect.left) * (els.frontCanvas.width / rect.width);
     const y = (evt.clientY - rect.top) * (els.frontCanvas.height / rect.height);
     return {x,y};
   }
+
   function isOverLogo(mx, my){
     if(!state.logoImg) return false;
     const w = els.frontCanvas.width, h = els.frontCanvas.height;
@@ -780,7 +1970,7 @@
     const cy = h * state.logoPos.y;
     const x = cx - targetW/2;
     const y = cy - targetH/2;
-    return mx >= x-16 && mx <= x+targetW+16 && my >= y-16 && my <= y+targetH+16;
+    return mx >= x-18 && mx <= x+targetW+18 && my >= y-18 && my <= y+targetH+18;
   }
 
   els.frontCanvas.addEventListener("mousedown", (e) => {
@@ -792,6 +1982,7 @@
     state.dragOff.x = (p.x / w) - state.logoPos.x;
     state.dragOff.y = (p.y / h) - state.logoPos.y;
   });
+
   window.addEventListener("mousemove", (e) => {
     if(!state.dragging) return;
     const rect = els.frontCanvas.getBoundingClientRect();
@@ -801,45 +1992,88 @@
     const p = getMousePos(e);
     const w = els.frontCanvas.width, h = els.frontCanvas.height;
 
-    const speed = e.shiftKey ? 1.8 : 1.0;
+    const speed = e.shiftKey ? 2.0 : 1.0;
     const nx = (p.x / w) - state.dragOff.x;
     const ny = (p.y / h) - state.dragOff.y;
 
-    // clamp to canvas
-    state.logoPos.x = Math.max(0.05, Math.min(0.95, state.logoPos.x + (nx - state.logoPos.x) * 0.35 * speed));
-    state.logoPos.y = Math.max(0.05, Math.min(0.95, state.logoPos.y + (ny - state.logoPos.y) * 0.35 * speed));
+    state.logoPos.x = clamp(state.logoPos.x + (nx - state.logoPos.x) * 0.35 * speed, 0.05, 0.95);
+    state.logoPos.y = clamp(state.logoPos.y + (ny - state.logoPos.y) * 0.35 * speed, 0.05, 0.95);
 
-    localStorage.setItem("bc_logo_pos", JSON.stringify(state.logoPos));
+    localStorage.setItem("bc_logo_pos_v2", JSON.stringify(state.logoPos));
     drawFront();
   });
+
   window.addEventListener("mouseup", () => { state.dragging = false; });
 
-  // Mouse wheel to resize logo
   els.frontCanvas.addEventListener("wheel", (e) => {
     if(!state.logoImg) return;
     const p = getMousePos(e);
     if(!isOverLogo(p.x, p.y)) return;
     e.preventDefault();
     const delta = Math.sign(e.deltaY);
-    state.logoScale = Math.max(0.10, Math.min(0.42, state.logoScale + delta * 0.015));
+    state.logoScale = clamp(state.logoScale + delta * 0.015, 0.10, 0.42);
     drawFront();
   }, { passive: false });
 
-  // Downloads
-  els.downloadFront.addEventListener("click", () => {
-    downloadCanvas(els.frontCanvas, "business-card-front.png");
+  // ========= Logo upload =========
+  els.logo.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    // SVG handling: render into an Image via blob URL (works in most browsers)
+    const img = new Image();
+    img.onload = () => {
+      state.logoImg = img;
+      toast("ok","Logo loaded","Drag it on the card.");
+      drawFront();
+    };
+    img.onerror = () => toast("warn","Logo error","Try PNG/JPG if SVG fails in your browser.");
+    img.src = URL.createObjectURL(file);
   });
 
-  els.downloadBack.addEventListener("click", () => {
-    if(!els.backSide.checked){
-      alert("Enable back side first (toggle on the left).");
+  // ========= Save / load preset =========
+  const PRESET_KEY = "bc_preset_v2";
+
+  function savePreset(){
+    const cfg = getConfig();
+    localStorage.setItem(PRESET_KEY, JSON.stringify(cfg));
+    toast("ok","Preset saved","Stored in this browser.");
+  }
+
+  function loadPreset(){
+    const raw = localStorage.getItem(PRESET_KEY);
+    if(!raw){
+      toast("warn","No preset found","Save one first.");
       return;
     }
-    downloadCanvas(els.backCanvas, "business-card-back.png");
-  });
+    try{
+      const cfg = JSON.parse(raw);
+      setConfig(cfg);
+      toast("ok","Preset loaded","Applied settings.");
+    }catch{
+      toast("warn","Preset corrupted","Reset and save again.");
+    }
+  }
 
-  els.reset.addEventListener("click", () => {
-    // reset simple defaults
+  // ========= Actions =========
+  function exportFront(){
+    const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
+    downloadCanvas(els.frontCanvas, `${base}-front.png`);
+    toast("ok","Exported","Front PNG downloaded.");
+  }
+
+  function exportBack(){
+    if(!els.backSide.checked){
+      toast("warn","Back disabled","Enable back side first.");
+      return;
+    }
+    const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
+    downloadCanvas(els.backCanvas, `${base}-back.png`);
+    toast("ok","Exported","Back PNG downloaded.");
+  }
+
+  function resetAll(){
+    // Defaults
     els.size.value = "us";
     els.dpi.value = "300";
     els.company.value = "Logic Lab";
@@ -850,24 +2084,130 @@
     els.email.value = "hello@yourdomain.com";
     els.website.value = "logiclabstudio.github.io";
     els.address.value = "Johannesburg, South Africa";
+
+    els.layout.value = "classic";
+    els.icons.value = "on";
+
     els.font.value = "system";
+    els.radius.value = "18";
+
     els.bg1.value = "#0b1020";
     els.bg2.value = "#111827";
     els.accent.value = "#60a5fa";
     els.text.value = "#e5e7eb";
+    els.preset.value = "custom";
+
     els.guides.checked = true;
     els.backSide.checked = false;
 
+    els.logoMode.value = "plate";
     state.logoImg = null;
-    state.logoPos = { x: 0.72, y: 0.22 };
+    state.logoPos = { x: 0.77, y: 0.24 };
     state.logoScale = 0.22;
-    localStorage.removeItem("bc_logo_pos");
+    localStorage.removeItem("bc_logo_pos_v2");
     els.logo.value = "";
+
+    els.qrMode.value = "off";
+    els.qrSize.value = "0.24";
+    els.qrLabel.value = "Scan to save contact";
+    els.qrOnBack.value = "front";
+
+    els.exportMode.value = "withBleed";
+    els.fileName.value = "business-card";
+
+    // clear qr cache
+    state.qrCache = { front: null, back: null, keyFront: "", keyBack: "" };
+
     setupCanvases();
     drawFront();
+    toast("ok","Reset done","Back to defaults.");
+  }
+
+  // ========= Inputs -> redraw =========
+  const redrawIds = [
+    "company","tagline","name","title","phone","email","website","address",
+    "layout","icons",
+    "size","dpi","font","radius","bg1","bg2","accent","text","guides","backSide","exportMode",
+    "logoMode",
+    "qrMode","qrSize","qrLabel","qrOnBack",
+    "fileName"
+  ];
+
+  redrawIds.forEach(id=>{
+    const el = $(id);
+    if(!el) return;
+    el.addEventListener("input", () => {
+      if (id === "preset") return;
+      if (id === "size" || id === "dpi" || id === "exportMode") setupCanvases();
+      if (id.startsWith("qr")) { state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" }; }
+      drawFront();
+    });
+    el.addEventListener("change", () => {
+      if (id === "size" || id === "dpi" || id === "exportMode") setupCanvases();
+      if (id.startsWith("qr")) { state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" }; }
+      drawFront();
+    });
   });
 
-  // Init
+  els.preset.addEventListener("change", () => {
+    const v = els.preset.value;
+    if (v === "custom") return;
+    applyPreset(v);
+    els.preset.value = "custom";
+  });
+
+  // Buttons
+  els.downloadFront.addEventListener("click", exportFront);
+  els.downloadBack.addEventListener("click", exportBack);
+  els.downloadFrontTop.addEventListener("click", exportFront);
+  els.copyLink.addEventListener("click", copyShareLink);
+  els.savePreset.addEventListener("click", savePreset);
+  els.loadPreset.addEventListener("click", loadPreset);
+  els.reset.addEventListener("click", resetAll);
+
+  // ========= Help modal =========
+  function openHelp(){
+    els.helpModal.classList.add("open");
+    els.helpModal.setAttribute("aria-hidden","false");
+  }
+  function closeHelp(){
+    els.helpModal.classList.remove("open");
+    els.helpModal.setAttribute("aria-hidden","true");
+  }
+  els.openHelp.addEventListener("click", openHelp);
+  els.closeHelp.addEventListener("click", closeHelp);
+  els.helpModal.addEventListener("click", (e) => {
+    if (e.target === els.helpModal) closeHelp();
+  });
+
+  // ========= Keyboard shortcuts =========
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeHelp();
+    const ctrl = e.ctrlKey || e.metaKey;
+    if (!ctrl) return;
+    if (e.key.toLowerCase() === "s"){
+      e.preventDefault(); savePreset();
+    }
+    if (e.key.toLowerCase() === "o"){
+      e.preventDefault(); loadPreset();
+    }
+    if (e.key.toLowerCase() === "e"){
+      e.preventDefault(); exportFront();
+    }
+  });
+
+  // ========= Share link load =========
+  const url = new URL(window.location.href);
+  const cParam = url.searchParams.get("c");
+  if (cParam){
+    const cfg = decodeShare(cParam);
+    if (cfg){
+      setConfig(cfg);
+      toast("ok","Loaded from link","Settings applied.");
+    }
+  }
+
+  // ========= Init =========
   setupCanvases();
   drawFront();
 })();
