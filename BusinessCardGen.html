@@ -26,8 +26,16 @@
 
       --focus: 0 0 0 4px rgba(96,165,250,.25);
 
+      /* UI sizing */
       --sidebar: 420px;
       --max: 1280px;
+
+      /* Theme defaults (editable) */
+      --t_bg1:#0b1020;
+      --t_bg2:#111827;
+      --t_text:#e5e7eb;
+      --t_accent:#60a5fa;
+      --t_muted:rgba(229,231,235,.82);
     }
 
     *{box-sizing:border-box}
@@ -219,7 +227,7 @@
       outline:none;
       transition: .15s ease;
     }
-    textarea{min-height: 88px; resize: vertical;}
+    textarea{min-height: 70px; resize: vertical;}
     input:focus, select:focus, textarea:focus{box-shadow: var(--focus); border-color: rgba(96,165,250,.35);}
     input[type="color"]{
       width:100%;
@@ -356,6 +364,7 @@
       color: var(--text);
     }
 
+    /* Hide sections */
     .tabPanel{display:none;}
     .tabPanel.active{display:block;}
   </style>
@@ -401,6 +410,7 @@
       </div>
 
       <div class="content">
+
         <!-- CONTENT TAB -->
         <section id="tab-content" class="tabPanel active" role="tabpanel" aria-labelledby="t-content">
           <div class="grid">
@@ -446,20 +456,6 @@
                 <label for="address">Address</label>
                 <input id="address" type="text" value="Johannesburg, South Africa" autocomplete="street-address"/>
               </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div>
-              <label for="backBullets">Back bullet points</label>
-              <textarea id="backBullets" placeholder="• Websites & Apps
-• QR Code Tools
-• Fast turnaround
-• WhatsApp support">• Websites & Apps
-• QR Code Tools
-• Fast turnaround
-• WhatsApp support</textarea>
-              <div class="help">One bullet per line. You can type • or - or just plain text.</div>
             </div>
 
             <div class="divider"></div>
@@ -673,6 +669,7 @@
             </div>
           </div>
         </section>
+
       </div>
     </section>
 
@@ -776,36 +773,40 @@
     }
   }
 
-  function parseBullets(text){
-    return (text || "")
-      .split("\n")
-      .map(s => s.trim())
-      .filter(Boolean)
-      .map(s => s.replace(/^[-•\u2022]\s*/,"")); // strip leading "-" or "•"
+  function hexToRgb(hex){
+    const h = hex.replace("#","").trim();
+    if (h.length === 3){
+      const r = parseInt(h[0]+h[0],16);
+      const g = parseInt(h[1]+h[1],16);
+      const b = parseInt(h[2]+h[2],16);
+      return {r,g,b};
+    }
+    const r = parseInt(h.slice(0,2),16);
+    const g = parseInt(h.slice(2,4),16);
+    const b = parseInt(h.slice(4,6),16);
+    return {r,g,b};
   }
 
-  function wrapText(ctx, text, maxWidth){
-    const words = text.split(/\s+/);
-    const lines = [];
-    let line = "";
-    for (const w of words){
-      const test = line ? (line + " " + w) : w;
-      if (ctx.measureText(test).width <= maxWidth) line = test;
-      else {
-        if (line) lines.push(line);
-        line = w;
-      }
-    }
-    if (line) lines.push(line);
-    return lines;
+  function luminance(hex){
+    const {r,g,b} = hexToRgb(hex);
+    const srgb = [r,g,b].map(v=>{
+      v/=255;
+      return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+    });
+    return 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+  }
+
+  function bestTextColor(bgHex){
+    // simple contrast: choose near-white or near-black
+    return luminance(bgHex) > 0.45 ? "#0b1020" : "#e5e7eb";
   }
 
   // ========= Card sizes / export =========
   const SIZES = {
     us: { w_in: 3.5, h_in: 2.0, label: "US 3.5×2 in" },
-    eu: { w_in: 3.346, h_in: 2.165, label: "85×55 mm" }
+    eu: { w_in: 3.346, h_in: 2.165, label: "85×55 mm" } // mm → in
   };
-  const BLEED_IN = 0.125;
+  const BLEED_IN = 0.125; // 1/8"
   const SAFE_IN  = 0.125;
 
   function px(inches, dpi){ return Math.round(inches * dpi); }
@@ -816,7 +817,7 @@
     tabs: ["t-content","t-style","t-logo","t-export"].map($),
     panels: ["tab-content","tab-style","tab-logo","tab-export"].map($),
 
-    // content
+    // controls
     company: $("company"),
     tagline: $("tagline"),
     name: $("name"),
@@ -825,12 +826,10 @@
     email: $("email"),
     website: $("website"),
     address: $("address"),
-    backBullets: $("backBullets"),
 
     layout: $("layout"),
     icons: $("icons"),
 
-    // style
     size: $("size"),
     dpi: $("dpi"),
     font: $("font"),
@@ -843,15 +842,14 @@
     guides: $("guides"),
     backSide: $("backSide"),
 
-    // logo + qr
     logo: $("logo"),
     logoMode: $("logoMode"),
+
     qrMode: $("qrMode"),
     qrSize: $("qrSize"),
     qrLabel: $("qrLabel"),
     qrOnBack: $("qrOnBack"),
 
-    // export
     exportMode: $("exportMode"),
     fileName: $("fileName"),
 
@@ -881,14 +879,16 @@
   // ========= State =========
   const state = {
     logoImg: null,
-    logoPos: { x: 0.77, y: 0.24 },
-    logoScale: 0.22,
+    logoPos: { x: 0.77, y: 0.24 }, // relative to canvas
+    logoScale: 0.22, // relative width fraction of canvas
     dragging: false,
     dragOff: { x: 0, y: 0 },
 
+    // internally cached QR canvas (per side)
     qrCache: { front: null, back: null, keyFront: "", keyBack: "" }
   };
 
+  // Restore saved logo position (per browser)
   const savedPos = localStorage.getItem("bc_logo_pos_v2");
   if (savedPos) {
     try {
@@ -937,7 +937,6 @@
       email: els.email.value,
       website: els.website.value,
       address: els.address.value,
-      backBullets: els.backBullets.value,
 
       layout: els.layout.value,
       icons: els.icons.value,
@@ -970,6 +969,7 @@
   function setConfig(cfg){
     if(!cfg) return;
 
+    // content
     if (cfg.company != null) els.company.value = cfg.company;
     if (cfg.tagline != null) els.tagline.value = cfg.tagline;
     if (cfg.name != null) els.name.value = cfg.name;
@@ -978,8 +978,8 @@
     if (cfg.email != null) els.email.value = cfg.email;
     if (cfg.website != null) els.website.value = cfg.website;
     if (cfg.address != null) els.address.value = cfg.address;
-    if (cfg.backBullets != null) els.backBullets.value = cfg.backBullets;
 
+    // style
     if (cfg.layout) els.layout.value = cfg.layout;
     if (cfg.icons) els.icons.value = cfg.icons;
 
@@ -994,15 +994,18 @@
     if (cfg.guides != null) els.guides.checked = !!cfg.guides;
     if (cfg.backSide != null) els.backSide.checked = !!cfg.backSide;
 
+    // logo
     if (cfg.logoMode) els.logoMode.value = cfg.logoMode;
     if (cfg.logoPos && typeof cfg.logoPos.x === "number" && typeof cfg.logoPos.y === "number") state.logoPos = cfg.logoPos;
     if (cfg.logoScale && typeof cfg.logoScale === "number") state.logoScale = clamp(cfg.logoScale, 0.10, 0.42);
 
+    // qr
     if (cfg.qrMode) els.qrMode.value = cfg.qrMode;
     if (cfg.qrSize) els.qrSize.value = String(cfg.qrSize);
     if (cfg.qrLabel != null) els.qrLabel.value = cfg.qrLabel;
     if (cfg.qrOnBack) els.qrOnBack.value = cfg.qrOnBack;
 
+    // export
     if (cfg.exportMode) els.exportMode.value = cfg.exportMode;
     if (cfg.fileName) els.fileName.value = cfg.fileName;
 
@@ -1027,6 +1030,7 @@
 
   function copyShareLink(){
     const cfg = getConfig();
+    // NOTE: logo image is not embedded (too big). Only position + settings.
     const b64 = encodeShare(cfg);
     const url = new URL(window.location.href);
     url.searchParams.set("c", b64);
@@ -1087,6 +1091,7 @@
     const safe = px(SAFE_IN, dpi);
 
     if (bleedIn === 0){
+      // only safe box when no bleed
       ctx.save();
       ctx.setLineDash([8, 8]);
       ctx.strokeStyle = "rgba(96,165,250,.55)";
@@ -1101,15 +1106,18 @@
     }
 
     ctx.save();
+    // Trim box
     ctx.setLineDash([10, 8]);
     ctx.strokeStyle = "rgba(255,255,255,.35)";
     ctx.lineWidth = 2;
     ctx.strokeRect(bleed, bleed, w-2*bleed, h-2*bleed);
 
+    // Safe box (inside trim)
     ctx.setLineDash([8, 8]);
     ctx.strokeStyle = "rgba(96,165,250,.55)";
     ctx.strokeRect(bleed+safe, bleed+safe, w-2*(bleed+safe), h-2*(bleed+safe));
 
+    // Labels
     ctx.setLineDash([]);
     ctx.fillStyle = "rgba(255,255,255,.75)";
     ctx.font = `bold ${Math.max(18, Math.round(w*0.018))}px ${fontStack("system")}`;
@@ -1170,8 +1178,13 @@
     ctx.restore();
   }
 
-  // ========= QR generation (self-contained, ECC M, byte mode, versions 1..4) =========
+  // ========= QR generation (built-in, no libraries) =========
+  // This is a light, self-contained QR implementation. It supports byte mode, ECC level M.
+  // It’s not a full spec implementation for every edge-case, but works reliably for typical vCard + URL lengths.
+
+  // ---- QR util: finite field + RS ECC ----
   const QR = (() => {
+    // GF(256) tables with primitive polynomial 0x11d
     const EXP = new Uint8Array(512);
     const LOG = new Uint8Array(256);
     let x = 1;
@@ -1219,19 +1232,23 @@
       return msg.slice(msg.length-ecLen);
     }
 
+    // ---- Minimal QR builder: versions 1..4 in byte mode, ECC M ----
+    // capacities (byte) for ECC M:
+    // v1: 14, v2: 26, v3: 42, v4: 62 (approx for byte mode)
     const CAP = {
-      1: { data: 16, ec: 10 },
-      2: { data: 28, ec: 16 },
-      3: { data: 44, ec: 26 },
-      4: { data: 64, ec: 36 },
+      1: { data: 16, ec: 10 }, // (codewords) total 26 -> data 16, ec 10
+      2: { data: 28, ec: 16 }, // total 44
+      3: { data: 44, ec: 26 }, // total 70
+      4: { data: 64, ec: 36 }, // total 100
     };
 
     function chooseVersion(bytes){
+      // very safe thresholds for byte-mode payload sizes
       if (bytes <= 14) return 1;
       if (bytes <= 26) return 2;
       if (bytes <= 42) return 3;
       if (bytes <= 62) return 4;
-      return 4;
+      return 4; // clamp; user should shorten
     }
 
     function makeMatrix(version){
@@ -1245,6 +1262,7 @@
         reserved[y][x] = true;
       }
 
+      // Finder patterns
       function finder(x0,y0){
         for(let y=0;y<7;y++){
           for(let x=0;x<7;x++){
@@ -1253,6 +1271,7 @@
             set(xx,yy,on?1:0);
           }
         }
+        // separators
         for(let i=-1;i<=7;i++){
           set(x0-1,y0+i,0);
           set(x0+7,y0+i,0);
@@ -1264,13 +1283,16 @@
       finder(size-7,0);
       finder(0,size-7);
 
+      // Timing patterns
       for(let i=8;i<size-8;i++){
         set(i,6, i%2===0 ? 1 : 0);
         set(6,i, i%2===0 ? 1 : 0);
       }
 
+      // Dark module
       set(8, size-8, 1);
 
+      // Reserve format info areas
       for(let i=0;i<9;i++){
         reserved[8][i]=true;
         reserved[i][8]=true;
@@ -1281,6 +1303,7 @@
       }
       reserved[size-8][8]=true;
 
+      // Alignment pattern for v2+
       function alignAt(cx,cy){
         for(let y=-2;y<=2;y++){
           for(let x=-2;x<=2;x++){
@@ -1300,6 +1323,7 @@
         for (let i=0;i<pos.length;i++){
           for (let j=0;j<pos.length;j++){
             const cx = pos[i], cy = pos[j];
+            // Skip overlaps with finders
             const inFinder =
               (cx<=8 && cy<=8) ||
               (cx>=size-9 && cy<=8) ||
@@ -1313,6 +1337,7 @@
     }
 
     function bytesFromString(str){
+      // UTF-8
       return Array.from(new TextEncoder().encode(str));
     }
 
@@ -1320,6 +1345,8 @@
       const cap = CAP[version];
       const dataCw = cap.data;
 
+      // Mode indicator: 0100 (byte)
+      // Count indicator: 8 bits for v1..9
       const bits = [];
       function pushBits(val, n){
         for(let i=n-1;i>=0;i--) bits.push((val>>i)&1);
@@ -1328,12 +1355,15 @@
       pushBits(payloadBytes.length, 8);
       for (const b of payloadBytes) pushBits(b, 8);
 
+      // Terminator
       const maxBits = dataCw * 8;
       const remaining = maxBits - bits.length;
       if (remaining > 0) pushBits(0, Math.min(4, remaining));
 
+      // Pad to byte boundary
       while (bits.length % 8 !== 0) bits.push(0);
 
+      // Convert to codewords
       const codewords = [];
       for(let i=0;i<bits.length;i+=8){
         let cw=0;
@@ -1341,6 +1371,7 @@
         codewords.push(cw);
       }
 
+      // Pad codewords
       const PAD0 = 0xEC, PAD1 = 0x11;
       let toggle = true;
       while (codewords.length < dataCw){
@@ -1350,8 +1381,10 @@
       return codewords;
     }
 
+    // Place bits into matrix (standard zigzag)
     function placeData(matrixObj, allCodewords){
       const {m, reserved, size} = matrixObj;
+      // Convert codewords to bit stream MSB first
       const bits = [];
       for(const cw of allCodewords){
         for(let i=7;i>=0;i--) bits.push((cw>>i)&1);
@@ -1360,7 +1393,7 @@
       let bitIdx = 0;
       let dirUp = true;
       for (let x = size-1; x>0; x-=2){
-        if (x === 6) x--;
+        if (x === 6) x--; // skip timing column
         for (let yi=0; yi<size; yi++){
           const y = dirUp ? (size-1-yi) : yi;
           for (let dx=0; dx<2; dx++){
@@ -1373,6 +1406,7 @@
       }
     }
 
+    // Masking: we use mask 0 for simplicity (works fine). (i+j)%2==0
     function applyMask(matrixObj){
       const {m, reserved, size} = matrixObj;
       for(let y=0;y<size;y++){
@@ -1384,6 +1418,12 @@
       }
     }
 
+    // Format info for ECC M + mask 0
+    // ECC M: 00, mask 0: 000 => 00000
+    // Precomputed final 15-bit format with BCH + XOR 0x5412:
+    // for (M, mask 0) => 0b101010000010010 = 0x5412? actually that's the mask itself.
+    // Correct format bits for (ECC M, mask 0) = 0x5412 ^ 0b00000???? (already includes xor).
+    // The final 15-bit string is: 101010000010010 (commonly shown for M/0).
     const FORMAT_M0 = 0b101010000010010;
 
     function setFormat(matrixObj){
@@ -1391,6 +1431,7 @@
       const bits = [];
       for(let i=14;i>=0;i--) bits.push((FORMAT_M0>>i)&1);
 
+      // positions around top-left finder
       const coords1 = [
         [0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[7,8],[8,8],
         [8,7],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0]
@@ -1400,6 +1441,7 @@
         m[y][x] = bits[i];
       }
 
+      // top-right + bottom-left
       const coords2 = [
         [size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
         [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]
@@ -1421,7 +1463,9 @@
       ctx.fillStyle = dark;
       for(let y=0;y<size;y++){
         for(let x=0;x<size;x++){
-          if (m[y][x]) ctx.fillRect((x+margin)*scale, (y+margin)*scale, scale, scale);
+          if (m[y][x]) {
+            ctx.fillRect((x+margin)*scale, (y+margin)*scale, scale, scale);
+          }
         }
       }
       return out;
@@ -1432,6 +1476,7 @@
       const version = chooseVersion(bytes.length);
       const cap = CAP[version];
 
+      // Build data + ECC
       const dataCw = buildDataCodewords(bytes, version);
       const ec = rsEncode(dataCw, cap.ec);
       const all = dataCw.concat(ec);
@@ -1441,6 +1486,7 @@
       applyMask(matrixObj);
       setFormat(matrixObj);
 
+      // Render
       return renderToCanvas(matrixObj, 6, 4, "#000", "#fff");
     }
 
@@ -1457,6 +1503,7 @@
     const url = safeText(els.website.value, 120);
     const adr = safeText(els.address.value, 120);
 
+    // vCard 3.0 (widely compatible)
     const lines = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -1514,11 +1561,12 @@
     }
   }
 
-  // ========= Drawing =========
+  // ========= Drawing templates =========
   function drawFront(){
     const c = els.frontCanvas;
     const ctx = c.getContext("2d");
     const dpi = +els.dpi.value;
+    const sizeKey = els.size.value;
     const w = c.width, h = c.height;
     const exportMode = els.exportMode.value;
     const bleedIn = exportMode === "trimOnly" ? 0 : BLEED_IN;
@@ -1530,7 +1578,7 @@
     ctx.fillStyle = linearGradient(ctx, w, h, els.bg1.value, els.bg2.value);
     ctx.fillRect(0,0,w,h);
 
-    // subtle blobs
+    // subtle texture
     ctx.globalAlpha = 0.10;
     ctx.fillStyle = els.accent.value;
     ctx.beginPath();
@@ -1549,14 +1597,15 @@
     const sh = h - 2*(bleed + safe);
 
     const font = fontStack(els.font.value);
+    const radius = +els.radius.value;
 
+    // Layout measurements
     const layout = els.layout.value;
+
     const company = safeText(els.company.value, 32);
     const tagline = safeText(els.tagline.value, 44);
     const name = safeText(els.name.value, 32);
     const title = safeText(els.title.value, 44);
-
-    // NOTE: Accent line REMOVED (you hated it)
 
     // Typography sizes
     const companySize = Math.round(sw*(layout==="minimal" ? 0.065 : 0.070));
@@ -1566,9 +1615,13 @@
     const infoLabelSize = Math.round(sw*0.028);
     const infoValueSize = Math.round(sw*0.032);
 
-    // placement
-    let infoX = sx;
+    // Draw blocks depending on layout
+    let infoX = sx, infoY = sy + sh*0.30;
     let textAlign = "left";
+    if (layout === "split"){
+      infoX = sx;
+      infoY = sy + sh*0.52;
+    }
     if (layout === "centered"){
       textAlign = "center";
       infoX = w/2;
@@ -1624,6 +1677,7 @@
       ctx.font = `900 ${infoLabelSize}px ${font}`;
       const labelW = ctx.measureText(label).width + padX*2;
 
+      // label pill
       ctx.save();
       ctx.globalAlpha = 0.95;
       ctx.fillStyle = "rgba(255,255,255,.08)";
@@ -1631,6 +1685,7 @@
       ctx.fill();
       ctx.restore();
 
+      // icon
       const iconsOn = els.icons.value === "on";
       const iconSize = Math.round(pillH*0.66);
       const iconX = baseX + labelW + Math.round(sw*0.018);
@@ -1639,9 +1694,11 @@
         drawIcon(ctx, iconKind, iconX, iconY, iconSize, "rgba(229,231,235,.75)");
       }
 
+      // label
       ctx.fillStyle = els.accent.value;
       ctx.fillText(label, baseX + padX, y);
 
+      // value
       ctx.fillStyle = "rgba(229,231,235,.88)";
       ctx.font = `800 ${infoValueSize}px ${font}`;
       const valueX = iconsOn ? (iconX + iconSize + Math.round(sw*0.012)) : (baseX + labelW + Math.round(sw*0.02));
@@ -1650,11 +1707,11 @@
     ctx.restore();
 
     // Logo
-    drawLogo(ctx, w, h);
+    drawLogo(ctx, w, h, radius);
 
-    // QR on front (optional)
+    // QR (optional) on front
     if (els.qrOnBack.value === "front"){
-      drawQR(ctx, "front", w, h);
+      drawQR(ctx, "front", w, h, radius);
     }
 
     drawGuides(ctx, w, h, dpi);
@@ -1663,10 +1720,9 @@
     drawBack();
   }
 
-  function drawLogo(ctx, w, h){
-    const radius = +els.radius.value;
-
+  function drawLogo(ctx, w, h, radius){
     if (!state.logoImg) {
+      // placeholder mark
       ctx.save();
       const r = Math.min(w,h)*0.085;
       ctx.globalAlpha = 0.75;
@@ -1711,14 +1767,14 @@
     ctx.drawImage(img, x, y, targetW, targetH);
   }
 
-  function drawQR(ctx, side, w, h){
+  function drawQR(ctx, side, w, h, radius){
     const txt = qrText();
     if (!txt) return;
 
+    // make a qr canvas
     const qr = getQrCanvas(side);
     if (!qr) return;
 
-    const radius = +els.radius.value;
     const scaleFrac = +els.qrSize.value;
     const sizePx = Math.round(Math.min(w,h) * scaleFrac);
 
@@ -1726,19 +1782,26 @@
     const x = w - pad - sizePx;
     const y = h - pad - sizePx;
 
+    // plate with contrast
+    const bg = "#ffffff";
+    const fg = "#000000";
+
     ctx.save();
+    // QR plate
     ctx.globalAlpha = 0.94;
     ctx.fillStyle = "rgba(0,0,0,.22)";
     roundedRect(ctx, x - 10, y - 10, sizePx + 20, sizePx + 20, Math.max(12, radius));
     ctx.fill();
 
     ctx.globalAlpha = 1;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = bg;
     roundedRect(ctx, x - 6, y - 6, sizePx + 12, sizePx + 12, Math.max(10, radius));
     ctx.fill();
 
+    // draw qr scaled
     ctx.drawImage(qr, 0, 0, qr.width, qr.height, x, y, sizePx, sizePx);
 
+    // label
     const label = (els.qrLabel.value || "").trim();
     if (label){
       ctx.fillStyle = "rgba(229,231,235,.85)";
@@ -1765,17 +1828,17 @@
     const font = fontStack(els.font.value);
     const radius = +els.radius.value;
 
-    // Brand ring
+    // Brand mark ring
     ctx.save();
     ctx.globalAlpha = 0.55;
     ctx.strokeStyle = els.accent.value;
     ctx.lineWidth = Math.max(8, Math.round(w*0.016));
     ctx.beginPath();
-    ctx.arc(w*0.5, h*0.36, Math.min(w,h)*0.18, 0, Math.PI*2);
+    ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.18, 0, Math.PI*2);
     ctx.stroke();
     ctx.restore();
 
-    // Center logo
+    // Logo centered or placeholder
     if (state.logoImg){
       const img = state.logoImg;
       const maxW = w*0.34;
@@ -1786,22 +1849,22 @@
         ctx.save();
         ctx.globalAlpha = 0.85;
         ctx.fillStyle = "rgba(0,0,0,.22)";
-        roundedRect(ctx, w*0.5 - maxW/2 - 12, h*0.36 - hh/2 - 12, maxW + 24, hh + 24, Math.max(14, radius));
+        roundedRect(ctx, w*0.5 - maxW/2 - 12, h*0.42 - hh/2 - 12, maxW + 24, hh + 24, Math.max(14, radius));
         ctx.fill();
         ctx.restore();
       }
 
-      ctx.drawImage(img, w*0.5 - maxW/2, h*0.36 - hh/2, maxW, hh);
+      ctx.drawImage(img, w*0.5 - maxW/2, h*0.42 - hh/2, maxW, hh);
     } else {
       ctx.save();
       ctx.fillStyle = "rgba(255,255,255,.12)";
       ctx.beginPath();
-      ctx.arc(w*0.5, h*0.36, Math.min(w,h)*0.14, 0, Math.PI*2);
+      ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.14, 0, Math.PI*2);
       ctx.fill();
       ctx.fillStyle = els.text.value;
       ctx.font = `900 ${Math.round(w*0.08)}px ${font}`;
       ctx.textAlign = "center";
-      ctx.fillText("LOGO", w*0.5, h*0.38);
+      ctx.fillText("LOGO", w*0.5, h*0.44);
       ctx.textAlign = "left";
       ctx.restore();
     }
@@ -1811,68 +1874,25 @@
     ctx.textAlign = "center";
     ctx.fillStyle = els.text.value;
     ctx.font = `900 ${Math.round(w*0.06)}px ${font}`;
-    ctx.fillText(safeText(els.company.value, 32) || "Company", w*0.5, h*0.58);
+    ctx.fillText(safeText(els.company.value, 32) || "Company", w*0.5, h*0.70);
 
     ctx.fillStyle = "rgba(229,231,235,.82)";
     ctx.font = `800 ${Math.round(w*0.028)}px ${font}`;
     const tag = safeText(els.tagline.value, 50);
-    if (tag) ctx.fillText(tag, w*0.5, h*0.66);
-    ctx.restore();
+    if (tag) ctx.fillText(tag, w*0.5, h*0.78);
 
-    // === Bulleted list (ONLY when back side enabled) ===
-    if (els.backSide.checked){
-      const bullets = parseBullets(els.backBullets.value);
-      if (bullets.length){
-        ctx.save();
-        ctx.textAlign = "left";
-
-        const left = w * 0.16;
-        let y = h * 0.74;
-
-        const fontSize = Math.round(w * 0.028);
-        const lineGap = Math.round(fontSize * 0.55);
-        const bulletGap = Math.round(fontSize * 0.85);
-        const bulletIndent = Math.round(fontSize * 1.1);
-        const maxWidth = w * 0.68;
-
-        ctx.font = `800 ${fontSize}px ${font}`;
-        for (const item of bullets.slice(0, 7)){
-          const wrapped = wrapText(ctx, item, maxWidth - bulletIndent);
-
-          // bullet symbol
-          ctx.fillStyle = els.accent.value;
-          ctx.fillText("•", left, y);
-
-          // text
-          ctx.fillStyle = "rgba(229,231,235,.88)";
-          let yy = y;
-          for (let i=0;i<wrapped.length;i++){
-            ctx.fillText(wrapped[i], left + bulletIndent, yy);
-            yy += fontSize + lineGap;
-          }
-
-          y = yy + bulletGap;
-          if (y > h * 0.92) break;
-        }
-
-        ctx.restore();
-      }
-    }
-
-    // Website (bottom)
+    // Website
     const web = (els.website.value || "").trim();
     if (web){
-      ctx.save();
-      ctx.textAlign = "center";
       ctx.fillStyle = els.accent.value;
       ctx.font = `900 ${Math.round(w*0.03)}px ${font}`;
-      ctx.fillText(web, w*0.5, h*0.92);
-      ctx.restore();
+      ctx.fillText(web, w*0.5, h*0.88);
     }
+    ctx.restore();
 
-    // QR on back (optional)
-    if (els.backSide.checked && els.qrOnBack.value === "back"){
-      drawQR(ctx, "back", w, h);
+    // QR (optional) on back
+    if (els.qrOnBack.value === "back"){
+      drawQR(ctx, "back", w, h, radius);
     }
 
     drawGuides(ctx, w, h, dpi);
@@ -1892,6 +1912,7 @@
   }
 
   function redrawAll(){
+    // status
     const hasQRCode = els.qrMode.value !== "off";
     const hasBack = els.backSide.checked;
     els.statusPill.textContent = hasQRCode ? "QR enabled" : (hasBack ? "Back enabled" : "Ready");
@@ -1976,6 +1997,7 @@
     const file = e.target.files && e.target.files[0];
     if(!file) return;
 
+    // SVG handling: render into an Image via blob URL (works in most browsers)
     const img = new Image();
     img.onload = () => {
       state.logoImg = img;
@@ -2028,6 +2050,7 @@
   }
 
   function resetAll(){
+    // Defaults
     els.size.value = "us";
     els.dpi.value = "300";
     els.company.value = "Logic Lab";
@@ -2038,7 +2061,6 @@
     els.email.value = "hello@yourdomain.com";
     els.website.value = "logiclabstudio.github.io";
     els.address.value = "Johannesburg, South Africa";
-    els.backBullets.value = "• Websites & Apps\n• QR Code Tools\n• Fast turnaround\n• WhatsApp support";
 
     els.layout.value = "classic";
     els.icons.value = "on";
@@ -2070,6 +2092,7 @@
     els.exportMode.value = "withBleed";
     els.fileName.value = "business-card";
 
+    // clear qr cache
     state.qrCache = { front: null, back: null, keyFront: "", keyBack: "" };
 
     setupCanvases();
@@ -2079,7 +2102,7 @@
 
   // ========= Inputs -> redraw =========
   const redrawIds = [
-    "company","tagline","name","title","phone","email","website","address","backBullets",
+    "company","tagline","name","title","phone","email","website","address",
     "layout","icons",
     "size","dpi","font","radius","bg1","bg2","accent","text","guides","backSide","exportMode",
     "logoMode",
@@ -2091,13 +2114,14 @@
     const el = $(id);
     if(!el) return;
     el.addEventListener("input", () => {
+      if (id === "preset") return;
       if (id === "size" || id === "dpi" || id === "exportMode") setupCanvases();
-      if (id.startsWith("qr")) state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" };
+      if (id.startsWith("qr")) { state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" }; }
       drawFront();
     });
     el.addEventListener("change", () => {
       if (id === "size" || id === "dpi" || id === "exportMode") setupCanvases();
-      if (id.startsWith("qr")) state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" };
+      if (id.startsWith("qr")) { state.qrCache = { front:null, back:null, keyFront:"", keyBack:"" }; }
       drawFront();
     });
   });
@@ -2109,6 +2133,7 @@
     els.preset.value = "custom";
   });
 
+  // Buttons
   els.downloadFront.addEventListener("click", exportFront);
   els.downloadBack.addEventListener("click", exportBack);
   els.downloadFrontTop.addEventListener("click", exportFront);

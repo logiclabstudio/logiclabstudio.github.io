@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PNG → ICO Converter (Offline)</title>
+  <meta name="description" content="Convert PNG images into a multi-size Windows ICO file, fully offline in your browser." />
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#0f172a;
+      --card:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.12);
+      --brand:#60a5fa;
+      --good:#22c55e;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --radius:16px;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --max: 1050px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(96,165,250,.12), transparent 60%),
+                  radial-gradient(900px 700px at 90% 20%, rgba(167,139,250,.10), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 16px 10px;
+    }
+    .wrap{max-width:var(--max); margin:0 auto;}
+    .title{
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .badge{
+      padding:6px 10px; border:1px solid var(--line);
+      border-radius:999px; color:var(--muted); font-size:12px;
+      background: rgba(255,255,255,.03);
+    }
+    h1{margin:0; font-size: clamp(22px, 3vw, 32px); letter-spacing:.2px;}
+    p{margin:8px 0 0; color:var(--muted); line-height:1.55}
+    main{padding:14px 16px 40px;}
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+    }
+    .panel{
+      background: rgba(15,23,42,.72);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .panel .hd h2{margin:0; font-size:16px}
+    .panel .bd{padding:16px}
+    .drop{
+      border:1.5px dashed rgba(96,165,250,.55);
+      border-radius: 18px;
+      background: rgba(96,165,250,.06);
+      padding:18px;
+      display:grid;
+      gap:10px;
+    }
+    .drop.drag{
+      border-color: rgba(34,197,94,.8);
+      background: rgba(34,197,94,.08);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      transition:.15s transform, .15s background, .15s border-color;
+      font-weight:600;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06)}
+    .btn.primary{
+      border-color: rgba(96,165,250,.55);
+      background: rgba(96,165,250,.14);
+    }
+    .btn.primary:hover{border-color: rgba(96,165,250,.8); background: rgba(96,165,250,.18)}
+    .btn.good{
+      border-color: rgba(34,197,94,.55);
+      background: rgba(34,197,94,.12);
+    }
+    .btn.good:hover{border-color: rgba(34,197,94,.8); background: rgba(34,197,94,.16)}
+    .btn.bad{
+      border-color: rgba(251,113,133,.55);
+      background: rgba(251,113,133,.10);
+    }
+    .btn.bad:hover{border-color: rgba(251,113,133,.8); background: rgba(251,113,133,.14)}
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .chips{display:flex; flex-wrap:wrap; gap:8px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      font-size:13px;
+    }
+    .chip b{font-size:12px; color:var(--muted); font-weight:700}
+    .list{display:grid; gap:10px; margin-top:12px}
+    .item{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+    }
+    .left{display:flex; gap:12px; align-items:center; min-width:0}
+    .thumb{
+      width:46px; height:46px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      display:grid; place-items:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .thumb img{width:100%; height:100%; object-fit:cover}
+    .meta{min-width:0}
+    .meta .name{
+      font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .meta .sub{
+      color:var(--muted); font-size:12px; margin-top:2px;
+    }
+    .actions{display:flex; gap:8px; flex:0 0 auto}
+    .small{
+      padding:8px 10px;
+      border-radius: 12px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .status{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px 12px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(148,163,184,.6);
+      margin-top:4px;
+      box-shadow: 0 0 0 3px rgba(148,163,184,.12);
+      flex:0 0 auto;
+    }
+    .dot.ok{background: rgba(34,197,94,.9); box-shadow: 0 0 0 3px rgba(34,197,94,.14)}
+    .dot.warn{background: rgba(251,191,36,.95); box-shadow: 0 0 0 3px rgba(251,191,36,.14)}
+    .dot.bad{background: rgba(251,113,133,.95); box-shadow: 0 0 0 3px rgba(251,113,133,.14)}
+    .status h3{margin:0; font-size:14px}
+    .status p{margin:4px 0 0; font-size:13px}
+    .footer{
+      padding:14px 16px;
+      border-top:1px solid var(--line);
+      display:flex; gap:10px; justify-content:space-between; flex-wrap:wrap; align-items:center;
+      background: rgba(0,0,0,.12);
+    }
+    input[type="file"]{display:none}
+    code.k{
+      padding:2px 6px; border:1px solid var(--line);
+      border-radius:8px; background: rgba(255,255,255,.03);
+      color: var(--text);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="title">
+        <h1>PNG → ICO Converter</h1>
+        <span class="badge">Offline • Multi-size ICO • No server</span>
+      </div>
+      <p>Drop one or more PNGs (recommended: 16, 24, 32, 48, 64, 128, 256). Download a single <code class="k">.ico</code> file.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap grid">
+      <section class="panel">
+        <div class="hd">
+          <h2>1) Add PNG(s)</h2>
+          <div class="chips" id="quickChips">
+            <span class="chip"><b>Tip</b> Use 256×256 for best quality</span>
+          </div>
+        </div>
+
+        <div class="bd">
+          <div class="drop" id="drop">
+            <div class="row">
+              <button class="btn primary" id="btnPick">Choose PNG files</button>
+              <input id="file" type="file" accept="image/png" multiple />
+              <button class="btn" id="btnAddCommon" title="Auto-generate common sizes from one source">Auto-make common sizes</button>
+              <button class="btn bad" id="btnClear">Clear</button>
+            </div>
+            <div class="hint">
+              Works best with <b>square PNGs</b>. If you only have one PNG, use <b>Auto-make common sizes</b> to generate 16→256 from it.
+            </div>
+          </div>
+
+          <div class="list" id="list"></div>
+        </div>
+
+        <div class="footer">
+          <div class="hint">
+            ICO can store multiple PNG images. Windows will pick the closest size it needs.
+          </div>
+          <div class="row">
+            <label class="hint">Output name:</label>
+            <input id="outName" type="text" value="favicon.ico"
+                   style="padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--text);min-width:200px" />
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="hd">
+          <h2>2) Build & Download</h2>
+          <span class="badge" id="countBadge">0 images</span>
+        </div>
+        <div class="bd" style="display:grid; gap:12px">
+          <div class="status" id="statusBox">
+            <span class="dot" id="statusDot"></span>
+            <div>
+              <h3 id="statusTitle">Add at least one PNG</h3>
+              <p id="statusText">Drop files in the box or click “Choose PNG files”.</p>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn good" id="btnBuild" style="flex:1; justify-content:center" disabled>
+              Download ICO
+            </button>
+          </div>
+
+          <div class="hint">
+            <b>Recommended set:</b> 16×16, 32×32, 48×48, 64×64, 128×128, 256×256.<br/>
+            If you add duplicates, only one per size will be used (largest file wins).
+          </div>
+
+          <div class="hint" style="opacity:.9">
+            <b>Note:</b> This exports a standards-compliant ICO with PNG frames (Vista+). Old Windows XP-era apps may need BMP-based ICO.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // --- State ---
+    /** @type {{name:string, size:number, w:number, h:number, pngBytes:Uint8Array, dataUrl:string}[]} */
+    let images = [];
+
+    const $ = (s)=>document.querySelector(s);
+    const fileInput = $("#file");
+    const drop = $("#drop");
+    const list = $("#list");
+    const btnPick = $("#btnPick");
+    const btnClear = $("#btnClear");
+    const btnBuild = $("#btnBuild");
+    const btnAddCommon = $("#btnAddCommon");
+    const outName = $("#outName");
+    const countBadge = $("#countBadge");
+
+    const statusDot = $("#statusDot");
+    const statusTitle = $("#statusTitle");
+    const statusText = $("#statusText");
+
+    btnPick.addEventListener("click", ()=> fileInput.click());
+    fileInput.addEventListener("change", async (e)=> {
+      if (!e.target.files?.length) return;
+      await addFiles([...e.target.files]);
+      fileInput.value = "";
+    });
+
+    btnClear.addEventListener("click", ()=>{
+      images = [];
+      render();
+    });
+
+    // Drag & drop
+    ["dragenter","dragover"].forEach(ev=>{
+      drop.addEventListener(ev, (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        drop.classList.add("drag");
+      });
+    });
+    ["dragleave","drop"].forEach(ev=>{
+      drop.addEventListener(ev, (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        drop.classList.remove("drag");
+      });
+    });
+    drop.addEventListener("drop", async (e)=>{
+      const files = [...(e.dataTransfer?.files || [])].filter(f=>f.type==="image/png");
+      if (!files.length) return;
+      await addFiles(files);
+    });
+
+    btnAddCommon.addEventListener("click", async ()=>{
+      // If user has exactly 1 PNG, auto-generate common sizes from it. If more than 1, uses the largest square-ish image.
+      if (!images.length){
+        status("warn","Add at least one PNG first","Choose a PNG, then auto-generate 16→256 from it.");
+        return;
+      }
+      const base = pickBestBase(images);
+      const sizes = [16,24,32,48,64,96,128,256];
+      const generated = await generateSizesFromDataUrl(base.dataUrl, sizes);
+      // Merge: generated sizes will overwrite existing if same size but smaller byte size
+      for (const g of generated){
+        upsertImage(g);
+      }
+      render();
+      status("ok","Generated common sizes","Added 16/24/32/48/64/96/128/256 from your source PNG.");
+    });
+
+    btnBuild.addEventListener("click", ()=>{
+      try{
+        const chosen = dedupeBySize(images);
+        if (!chosen.length) return;
+
+        // Build ICO bytes
+        const icoBytes = buildIcoFromPngFrames(chosen.map(i=>({
+          w: i.w, h: i.h, bytes: i.pngBytes
+        })));
+
+        const name = (outName.value || "favicon.ico").trim();
+        downloadBytes(icoBytes, name.endsWith(".ico") ? name : (name + ".ico"));
+      }catch(err){
+        console.error(err);
+        status("bad","Build failed", String(err?.message || err));
+      }
+    });
+
+    // --- Helpers ---
+    async function addFiles(files){
+      const pngs = files.filter(f=>f.type==="image/png");
+      if (!pngs.length){
+        status("warn","Only PNG supported","Please drop PNG files.");
+        return;
+      }
+      for (const f of pngs){
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        const info = await getPngDimensions(bytes);
+        const dataUrl = await fileToDataUrl(f);
+        const entry = {
+          name: f.name,
+          size: f.size,
+          w: info.w,
+          h: info.h,
+          pngBytes: bytes,
+          dataUrl
+        };
+        upsertImage(entry);
+      }
+      render();
+      statusFromSet();
+    }
+
+    function upsertImage(entry){
+      // Keep at most one per (w,h). If same dims exist, keep the larger file (usually higher quality).
+      const idx = images.findIndex(x=>x.w===entry.w && x.h===entry.h);
+      if (idx === -1) images.push(entry);
+      else images[idx] = (entry.size >= images[idx].size) ? entry : images[idx];
+    }
+
+    function dedupeBySize(arr){
+      // ICO wants square; still allows w/h but best is square. We dedupe by max(w,h).
+      // Prefer exact square; then larger byte size.
+      const map = new Map();
+      for (const it of arr){
+        const key = Math.max(it.w, it.h);
+        const prev = map.get(key);
+        if (!prev){
+          map.set(key, it);
+          continue;
+        }
+        const prevSquare = prev.w===prev.h;
+        const itSquare = it.w===it.h;
+        if (itSquare && !prevSquare) map.set(key, it);
+        else if (itSquare === prevSquare && it.size > prev.size) map.set(key, it);
+      }
+      return [...map.values()].sort((a,b)=>Math.max(a.w,a.h)-Math.max(b.w,b.h));
+    }
+
+    function pickBestBase(arr){
+      // pick largest square-ish by area, prefer square
+      const sorted = [...arr].sort((a,b)=>{
+        const aSq = a.w===a.h ? 1 : 0;
+        const bSq = b.w===b.h ? 1 : 0;
+        if (aSq !== bSq) return bSq - aSq;
+        const aArea = a.w*a.h;
+        const bArea = b.w*b.h;
+        return bArea - aArea;
+      });
+      return sorted[0];
+    }
+
+    async function generateSizesFromDataUrl(dataUrl, sizes){
+      const img = await loadImage(dataUrl);
+      const out = [];
+      for (const s of sizes){
+        const canvas = document.createElement("canvas");
+        canvas.width = s; canvas.height = s;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0,0,s,s);
+
+        // Contain-fit into square (keeps aspect ratio)
+        const scale = Math.min(s / img.width, s / img.height);
+        const dw = Math.round(img.width * scale);
+        const dh = Math.round(img.height * scale);
+        const dx = Math.floor((s - dw)/2);
+        const dy = Math.floor((s - dh)/2);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, dx, dy, dw, dh);
+
+        const blob = await new Promise(res=> canvas.toBlob(res, "image/png"));
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        out.push({
+          name: `generated-${s}x${s}.png`,
+          size: bytes.byteLength,
+          w: s, h: s,
+          pngBytes: bytes,
+          dataUrl: canvas.toDataURL("image/png")
+        });
+      }
+      return out;
+    }
+
+    function render(){
+      countBadge.textContent = `${images.length} image${images.length===1?"":"s"}`;
+      list.innerHTML = "";
+
+      const display = [...images].sort((a,b)=>(Math.max(a.w,a.h)-Math.max(b.w,b.h)));
+      for (const it of display){
+        const row = document.createElement("div");
+        row.className = "item";
+
+        const left = document.createElement("div");
+        left.className = "left";
+
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        const img = document.createElement("img");
+        img.alt = it.name;
+        img.src = it.dataUrl;
+        thumb.appendChild(img);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = it.name;
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.textContent = `${it.w}×${it.h} • ${(it.size/1024).toFixed(1)} KB`;
+        meta.appendChild(name);
+        meta.appendChild(sub);
+
+        left.appendChild(thumb);
+        left.appendChild(meta);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const remove = document.createElement("button");
+        remove.className = "btn small bad";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", ()=>{
+          images = images.filter(x => !(x.w===it.w && x.h===it.h));
+          render();
+          statusFromSet();
+        });
+
+        actions.appendChild(remove);
+
+        row.appendChild(left);
+        row.appendChild(actions);
+        list.appendChild(row);
+      }
+
+      btnBuild.disabled = images.length === 0;
+      statusFromSet();
+    }
+
+    function statusFromSet(){
+      if (!images.length){
+        status("","Add at least one PNG","Drop files in the box or click “Choose PNG files”.");
+        return;
+      }
+      const squares = images.filter(i=>i.w===i.h);
+      const has256 = images.some(i=>i.w===256 && i.h===256);
+      const hasSmall = images.some(i=>i.w===16 && i.h===16);
+
+      if (!squares.length){
+        status("warn","Your PNGs aren’t square","ICO works best with square images. Use Auto-make common sizes.");
+      } else if (!has256){
+        status("warn","Consider adding 256×256","For crisp favicon quality, include a 256×256 PNG.");
+      } else if (!hasSmall){
+        status("warn","Consider adding 16×16","Small sizes make icons sharper in Windows UI.");
+      } else {
+        status("ok","Ready to download","You have a good set. Click “Download ICO”.");
+      }
+    }
+
+    function status(level, title, text){
+      statusTitle.textContent = title || "";
+      statusText.textContent = text || "";
+      statusDot.className = "dot" +
+        (level==="ok" ? " ok" : level==="warn" ? " warn" : level==="bad" ? " bad" : "");
+    }
+
+    function downloadBytes(u8, filename){
+      const blob = new Blob([u8], {type:"image/x-icon"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    }
+
+    function fileToDataUrl(file){
+      return new Promise((resolve,reject)=>{
+        const r = new FileReader();
+        r.onload = ()=> resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(src){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        img.onload = ()=> resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    // --- PNG parsing: read IHDR width/height ---
+    async function getPngDimensions(bytes){
+      // PNG signature: 89 50 4E 47 0D 0A 1A 0A
+      if (bytes.length < 24) throw new Error("PNG too small.");
+      const sig = [0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A];
+      for (let i=0;i<8;i++) if (bytes[i] !== sig[i]) throw new Error("Not a valid PNG.");
+      // IHDR chunk starts at byte 8+4(length)+4(type)=16, then width at 16, height at 20 (big-endian)
+      // But some files may have ancillary chunks; spec says IHDR must be first chunk after signature.
+      const type = String.fromCharCode(bytes[12],bytes[13],bytes[14],bytes[15]);
+      if (type !== "IHDR") throw new Error("PNG missing IHDR header.");
+      const w = readU32BE(bytes, 16);
+      const h = readU32BE(bytes, 20);
+      return {w,h};
+    }
+    function readU32BE(b, o){
+      return (b[o]<<24) | (b[o+1]<<16) | (b[o+2]<<8) | (b[o+3]);
+    }
+
+    // --- ICO builder (PNG frames) ---
+    function buildIcoFromPngFrames(frames){
+      // frames: [{w,h,bytes:Uint8Array}]
+      // ICO format:
+      // ICONDIR (6 bytes): reserved(2)=0, type(2)=1, count(2)
+      // ICONDIRENTRY (16 bytes each):
+      //  bWidth(1), bHeight(1), bColorCount(1)=0, bReserved(1)=0,
+      //  wPlanes(2)=1, wBitCount(2)=32, dwBytesInRes(4), dwImageOffset(4)
+      // Image data: PNG bytes
+      const count = frames.length;
+      const dirSize = 6 + (16 * count);
+      let dataSize = 0;
+      for (const f of frames) dataSize += f.bytes.byteLength;
+
+      const out = new Uint8Array(dirSize + dataSize);
+      const dv = new DataView(out.buffer);
+
+      // ICONDIR
+      dv.setUint16(0, 0, true);       // reserved
+      dv.setUint16(2, 1, true);       // type = icon
+      dv.setUint16(4, count, true);   // count
+
+      let offset = dirSize;
+      for (let i=0;i<count;i++){
+        const f = frames[i];
+        const entryOff = 6 + i*16;
+
+        const w = clampIconDim(f.w);
+        const h = clampIconDim(f.h);
+        out[entryOff+0] = (w === 256) ? 0 : w;
+        out[entryOff+1] = (h === 256) ? 0 : h;
+        out[entryOff+2] = 0; // color count
+        out[entryOff+3] = 0; // reserved
+
+        dv.setUint16(entryOff+4, 1, true);   // planes
+        dv.setUint16(entryOff+6, 32, true);  // bitcount (common default)
+        dv.setUint32(entryOff+8, f.bytes.byteLength, true); // bytes
+        dv.setUint32(entryOff+12, offset, true);            // image offset
+
+        out.set(f.bytes, offset);
+        offset += f.bytes.byteLength;
+      }
+
+      return out;
+    }
+
+    function clampIconDim(n){
+      // ICO allows 1..256
+      n = Math.round(n);
+      if (n < 1) n = 1;
+      if (n > 256) n = 256;
+      return n;
+    }
+
+    // initial
+    render();
+  </script>
+</body>
+</html>
