@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0f19" />
   <title>Logic Lab | Software Development Studio</title>
-  <link rel="icon" type="image/png" href="favicon.ico">
 
+  <link rel="icon" type="image/png" href="favicon.ico">
 
   <!-- Google AdSense (MERGED) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5622407838304076"
@@ -307,116 +307,71 @@
     .li b{display:block; margin-bottom:2px}
     .li span{color: rgba(148,163,184,.95); font-size:13px}
 
-    /* QR section */
-    .qr-wrap{
+    /* Tools section */
+    .tools-wrap{
       border-radius: var(--radius2);
       border: 1px solid rgba(148,163,184,.16);
       background:
-        radial-gradient(720px 360px at 10% 0%, rgba(96,165,250,.22), transparent 60%),
-        radial-gradient(720px 360px at 95% 30%, rgba(167,139,250,.18), transparent 60%),
+        radial-gradient(700px 340px at 10% 0%, rgba(96,165,250,.18), transparent 60%),
+        radial-gradient(700px 340px at 95% 30%, rgba(167,139,250,.16), transparent 60%),
         rgba(17,24,39,.55);
       box-shadow: var(--shadow);
       padding: 22px;
       overflow:hidden;
       position:relative;
     }
-    .qr-grid{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:16px;
-      align-items:stretch;
-    }
-    .qr-kicker{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:8px 12px;
-      border:1px solid rgba(148,163,184,.16);
-      border-radius:999px;
-      background: rgba(11,15,25,.40);
-      font-weight:800;
-      font-size:13px;
-      width:fit-content;
-      color: rgba(229,231,235,.95);
-    }
-    .qr-title{
-      margin:12px 0 10px;
-      font-size: clamp(26px, 3.4vw, 38px);
-      line-height:1.08;
-      letter-spacing:-.7px;
-    }
-    .qr-sub{
-      margin:0 0 14px;
-      color: rgba(148,163,184,.95);
-      font-size:15px;
-      max-width: 62ch;
-    }
-    .qr-cta{
-      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
-      margin-top: 10px;
-    }
-    .qr-pills{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin-top:14px;
-      color: rgba(148,163,184,.92);
-      font-weight:700;
-      font-size:13px;
-    }
-    .qr-pill{
-      padding:8px 10px;
-      border:1px solid rgba(148,163,184,.14);
-      border-radius:999px;
-      background: rgba(11,15,25,.35);
-    }
-    .qr-side{
+    .tool-card{
       border-radius: var(--radius2);
       border: 1px solid rgba(148,163,184,.14);
       background: rgba(11,15,25,.40);
       padding: 16px;
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
-      gap: 12px;
+      gap: 10px;
       position:relative;
       overflow:hidden;
+      min-height: 220px;
     }
-    .qr-side:before{
+    .tool-card:before{
       content:"";
       position:absolute; inset:-1px;
-      background: radial-gradient(420px 220px at 20% 10%, rgba(34,197,94,.12), transparent 60%);
+      background: radial-gradient(480px 220px at 20% 10%, rgba(96,165,250,.12), transparent 60%);
       pointer-events:none;
     }
-    .qr-demo{
-      border-radius: 18px;
-      border:1px solid rgba(148,163,184,.12);
-      background: rgba(17,24,39,.45);
-      padding: 14px;
-      position:relative;
-      z-index:1;
-    }
-    .qr-demo h3{margin:0 0 6px; font-size:15px; letter-spacing:-.2px}
-    .qr-demo p{margin:0; color: rgba(148,163,184,.95); font-size:13px}
-    .qr-uses{
-      display:grid; gap:10px;
+    .tool-top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
       position:relative; z-index:1;
     }
-    .qr-mini{
-      display:flex; gap:10px; align-items:flex-start;
-      padding: 12px;
-      border-radius: 16px;
-      border:1px solid rgba(148,163,184,.12);
-      background: rgba(17,24,39,.40);
-    }
-    .qr-ic{
-      width:34px; height:34px;
-      border-radius: 12px;
+    .tool-ico{
+      width:44px; height:44px;
+      border-radius:14px;
       display:grid; place-items:center;
-      background: rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.20);
+      background: rgba(96,165,250,.12);
+      border: 1px solid rgba(96,165,250,.22);
       flex: 0 0 auto;
-      margin-top:1px;
     }
-    .qr-ic svg{width:18px;height:18px; fill:none; stroke: rgba(229,231,235,.92); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-    .qr-mini b{display:block; margin-bottom:2px}
-    .qr-mini span{color: rgba(148,163,184,.95); font-size:13px}
+    .tool-ico svg{width:22px; height:22px; fill:none; stroke: rgba(229,231,235,.92); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+    .tool-title{margin:0; font-size:16px; letter-spacing:-.2px}
+    .tool-desc{margin:0; color: rgba(148,163,184,.95); font-size:14px; position:relative; z-index:1}
+    .tool-meta{
+      display:flex; flex-wrap:wrap; gap:10px;
+      color: rgba(148,163,184,.92);
+      font-weight:700;
+      font-size:13px;
+      position:relative; z-index:1;
+      margin-top: 4px;
+    }
+    .tool-pill{
+      padding:8px 10px;
+      border:1px solid rgba(148,163,184,.14);
+      border-radius:999px;
+      background: rgba(11,15,25,.35);
+    }
+    .tool-actions{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:auto;
+      position:relative; z-index:1;
+    }
 
     /* Pricing */
     .pricing{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;}
@@ -521,15 +476,8 @@
     .modal-actions{display:flex; gap:10px; flex-wrap:wrap}
 
     /* Mobile menu */
-    .menu-sheet{
-      position:fixed; inset:0;
-      display:none;
-      z-index: 90;
-    }
-    .menu-sheet .shade{
-      position:absolute; inset:0;
-      background: rgba(0,0,0,.55);
-    }
+    .menu-sheet{position:fixed; inset:0; display:none; z-index: 90;}
+    .menu-sheet .shade{position:absolute; inset:0; background: rgba(0,0,0,.55);}
     .menu-sheet .panel{
       position:absolute; top:0; right:0; height:100%;
       width:min(380px, 88vw);
@@ -542,20 +490,9 @@
       gap:10px;
       box-shadow: var(--shadow);
     }
-    .menu-head{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(148,163,184,.12);
-    }
+    .menu-head{display:flex; align-items:center; justify-content:space-between; padding: 10px 8px; border-bottom: 1px solid rgba(148,163,184,.12);}
     .menu-links{display:grid; gap:10px; padding: 8px}
-    .menu-links a{
-      padding: 12px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(148,163,184,.12);
-      background: rgba(17,24,39,.40);
-      font-weight:800;
-      color: rgba(229,231,235,.95);
-    }
+    .menu-links a{padding: 12px 12px; border-radius: 14px; border:1px solid rgba(148,163,184,.12); background: rgba(17,24,39,.40); font-weight:800; color: rgba(229,231,235,.95);}
     .menu-links a:hover{border-color: rgba(96,165,250,.30)}
     .menu-actions{display:flex; flex-wrap:wrap; gap:10px; padding: 8px}
 
@@ -565,15 +502,7 @@
     .small{font-size:13px; color: rgba(148,163,184,.92)}
     .footlinks{display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end}
     .footlinks a{padding:8px 10px; border-radius:12px; border:1px solid rgba(148,163,184,.12); background: rgba(17,24,39,.35)}
-    .note{
-      margin-top:10px;
-      border:1px dashed rgba(148,163,184,.18);
-      border-radius: 14px;
-      padding: 12px 14px;
-      background: rgba(17,24,39,.28);
-      color: rgba(148,163,184,.92);
-      font-size: 13px;
-    }
+    .note{margin-top:10px; border:1px dashed rgba(148,163,184,.18); border-radius: 14px; padding: 12px 14px; background: rgba(17,24,39,.28); color: rgba(148,163,184,.92); font-size: 13px;}
 
     /* Mobile */
     @media (max-width: 920px){
@@ -585,7 +514,6 @@
       .section-head{flex-direction:column; align-items:flex-start}
       .footer-grid{grid-template-columns: 1fr;}
       .footlinks{justify-content:flex-start}
-      .qr-grid{grid-template-columns: 1fr;}
     }
     @media (max-width: 720px){
       .navlinks{display:none}
@@ -609,8 +537,8 @@
         <nav class="navlinks" aria-label="Primary">
           <a href="#services">Services</a>
           <a href="#process">Process</a>
+          <a href="#tools">Tools</a>
           <a href="#templates">Templates</a>
-          <a href="#qr">QR Generator</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
         </nav>
@@ -635,8 +563,8 @@
       <div class="menu-links" aria-label="Menu links">
         <a href="#services" class="m-link">Services</a>
         <a href="#process" class="m-link">Process</a>
+        <a href="#tools" class="m-link">Logic Lab Tools</a>
         <a href="#templates" class="m-link">Templates</a>
-        <a href="#qr" class="m-link">QR Generator</a>
         <a href="#pricing" class="m-link">Pricing</a>
         <a href="#faq" class="m-link">FAQ</a>
       </div>
@@ -666,7 +594,7 @@
 
             <div class="hero-cta">
               <a class="btn primary" href="#pricing">See packages</a>
-              <a class="btn" href="#templates">View templates</a>
+              <a class="btn" href="#tools">Explore tools</a>
               <button class="btn" type="button" id="openContact1">Talk to us</button>
             </div>
 
@@ -781,69 +709,75 @@
         </div>
       </section>
 
-      <section id="qr">
+      <section id="tools">
         <div class="section-head">
           <div>
-            <h2>QR Code Generator</h2>
-            <p>Stop losing customers to “type the link later”. Put one scan between them and your business.</p>
+            <h2>Logic Lab Tools</h2>
+            <p>Free, practical tools built by Logic Lab — made for marketing, visibility, and fast content creation.</p>
           </div>
-          <a class="btn" href="#templates">See templates</a>
+          <a class="btn" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab%20%E2%9C%8B%0A%0AI%20want%20a%20custom%20tool%20for%20my%20business.%20Can%20we%20talk%3F" target="_blank" rel="noreferrer">Request a custom tool</a>
         </div>
 
-        <div class="qr-wrap">
-          <div class="qr-grid">
-            <div style="position:relative; z-index:1">
-              <div class="qr-kicker"><span class="dot" aria-hidden="true"></span>Free tool • Instant results • No signup</div>
-              <h3 class="qr-title">Turn any link into a “SCAN ME” that gets you calls, orders, and foot traffic.</h3>
-              <p class="qr-sub">
-                Customers dont have time to type the link adress? Good. Make it easy for them.
-                One QR code can open your WhatsApp, your Google Maps location, your menu, your website, your payment link — whatever makes you money.
-                Print it on flyers, posters, business cards, packaging, even your shop window.
-              </p>
-
-              <div class="qr-cta">
-                <a class="btn primary" href="qr-code.html">Open the QR Generator</a>
-                <a class="btn" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab%20%E2%9C%8B%0A%0AI%20want%20a%20QR%20code%20setup%20for%20my%20business.%0A%0AWhat%20link%20should%20it%20open%3A%0AWhere%20will%20I%20use%20it%20(flyers%2Fmenu%2Fwindow%2Fcards)%3A%0A" target="_blank" rel="noreferrer">Help me set it up</a>
+        <div class="tools-wrap">
+          <div class="grid-2">
+            <div class="tool-card">
+              <div class="tool-top">
+                <div class="tool-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/>
+                    <path d="M14 14h2v2h-2z"/><path d="M18 14h2v6h-6v-2"/>
+                  </svg>
+                </div>
+                <span class="tag">Free • Instant</span>
               </div>
 
-              <div class="qr-pills" aria-label="Best uses">
-                <span class="qr-pill">📞 WhatsApp “Chat Now”</span>
-                <span class="qr-pill">📍 Google Maps directions</span>
-                <span class="qr-pill">📋 Menu / price list</span>
-                <span class="qr-pill">🌐 Website / landing page</span>
-                <span class="qr-pill">💳 Payment link</span>
-                <span class="qr-pill">📲 App download</span>
+              <h3 class="tool-title">QR Code Generator</h3>
+              <p class="tool-desc">Turn a link into a clean “SCAN ME” code for WhatsApp, Google Maps, menus, websites, payment links, and more.</p>
+
+              <div class="tool-meta" aria-label="QR tool highlights">
+                <span class="tool-pill">📞 WhatsApp</span>
+                <span class="tool-pill">📍 Maps</span>
+                <span class="tool-pill">🌐 Websites</span>
+                <span class="tool-pill">🖨️ Print-ready</span>
+              </div>
+
+              <div class="tool-actions">
+                <a class="btn primary" href="qr-code.html">Open QR Generator</a>
+                <a class="btn" href="#templates">See examples</a>
               </div>
             </div>
 
-            <aside class="qr-side" aria-label="QR generator benefits">
-              <div class="qr-demo">
-                <h3>What happens when they scan?</h3>
-                <p>They land exactly where you want — zero typing, zero confusion, zero excuses.</p>
+            <div class="tool-card">
+              <div class="tool-top">
+                <div class="tool-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M6 2h9l3 3v17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/>
+                    <path d="M15 2v4h4"/>
+                    <path d="M7 10h10"/><path d="M7 14h10"/><path d="M7 18h7"/>
+                  </svg>
+                </div>
+                <span class="tag">Design • Export</span>
               </div>
 
-              <div class="qr-uses">
-                <div class="qr-mini">
-                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h2v2h-2z"/><path d="M18 14h2v6h-6v-2"/></svg></span>
-                  <div><b>Instant, clean codes</b><span>Fast generation that looks sharp on print.</span></div>
-                </div>
-                <div class="qr-mini">
-                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 17l-5-5"/><path d="M12 17l5-5"/><path d="M12 4v13"/></svg></span>
-                  <div><b>Perfect for marketing</b><span>Flyers, posters, business cards, stickers, packaging.</span></div>
-                </div>
-                <div class="qr-mini">
-                  <span class="qr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M12 3v18"/></svg></span>
-                  <div><b>Works for any link</b><span>WhatsApp, Maps, menus, sites, payments, socials.</span></div>
-                </div>
+              <h3 class="tool-title">Flyer Maker</h3>
+              <p class="tool-desc">Create clean flyers fast. Perfect for promos, events, price lists, and social posts — then export and share.</p>
+
+              <div class="tool-meta" aria-label="Flyer tool highlights">
+                <span class="tool-pill">🧾 Promotions</span>
+                <span class="tool-pill">📅 Events</span>
+                <span class="tool-pill">📲 Social media</span>
+                <span class="tool-pill">⚡ Fast creation</span>
               </div>
 
-              <div class="divider"></div>
-              <div class="small" style="position:relative; z-index:1">
-                <b>Pro move:</b> Put your QR on every physical thing customers touch.
-                You’re basically turning paper into a clickable button.
+              <div class="tool-actions">
+                <a class="btn primary" href="FlyerMaker.html">Open Flyer Maker</a>
+                <a class="btn" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab%20%E2%9C%8B%0A%0AI%20need%20a%20flyer%20design%20help.%20Here%E2%80%99s%20my%20business%20and%20what%20I%20want%3A%0A" target="_blank" rel="noreferrer">Need design help</a>
               </div>
-            </aside>
+            </div>
           </div>
+
+          <div class="divider"></div>
+          <div class="small"><b>Tip:</b> Put your QR code directly on flyers you create — it turns paper into a clickable button.</div>
         </div>
       </section>
 
@@ -878,25 +812,16 @@
             <p class="small"><b>Best for:</b> New businesses, pop-ups, small teams.</p>
           </a>
 
-          <a class="card" href="qr-code.html">
-            <h3>Free QR Code Generator</h3>
-            <p>
-              Want to make it easier for customers to find you, save your number, or open your menu?
-              Generate a QR code in seconds — free.
-            </p>
-            <div class="divider"></div>
-            <p class="small"><b>Perfect for:</b> Flyers, business cards, WhatsApp links, Google Maps, menus.</p>
-          </a>
         </div>
 
         <div class="divider"></div>
 
         <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap">
           <div>
-            <h3 style="margin:0 0 6px">Need a QR built into your website too?</h3>
-            <p style="margin:0; color: rgba(148,163,184,.95)">We can add a “Scan to WhatsApp / Menu / Map” section to your site so customers convert faster.</p>
+            <h3 style="margin:0 0 6px">Want your tools integrated into a custom website?</h3>
+            <p style="margin:0; color: rgba(148,163,184,.95)">We can build a “Tools” area on your site with custom branding, analytics, and lead capture.</p>
           </div>
-          <a class="btn primary" href="#qr">Open QR Generator</a>
+          <a class="btn primary" href="#tools">Explore Tools</a>
         </div>
       </section>
 
@@ -979,9 +904,7 @@
               </svg>
             </span>
           </summary>
-          <div class="faq-a">
-            Starter pages can be 2–5 days if content is ready. Business sites are usually 1–2 weeks. Product/MVP depends on scope, but we ship in weekly sprints with demos.
-          </div>
+          <div class="faq-a">Starter pages can be 2–5 days if content is ready. Business sites are usually 1–2 weeks. Product/MVP depends on scope, but we ship in weekly sprints with demos.</div>
         </details>
 
         <details>
@@ -993,9 +916,7 @@
               </svg>
             </span>
           </summary>
-          <div class="faq-a">
-            Business name, services, contact details, logo (if you have), and examples of websites you like. If you don’t have content, we can help structure it.
-          </div>
+          <div class="faq-a">Business name, services, contact details, logo (if you have), and examples of websites you like. If you don’t have content, we can help structure it.</div>
         </details>
 
         <details>
@@ -1007,9 +928,7 @@
               </svg>
             </span>
           </summary>
-          <div class="faq-a">
-            Yes — we do the technical basics (metadata, structure, speed, mobile). Full SEO strategy/content is a bigger project, but we can quote it.
-          </div>
+          <div class="faq-a">Yes — we do the technical basics (metadata, structure, speed, mobile). Full SEO strategy/content is a bigger project, but we can quote it.</div>
         </details>
 
         <details>
@@ -1021,9 +940,7 @@
               </svg>
             </span>
           </summary>
-          <div class="faq-a">
-            Yes. WhatsApp CTAs are quick. Bookings and payments depend on the provider you choose (PayFast, Peach Payments, Yoco links, etc.). We integrate and test.
-          </div>
+          <div class="faq-a">Yes. WhatsApp CTAs are quick. Bookings and payments depend on the provider you choose (PayFast, Peach Payments, Yoco links, etc.). We integrate and test.</div>
         </details>
 
         <details>
@@ -1035,9 +952,7 @@
               </svg>
             </span>
           </summary>
-          <div class="faq-a">
-            You own your domain and content. We deliver your site files and can host/maintain it for you, or hand over if you want to manage it yourself.
-          </div>
+          <div class="faq-a">You own your domain and content. We deliver your site files and can host/maintain it for you, or hand over if you want to manage it yourself.</div>
         </details>
       </section>
 
@@ -1061,9 +976,7 @@
               <img class="logo" src="Logiclab.png" alt="Logic Lab logo" />
               <span>Logic Lab</span>
             </div>
-            <p class="small" style="margin:10px 0 0">
-              We build fast, reliable websites and software. Based in South Africa. Remote-friendly.
-            </p>
+            <p class="small" style="margin:10px 0 0">We build fast, reliable websites and software. Based in South Africa. Remote-friendly.</p>
             <div class="note">
               <b>Quick contact:</b>
               <span> WhatsApp </span>
@@ -1076,8 +989,8 @@
           <div class="footlinks" aria-label="Footer links">
             <a href="#services">Services</a>
             <a href="#process">Process</a>
+            <a href="#tools">Tools</a>
             <a href="#templates">Templates</a>
-            <a href="#qr">QR Generator</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
@@ -1137,9 +1050,7 @@
             <button class="btn" type="button" id="sendEmailBtn">Send by Email</button>
           </div>
 
-          <div class="note">
-            We reply fast. If you choose a package, we’ll use it as the starting point and refine scope from there.
-          </div>
+          <div class="note">We reply fast. If you choose a package, we’ll use it as the starting point and refine scope from there.</div>
         </form>
       </div>
     </div>
@@ -1176,7 +1087,6 @@
           `Deadline (if any):\n`;
       }
 
-      // Focus first input
       setTimeout(() => $('name').focus(), 0);
     }
 
@@ -1205,13 +1115,24 @@
     backdrop.addEventListener('click', (e)=>{
       if (e.target === backdrop) closeModal();
     });
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === 'Escape'){
-        // close modal if open
-        if (backdrop.style.display === 'flex') closeModal();
-        // close menu if open
-        if ($('menuSheet').style.display === 'block') closeMenu();
-      }
+
+    // Email send
+    $('sendEmailBtn').addEventListener('click', ()=>{
+      const name = $('name').value.trim();
+      const phone = $('phone').value.trim();
+      const email = $('email').value.trim();
+      const plan = $('plan').value;
+      const message = $('message').value.trim();
+
+      const subject = `Logic Lab project enquiry (${plan})`;
+      const body =
+        `Name: ${name}\n` +
+        (phone ? `Phone: ${phone}\n` : ``) +
+        (email ? `Email: ${email}\n` : ``) +
+        `Package: ${plan}\n\n` +
+        `Details:\n${message || '(please ask me what you need)'}\n`;
+
+      window.location.href = `mailto:logiclabstudio@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
 
     // WhatsApp send (form submit)
@@ -1236,25 +1157,6 @@
       closeModal();
     });
 
-    // Email send
-    $('sendEmailBtn').addEventListener('click', ()=>{
-      const name = $('name').value.trim();
-      const phone = $('phone').value.trim();
-      const email = $('email').value.trim();
-      const plan = $('plan').value;
-      const message = $('message').value.trim();
-
-      const subject = `Logic Lab project enquiry (${plan})`;
-      const body =
-        `Name: ${name}\n` +
-        (phone ? `Phone: ${phone}\n` : ``) +
-        (email ? `Email: ${email}\n` : ``) +
-        `Package: ${plan}\n\n` +
-        `Details:\n${message || '(please ask me what you need)'}\n`;
-
-      window.location.href = `mailto:logiclabstudio@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-
     // Mobile menu
     const menuBtn = $('menuBtn');
     const menuSheet = $('menuSheet');
@@ -1266,6 +1168,7 @@
       menuSheet.setAttribute('aria-hidden','false');
       document.body.style.overflow = 'hidden';
     }
+
     function closeMenu(){
       menuSheet.style.display = 'none';
       menuSheet.setAttribute('aria-hidden','true');
@@ -1279,6 +1182,26 @@
     // Close menu on link click
     document.querySelectorAll('.m-link').forEach(a=>{
       a.addEventListener('click', ()=> closeMenu());
+    });
+
+    // Escape key closes modal/menu
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape'){
+        if (backdrop.style.display === 'flex') closeModal();
+        if (menuSheet.style.display === 'block') closeMenu();
+      }
+    });
+
+    // Nice-to-have: smooth scroll for in-page links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e)=>{
+        const href = a.getAttribute('href');
+        if (!href || href === '#') return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     });
   </script>
 </body>
