@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
-  <title><a href="/qr-code.html">Free QR Code Generator</a></title>
+  <title>Free QR Code Generator | Logic Lab Studio</title>
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5622407838304076"
      crossorigin="anonymous"></script>
@@ -18,10 +18,11 @@
       --muted:#94a3b8;
       --blue:#60a5fa;
       --blue2:#38bdf8;
-      --ring: rgba(96,165,250,.35);
       --shadow: 0 18px 50px rgba(0,0,0,.55);
       --radius: 20px;
       --max: 980px;
+      --line: rgba(255,255,255,.12);
+      --soft: rgba(0,0,0,.18);
     }
     *{box-sizing:border-box}
     body{
@@ -87,7 +88,7 @@
     p{ margin:0; color: var(--muted); font-size: 16px; line-height:1.6; }
 
     .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; align-items:center;}
-    .input{
+    .input, .select, .textarea{
       flex:1 1 320px;
       padding:12px 12px;
       border-radius: 14px;
@@ -96,6 +97,9 @@
       color: var(--text);
       outline:none;
     }
+    .select{flex: 0 0 220px}
+    .textarea{min-height: 90px; resize: vertical; flex: 1 1 100%}
+
     .btn{
       appearance:none; border:none; cursor:pointer;
       border-radius: 14px; padding: 12px 16px;
@@ -114,6 +118,11 @@
       color: var(--text);
       background: rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.12);
+    }
+    .mini{
+      padding:10px 12px;
+      font-weight:700;
+      border-radius: 12px;
     }
 
     /* QR */
@@ -135,7 +144,7 @@
       width: 220px;
       height: 220px;
       margin: 0 auto;
-      background: #fff; /* keep white for scanning */
+      background: #fff;
       border-radius: 12px;
       display:flex;
       align-items:center;
@@ -147,6 +156,18 @@
       color: rgba(148,163,184,.9);
       margin-top:10px;
       text-align:center;
+    }
+    .small{
+      font-size:12px;color:rgba(148,163,184,.85);margin-top:12px
+    }
+    .codebox{
+      display:block;
+      background:rgba(0,0,0,.25);
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      color:#e5e7eb;
+      word-break: break-all;
     }
 
     /* Right side */
@@ -160,7 +181,9 @@
       display:flex; justify-content:space-between; gap:10px; align-items:center;
     }
     .item span{color: var(--muted); font-size: 13px}
-    .small{font-size:12px;color:rgba(148,163,184,.85);margin-top:12px}
+    .item button{white-space: nowrap}
+    .divider{height:1px;background:rgba(255,255,255,.10);margin:14px 0}
+    .hide{display:none !important;}
   </style>
 </head>
 
@@ -170,10 +193,42 @@
       <div class="inner">
         <div class="badge"><span class="dot"></span><span>QR Code Generator</span></div>
         <h1>Logic Lab Studio QR</h1>
-        <p>Scan the code or download it as an image.</p>
+        <p>Pick a type, fill details, then generate + download.</p>
 
+        <!-- TYPE SELECT -->
         <div class="row">
-          <input class="input" id="urlInput" value="https://logiclabstudio.github.io/" />
+          <select class="select" id="typeSelect" aria-label="QR type">
+            <option value="website">Website</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="maps">Maps</option>
+          </select>
+
+          <button class="btn ghost mini" id="useWebsite" type="button">Use website</button>
+          <button class="btn ghost mini" id="useWhatsApp" type="button">Use WhatsApp</button>
+          <button class="btn ghost mini" id="useMaps" type="button">Use maps</button>
+        </div>
+
+        <!-- WEBSITE INPUT -->
+        <div id="websiteFields" class="row">
+          <input class="input" id="websiteInput" placeholder="https://yourwebsite.com" value="https://logiclabstudio.github.io/" />
+        </div>
+
+        <!-- WHATSAPP INPUTS -->
+        <div id="whatsappFields" class="row hide">
+          <input class="input" id="waPhone" placeholder="Phone (international) e.g. 27623881570" value="27623881570" />
+          <textarea class="textarea" id="waMsg" placeholder="Optional message (auto-encoded)">Hi, I’m interested in your services.</textarea>
+        </div>
+
+        <!-- MAPS INPUTS -->
+        <div id="mapsFields" class="row hide">
+          <input class="input" id="mapsQuery" placeholder="Search place/address e.g. 'Logic Lab Studio Johannesburg'" />
+          <input class="input" id="mapsLat" placeholder="Latitude (optional)" />
+          <input class="input" id="mapsLng" placeholder="Longitude (optional)" />
+        </div>
+
+        <!-- FINAL LINK + ACTIONS -->
+        <div class="row">
+          <input class="input" id="finalLink" readonly />
           <button class="btn primary" id="makeBtn" type="button">Generate QR</button>
           <button class="btn ghost" id="downloadBtn" type="button">Download PNG</button>
         </div>
@@ -186,11 +241,15 @@
 
           <div style="flex:1; min-width:220px">
             <p style="margin-bottom:10px">
-              Tip: keep the QR on a white background for best scanning.  
-              This one is made correctly.
+              Your QR is generated from the link below (copy it if you want).
             </p>
+            <div class="small">Current link:</div>
+            <code class="codebox" id="linkPreview"></code>
+
+            <div class="divider"></div>
+
             <div class="small">
-              If you print it: use at least <b>3–4 cm</b> size and don’t stretch it.
+              Printing tip: keep it on a white background, at least <b>3–4 cm</b> and don’t stretch it.
             </div>
           </div>
         </div>
@@ -201,45 +260,149 @@
       <div class="inner">
         <h2>Quick options</h2>
         <ul class="list">
-          <li class="item"><strong>Website</strong><span>Link to your homepage</span></li>
-          <li class="item"><strong>WhatsApp</strong><span>Direct chat link</span></li>
-          <li class="item"><strong>Maps</strong><span>Location link</span></li>
+          <li class="item">
+            <div><strong>Website</strong><br><span>Any URL (homepage, page, PDF)</span></div>
+            <button class="btn ghost mini" type="button" data-pick="website">Pick</button>
+          </li>
+          <li class="item">
+            <div><strong>WhatsApp</strong><br><span>Direct chat + optional message</span></div>
+            <button class="btn ghost mini" type="button" data-pick="whatsapp">Pick</button>
+          </li>
+          <li class="item">
+            <div><strong>Maps</strong><br><span>Search address OR lat/lng</span></div>
+            <button class="btn ghost mini" type="button" data-pick="maps">Pick</button>
+          </li>
         </ul>
 
+        <div class="divider"></div>
+
         <div class="small">
-          Want a WhatsApp QR too? Use a link like:
+          Examples:
           <br><br>
-          <code style="display:block;background:rgba(0,0,0,.25);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.10);color:#e5e7eb;">
-https://wa.me/27623881570
-          </code>
+          <span class="codebox">Website: https://logiclabstudi.co.za</span>
+          <br>
+          <span class="codebox">WhatsApp: https://wa.me/27623881570?text=Hi%20Logic%20Lab</span>
+          <br>
+          <span class="codebox">Maps: https://www.google.com/maps/search/?api=1&query=Johannesburg</span>
         </div>
       </div>
     </aside>
   </main>
 
-  <!-- QR library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <script>
-    const urlInput = document.getElementById("urlInput");
+    const typeSelect = document.getElementById("typeSelect");
+
+    const websiteFields = document.getElementById("websiteFields");
+    const whatsappFields = document.getElementById("whatsappFields");
+    const mapsFields = document.getElementById("mapsFields");
+
+    const websiteInput = document.getElementById("websiteInput");
+
+    const waPhone = document.getElementById("waPhone");
+    const waMsg = document.getElementById("waMsg");
+
+    const mapsQuery = document.getElementById("mapsQuery");
+    const mapsLat = document.getElementById("mapsLat");
+    const mapsLng = document.getElementById("mapsLng");
+
+    const finalLink = document.getElementById("finalLink");
+    const linkPreview = document.getElementById("linkPreview");
+
     const makeBtn = document.getElementById("makeBtn");
     const downloadBtn = document.getElementById("downloadBtn");
     const statusEl = document.getElementById("status");
     const qrEl = document.getElementById("qrcode");
 
+    const useWebsite = document.getElementById("useWebsite");
+    const useWhatsApp = document.getElementById("useWhatsApp");
+    const useMaps = document.getElementById("useMaps");
+
     let qr;
 
-    function renderQR() {
-      const text = (urlInput.value || "").trim();
-      if (!text) {
-        statusEl.textContent = "Enter a link first.";
+    function safeTrim(v){ return (v || "").trim(); }
+
+    function normalizeWebsite(url){
+      const t = safeTrim(url);
+      if(!t) return "";
+      // If user types "example.com" -> make it https://example.com
+      if(!/^https?:\/\//i.test(t)) return "https://" + t;
+      return t;
+    }
+
+    function normalizePhone(phone){
+      // Keep digits only
+      return safeTrim(phone).replace(/[^\d]/g, "");
+    }
+
+    function buildWhatsAppLink(){
+      const phone = normalizePhone(waPhone.value);
+      if(!phone) return "";
+      const msg = safeTrim(waMsg.value);
+      const base = `https://wa.me/${phone}`;
+      if(!msg) return base;
+      return `${base}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function buildMapsLink(){
+      const lat = safeTrim(mapsLat.value);
+      const lng = safeTrim(mapsLng.value);
+      const q = safeTrim(mapsQuery.value);
+
+      // If lat/lng provided -> use "query=lat,lng" (most reliable)
+      if(lat && lng){
+        const coords = `${lat},${lng}`;
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coords)}`;
+      }
+
+      // Otherwise query search
+      if(!q) return "";
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+    }
+
+    function buildFinalLink(){
+      const type = typeSelect.value;
+
+      if(type === "website"){
+        return normalizeWebsite(websiteInput.value);
+      }
+      if(type === "whatsapp"){
+        return buildWhatsAppLink();
+      }
+      if(type === "maps"){
+        return buildMapsLink();
+      }
+      return "";
+    }
+
+    function toggleFields(){
+      const type = typeSelect.value;
+      websiteFields.classList.toggle("hide", type !== "website");
+      whatsappFields.classList.toggle("hide", type !== "whatsapp");
+      mapsFields.classList.toggle("hide", type !== "maps");
+    }
+
+    function updateLinkUI(){
+      const link = buildFinalLink();
+      finalLink.value = link;
+      linkPreview.textContent = link || "—";
+      if(!link) statusEl.textContent = "Fill the fields to build a valid link.";
+    }
+
+    function renderQR(){
+      const link = buildFinalLink();
+      updateLinkUI();
+
+      if(!link){
+        qrEl.innerHTML = "";
+        statusEl.textContent = "Nothing to generate yet.";
         return;
       }
 
-      // Clear previous QR
       qrEl.innerHTML = "";
       qr = new QRCode(qrEl, {
-        text,
+        text: link,
         width: 220,
         height: 220,
         colorDark: "#000000",
@@ -250,8 +413,7 @@ https://wa.me/27623881570
       statusEl.textContent = "QR generated ✅";
     }
 
-    function downloadPNG() {
-      // qrcodejs creates either an <img> or <canvas> depending on browser
+    function downloadPNG(){
       const img = qrEl.querySelector("img");
       const canvas = qrEl.querySelector("canvas");
 
@@ -259,7 +421,7 @@ https://wa.me/27623881570
       if (canvas) dataUrl = canvas.toDataURL("image/png");
       else if (img) dataUrl = img.src;
 
-      if (!dataUrl) {
+      if (!dataUrl){
         statusEl.textContent = "Generate a QR first.";
         return;
       }
@@ -273,10 +435,40 @@ https://wa.me/27623881570
       statusEl.textContent = "Downloaded ✅";
     }
 
+    function pickType(t){
+      typeSelect.value = t;
+      toggleFields();
+      updateLinkUI();
+      renderQR();
+    }
+
+    // Top quick buttons
+    useWebsite.addEventListener("click", () => pickType("website"));
+    useWhatsApp.addEventListener("click", () => pickType("whatsapp"));
+    useMaps.addEventListener("click", () => pickType("maps"));
+
+    // Side “Pick” buttons
+    document.querySelectorAll("[data-pick]").forEach(btn=>{
+      btn.addEventListener("click", ()=> pickType(btn.dataset.pick));
+    });
+
+    // Live updates
+    typeSelect.addEventListener("change", () => { toggleFields(); renderQR(); });
+
+    [websiteInput, waPhone, waMsg, mapsQuery, mapsLat, mapsLng].forEach(el=>{
+      el.addEventListener("input", () => {
+        updateLinkUI();
+        // auto re-render so it feels instant
+        renderQR();
+      });
+    });
+
     makeBtn.addEventListener("click", renderQR);
     downloadBtn.addEventListener("click", downloadPNG);
 
-    // Auto-generate on load
+    // Init
+    toggleFields();
+    updateLinkUI();
     renderQR();
   </script>
 </body>
