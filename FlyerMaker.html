@@ -223,6 +223,7 @@
       user-select:none;
       border:1px solid transparent;
       border-radius:10px;
+      touch-action: none; /* ✅ important for mobile drag */
     }
     .item.selected{border-color: rgba(96,165,250,.7); box-shadow: 0 0 0 3px rgba(96,165,250,.18)}
     .item.hidden{display:none}
@@ -243,6 +244,7 @@
       right:-6px; bottom:-6px;
       cursor: nwse-resize;
       display:none;
+      touch-action: none; /* ✅ important for mobile resize */
     }
     .item.selected .handle{display:block}
     .img{width:100%; height:100%; object-fit:cover; display:block; border-radius:10px;}
@@ -303,7 +305,7 @@
         overflow: auto;
       }
       .canvasWrap{
-        min-width: 0; /* IMPORTANT: stop forced overflow */
+        min-width: 0; /* stop forced overflow */
       }
       .topbar{
         position: sticky;
@@ -316,36 +318,22 @@
     }
 
     @media (max-width: 640px){
-      .app{
-        padding: 8px;
-        gap: 8px;
-      }
-      aside.panel{
-        max-height: 48dvh;
-      }
+      .app{ padding: 8px; gap: 8px; }
+      aside.panel{ max-height: 48dvh; }
+
       .row{ grid-template-columns: 1fr; }
       .row3{ grid-template-columns: 1fr; }
 
       .tabs{ gap: 8px; }
       .tab{ padding: 9px 10px; font-size: 12px; }
 
-      button{
-        padding: 10px 10px;
-        width: 100%;
-      }
+      /* ✅ Only make grouped buttons full width */
+      button{ padding: 10px 10px; width: auto; }
       .btns{ gap: 8px; }
       .btns button{ width: 100%; }
 
       .zoom{ width: 120px; }
-
-      .stage{
-        overflow: auto;
-      }
-    }
-
-    /* Touch improvements */
-    @media (pointer: coarse){
-      .item{ touch-action: none; } /* prevents page scrolling while dragging */
+      .stage{ overflow: auto; }
     }
   </style>
 </head>
@@ -1010,6 +998,59 @@
       setStatus("Canvas cleared", "Ready");
     }
 
+    // ===== Pointer Drag/Resize (mobile + desktop) =====
+    function startDragPointer(e, id){
+      const el = elements.find(x=>x.id===id);
+      if(!el) return;
+      drag = { id, startX: e.clientX, startY: e.clientY, elX: el.x, elY: el.y };
+      window.addEventListener("pointermove", onDragMovePointer);
+      window.addEventListener("pointerup", onDragEndPointer, { once:true });
+    }
+    function onDragMovePointer(e){
+      if(!drag) return;
+      const el = elements.find(x=>x.id===drag.id);
+      if(!el) return;
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      el.x = snap(clamp(drag.elX + dx, 0, paper.clientWidth - 10));
+      el.y = snap(clamp(drag.elY + dy, 0, paper.clientHeight - 10));
+      render();
+      updateEditPanelQuiet();
+      setStatus("Moving", `x:${Math.round(el.x)} y:${Math.round(el.y)}`);
+    }
+    function onDragEndPointer(){
+      drag = null;
+      window.removeEventListener("pointermove", onDragMovePointer);
+      renderLayers();
+      setStatus("Moved", "Ready");
+    }
+
+    function startResizePointer(e, id){
+      const el = elements.find(x=>x.id===id);
+      if(!el) return;
+      resize = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
+      window.addEventListener("pointermove", onResizeMovePointer);
+      window.addEventListener("pointerup", onResizeEndPointer, { once:true });
+    }
+    function onResizeMovePointer(e){
+      if(!resize) return;
+      const el = elements.find(x=>x.id===resize.id);
+      if(!el) return;
+      const dx = e.clientX - resize.startX;
+      const dy = e.clientY - resize.startY;
+      el.w = snap(clamp(resize.w + dx, 30, paper.clientWidth - el.x));
+      el.h = snap(clamp(resize.h + dy, 24, paper.clientHeight - el.y));
+      render();
+      updateEditPanelQuiet();
+      setStatus("Resizing", `w:${Math.round(el.w)} h:${Math.round(el.h)}`);
+    }
+    function onResizeEndPointer(){
+      resize = null;
+      window.removeEventListener("pointermove", onResizeMovePointer);
+      renderLayers();
+      setStatus("Resized", "Ready");
+    }
+
     // ===== Render =====
     function render(){
       paper.querySelectorAll(".item").forEach(n=>n.remove());
@@ -1079,24 +1120,30 @@
         node.appendChild(content);
         node.appendChild(handle);
 
-        node.addEventListener("mousedown", (e) => {
+        // ✅ Pointer events: works for mouse + touch
+        node.addEventListener("pointerdown", (e) => {
           if(el.hidden) return;
+
+          // keep receiving moves even if finger leaves the element
+          node.setPointerCapture?.(e.pointerId);
+
           const isHandle = e.target.classList.contains("handle");
           if(isHandle){
             e.preventDefault();
             select(el.id);
-            startResize(e, el.id);
+            startResizePointer(e, el.id);
             return;
           }
           e.preventDefault();
           select(el.id);
-          startDrag(e, el.id);
+          startDragPointer(e, el.id);
         });
 
         paper.appendChild(node);
       }
 
-      paper.onmousedown = (e) => {
+      // deselect when clicking blank area
+      paper.onpointerdown = (e) => {
         const t = e.target;
         if(t === paper || t.classList.contains("gridOverlay") || t.classList.contains("guides") || t.classList.contains("guide-bleed") || t.classList.contains("guide-safe") || t.classList.contains("centerGuides")){
           selectedId = null;
@@ -1115,59 +1162,6 @@
       render();
       const el = getSelected();
       if(el) setStatus("Selected", el.name || "");
-    }
-
-    // ===== Drag/Resize =====
-    function startDrag(e, id){
-      const el = elements.find(x=>x.id===id);
-      if(!el) return;
-      drag = { id, startX: e.clientX, startY: e.clientY, elX: el.x, elY: el.y };
-      window.addEventListener("mousemove", onDragMove);
-      window.addEventListener("mouseup", onDragEnd, { once:true });
-    }
-    function onDragMove(e){
-      if(!drag) return;
-      const el = elements.find(x=>x.id===drag.id);
-      if(!el) return;
-      const dx = e.clientX - drag.startX;
-      const dy = e.clientY - drag.startY;
-      el.x = snap(clamp(drag.elX + dx, 0, paper.clientWidth - 10));
-      el.y = snap(clamp(drag.elY + dy, 0, paper.clientHeight - 10));
-      render();
-      updateEditPanelQuiet();
-      setStatus("Moving", `x:${Math.round(el.x)} y:${Math.round(el.y)}`);
-    }
-    function onDragEnd(){
-      drag = null;
-      window.removeEventListener("mousemove", onDragMove);
-      renderLayers();
-      setStatus("Moved", "Ready");
-    }
-
-    function startResize(e, id){
-      const el = elements.find(x=>x.id===id);
-      if(!el) return;
-      resize = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
-      window.addEventListener("mousemove", onResizeMove);
-      window.addEventListener("mouseup", onResizeEnd, { once:true });
-    }
-    function onResizeMove(e){
-      if(!resize) return;
-      const el = elements.find(x=>x.id===resize.id);
-      if(!el) return;
-      const dx = e.clientX - resize.startX;
-      const dy = e.clientY - resize.startY;
-      el.w = snap(clamp(resize.w + dx, 30, paper.clientWidth - el.x));
-      el.h = snap(clamp(resize.h + dy, 24, paper.clientHeight - el.y));
-      render();
-      updateEditPanelQuiet();
-      setStatus("Resizing", `w:${Math.round(el.w)} h:${Math.round(el.h)}`);
-    }
-    function onResizeEnd(){
-      resize = null;
-      window.removeEventListener("mousemove", onResizeMove);
-      renderLayers();
-      setStatus("Resized", "Ready");
     }
 
     // ===== Edit panel =====
