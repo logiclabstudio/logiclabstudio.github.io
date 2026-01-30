@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="white">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
   <title>Smart Whiteboard — Logic Lab (Offline)</title>
+
   <style>
     /* =========================================================
        THEME SYSTEM
@@ -100,9 +101,7 @@
     .brand .t{font-weight:900; letter-spacing:.2px; font-size:14px}
     .brand .s{color:var(--muted); font-size:12px}
 
-    .top{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
-    }
+    .top{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;}
 
     button,.btn{
       appearance:none; border:1px solid var(--line);
@@ -113,9 +112,7 @@
       user-select:none;
     }
     html[data-theme="brown"] button,
-    html[data-theme="brown"] .btn{
-      background: rgba(25,18,15,.30);
-    }
+    html[data-theme="brown"] .btn{ background: rgba(25,18,15,.30); }
 
     button:hover{border-color:rgba(37,99,235,.35)}
     html[data-theme="brown"] button:hover{border-color: rgba(212,163,115,.55)}
@@ -174,15 +171,10 @@
       background:linear-gradient(180deg, rgba(2,6,23,.03), rgba(2,6,23,.01));
       border-bottom:1px solid var(--line2);
     }
-    html[data-theme="brown"] .colHd{
-      background:linear-gradient(180deg, rgba(245,237,230,.05), rgba(245,237,230,.01));
-    }
+    html[data-theme="brown"] .colHd{ background:linear-gradient(180deg, rgba(245,237,230,.05), rgba(245,237,230,.01)); }
 
     .colTitle{display:flex; flex-direction:column; gap:2px; min-width:0;}
-    .colTitle .name{
-      font-weight:1000; font-size:13px;
-      display:flex; gap:8px; align-items:center;
-    }
+    .colTitle .name{font-weight:1000; font-size:13px; display:flex; gap:8px; align-items:center;}
     .colTitle .meta{font-size:12px; color:var(--muted)}
 
     .countBadge{
@@ -196,11 +188,7 @@
     }
     html[data-theme="brown"] .countBadge{background: rgba(245,237,230,.05)}
 
-    .colBody{
-      padding:10px;
-      display:flex; flex-direction:column; gap:10px;
-      flex:1;
-    }
+    .colBody{ padding:10px; display:flex; flex-direction:column; gap:10px; flex:1; }
 
     .dropHint{
       border:1px dashed rgba(2,6,23,.14);
@@ -211,10 +199,7 @@
       font-size:12px;
       text-align:center;
     }
-    html[data-theme="brown"] .dropHint{
-      color: rgba(245,237,230,.75);
-      border-color: rgba(245,237,230,.16);
-    }
+    html[data-theme="brown"] .dropHint{ color: rgba(245,237,230,.75); border-color: rgba(245,237,230,.16); }
 
     .card{
       border:1px solid var(--line);
@@ -233,30 +218,10 @@
     html[data-theme="brown"] .card:hover{border-color: rgba(212,163,115,.45)}
     .card.dragging{opacity:.6; transform: scale(.99)}
 
-    .cardTop{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-    }
-    .cardTitle{
-      font-weight:1000; font-size:13px; line-height:1.15;
-      word-break:break-word;
-    }
-    .cardMeta{
-      margin-top:6px;
-      display:flex; flex-wrap:wrap; gap:8px;
-      align-items:center;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .tag{
-      display:inline-flex; align-items:center; gap:6px;
-      border:1px solid var(--chipBorder);
-      background: var(--chipBg);
-      padding:6px 10px;
-      border-radius: 999px;
-      font-size:12px;
-      font-weight:900;
-      white-space:nowrap;
-    }
+    .cardTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+    .cardTitle{font-weight:1000; font-size:13px; line-height:1.15; word-break:break-word;}
+    .cardMeta{margin-top:6px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:var(--muted); font-size:12px;}
+    .tag{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--chipBorder); background: var(--chipBg); padding:6px 10px; border-radius: 999px; font-size:12px; font-weight:900; white-space:nowrap;}
 
     /* Smart styling classes */
     .prio-low{border-color: rgba(148,163,184,.35)}
@@ -288,13 +253,7 @@
     html[data-theme="brown"] .miniBtn:hover{border-color: rgba(212,163,115,.55)}
 
     .kpiBar{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-    .kpi{
-      display:flex; flex-direction:column; gap:2px;
-      padding:8px 10px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(2,6,23,.03);
-    }
+    .kpi{display:flex; flex-direction:column; gap:2px; padding:8px 10px; border-radius: 14px; border:1px solid var(--line); background: rgba(2,6,23,.03);}
     html[data-theme="brown"] .kpi{background: rgba(25,18,15,.22)}
     .kpi .k{font-size:11px; color:var(--muted)}
     .kpi .v{font-weight:1000; letter-spacing:.2px}
@@ -302,51 +261,20 @@
     .rightInfo{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end;}
     .hint{font-size:12px; color:var(--muted)}
 
-    .search{
-      display:flex; gap:8px; align-items:center;
-      border:1px solid var(--line);
-      background: rgba(2,6,23,.03);
-      border-radius: 999px;
-      padding:8px 10px;
-      min-width: 240px;
-    }
+    .search{display:flex; gap:8px; align-items:center; border:1px solid var(--line); background: rgba(2,6,23,.03); border-radius: 999px; padding:8px 10px; min-width: 240px;}
     html[data-theme="brown"] .search{background: rgba(25,18,15,.22)}
-
-    .search input{
-      border:none; outline:none; background:transparent; color:var(--text);
-      width: 100%;
-      font-size:12px;
-    }
+    .search input{border:none; outline:none; background:transparent; color:var(--text); width: 100%; font-size:12px;}
     .search input::placeholder{color: rgba(71,85,105,.75)}
     html[data-theme="brown"] .search input::placeholder{color: rgba(201,184,171,.75)}
 
-    .foot{
-      margin-top:12px;
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      padding:12px;
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(2,6,23,.02);
-    }
+    .foot{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:12px; border:1px solid var(--line); border-radius: var(--radius); background: rgba(2,6,23,.02);}
     html[data-theme="brown"] .foot{background: rgba(25,18,15,.22)}
 
-    dialog{
-      border:none; border-radius: 18px;
-      padding:0;
-      width: min(760px, 94vw);
-      background: var(--panel2);
-      color: var(--text);
-      box-shadow: var(--shadow);
-    }
+    dialog{border:none; border-radius: 18px; padding:0; width: min(760px, 94vw); background: var(--panel2); color: var(--text); box-shadow: var(--shadow);}
     dialog::backdrop{background: rgba(2,6,23,.25)}
     html[data-theme="brown"] dialog::backdrop{background: rgba(0,0,0,.55)}
 
-    .dlgHd{
-      padding:12px 12px;
-      border-bottom:1px solid var(--line);
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      background: rgba(2,6,23,.02);
-    }
+    .dlgHd{padding:12px 12px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px; background: rgba(2,6,23,.02);}
     html[data-theme="brown"] .dlgHd{background: rgba(245,237,230,.03)}
 
     .dlgHd .t{font-weight:1000}
@@ -357,16 +285,7 @@
     .field{display:flex; flex-direction:column; gap:6px}
     .field label{font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:10px}
 
-    input, select, textarea{
-      width:100%;
-      padding:10px 10px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: var(--inputBg);
-      color: var(--text);
-      outline:none;
-      font-size: 13px;
-    }
+    input, select, textarea{width:100%; padding:10px 10px; border-radius: 14px; border:1px solid var(--line); background: var(--inputBg); color: var(--text); outline:none; font-size: 13px;}
     input:focus, select:focus, textarea:focus{border-color: rgba(37,99,235,.35); box-shadow: 0 0 0 3px var(--ring)}
     html[data-theme="brown"] input:focus,
     html[data-theme="brown"] select:focus,
@@ -377,43 +296,16 @@
     .dlgActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:12px; border-top:1px solid var(--line)}
 
     /* ---------- Toggle Switch ---------- */
-    .toggle{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:8px 10px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      background: rgba(2,6,23,.03);
-      user-select:none;
-    }
+    .toggle{display:inline-flex; align-items:center; gap:10px; padding:8px 10px; border-radius: 999px; border:1px solid var(--line); background: rgba(2,6,23,.03); user-select:none;}
     html[data-theme="brown"] .toggle{background: rgba(25,18,15,.22)}
 
-    .switch{
-      width:44px; height:26px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(2,6,23,.05);
-      position:relative;
-      cursor:pointer;
-      flex: 0 0 auto;
-    }
+    .switch{width:44px; height:26px; border-radius:999px; border:1px solid var(--line); background: rgba(2,6,23,.05); position:relative; cursor:pointer; flex: 0 0 auto;}
     html[data-theme="brown"] .switch{background: rgba(245,237,230,.06)}
 
-    .knob{
-      width:22px; height:22px; border-radius:999px;
-      background: var(--text);
-      position:absolute; top:1px; left:1px;
-      transition: left .18s ease, background .18s ease;
-    }
+    .knob{width:22px; height:22px; border-radius:999px; background: var(--text); position:absolute; top:1px; left:1px; transition: left .18s ease, background .18s ease;}
 
-    .switch.on{
-      border-color: rgba(37,99,235,.35);
-      background: rgba(37,99,235,.10);
-    }
-    html[data-theme="brown"] .switch.on{
-      border-color: rgba(212,163,115,.55);
-      background: rgba(212,163,115,.18);
-    }
-
+    .switch.on{border-color: rgba(37,99,235,.35); background: rgba(37,99,235,.10);}
+    html[data-theme="brown"] .switch.on{border-color: rgba(212,163,115,.55); background: rgba(212,163,115,.18);}
     .switch.on .knob{left:21px; background: #fff}
 
     /* ---------- Wall mode ---------- */
@@ -428,6 +320,9 @@
     html.wall .cardTitle{font-size:15px}
     html.wall .tag{font-size:12px; padding:7px 12px}
     html.wall .colBody{padding:12px}
+
+    /* Read-only mode (blocks all edits, even outside wall mode) */
+    html.readonly .noReadonly{display:none !important}
 
     /* Wall-mode exit button (always visible in wall mode) */
     .wallExit{
@@ -451,7 +346,6 @@
     html[data-theme="brown"] .wallExit{ background: rgba(25,18,15,.72); }
     html.wall .wallExit{ display: inline-flex; }
 
-    /* ---------- Print / Shift Summary ---------- */
     @media print{
       header, .foot, .noPrint, .noWall, .wallExit{display:none !important;}
       body{background:#fff !important; color:#111 !important}
@@ -461,6 +355,7 @@
     }
   </style>
 </head>
+
 <body>
 <div class="wrap">
   <header>
@@ -470,7 +365,6 @@
     </div>
 
     <div class="top">
-      <!-- Board selector -->
       <div class="pill noWall" title="Switch between boards">
         <span class="muted">Board:</span>
         <select id="boardSelect" style="padding:6px 10px; border-radius:999px; min-width:170px"></select>
@@ -479,7 +373,6 @@
         <button class="danger" id="btnDeleteBoard" title="Delete current board">Delete</button>
       </div>
 
-      <!-- Theme selector (WHITE + BROWN only) -->
       <div class="pill noWall" title="Theme">
         <span class="muted">Theme:</span>
         <select id="themeSelect" style="padding:6px 10px; border-radius:999px">
@@ -488,7 +381,6 @@
         </select>
       </div>
 
-      <!-- Search -->
       <div class="search noWall" title="Search cards by title, owner, tag, notes">
         <span class="muted">🔎</span>
         <input id="q" placeholder="Search…" />
@@ -496,13 +388,15 @@
 
       <div class="pill noWall" id="clock">—</div>
 
-      <button class="ghost noWall" id="btnFocus">Focus: Off</button>
-      <button class="ghost noWall" id="btnArchiveDone">Archive Done</button>
-      <button class="ghost noWall" id="btnColumns">Columns</button>
+      <button class="ghost noWall noReadonly" id="btnFocus">Focus: Off</button>
+      <button class="ghost noWall noReadonly" id="btnArchiveDone">Archive Done</button>
+      <button class="ghost noWall noReadonly" id="btnColumns">Columns</button>
       <button class="ghost noWall" id="btnShiftSummary">Shift Summary</button>
-      <button class="primary noWall" id="btnAdd">+ Add Card</button>
+      <button class="ghost noWall" id="btnQR">QR Board</button>
+      <button class="ghost noWall" id="btnReport">Export Report</button>
+      <button class="ghost noWall" id="btnWallScreen" title="Open a wall-view in a new window">Open Wall Screen</button>
+      <button class="primary noWall noReadonly" id="btnAdd">+ Add Card</button>
 
-      <!-- Wall Mode Toggle -->
       <div class="toggle" title="Wall Mode toggle (ESC to exit)">
         <span class="muted">Wall</span>
         <div class="switch" id="wallSwitch" role="switch" aria-checked="false">
@@ -510,11 +404,11 @@
         </div>
       </div>
 
-      <button class="ghost noWall" id="btnLock">Lock</button>
-      <button class="ghost" id="btnUnlock" style="display:none">Unlock</button>
+      <button class="ghost noWall noReadonly" id="btnLock">Lock</button>
+      <button class="ghost noWall noReadonly" id="btnUnlock" style="display:none">Unlock</button>
 
-      <button class="ghost noWall" id="btnData">Import/Export</button>
-      <button class="danger noWall" id="btnReset">Reset</button>
+      <button class="ghost noWall noReadonly" id="btnData">Import/Export</button>
+      <button class="danger noWall noReadonly" id="btnReset">Reset</button>
     </div>
   </header>
 
@@ -531,10 +425,105 @@
   <main class="board" id="board"></main>
 </div>
 
-<!-- Always-visible Exit Wall button -->
 <button class="wallExit" id="btnExitWall" title="Exit wall mode (ESC)">
   ⤺ Exit Wall <span class="muted">(ESC)</span>
 </button>
+
+<!-- QR Board -->
+<dialog id="dlgQR">
+  <div class="dlgHd">
+    <div>
+      <div class="t">QR Board Access</div>
+      <div class="muted" style="font-size:12px">Scan to open this board (read-only wall link included)</div>
+    </div>
+    <button class="ghost" id="closeQR">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Normal link</label>
+        <input id="qrLinkNormal" readonly />
+      </div>
+      <div class="field">
+        <label>Wall (read-only) link</label>
+        <input id="qrLinkWall" readonly />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start">
+      <div style="flex:0 0 auto; padding:10px; border:1px solid var(--line); border-radius:16px; background: rgba(2,6,23,.06)">
+        <canvas id="qrCanvas" width="220" height="220" style="display:block"></canvas>
+      </div>
+
+      <div style="flex:1; min-width:240px">
+        <div class="muted" style="font-size:12px; line-height:1.45">
+          • <b>Normal link</b>: opens board normally (editable if unlocked).<br/>
+          • <b>Wall link</b>: forces Wall Mode + read-only (no edits).<br/><br/>
+          Tip: Print this QR and stick it near the workshop TV.
+        </div>
+
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+          <button class="ghost" id="btnCopyQRNormal">Copy Normal</button>
+          <button class="ghost" id="btnCopyQRWall">Copy Wall</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dlgActions">
+    <button class="primary" id="btnPrintQR">Print</button>
+  </div>
+</dialog>
+
+<!-- Export Report -->
+<dialog id="dlgReport">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Export Report</div>
+      <div class="muted" style="font-size:12px">Generate a printable client report + CSV export</div>
+    </div>
+    <button class="ghost" id="closeReport">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Report title</label>
+        <input id="r_title" placeholder="e.g., Site A — Daily Work Report" />
+      </div>
+      <div class="field">
+        <label>Client / Location</label>
+        <input id="r_client" placeholder="e.g., ABC Mining / Workshop 2" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Include sections</label>
+        <select id="r_sections">
+          <option value="full" selected>Full (KPIs + all columns)</option>
+          <option value="ops">Operations (Doing/Blocked/Done only)</option>
+          <option value="handover">Handover (Done + Blocked only)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Branding</label>
+        <select id="r_brand">
+          <option value="logiclab" selected>Logic Lab</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="muted" style="font-size:12px; line-height:1.45">
+      Exports:
+      • <b>Print/PDF</b> opens a print-ready report page.<br/>
+      • <b>CSV</b> downloads all cards (useful for Excel).<br/>
+    </div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnExportCSV">Download CSV</button>
+    <button class="primary" id="btnExportPDF">Print / PDF</button>
+  </div>
+</dialog>
 
 <!-- Add/Edit Card -->
 <dialog id="dlgCard">
@@ -564,11 +553,12 @@
       </div>
       <div class="field">
         <label>Priority</label>
-        <select id="c_prio">
-          <option value="normal" selected>Normal</option>
-          <option value="urgent">Urgent</option>
-          <option value="low">Low</option>
-        </select>
+       <select id="c_prio">
+  <option value="normal" selected>Normal</option>
+  <option value="urgent">Urgent</option>
+  <option value="low">Low</option>
+</select>
+
       </div>
     </div>
 
@@ -694,12 +684,15 @@
      MULTI-BOARD SMART WHITEBOARD (Offline)
      - Multiple boards
      - Lock/unlock (password)
-     - Wall mode toggle switch + ALWAYS-VISIBLE EXIT
-     - Themes: white / brown (default white)
+     - Wall mode toggle + ALWAYS-VISIBLE EXIT
+     - Themes: white / brown
      - Shift Summary (printable)
+     - QR board access (normal + wall/read-only link)
+     - Export report (Print/PDF + CSV)
+     - Open Wall Screen (new window)
   ========================================================= */
 
-  const STORAGE_KEY = "ll_whiteboard_multi_v2";
+  const STORAGE_KEY = "ll_whiteboard_multi_v3";
 
   const now = () => new Date();
   const iso = (d) => new Date(d).toISOString();
@@ -714,7 +707,7 @@
       focus: false,
       wall: false,
       locked: false,
-      passwordHash: "", // naive hash (not crypto), just to stop casual edits
+      passwordHash: "",      // naive hash (not crypto)
       staleHours: 6,
       blockedWarnHours: 4,
       blockedOverdueHours: 12
@@ -730,7 +723,7 @@
   });
 
   const defaultAppState = () => ({
-    version: 2,
+    version: 3,
     prefs: { theme: "white" },
     activeBoardId: "",
     boards: [
@@ -744,6 +737,11 @@
   let app = load() || defaultAppState();
   if(!app.activeBoardId) app.activeBoardId = app.boards[0].id;
   applyTheme(app.prefs.theme);
+
+  // query flags for special modes
+  const QS = new URLSearchParams(location.search);
+  const qsWall = QS.get("wall") === "1";
+  const qsReadonly = QS.get("readonly") === "1";
 
   function load(){
     try{
@@ -804,7 +802,6 @@
     const d = new Date(val);
     return isNaN(d) ? null : d.toISOString();
   }
-
   function startOfToday(){
     const d = new Date();
     d.setHours(0,0,0,0);
@@ -826,22 +823,29 @@
     const ms = now().getTime() - new Date(isoDate).getTime();
     return ms / (1000*60*60);
   }
-
   function laneTitle(board, colId){
     return board.columns.find(c=>c.id===colId)?.title ?? colId;
   }
 
   /* ---------------- Locking ---------------- */
-  function isLocked(board){
-    return !!board.settings.locked;
-  }
+  function isLocked(board){ return !!board.settings.locked; }
+  function isReadonly(){ return document.documentElement.classList.contains("readonly"); }
+
   function requireUnlocked(board){
+    if(isReadonly()){
+      alert("Read-only mode. Editing is disabled.");
+      return false;
+    }
     if(!isLocked(board)) return true;
     alert("Board is locked. Tap Unlock and enter the password.");
     return false;
   }
 
-  /* ---------------- Wall mode toggle switch ---------------- */
+  function setReadonly(on){
+    document.documentElement.classList.toggle("readonly", !!on);
+  }
+
+  /* ---------------- Wall mode toggle ---------------- */
   function setWallSwitchUI(board){
     const sw = $("wallSwitch");
     if(!sw) return;
@@ -880,9 +884,7 @@
   function formatTimer(cardTimer){
     const t = cardTimer || {running:false, startedAt:null, totalMs:0};
     let ms = t.totalMs || 0;
-    if(t.running && t.startedAt){
-      ms += now().getTime() - new Date(t.startedAt).getTime();
-    }
+    if(t.running && t.startedAt) ms += now().getTime() - new Date(t.startedAt).getTime();
     const s = Math.floor(ms/1000);
     const h = Math.floor(s/3600);
     const m = Math.floor((s%3600)/60);
@@ -902,9 +904,7 @@
     }
 
     const staleH = board.settings.staleHours ?? 6;
-    if(hoursSince(card.updatedAt) >= staleH && laneId !== "done"){
-      cls.push("status-stale");
-    }
+    if(hoursSince(card.updatedAt) >= staleH && laneId !== "done") cls.push("status-stale");
 
     if(laneId === "blocked"){
       const h = hoursSince(card.movedToLaneAt?.blocked || card.updatedAt);
@@ -988,20 +988,22 @@
     const clk = $("clock");
     if(clk){
       const d = new Date();
-      clk.textContent = d.toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      clk.textContent = d.toLocaleString(undefined, {
+        weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"
+      });
     }
 
-    // focus button text
-    $("btnFocus").textContent = `Focus: ${board.settings.focus ? "On" : "Off"}`;
+    // focus button
+    const focusBtn = $("btnFocus");
+    if(focusBtn) focusBtn.textContent = `Focus: ${board.settings.focus ? "On" : "Off"}`;
 
-    // board name
+    // brand
     $("brandTitle").textContent = `${board.name} — Smart Whiteboard`;
-    $("brandSub").textContent = isLocked(board)
-      ? "LOCKED • Drag disabled • Unlock to edit"
-      : "Multiple boards • Lockable wall mode • Shift summary";
+    const lockedText = isLocked(board) ? "LOCKED" : "UNLOCKED";
+    const roText = isReadonly() ? "READ-ONLY" : "EDITABLE";
+    $("brandSub").textContent = `${roText} • ${lockedText} • Wall mode available`;
 
     renderKPIs(board);
-
     setWallSwitchUI(board);
     syncLockButtons(board);
 
@@ -1011,11 +1013,11 @@
     const root = $("board");
     root.innerHTML = "";
 
-    board.columns.forEach(col => {
+    board.columns.forEach(col=>{
       const lane = col.id;
       const ids = board.lanes[lane] || [];
 
-      const visibleIds = ids.filter(cid => {
+      const visibleIds = ids.filter(cid=>{
         const c = board.cards[cid];
         if(!c) return false;
 
@@ -1044,7 +1046,7 @@
             </div>
             <div class="meta">${escapeHtml(col.hint || "")}</div>
           </div>
-          <div class="miniBtns noWall">
+          <div class="miniBtns noWall noReadonly">
             <div class="miniBtn" title="Add card here" data-act="addHere" data-lane="${lane}">＋</div>
           </div>
         </div>
@@ -1057,16 +1059,16 @@
       const body = colEl.querySelector(".colBody");
       const cardsWrap = colEl.querySelector(".cards");
 
-      // drop handlers
+      // drop handlers (disabled if locked/readonly)
       body.addEventListener("dragover", (e)=>{
-        if(isLocked(board)) return;
+        if(isLocked(board) || isReadonly()) return;
         e.preventDefault();
         body.style.outline = "2px solid rgba(37,99,235,.20)";
         body.style.outlineOffset="4px";
       });
       body.addEventListener("dragleave", ()=>{ body.style.outline = ""; });
       body.addEventListener("drop", (e)=>{
-        if(isLocked(board)) return;
+        if(isLocked(board) || isReadonly()) return;
         e.preventDefault();
         body.style.outline = "";
         const cid = dragging.cardId;
@@ -1075,13 +1077,13 @@
       });
 
       // cards
-      visibleIds.forEach(cid => {
+      visibleIds.forEach(cid=>{
         const c = board.cards[cid];
         if(!c) return;
 
         const cardEl = document.createElement("article");
         cardEl.className = `card ${smartClass(board, c, lane)}`;
-        cardEl.draggable = !isLocked(board);
+        cardEl.draggable = (!isLocked(board) && !isReadonly());
         cardEl.dataset.id = cid;
 
         const dueTxt = c.dueAt
@@ -1101,7 +1103,7 @@
               </div>
             </div>
 
-            <div class="miniBtns noWall">
+            <div class="miniBtns noWall noReadonly">
               <div class="miniBtn" title="Edit" data-act="edit" data-id="${cid}">✎</div>
               <div class="miniBtn" title="Delete" data-act="del" data-id="${cid}">🗑</div>
             </div>
@@ -1115,7 +1117,7 @@
           </div>
         `;
 
-        if(!isLocked(board)){
+        if(!isLocked(board) && !isReadonly()){
           cardEl.addEventListener("dragstart", ()=>{
             dragging.cardId = cid;
             cardEl.classList.add("dragging");
@@ -1131,7 +1133,7 @@
 
       if(visibleIds.length) colEl.querySelector(".dropHint").style.display = "none";
 
-      // add here button
+      // add here
       colEl.querySelectorAll('[data-act="addHere"]').forEach(btn=>{
         btn.addEventListener("click", ()=>{
           if(!requireUnlocked(board)) return;
@@ -1142,14 +1144,14 @@
       root.appendChild(colEl);
     });
 
-    // actions
+    // edit/delete actions
     root.querySelectorAll("[data-act='edit']").forEach(b => b.addEventListener("click", ()=>{
-      if(!requireUnlocked(board)) return;
+      if(!requireUnlocked(getBoard())) return;
       openCardDialog({ id: b.dataset.id });
     }));
     root.querySelectorAll("[data-act='del']").forEach(b => b.addEventListener("click", ()=>{
-      if(!requireUnlocked(board)) return;
-      deleteCard(board, b.dataset.id);
+      if(!requireUnlocked(getBoard())) return;
+      deleteCard(getBoard(), b.dataset.id);
     }));
   }
 
@@ -1243,14 +1245,9 @@
     const id = uid();
     const lane = (defaultLaneForNew in board.lanes) ? defaultLaneForNew : "todo";
     const card = {
-      id,
-      title,
-      owner,
-      tag,
+      id, title, owner, tag,
       priority: prio,
-      dueAt,
-      notes,
-      prompt,
+      dueAt, notes, prompt,
       lane,
       createdAt: iso(now()),
       updatedAt: iso(now()),
@@ -1326,7 +1323,7 @@
     const wrap = $("colsForm");
     wrap.innerHTML = "";
 
-    board.columns.forEach((col, idx) => {
+    board.columns.forEach((col, idx)=>{
       const row = document.createElement("div");
       row.className = "row";
       row.innerHTML = `
@@ -1351,13 +1348,14 @@
     if(!requireUnlocked(board)) return;
 
     const inputs = $("colsForm").querySelectorAll("input[data-col-id]");
-    inputs.forEach(inp => {
+    inputs.forEach(inp=>{
       const id = inp.dataset.colId;
       const k = inp.dataset.k;
       const v = inp.value.trim();
       const col = board.columns.find(c=>c.id===id);
       if(col) col[k] = v;
     });
+
     save();
     render();
     closeColsDialog();
@@ -1393,7 +1391,9 @@
   /* ---------------- Shift Summary ---------------- */
   function openShiftSummary(){
     const board = getBoard();
-    const dt = new Date().toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    const dt = new Date().toLocaleString(undefined, {
+      weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"
+    });
     $("sumSub").textContent = `${board.name} • ${dt}`;
 
     const done = (board.lanes.done || []).map(id => board.cards[id]).filter(Boolean);
@@ -1401,11 +1401,13 @@
     const doing = (board.lanes.doing || []).map(id => board.cards[id]).filter(Boolean);
     const todo = (board.lanes.todo || []).map(id => board.cards[id]).filter(Boolean);
 
-    const list = (arr) => {
+    const list = (arr)=>{
       if(!arr.length) return `<div class="muted">None</div>`;
       return `<ol style="margin:8px 0 0; padding-left:18px; line-height:1.45">
-        ${arr.map(c => {
-          const due = c.dueAt ? new Date(c.dueAt).toLocaleString(undefined, { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" }) : "";
+        ${arr.map(c=>{
+          const due = c.dueAt
+            ? new Date(c.dueAt).toLocaleString(undefined, { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" })
+            : "";
           const bits = [
             c.owner ? `Owner: ${escapeHtml(c.owner)}` : "",
             c.tag ? `Tag: ${escapeHtml(c.tag)}` : "",
@@ -1421,222 +1423,328 @@
     const stale = Object.values(board.cards).filter(c => c.lane !== "done" && hoursSince(c.updatedAt) >= (board.settings.staleHours ?? 6));
 
     $("sumBody").innerHTML = `
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
-        <div class="pill"><span class="muted">Done:</span> <b>${done.length}</b></div>
-        <div class="pill"><span class="muted">Blocked:</span> <b>${blocked.length}</b></div>
-        <div class="pill"><span class="muted">In Progress:</span> <b>${doing.length}</b></div>
-        <div class="pill"><span class="muted">To Do:</span> <b>${todo.length}</b></div>
-        <div class="pill"><span class="muted">Overdue:</span> <b>${overdue.length}</b></div>
-        <div class="pill"><span class="muted">Stale:</span> <b>${stale.length}</b></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+    <div class="pill"><span class="muted">Overdue</span> <b class="mono">${overdue.length}</b></div>
+        <div class="pill"><span class="muted">Stale</span> <b class="mono">${stale.length}</b></div>
+        <div class="pill"><span class="muted">Done</span> <b class="mono">${done.length}</b></div>
+        <div class="pill"><span class="muted">In Progress</span> <b class="mono">${doing.length}</b></div>
+        <div class="pill"><span class="muted">Blocked</span> <b class="mono">${blocked.length}</b></div>
       </div>
 
-      <div class="col" style="box-shadow:none; margin-bottom:10px">
-        <div class="colHd"><div class="colTitle"><div class="name">Done</div><div class="meta">Completed this shift</div></div></div>
-        <div class="colBody">${list(done)}</div>
+      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0">
+        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+          <div class="colTitle">
+            <div class="name">✅ Completed</div>
+            <div class="meta">What was finished this shift</div>
+          </div>
+        </div>
+        <div class="colBody" style="padding:0">${list(done)}</div>
       </div>
 
-      <div class="col" style="box-shadow:none; margin-bottom:10px">
-        <div class="colHd"><div class="colTitle"><div class="name">Blocked</div><div class="meta">Top focus for next shift</div></div></div>
-        <div class="colBody">${list(blocked)}</div>
+      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+          <div class="colTitle">
+            <div class="name">⛔ Blocked</div>
+            <div class="meta">Anything stuck / waiting</div>
+          </div>
+        </div>
+        <div class="colBody" style="padding:0">${list(blocked)}</div>
       </div>
 
-      <div class="col" style="box-shadow:none; margin-bottom:10px">
-        <div class="colHd"><div class="colTitle"><div class="name">In Progress</div><div class="meta">Carry-over work</div></div></div>
-        <div class="colBody">${list(doing)}</div>
+      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+          <div class="colTitle">
+            <div class="name">🟦 In Progress</div>
+            <div class="meta">Still being worked</div>
+          </div>
+        </div>
+        <div class="colBody" style="padding:0">${list(doing)}</div>
       </div>
 
-      <div class="col" style="box-shadow:none">
-        <div class="colHd"><div class="colTitle"><div class="name">To Do</div><div class="meta">Upcoming tasks</div></div></div>
-        <div class="colBody">${list(todo)}</div>
+      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+          <div class="colTitle">
+            <div class="name">📝 To Do</div>
+            <div class="meta">Next tasks / upcoming</div>
+          </div>
+        </div>
+        <div class="colBody" style="padding:0">${list(todo)}</div>
       </div>
     `;
 
     $("dlgSummary").showModal();
   }
 
-  async function copyShiftSummary(){
+  function copyShiftSummary(){
     const board = getBoard();
     const done = (board.lanes.done || []).map(id => board.cards[id]).filter(Boolean);
     const blocked = (board.lanes.blocked || []).map(id => board.cards[id]).filter(Boolean);
+    const doing = (board.lanes.doing || []).map(id => board.cards[id]).filter(Boolean);
+    const todo = (board.lanes.todo || []).map(id => board.cards[id]).filter(Boolean);
 
-    const lines = [];
-    lines.push(`Shift Summary — ${board.name}`);
-    lines.push(new Date().toLocaleString());
-    lines.push("");
-    lines.push(`Done (${done.length}):`);
-    done.forEach((c,i)=> lines.push(`${i+1}. ${c.title}${c.owner ? " — " + c.owner : ""}`));
-    lines.push("");
-    lines.push(`Blocked (${blocked.length}):`);
-    blocked.forEach((c,i)=> lines.push(`${i+1}. ${c.title}${c.owner ? " — " + c.owner : ""}`));
+    const fmt = (arr)=> arr.length ? arr.map((c,i)=>`${i+1}. ${c.title}${c.owner?` (Owner: ${c.owner})`:""}${c.tag?` [${c.tag}]`:""}${c.dueAt?` (Due: ${new Date(c.dueAt).toLocaleString()})`:""}`).join("\n") : "None";
 
-    const txt = lines.join("\n");
-    try{
-      await navigator.clipboard.writeText(txt);
-      alert("Copied summary.");
-    }catch(e){
-      alert("Copy failed (clipboard blocked).");
-    }
+    const text =
+`Shift Summary — ${board.name}
+${new Date().toLocaleString()}
+
+DONE:
+${fmt(done)}
+
+BLOCKED:
+${fmt(blocked)}
+
+IN PROGRESS:
+${fmt(doing)}
+
+TO DO:
+${fmt(todo)}
+`;
+
+    navigator.clipboard?.writeText(text).then(()=>alert("Copied."), ()=>prompt("Copy this:", text));
   }
 
   function printShiftSummary(){
+    const board = getBoard();
     const html = `
-      <html>
-      <head>
-        <meta charset="UTF-8"/>
-        <title>Shift Summary</title>
-        <style>
-          body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding:24px; color:#111}
-          h1{margin:0 0 6px; font-size:18px}
-          .muted{color:#555}
-          .pill{display:inline-block; padding:6px 10px; border:1px solid #ddd; border-radius:999px; margin:0 8px 8px 0; font-weight:600; font-size:12px}
-          .box{border:1px solid #ddd; border-radius:12px; padding:12px; margin:12px 0}
-          .box h2{margin:0 0 6px; font-size:14px}
-          ol{margin:8px 0 0; padding-left:18px; line-height:1.45}
-          li{margin:4px 0}
-        </style>
-      </head>
-      <body>
-        <h1>${escapeHtml($("sumSub").textContent)}</h1>
-        <div class="muted">Generated by Smart Whiteboard</div>
-        <div>${$("sumBody").innerHTML}</div>
-        <script>window.onload=()=>{window.print();}<\/script>
-      </body></html>
-    `;
-    const w = window.open("", "_blank");
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
+<!doctype html><html><head><meta charset="utf-8">
+<title>Shift Summary — ${escapeHtml(board.name)}</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:24px; color:#111}
+  h1{font-size:18px;margin:0 0 4px}
+  .m{color:#555;font-size:12px;margin:0 0 18px}
+  h2{font-size:14px;margin:18px 0 8px}
+  li{margin:6px 0}
+  .meta{color:#555;font-size:12px}
+</style>
+</head><body>
+  <h1>Shift Summary — ${escapeHtml(board.name)}</h1>
+  <div class="m">${new Date().toLocaleString()}</div>
+  ${$("sumBody").innerHTML}
+<script>window.print();<\/script>
+</body></html>`;
+    const w = window.open("", "_blank", "noopener,noreferrer,width=980,height=720");
+    w.document.open(); w.document.write(html); w.document.close();
   }
 
-  /* ---------------- Import/Export all boards ---------------- */
+  /* ---------------- Report Export (Print/PDF + CSV) ---------------- */
+  function openReportDialog(){
+    $("dlgReport").showModal();
+    $("r_title").value = $("r_title").value || `${getBoard().name} — Report`;
+    $("r_client").value = $("r_client").value || "";
+  }
+
+  function exportCSV(){
+    const board = getBoard();
+    const cols = ["lane","title","owner","tag","priority","dueAt","updatedAt","createdAt","notes","timerHours"];
+    const esc = (v)=> `"${String(v??"").replaceAll('"','""')}"`;
+    const rows = [cols.join(",")];
+
+    Object.values(board.cards).forEach(c=>{
+      ensureTimer(c);
+      const hours = Math.round(((c.timer.totalMs||0)/3600000)*100)/100;
+      rows.push([
+        c.lane, c.title, c.owner, c.tag, c.priority, c.dueAt, c.updatedAt, c.createdAt, (c.notes||"").replaceAll("\n"," • "), hours
+      ].map(esc).join(","));
+    });
+
+    const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(board.name||"board").replaceAll(/\s+/g,"_")}_export.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function exportReportPrint(){
+    const board = getBoard();
+    const title = ($("r_title").value || `${board.name} — Report`).trim();
+    const client = ($("r_client").value || "").trim();
+    const sections = $("r_sections").value;
+    const brand = $("r_brand").value;
+
+    const lanePick = (lane)=> (board.lanes[lane]||[]).map(id=>board.cards[id]).filter(Boolean);
+    const list = (arr)=> arr.length ? `<ol>${arr.map(c=>{
+      const due = c.dueAt ? new Date(c.dueAt).toLocaleString() : "";
+      const t = c.timer ? formatTimer(c.timer) : "";
+      const meta = [
+        c.owner ? `Owner: ${escapeHtml(c.owner)}` : "",
+        c.tag ? `Tag: ${escapeHtml(c.tag)}` : "",
+        c.priority ? `Priority: ${escapeHtml(c.priority)}` : "",
+        due ? `Due: ${escapeHtml(due)}` : "",
+        (c.timer?.running || (c.timer?.totalMs||0)>0) ? `Time: ${escapeHtml(t)}` : ""
+      ].filter(Boolean).join(" • ");
+      return `<li><b>${escapeHtml(c.title)}</b>${meta?`<div class="meta">${meta}</div>`:""}${c.notes?`<div class="notes">${escapeHtml(c.notes)}</div>`:""}</li>`;
+    }).join("")}</ol>` : `<div class="muted">None</div>`;
+
+    const kpi = (()=> {
+      const counts = {};
+      board.columns.forEach(c => counts[c.id] = (board.lanes[c.id]||[]).length);
+      const total = Object.keys(board.cards).length;
+      return `
+        <div class="kpis">
+          <div class="k"><span>Total</span><b>${total}</b></div>
+          <div class="k"><span>To Do</span><b>${counts.todo||0}</b></div>
+          <div class="k"><span>In Progress</span><b>${counts.doing||0}</b></div>
+          <div class="k"><span>Blocked</span><b>${counts.blocked||0}</b></div>
+          <div class="k"><span>Done</span><b>${counts.done||0}</b></div>
+        </div>`;
+    })();
+
+    const blocks = [];
+    const addSection = (name, lane)=> blocks.push(`<h2>${name}</h2>${list(lanePick(lane))}`);
+
+    if(sections === "full"){
+      blocks.push(`<h2>KPIs</h2>${kpi}`);
+      board.columns.forEach(c => addSection(c.title || c.id, c.id));
+    }else if(sections === "ops"){
+      blocks.push(`<h2>KPIs</h2>${kpi}`);
+      addSection("In Progress", "doing");
+      addSection("Blocked", "blocked");
+      addSection("Done", "done");
+    }else{
+      addSection("Done", "done");
+      addSection("Blocked", "blocked");
+    }
+
+    const logo = brand === "logiclab"
+      ? `<div class="logo">Logic Lab • Smart Whiteboard</div>`
+      : ``;
+
+    const html = `
+<!doctype html><html><head><meta charset="utf-8">
+<title>${escapeHtml(title)}</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:24px; color:#111}
+  .logo{font-weight:900; margin:0 0 8px; color:#111}
+  h1{font-size:18px;margin:0 0 4px}
+  .m{color:#555;font-size:12px;margin:0 0 18px}
+  h2{font-size:14px;margin:18px 0 8px}
+  ol{padding-left:18px; line-height:1.45}
+  li{margin:8px 0}
+  .meta{color:#555;font-size:12px;margin-top:3px}
+  .notes{color:#333;font-size:12px;margin-top:6px; white-space:pre-wrap}
+  .muted{color:#777;font-size:12px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap}
+  .k{border:1px solid #ddd;border-radius:12px;padding:8px 10px;display:flex;gap:10px;align-items:center}
+  .k span{color:#555;font-size:12px}
+  @media print{ button{display:none} }
+</style>
+</head><body>
+  ${logo}
+  <h1>${escapeHtml(title)}</h1>
+  <div class="m">${client ? `Client/Location: <b>${escapeHtml(client)}</b> • ` : ""}${new Date().toLocaleString()}</div>
+  ${blocks.join("\n")}
+<script>window.print();<\/script>
+</body></html>`;
+
+    const w = window.open("", "_blank", "noopener,noreferrer,width=980,height=720");
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+
+  /* ---------------- QR (Normal + Wall/Read-only) ---------------- */
+  function currentBoardUrl(){
+    // keep same file; just change query params
+    const u = new URL(location.href);
+    u.searchParams.delete("wall");
+    u.searchParams.delete("readonly");
+    return u.toString();
+  }
+  function currentWallUrl(){
+    const u = new URL(location.href);
+    u.searchParams.set("wall","1");
+    u.searchParams.set("readonly","1");
+    return u.toString();
+  }
+
+  function openQRDialog(){
+    const normal = currentBoardUrl();
+    const wall = currentWallUrl();
+    $("qrLinkNormal").value = normal;
+    $("qrLinkWall").value = wall;
+    drawQR("qrCanvas", normal); // default show normal
+    $("dlgQR").showModal();
+  }
+
+  function copyText(v){
+    navigator.clipboard?.writeText(v).then(()=>alert("Copied."), ()=>prompt("Copy this:", v));
+  }
+
+  function printQR(){
+    const normal = $("qrLinkNormal").value;
+    const wall = $("qrLinkWall").value;
+    const png = $("qrCanvas").toDataURL("image/png");
+    const html = `
+<!doctype html><html><head><meta charset="utf-8"><title>QR Board</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:24px; color:#111}
+  .row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .card{border:1px solid #ddd;border-radius:14px;padding:12px}
+  img{width:260px;height:260px;display:block}
+  .m{color:#555;font-size:12px}
+  code{display:block;background:#f6f6f6;padding:8px;border-radius:10px;word-break:break-all}
+</style></head><body>
+<h1 style="margin:0 0 6px">Board QR</h1>
+<div class="m">Normal + Wall (read-only) links included</div>
+<div class="row" style="margin-top:14px">
+  <div class="card">
+    <div style="font-weight:800;margin-bottom:8px">Normal</div>
+    <img src="${png}" alt="QR">
+    <div class="m" style="margin-top:10px">Link:</div>
+    <code>${escapeHtml(normal)}</code>
+  </div>
+  <div class="card">
+    <div style="font-weight:800;margin-bottom:8px">Wall (read-only)</div>
+    <div class="m">Use this on Display 2 / TV:</div>
+    <code>${escapeHtml(wall)}</code>
+  </div>
+</div>
+<script>window.print();<\/script>
+</body></html>`;
+    const w = window.open("", "_blank", "noopener,noreferrer,width=980,height=720");
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+
+  /* ---------------- Import/Export JSON ---------------- */
   function openDataDialog(){
-    $("jsonBox").value = JSON.stringify(app, null, 2);
+    const payload = JSON.stringify(app, null, 2);
+    $("jsonBox").value = payload;
     $("dlgData").showModal();
   }
-  function closeDataDialog(){ $("dlgData").close(); }
 
-  async function copyJson(){
-    const txt = JSON.stringify(app, null, 2);
-    $("jsonBox").value = txt;
-    try{
-      await navigator.clipboard.writeText(txt);
-      alert("Copied JSON to clipboard.");
-    }catch(e){
-      alert("Copy failed (clipboard blocked). You can manually copy from the box.");
-    }
+  function copyJson(){
+    copyText($("jsonBox").value || "");
   }
 
   function importJson(){
-    const txt = $("jsonBox").value.trim();
-    if(!txt){ alert("Paste JSON first."); return; }
-    let s;
-    try{ s = JSON.parse(txt); }catch(e){ alert("Invalid JSON."); return; }
-
-    if(!s || !Array.isArray(s.boards) || !s.prefs){
-      alert("JSON doesn’t look like an export.");
-      return;
-    }
-
-    if(!confirm("Import will replace ALL boards. Continue?")) return;
-    app = s;
-    if(!app.activeBoardId && app.boards[0]) app.activeBoardId = app.boards[0].id;
-
-    app.boards.forEach(normalizeBoard);
-    applyTheme(app.prefs?.theme || "white");
-
-    save();
-    renderBoardSelector();
-    switchBoard(app.activeBoardId);
-    closeDataDialog();
-  }
-
-  /* ---------------- Lock dialog ---------------- */
-  let lockMode = "lock"; // "lock" or "unlock"
-
-  function syncLockButtons(board){
-    const locked = isLocked(board);
-    $("btnLock").style.display = locked ? "none" : "inline-flex";
-    $("btnUnlock").style.display = locked ? "inline-flex" : "none";
-  }
-
-  function openLockDialog(mode){
-    const board = getBoard();
-    lockMode = mode;
-
-    $("lockPass").value = "";
-    if(mode === "lock"){
-      $("lockTitle").textContent = board.settings.passwordHash ? "Lock Board" : "Set Password & Lock";
-      $("lockMsg").textContent = board.settings.passwordHash
-        ? "Enter password to lock (or leave blank to cancel)."
-        : "Set a password. You’ll need it to unlock.";
-    }else{
-      $("lockTitle").textContent = "Unlock Board";
-      $("lockMsg").textContent = "Enter the password to unlock editing.";
-    }
-    $("dlgLock").showModal();
-    setTimeout(()=> $("lockPass").focus(), 50);
-  }
-
-  function closeLockDialog(){ $("dlgLock").close(); }
-
-  function confirmLockDialog(){
-    const board = getBoard();
-    const pass = $("lockPass").value;
-
-    if(lockMode === "lock"){
-      if(!pass && !board.settings.passwordHash){
-        alert("Set a password first.");
-        return;
-      }
-
-      if(board.settings.passwordHash && !pass){
-        closeLockDialog();
-        return;
-      }
-
-      if(!board.settings.passwordHash){
-        board.settings.passwordHash = tinyHash(pass);
-      }else{
-        if(tinyHash(pass) !== board.settings.passwordHash){
-          alert("Wrong password.");
-          return;
-        }
-      }
-
-      board.settings.locked = true;
+    if(!requireUnlocked(getBoard())) return;
+    const raw = $("jsonBox").value.trim();
+    if(!raw){ alert("Paste JSON first."); return; }
+    if(!confirm("Import will replace EVERYTHING. Continue?")) return;
+    try{
+      const next = JSON.parse(raw);
+      if(!next || !Array.isArray(next.boards) || !next.prefs){ throw new Error("Invalid format"); }
+      app = next;
+      if(!app.activeBoardId && app.boards[0]) app.activeBoardId = app.boards[0].id;
+      app.prefs = app.prefs || { theme:"white" };
+      applyTheme(app.prefs.theme);
       save();
-      syncLockButtons(board);
-      render();
-      closeLockDialog();
-      return;
+      renderBoardSelector();
+      switchBoard(app.activeBoardId);
+      $("dlgData").close();
+      alert("Imported.");
+    }catch(e){
+      alert("Import failed: " + e.message);
     }
-
-    if(!board.settings.passwordHash){
-      alert("No password set. This board isn't protected.");
-      board.settings.locked = false;
-      save();
-      syncLockButtons(board);
-      render();
-      closeLockDialog();
-      return;
-    }
-    if(tinyHash(pass) !== board.settings.passwordHash){
-      alert("Wrong password.");
-      return;
-    }
-    board.settings.locked = false;
-    save();
-    syncLockButtons(board);
-    render();
-    closeLockDialog();
   }
 
-  /* ---------------- Board management ---------------- */
+  /* ---------------- Board CRUD ---------------- */
   function newBoard(){
-    const name = prompt("New board name?", "New Board");
+    if(!requireUnlocked(getBoard())) return;
+    const name = prompt("New board name:", "New Board");
     if(!name) return;
     const b = defaultBoard(name.trim());
-    app.boards.push(b);
+    app.boards.unshift(b);
     app.activeBoardId = b.id;
     save();
     renderBoardSelector();
@@ -1644,8 +1752,8 @@
   }
 
   function renameBoard(){
+    if(!requireUnlocked(getBoard())) return;
     const b = getBoard();
-    if(!requireUnlocked(b) && isLocked(b)) return;
     const name = prompt("Rename board:", b.name);
     if(!name) return;
     b.name = name.trim();
@@ -1655,147 +1763,595 @@
   }
 
   function deleteBoard(){
-    if(app.boards.length <= 1){
-      alert("You must keep at least one board.");
+    if(!requireUnlocked(getBoard())) return;
+    if(app.boards.length <= 1){ alert("You must keep at least 1 board."); return; }
+    const b = getBoard();
+    const ok = confirm(`Delete board "${b.name}"?\n\nThis cannot be undone.`);
+    if(!ok) return;
+    app.boards = app.boards.filter(x=>x.id !== b.id);
+    app.activeBoardId = app.boards[0].id;
+    save();
+    renderBoardSelector();
+    switchBoard(app.activeBoardId);
+  }
+
+  /* ---------------- Reset ---------------- */
+  function resetAll(){
+    if(!confirm("Reset EVERYTHING back to defaults?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+
+  /* ---------------- Lock / Unlock ---------------- */
+  function syncLockButtons(board){
+    const locked = isLocked(board);
+    $("btnLock").style.display = locked ? "none" : "inline-flex";
+    $("btnUnlock").style.display = locked ? "inline-flex" : "none";
+
+    // disable add/edit controls visually when locked/readonly
+// keep readonly state driven by setReadonly(), not hard-forced here
+// document.documentElement.classList.toggle("readonly", !!qsReadonly);
+  }
+
+  function openLockDialog(mode){
+    const board = getBoard();
+    const locking = (mode === "lock");
+    $("lockTitle").textContent = locking ? "Lock Board" : "Unlock Board";
+    $("lockMsg").textContent = locking
+      ? "Set a password to prevent edits."
+      : "Enter the password to enable edits.";
+    $("lockPass").value = "";
+    $("dlgLock").dataset.mode = mode;
+    $("dlgLock").showModal();
+    setTimeout(()=> $("lockPass").focus(), 50);
+  }
+
+  function confirmLockDialog(){
+    const board = getBoard();
+    const pass = ($("lockPass").value || "").trim();
+    const mode = $("dlgLock").dataset.mode;
+
+    if(mode === "lock"){
+      if(!pass){ alert("Password required."); return; }
+      board.settings.passwordHash = tinyHash(pass);
+      board.settings.locked = true;
+      save();
+      render();
+      $("dlgLock").close();
+      alert("Locked.");
       return;
     }
-    const b = getBoard();
-    const ok = confirm(`Delete board "${b.name}"? This removes all its cards.`);
-    if(!ok) return;
 
-    app.boards = app.boards.filter(x => x.id !== b.id);
-    app.activeBoardId = app.boards[0].id;
+    // unlock
+    if(!board.settings.passwordHash){
+      // if no password stored, allow unlock
+      board.settings.locked = false;
+      save(); render();
+      $("dlgLock").close();
+      return;
+    }
+    if(tinyHash(pass) !== board.settings.passwordHash){
+      alert("Wrong password.");
+      return;
+    }
+    board.settings.locked = false;
     save();
+    render();
+    $("dlgLock").close();
+    alert("Unlocked.");
+  }
+
+  /* ---------------- Open Wall Screen ---------------- */
+  function openWallScreen(){
+    const u = new URL(location.href);
+    u.searchParams.set("wall","1");
+    u.searchParams.set("readonly","1");
+    window.open(u.toString(), "_blank", "noopener,noreferrer,width=1400,height=900");
+  }
+
+  /* ---------------- Wall exit ---------------- */
+  function exitWall(){
+  const board = getBoard();
+  const u = new URL(location.href);
+
+  if(u.searchParams.get("wall")==="1" || u.searchParams.get("readonly")==="1"){
+    u.searchParams.delete("wall");
+    u.searchParams.delete("readonly");
+    location.href = u.toString();
+    return;
+  }
+
+  setWallMode(board, false);
+  setReadonly(false);
+}
+
+
+  /* ---------------- Init: apply query modes ---------------- */
+  (function initModes(){
+    const board = getBoard();
+    normalizeBoard(board);
+
+    // If opened via URL flags:
+    if(qsWall){
+      document.documentElement.classList.add("wall");
+      board.settings.wall = true; // local UI
+    }
+    setReadonly(!!qsReadonly);
+
+    // If readonly, make sure locked buttons hidden from wall/readonly UI already
+    applyTheme(app.prefs.theme || "white");
+  })();
+
+  /* ---------------- Events wiring ---------------- */
+  function wire(){
+    // theme
+    $("themeSelect").addEventListener("change", (e)=> applyTheme(e.target.value));
+
+    // board select
     renderBoardSelector();
-    switchBoard(app.activeBoardId);
-  }
-
-  /* ---------------- Reset all ---------------- */
-  function resetAll(){
-    if(!confirm("Reset EVERYTHING? This deletes all boards and cards.")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    app = defaultAppState();
-    app.activeBoardId = app.boards[0].id;
-    applyTheme(app.prefs.theme);
-    save();
-    renderBoardSelector();
-    switchBoard(app.activeBoardId);
-  }
-
-  /* ---------------- Search ---------------- */
-  function bindSearch(){
-    $("q").addEventListener("input", ()=> render());
-  }
-
-  /* ---------------- Dialog binds ---------------- */
-  function bindDialogs(){
-    // Card
-    $("closeCard").addEventListener("click", closeCardDialog);
-    $("btnCancelCard").addEventListener("click", closeCardDialog);
-    $("btnSaveCard").addEventListener("click", upsertCard);
-    $("btnDeleteCard").addEventListener("click", ()=>{
-      const b = getBoard();
-      if(!requireUnlocked(b)) return;
-      if(editingId) deleteCard(b, editingId);
-      closeCardDialog();
-    });
-
-    // Columns
-    $("closeCols").addEventListener("click", closeColsDialog);
-    $("btnCancelCols").addEventListener("click", closeColsDialog);
-    $("btnSaveCols").addEventListener("click", saveColsDialog);
-
-    // Data
-    $("closeData").addEventListener("click", closeDataDialog);
-    $("btnCloseData2").addEventListener("click", closeDataDialog);
-    $("btnCopyJson").addEventListener("click", copyJson);
-    $("btnImportJson").addEventListener("click", importJson);
-
-    // Summary
-    $("closeSummary").addEventListener("click", ()=> $("dlgSummary").close());
-    $("btnCopySummary").addEventListener("click", copyShiftSummary);
-    $("btnPrintSummary").addEventListener("click", printShiftSummary);
-
-    // Lock
-    $("closeLock").addEventListener("click", closeLockDialog);
-    $("btnCancelLock").addEventListener("click", closeLockDialog);
-    $("btnConfirmLock").addEventListener("click", confirmLockDialog);
-  }
-
-  /* ---------------- Main button binds ---------------- */
-  function bindButtons(){
-    $("btnAdd").addEventListener("click", ()=>{
-      const b = getBoard();
-      if(!requireUnlocked(b)) return;
-      openCardDialog({ lane: "todo" });
-    });
-
-    $("btnColumns").addEventListener("click", openColsDialog);
-    $("btnArchiveDone").addEventListener("click", archiveDone);
-    $("btnFocus").addEventListener("click", toggleFocus);
-    $("btnShiftSummary").addEventListener("click", openShiftSummary);
-    $("btnData").addEventListener("click", openDataDialog);
-    $("btnReset").addEventListener("click", resetAll);
-
-    // Board selector
     $("boardSelect").addEventListener("change", (e)=> switchBoard(e.target.value));
     $("btnNewBoard").addEventListener("click", newBoard);
     $("btnRenameBoard").addEventListener("click", renameBoard);
     $("btnDeleteBoard").addEventListener("click", deleteBoard);
 
-    // Theme
-    $("themeSelect").addEventListener("change", (e)=> applyTheme(e.target.value));
+    // search rerender
+    $("q").addEventListener("input", ()=> render());
 
-    // Lock / Unlock
+    // add card
+    $("btnAdd").addEventListener("click", ()=> openCardDialog({ lane:"todo" }));
+
+    // dialogs close
+    $("closeCard").addEventListener("click", closeCardDialog);
+    $("btnCancelCard").addEventListener("click", closeCardDialog);
+    $("btnSaveCard").addEventListener("click", upsertCard);
+    $("btnDeleteCard").addEventListener("click", ()=> {
+      const board = getBoard();
+      if(editingId) deleteCard(board, editingId);
+      closeCardDialog();
+    });
+
+    // columns
+    $("btnColumns").addEventListener("click", openColsDialog);
+    $("closeCols").addEventListener("click", closeColsDialog);
+    $("btnCancelCols").addEventListener("click", closeColsDialog);
+    $("btnSaveCols").addEventListener("click", saveColsDialog);
+
+    // focus
+    $("btnFocus").addEventListener("click", toggleFocus);
+
+    // archive
+    $("btnArchiveDone").addEventListener("click", archiveDone);
+
+    // shift summary
+    $("btnShiftSummary").addEventListener("click", openShiftSummary);
+    $("closeSummary").addEventListener("click", ()=> $("dlgSummary").close());
+    $("btnCopySummary").addEventListener("click", copyShiftSummary);
+    $("btnPrintSummary").addEventListener("click", printShiftSummary);
+
+    // report
+    $("btnReport").addEventListener("click", openReportDialog);
+    $("closeReport").addEventListener("click", ()=> $("dlgReport").close());
+    $("btnExportCSV").addEventListener("click", exportCSV);
+    $("btnExportPDF").addEventListener("click", exportReportPrint);
+
+    // QR
+    $("btnQR").addEventListener("click", openQRDialog);
+    $("closeQR").addEventListener("click", ()=> $("dlgQR").close());
+    $("btnCopyQRNormal").addEventListener("click", ()=> {
+      drawQR("qrCanvas", $("qrLinkNormal").value);
+      copyText($("qrLinkNormal").value);
+    });
+    $("btnCopyQRWall").addEventListener("click", ()=> {
+      drawQR("qrCanvas", $("qrLinkWall").value);
+      copyText($("qrLinkWall").value);
+    });
+    $("btnPrintQR").addEventListener("click", printQR);
+
+    // wall screen
+    $("btnWallScreen").addEventListener("click", openWallScreen);
+
+    // wall switch
+    $("wallSwitch").addEventListener("click", ()=>{
+      const board = getBoard();
+      // if readonly, allow viewing wall but don't store if from qsReadonly? still ok
+      setWallMode(board, !board.settings.wall);
+    });
+
+    // exit wall
+    $("btnExitWall").addEventListener("click", exitWall);
+
+    // lock / unlock
     $("btnLock").addEventListener("click", ()=> openLockDialog("lock"));
     $("btnUnlock").addEventListener("click", ()=> openLockDialog("unlock"));
+    $("closeLock").addEventListener("click", ()=> $("dlgLock").close());
+    $("btnCancelLock").addEventListener("click", ()=> $("dlgLock").close());
+    $("btnConfirmLock").addEventListener("click", confirmLockDialog);
 
-    // Wall toggle (works even when locked)
-    $("wallSwitch").addEventListener("click", ()=>{
-      const b = getBoard();
-      setWallMode(b, !b.settings.wall);
+    // data
+    $("btnData").addEventListener("click", openDataDialog);
+    $("closeData").addEventListener("click", ()=> $("dlgData").close());
+    $("btnCloseData2").addEventListener("click", ()=> $("dlgData").close());
+    $("btnCopyJson").addEventListener("click", copyJson);
+    $("btnImportJson").addEventListener("click", importJson);
+
+    // reset
+    $("btnReset").addEventListener("click", resetAll);
+
+    // ESC to exit wall + close dialogs
+    window.addEventListener("keydown", (e)=>{
+      if(e.key === "Escape"){
+        // if any dialog open, browser handles first; if not, exit wall
+        if(document.querySelector("dialog[open]")) return;
+        if(document.documentElement.classList.contains("wall")) exitWall();
+      }
     });
 
-    // Exit wall button (always visible)
-    $("btnExitWall").addEventListener("click", ()=>{
-      const b = getBoard();
-      setWallMode(b, false);
-    });
+    // periodic refresh for timers / clock / stale statuses
+    setInterval(()=> {
+      // just rerender lightweight
+      render();
+    }, 30_000);
   }
 
-  /* ---------------- ESC exits wall mode ---------------- */
-  document.addEventListener("keydown", (e)=>{
-    if(e.key === "Escape"){
-      const b = getBoard();
-      if(b?.settings?.wall) setWallMode(b, false);
+  /* ---------------- QR generator (offline) ----------------
+     Lightweight QR via "qrcode-generator" (Kazuhiko Arase) compacted.
+  --------------------------------------------------------- */
+  // Minimal qrcode-generator (MIT)
+  // Source: https://github.com/kazuhikoarase/qrcode-generator (concept)
+  // (trimmed/compact for this single-file offline tool)
+  function QRCode(typeNumber, errorCorrectionLevel) {
+    const PAD0 = 0xEC, PAD1 = 0x11;
+    const _typeNumber = typeNumber;
+    const _errorCorrectionLevel = errorCorrectionLevel;
+    let _modules = null;
+    let _moduleCount = 0;
+    let _dataCache = null;
+    const _dataList = [];
+
+    const RS_BLOCK_TABLE = {
+      L: [
+        [], [1,26,19],[1,44,34],[1,70,55],[1,100,80],[1,134,108],[2,86,68],[2,98,78],[2,121,97],[2,146,116],[2,86,68],
+        [4,101,81],[2,116,92],[4,133,107],[3,145,115],[5,109,87],[5,122,98],[1,135,107],[5,150,120],[3,141,113],[3,135,107]
+      ],
+      M: [
+        [], [1,26,16],[1,44,28],[1,70,44],[2,50,32],[2,67,43],[4,43,27],[4,49,31],[2,60,38],[3,58,36],[4,69,43],
+        [1,80,50],[6,58,36],[8,59,37],[4,64,40],[5,65,41],[7,73,45],[10,74,46],[9,69,43],[3,70,44],[3,67,41]
+      ],
+      Q: [
+        [], [1,26,13],[1,44,22],[2,35,17],[2,50,24],[2,33,15,2,34,16],[4,43,19],[2,32,14,4,33,15],[4,40,18,2,41,19],[4,36,16,4,37,17],[6,43,19,2,44,20],
+        [4,50,22,4,51,23],[4,46,20,6,47,21],[8,44,20,4,45,21],[11,36,16,5,37,17],[5,54,24,7,55,25],[15,43,19,2,44,20],[1,50,22,15,51,23],[17,50,22,1,51,23],[17,47,21,4,48,22],[15,54,24,5,55,25]
+      ],
+      H: [
+        [], [1,26,9],[1,44,16],[2,35,13],[4,25,9],[2,33,11,2,34,12],[4,43,15],[4,39,13,1,40,14],[4,40,14,2,41,15],[4,36,12,4,37,13],[6,43,15,2,44,16],
+        [3,36,12,8,37,13],[7,42,14,4,43,15],[12,33,11,4,34,12],[11,36,12,5,37,13],[11,36,12,7,37,13],[3,45,15,13,46,16],[2,42,14,17,43,15],[2,42,14,19,43,15],[9,39,13,16,40,14],[15,43,15,10,44,16]
+      ]
+    };
+
+    function getBCHTypeInfo(data){
+      let d = data << 10;
+      const g = 0x537;
+      while (getBCHDigit(d) - getBCHDigit(g) >= 0) d ^= (g << (getBCHDigit(d) - getBCHDigit(g)));
+      return ((data << 10) | d) ^ 0x5412;
     }
-  });
+    function getBCHDigit(data){
+      let digit = 0;
+      while (data != 0) { digit++; data >>>= 1; }
+      return digit;
+    }
+    function getPatternPosition(typeNumber){
+      return [
+        [], [], [6,18], [6,22], [6,26], [6,30], [6,34], [6,22,38], [6,24,42], [6,26,46], [6,28,50],
+        [6,30,54], [6,32,58], [6,34,62], [6,26,46,66], [6,26,48,70], [6,26,50,74], [6,30,54,78], [6,30,56,82], [6,30,58,86], [6,34,62,90]
+      ][typeNumber] || [];
+    }
+    function getMask(maskPattern, i, j){
+      switch(maskPattern){
+        case 0: return (i + j) % 2 == 0;
+        case 1: return i % 2 == 0;
+        case 2: return j % 3 == 0;
+        case 3: return (i + j) % 3 == 0;
+        case 4: return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 == 0;
+        case 5: return ((i * j) % 2) + ((i * j) % 3) == 0;
+        case 6: return (((i * j) % 2) + ((i * j) % 3)) % 2 == 0;
+        case 7: return (((i + j) % 2) + ((i * j) % 3)) % 2 == 0;
+        default: return false;
+      }
+    }
 
-  /* ---------------- Tick / refresh ---------------- */
-  function tick(){
-    render();
+    function QRBitBuffer(){
+      this.buffer = [];
+      this.length = 0;
+    }
+    QRBitBuffer.prototype = {
+      get: function(index){
+        const bufIndex = Math.floor(index / 8);
+        return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) == 1;
+      },
+      put: function(num, length){
+        for(let i=0;i<length;i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+      },
+      putBit: function(bit){
+        const bufIndex = Math.floor(this.length / 8);
+        if(this.buffer.length <= bufIndex) this.buffer.push(0);
+        if(bit) this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+        this.length++;
+      }
+    };
+
+    function QR8bitByte(data){
+      this.mode = 1; // 8bit
+      this.data = data;
+      this.parsed = [];
+      for(let i=0;i<data.length;i++){
+        const c = data.charCodeAt(i);
+        if(c < 0x80) this.parsed.push(c);
+        else if(c < 0x800){
+          this.parsed.push(0xC0 | (c >> 6));
+          this.parsed.push(0x80 | (c & 0x3F));
+        }else{
+          this.parsed.push(0xE0 | (c >> 12));
+          this.parsed.push(0x80 | ((c >> 6) & 0x3F));
+          this.parsed.push(0x80 | (c & 0x3F));
+        }
+      }
+    }
+    QR8bitByte.prototype = {
+      getLength: function(){ return this.parsed.length; },
+      write: function(buffer){
+        for(let i=0;i<this.parsed.length;i++) buffer.put(this.parsed[i], 8);
+      }
+    };
+
+    function getRSBlocks(typeNumber, errorCorrectionLevel){
+      const tbl = RS_BLOCK_TABLE[errorCorrectionLevel][typeNumber];
+      if(!tbl) throw new Error("RS block table not found");
+      const list = [];
+      for(let i=0;i<tbl.length;){
+        const count = tbl[i++], totalCount = tbl[i++], dataCount = tbl[i++];
+        for(let j=0;j<count;j++) list.push({totalCount, dataCount});
+      }
+      return list;
+    }
+
+    function createData(typeNumber, errorCorrectionLevel, dataList){
+      const rsBlocks = getRSBlocks(typeNumber, errorCorrectionLevel);
+      const buffer = new QRBitBuffer();
+      for(let i=0;i<dataList.length;i++){
+        const data = dataList[i];
+        buffer.put(0b0100, 4); // mode 8bit
+        buffer.put(data.getLength(), typeNumber < 10 ? 8 : 16);
+        data.write(buffer);
+      }
+      // terminator
+      const totalDataCount = rsBlocks.reduce((s,b)=>s+b.dataCount,0);
+      if(buffer.length + 4 <= totalDataCount * 8) buffer.put(0, 4);
+      while(buffer.length % 8 != 0) buffer.putBit(false);
+
+      // padding
+      while(buffer.buffer.length < totalDataCount){
+        buffer.put(PAD0, 8);
+        if(buffer.buffer.length >= totalDataCount) break;
+        buffer.put(PAD1, 8);
+      }
+      return buffer.buffer;
+    }
+
+    function makeImpl(test, maskPattern){
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = new Array(_moduleCount);
+      for(let r=0;r<_moduleCount;r++){
+        _modules[r] = new Array(_moduleCount);
+        for(let c=0;c<_moduleCount;c++) _modules[r][c] = null;
+      }
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if(_dataCache == null) _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      mapData(_dataCache, maskPattern);
+    }
+
+    function setupPositionProbePattern(row, col){
+      for(let r=-1;r<=7;r++){
+        if(row+r <= -1 || _moduleCount <= row+r) continue;
+        for(let c=-1;c<=7;c++){
+          if(col+c <= -1 || _moduleCount <= col+c) continue;
+          if((0 <= r && r <= 6 && (c == 0 || c == 6)) ||
+             (0 <= c && c <= 6 && (r == 0 || r == 6)) ||
+             (2 <= r && r <= 4 && 2 <= c && c <= 4)){
+            _modules[row+r][col+c] = true;
+          }else{
+            _modules[row+r][col+c] = false;
+          }
+        }
+      }
+    }
+
+    function setupTimingPattern(){
+      for(let i=8;i<_moduleCount-8;i++){
+        if(_modules[i][6] == null) _modules[i][6] = (i % 2 == 0);
+        if(_modules[6][i] == null) _modules[6][i] = (i % 2 == 0);
+      }
+    }
+
+    function setupPositionAdjustPattern(){
+      const pos = getPatternPosition(_typeNumber);
+      for(let i=0;i<pos.length;i++){
+        for(let j=0;j<pos.length;j++){
+          const row = pos[i], col = pos[j];
+          if(_modules[row][col] != null) continue;
+          for(let r=-2;r<=2;r++){
+            for(let c=-2;c<=2;c++){
+              if(r == -2 || r == 2 || c == -2 || c == 2 || (r==0 && c==0)){
+                _modules[row+r][col+c] = true;
+              }else{
+                _modules[row+r][col+c] = false;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function setupTypeInfo(test, maskPattern){
+      const data = (_errorCorrectionLevel === "L" ? 1 :
+                   _errorCorrectionLevel === "M" ? 0 :
+                   _errorCorrectionLevel === "Q" ? 3 : 2);
+      const bits = getBCHTypeInfo((data << 3) | maskPattern);
+
+      for(let i=0;i<15;i++){
+        const mod = (!test && ((bits >> i) & 1) == 1);
+        // vertical
+        if(i < 6) _modules[i][8] = mod;
+        else if(i < 8) _modules[i + 1][8] = mod;
+        else _modules[_moduleCount - 15 + i][8] = mod;
+
+        // horizontal
+        if(i < 8) _modules[8][_moduleCount - i - 1] = mod;
+        else if(i < 9) _modules[8][15 - i - 1 + 1] = mod;
+        else _modules[8][15 - i - 1] = mod;
+      }
+      _modules[_moduleCount - 8][8] = (!test);
+    }
+
+    function mapData(data, maskPattern){
+      let inc = -1;
+      let row = _moduleCount - 1;
+      let bitIndex = 7;
+      let byteIndex = 0;
+
+      for(let col = _moduleCount - 1; col > 0; col -= 2){
+        if(col == 6) col--;
+        while(true){
+          for(let c=0;c<2;c++){
+            if(_modules[row][col - c] == null){
+              let dark = false;
+              if(byteIndex < data.length) dark = (((data[byteIndex] >>> bitIndex) & 1) == 1);
+              const mask = getMask(maskPattern, row, col - c);
+              _modules[row][col - c] = mask ? !dark : dark;
+              bitIndex--;
+              if(bitIndex == -1){ byteIndex++; bitIndex = 7; }
+            }
+          }
+          row += inc;
+          if(row < 0 || _moduleCount <= row){
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    }
+
+    function getBestMaskPattern(){
+      // simple pick 0 (good enough for our use)
+      return 0;
+    }
+
+    this.addData = function(data){ _dataList.push(new QR8bitByte(data)); _dataCache = null; };
+    this.make = function(){
+      // choose a safe typeNumber automatically (<= 10 is enough for URLs normally)
+      // try type 4..10
+       let t = _typeNumber || 0;
+      if(!t){
+        for(let n=4;n<=10;n++){
+          try{
+            _dataCache = null;
+            createData(n, _errorCorrectionLevel, _dataList);
+            t = n; break;
+          }catch(e){}
+        }
+        if(!t) t = 10;
+      }
+      // override internal type
+      // (quick hack for this minimal port)
+      // eslint-disable-next-line no-unused-vars
+      const __ = t;
+    };
+
+    this.getModuleCount = function(){ return _moduleCount; };
+    this.isDark = function(r,c){ return _modules[r][c]; };
+
+    this.make2 = function(){
+      // auto typeNumber selection (simple)
+      let chosen = _typeNumber || 0;
+      if(!chosen){
+        for(let n=4;n<=10;n++){
+          try{
+            _dataCache = null;
+            createData(n, _errorCorrectionLevel, _dataList);
+            chosen = n; break;
+          }catch(e){}
+        }
+        if(!chosen) chosen = 10;
+      }
+      // rebuild with chosen
+      // re-init internal by recreating object state we rely on
+      // (we keep chosen via closure by overwriting _typeNumber use)
+      // For this trimmed version: just set global-ish by reassigning through a hack:
+      // NOTE: For our use (URLs), n=6~10 is typical.
+      // We'll rebuild by calling makeImpl with chosen via a quick proxy:
+      // Create a temp QRCode with chosen as constructor param.
+      return chosen;
+    };
+
+    this._build = function(realType){
+      // rebuild using realType as _typeNumber
+      // we "simulate" by creating a new QRCode and copying modules
+      const tmp = new QRCode(realType, _errorCorrectionLevel);
+      tmp.addData(_dataList[0].data);
+      tmp._finalize();
+      _modules = tmp._modules;
+      _moduleCount = tmp._moduleCount;
+    };
+
+    this._finalize = function(){
+      const mask = getBestMaskPattern();
+      makeImpl(false, mask);
+      // expose internals for _build copy
+      this._modules = _modules;
+      this._moduleCount = _moduleCount;
+    };
   }
 
-  /* ---------------- Init ---------------- */
-  function init(){
-    app.boards.forEach(normalizeBoard);
+  function drawQR(canvasId, text){
+    const canvas = $(canvasId);
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // Ensure selector matches current stored theme
-    $("themeSelect").value = (app.prefs.theme === "brown") ? "brown" : "white";
+    const qr = new QRCode(0, "M");
+    qr.addData(text);
+    const t = qr.make2();
+    qr._build(t);
 
-    renderBoardSelector();
-    switchBoard(app.activeBoardId);
+    const count = qr.getModuleCount();
+    const size = canvas.width;
+    const margin = 10;
+    const cell = Math.floor((size - margin*2) / count);
+    const offset = Math.floor((size - cell*count) / 2);
 
-    bindButtons();
-    bindDialogs();
-    bindSearch();
+    // background
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,size,size);
 
-    render();
-    setInterval(tick, 60_000);   // clock + stale indicators
-    setInterval(render, 30_000); // running timers refresh
+    ctx.fillStyle = "#000";
+    for(let r=0;r<count;r++){
+      for(let c=0;c<count;c++){
+        if(qr.isDark(r,c)){
+          ctx.fillRect(offset + c*cell, offset + r*cell, cell, cell);
+        }
+      }
+    }
   }
 
-  init();
+  /* ---------------- Boot ---------------- */
+  wire();
+  render();
+
 })();
 </script>
 </body>
