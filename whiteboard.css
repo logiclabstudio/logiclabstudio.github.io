@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Smart Whiteboard — Logic Lab (Offline)</title>
+  <style>
+    :root{
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(17,24,39,.72);
+      --card2: rgba(17,24,39,.92);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.12);
+      --line2:rgba(255,255,255,.08);
+      --blue:#60a5fa;
+      --blue2:#38bdf8;
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --ring: rgba(96,165,250,.35);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --radius:16px;
+      --radius2:20px;
+      --max: 1400px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, rgba(96,165,250,.22), transparent 60%),
+        radial-gradient(900px 600px at 85% 0%, rgba(167,139,250,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 14px 18px;}
+    header{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:sticky; top:10px; z-index:10;
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; flex-direction:column; gap:2px}
+    .brand .t{font-weight:900; letter-spacing:.2px; font-size:14px}
+    .brand .s{color:var(--muted); font-size:12px}
+    .top{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
+    }
+    button,.btn{
+      appearance:none; border:1px solid var(--line);
+      background: rgba(15,23,42,.55);
+      color:var(--text); padding:10px 12px; border-radius:14px;
+      cursor:pointer; font-weight:800; font-size:12px;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+      user-select:none;
+    }
+    button:hover{border-color:rgba(96,165,250,.45)}
+    button:active{transform: translateY(1px)}
+    button.primary{border-color:rgba(96,165,250,.55); background: rgba(96,165,250,.14)}
+    button.ghost{background:transparent}
+    button.danger{border-color: rgba(251,113,133,.55); background: rgba(251,113,133,.12)}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      background: rgba(2,6,23,.35);
+      color:var(--text);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .mono{font-family:var(--mono)}
+    .muted{color:var(--muted)}
+    .board{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 1100px){
+      .board{grid-template-columns: repeat(2, minmax(260px, 1fr));}
+    }
+    @media (max-width: 650px){
+      .board{grid-template-columns: 1fr;}
+      header{position:relative; top:0}
+    }
+    .col{
+      background: rgba(17,24,39,.55);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 240px;
+    }
+    .colHd{
+      padding:10px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
+      border-bottom:1px solid var(--line2);
+    }
+    .colTitle{
+      display:flex; flex-direction:column; gap:2px;
+      min-width:0;
+    }
+    .colTitle .name{
+      font-weight:900; font-size:13px;
+      display:flex; gap:8px; align-items:center;
+    }
+    .colTitle .meta{font-size:12px; color:var(--muted)}
+    .countBadge{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:24px; height:24px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      font-size:12px; font-weight:900;
+    }
+    .colBody{
+      padding:10px;
+      display:flex; flex-direction:column; gap:10px;
+      flex:1;
+    }
+    .dropHint{
+      border:1px dashed rgba(255,255,255,.16);
+      border-radius: 16px;
+      padding:10px;
+      color: rgba(229,231,235,.75);
+      background: rgba(2,6,23,.18);
+      font-size:12px;
+      text-align:center;
+    }
+    .card{
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.34);
+      border-radius: 18px;
+      padding:10px;
+      cursor:grab;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      transition: transform .08s ease, border-color .2s ease, background .2s ease;
+      position:relative;
+    }
+    .card:active{cursor:grabbing}
+    .card:hover{border-color: rgba(96,165,250,.35)}
+    .card.dragging{opacity:.6; transform: scale(.99)}
+    .cardTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .cardTitle{
+      font-weight:900; font-size:13px; line-height:1.15;
+      word-break:break-word;
+    }
+    .cardMeta{
+      margin-top:6px;
+      display:flex; flex-wrap:wrap; gap:8px;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.03);
+      padding:6px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .prio-low{border-color: rgba(148,163,184,.35)}
+    .prio-normal{border-color: rgba(96,165,250,.45); background: rgba(96,165,250,.08)}
+    .prio-urgent{border-color: rgba(251,191,36,.55); background: rgba(251,191,36,.10)}
+    .status-overdue{border-color: rgba(251,113,133,.70); background: rgba(251,113,133,.10)}
+    .status-due{border-color: rgba(251,191,36,.65); background: rgba(251,191,36,.10)}
+    .status-stale{border-color: rgba(56,189,248,.55); background: rgba(56,189,248,.08)}
+    .miniBtns{display:flex; gap:8px}
+    .miniBtn{
+      width:32px; height:32px; border-radius:12px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.03);
+      cursor:pointer;
+      user-select:none;
+    }
+    .miniBtn:hover{border-color: rgba(96,165,250,.45)}
+    .kpiBar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .kpi{
+      display:flex; flex-direction:column; gap:2px;
+      padding:8px 10px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.28);
+    }
+    .kpi .k{font-size:11px; color:var(--muted)}
+    .kpi .v{font-weight:1000; letter-spacing:.2px}
+    .rightInfo{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+    }
+    .search{
+      display:flex; gap:8px; align-items:center;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.26);
+      border-radius: 999px;
+      padding:8px 10px;
+      min-width: 260px;
+    }
+    .search input{
+      border:none; outline:none; background:transparent; color:var(--text);
+      width: 100%;
+      font-size:12px;
+    }
+    .search input::placeholder{color: rgba(148,163,184,.8)}
+    .foot{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(17,24,39,.40);
+    }
+    .hint{font-size:12px; color:var(--muted)}
+    dialog{
+      border:none; border-radius: 18px;
+      padding:0;
+      width: min(720px, 94vw);
+      background: rgba(2,6,23,.95);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    dialog::backdrop{background: rgba(0,0,0,.55)}
+    .dlgHd{
+      padding:12px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      background: rgba(255,255,255,.03);
+    }
+    .dlgHd .t{font-weight:1000}
+    .dlgBd{padding:12px}
+    .row{
+      display:grid; grid-template-columns: 1fr 1fr;
+      gap:10px; margin-bottom:10px;
+    }
+    @media (max-width: 560px){ .row{grid-template-columns:1fr} }
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:10px}
+    input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(3,7,18,.45);
+      color: var(--text);
+      outline:none;
+      font-size: 13px;
+    }
+    input:focus, select:focus, textarea:focus{border-color:rgba(96,165,250,.55); box-shadow: 0 0 0 3px var(--ring)}
+    textarea{min-height:90px; resize:vertical}
+    .dlgActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:12px; border-top:1px solid var(--line)}
+    .split{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .wall body{}
+    .wall header, .wall .foot, .wall .noWall{display:none !important}
+    .wall .wrap{max-width: none; padding:12px;}
+    .wall .board{gap:10px}
+    .wall .col{min-height: calc(100vh - 24px); border-radius: 22px}
+    .wall .colHd{padding:14px 14px}
+    .wall .colTitle .name{font-size:16px}
+    .wall .colTitle .meta{font-size:12px}
+    .wall .card{padding:12px}
+    .wall .cardTitle{font-size:15px}
+    .wall .tag{font-size:12px; padding:7px 12px}
+    @media print{
+      header,.foot,.noPrint{display:none !important;}
+      body{background:#fff; color:#111}
+      .col{box-shadow:none}
+      .card{box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="t">Smart Whiteboard (Offline)</div>
+      <div class="s">Drag & drop • Auto-save • Due/Overdue/Stale warnings • Wall mode</div>
+    </div>
+
+    <div class="top">
+      <div class="search noWall" title="Search cards by title, owner, tag, notes">
+        <span class="muted">🔎</span>
+        <input id="q" placeholder="Search…" />
+      </div>
+
+      <div class="pill noWall" id="clock">—</div>
+
+      <button class="ghost noWall" id="btnFocus">Focus: Off</button>
+      <button class="ghost noWall" id="btnArchiveDone">Archive Done</button>
+      <button class="ghost noWall" id="btnColumns">Columns</button>
+      <button class="primary noWall" id="btnAdd">+ Add Card</button>
+      <button class="ghost" id="btnWall">Wall Mode</button>
+      <button class="ghost noWall" id="btnData">Import/Export</button>
+      <button class="danger noWall" id="btnReset">Reset</button>
+    </div>
+  </header>
+
+  <div class="foot noWall">
+    <div class="kpiBar" id="kpis"></div>
+    <div class="rightInfo">
+      <div class="hint">
+        Smart rules: <span class="mono">Due today</span> → yellow • <span class="mono">Overdue</span> → red •
+        <span class="mono">No update</span> → blue • Blocked too long → yellow/red
+      </div>
+    </div>
+  </div>
+
+  <main class="board" id="board"></main>
+</div>
+
+<!-- Add/Edit Card -->
+<dialog id="dlgCard">
+  <div class="dlgHd">
+    <div>
+      <div class="t" id="dlgCardTitle">Add Card</div>
+      <div class="muted" style="font-size:12px" id="dlgCardSub">Fast, clean, printable.</div>
+    </div>
+    <button class="ghost" id="closeCard">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Title <small class="muted">required</small></label>
+        <input id="c_title" placeholder="e.g., Fix leaking pipe at Site A" />
+      </div>
+      <div class="field">
+        <label>Owner</label>
+        <input id="c_owner" placeholder="e.g., Thabo" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Tag</label>
+        <input id="c_tag" placeholder="e.g., Job / Maintenance / Delivery / Safety" />
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <select id="c_prio">
+          <option value="normal" selected>Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Due date/time</label>
+        <input id="c_due" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label>Status prompt</label>
+        <select id="c_prompt">
+          <option value="none" selected>None</option>
+          <option value="done">When moved to Done → ask “Any issues?”</option>
+          <option value="blocked">When moved to Blocked → ask reason</option>
+          <option value="progress">When moved to In Progress → auto-start timer</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Notes <small class="muted">short</small></label>
+      <textarea id="c_notes" placeholder="Parts needed, customer name, instructions…"></textarea>
+    </div>
+  </div>
+  <div class="dlgActions">
+    <button class="danger" id="btnDeleteCard" style="display:none">Delete</button>
+    <button class="ghost" id="btnCancelCard">Cancel</button>
+    <button class="primary" id="btnSaveCard">Save</button>
+  </div>
+</dialog>
+
+<!-- Columns manager -->
+<dialog id="dlgCols">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Columns</div>
+      <div class="muted" style="font-size:12px">Rename columns (simple, fast)</div>
+    </div>
+    <button class="ghost" id="closeCols">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="muted" style="font-size:12px; margin-bottom:10px">Tip: keep them short for wall screens.</div>
+    <div id="colsForm" style="display:flex; flex-direction:column; gap:10px"></div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCancelCols">Cancel</button>
+    <button class="primary" id="btnSaveCols">Save</button>
+  </div>
+</dialog>
+
+<!-- Import/Export -->
+<dialog id="dlgData">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Import / Export</div>
+      <div class="muted" style="font-size:12px">Backup your board as JSON</div>
+    </div>
+    <button class="ghost" id="closeData">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Export</label>
+        <button class="ghost" id="btnCopyJson">Copy JSON</button>
+      </div>
+      <div class="field">
+        <label>Import</label>
+        <button class="primary" id="btnImportJson">Import JSON</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Board JSON</label>
+      <textarea id="jsonBox" class="mono" placeholder='{"columns":[...],"cards":[...],"lanes":{...}}'></textarea>
+    </div>
+    <div class="muted" style="font-size:12px">Import will replace your current board.</div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCloseData2">Done</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  const LS_KEY = "ll_smart_whiteboard_v1";
+  const now = () => new Date();
+  const iso = (d) => new Date(d).toISOString();
+  const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  const byId = (id) => document.getElementById(id);
+
+  const DEFAULT = () => ({
+    version: 1,
+    settings: {
+      focus: false,
+      wall: false,
+      staleHours: 6,      // no update warning
+      blockedWarnHours: 4,
+      blockedOverdueHours: 12
+    },
+    columns: [
+      { id: "todo", title: "To Do", hint: "New tasks" },
+      { id: "doing", title: "In Progress", hint: "Currently being worked" },
+      { id: "blocked", title: "Blocked", hint: "Waiting / stuck" },
+      { id: "done", title: "Done", hint: "Completed" }
+    ],
+    lanes: { todo: [], doing: [], blocked: [], done: [] }, // arrays of cardIds
+    cards: {} // id -> card
+  });
+
+  let state = load() || DEFAULT();
+  let dragging = { cardId: null };
+
+  // ---------- Persistence ----------
+  function load(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      const s = JSON.parse(raw);
+      // basic shape check
+      if(!s || !Array.isArray(s.columns) || !s.lanes || !s.cards) return null;
+      return s;
+    }catch(e){ return null; }
+  }
+  function save(){
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+
+  // ---------- Helpers ----------
+  function toLocalInputValue(d){
+    if(!d) return "";
+    const x = new Date(d);
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
+  }
+
+  function parseLocalDateTime(val){
+    if(!val) return null;
+    const d = new Date(val);
+    return isNaN(d) ? null : d.toISOString();
+  }
+
+  function startOfToday(){
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  function isDueToday(dueIso){
+    if(!dueIso) return false;
+    const d = new Date(dueIso);
+    const t0 = startOfToday();
+    const t1 = new Date(t0); t1.setDate(t1.getDate()+1);
+    return d >= t0 && d < t1;
+  }
+
+  function isOverdue(dueIso){
+    if(!dueIso) return false;
+    return new Date(dueIso) < now();
+  }
+
+  function hoursSince(isoDate){
+    if(!isoDate) return Infinity;
+    const ms = now().getTime() - new Date(isoDate).getTime();
+    return ms / (1000*60*60);
+  }
+
+  function laneTitle(colId){
+    return state.columns.find(c=>c.id===colId)?.title ?? colId;
+  }
+
+  // ---------- Smart status classes ----------
+  function smartClass(card, laneId){
+    const cls = [];
+    // priority
+    if(card.priority === "urgent") cls.push("prio-urgent");
+    else if(card.priority === "low") cls.push("prio-low");
+    else cls.push("prio-normal");
+
+    // due / overdue
+    if(card.dueAt){
+      if(isOverdue(card.dueAt)) cls.push("status-overdue");
+      else if(isDueToday(card.dueAt)) cls.push("status-due");
+    }
+
+    // stale updates
+    const staleH = state.settings.staleHours ?? 6;
+    if(hoursSince(card.updatedAt) >= staleH && laneId !== "done"){
+      cls.push("status-stale");
+    }
+
+    // blocked aging
+    if(laneId === "blocked"){
+      const h = hoursSince(card.movedToLaneAt?.blocked || card.updatedAt);
+      if(h >= (state.settings.blockedOverdueHours ?? 12)) cls.push("status-overdue");
+      else if(h >= (state.settings.blockedWarnHours ?? 4)) cls.push("status-due");
+    }
+
+    return cls.join(" ");
+  }
+
+  // ---------- Render ----------
+  function render(){
+    // Wall mode class
+    document.documentElement.classList.toggle("wall", !!state.settings.wall);
+
+    // clock
+    const clk = byId("clock");
+    if(clk){
+      const d = new Date();
+      clk.textContent = d.toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    }
+
+    // focus button
+    const btnFocus = byId("btnFocus");
+    if(btnFocus) btnFocus.textContent = `Focus: ${state.settings.focus ? "On" : "Off"}`;
+
+    // KPIs
+    renderKPIs();
+
+    // Board
+    const board = byId("board");
+    board.innerHTML = "";
+
+    const q = (byId("q")?.value || "").trim().toLowerCase();
+    const focus = !!state.settings.focus;
+
+    state.columns.forEach(col => {
+      const lane = col.id;
+      const ids = state.lanes[lane] || [];
+
+      // filter logic (focus hides Done + low priority)
+      const visibleIds = ids.filter(cid => {
+        const c = state.cards[cid];
+        if(!c) return false;
+
+        if(focus){
+          if(lane === "done") return false;
+          if(c.priority === "low") return false;
+        }
+        if(q){
+          const blob = `${c.title} ${c.owner||""} ${c.tag||""} ${c.notes||""}`.toLowerCase();
+          if(!blob.includes(q)) return false;
+        }
+        return true;
+      });
+
+      const colEl = document.createElement("section");
+      colEl.className = "col";
+      colEl.dataset.lane = lane;
+
+      colEl.innerHTML = `
+        <div class="colHd">
+          <div class="colTitle">
+            <div class="name">
+              <span>${escapeHtml(col.title || lane)}</span>
+              <span class="countBadge" title="Visible cards">${visibleIds.length}</span>
+            </div>
+            <div class="meta">${escapeHtml(col.hint || "")}</div>
+          </div>
+          <div class="miniBtns noWall">
+            <div class="miniBtn" title="Add card here" data-act="addHere" data-lane="${lane}">＋</div>
+          </div>
+        </div>
+        <div class="colBody" data-dropzone="1">
+          <div class="dropHint">Drop cards here</div>
+          <div class="cards"></div>
+        </div>
+      `;
+
+      const body = colEl.querySelector(".colBody");
+      const cardsWrap = colEl.querySelector(".cards");
+
+      // drag handlers for lane
+      body.addEventListener("dragover", (e)=>{ e.preventDefault(); body.style.outline = "2px solid rgba(96,165,250,.25)"; body.style.outlineOffset="4px"; });
+      body.addEventListener("dragleave", ()=>{ body.style.outline = ""; });
+      body.addEventListener("drop", (e)=>{
+        e.preventDefault();
+        body.style.outline = "";
+        const cid = dragging.cardId;
+        if(!cid) return;
+        moveCard(cid, lane);
+      });
+
+      // cards
+      visibleIds.forEach(cid => {
+        const c = state.cards[cid];
+        if(!c) return;
+        const cardEl = document.createElement("article");
+        cardEl.className = `card ${smartClass(c, lane)}`;
+        cardEl.draggable = true;
+        cardEl.dataset.id = cid;
+
+        const dueTxt = c.dueAt ? new Date(c.dueAt).toLocaleString(undefined, { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" }) : "—";
+        const updH = Math.floor(hoursSince(c.updatedAt) * 10) / 10;
+
+        cardEl.innerHTML = `
+          <div class="cardTop">
+            <div style="min-width:0">
+              <div class="cardTitle">${escapeHtml(c.title || "")}</div>
+              <div class="cardMeta">
+                ${c.owner ? `<span class="tag" title="Owner">👤 ${escapeHtml(c.owner)}</span>` : ""}
+                ${c.tag ? `<span class="tag" title="Tag">🏷️ ${escapeHtml(c.tag)}</span>` : ""}
+                ${c.dueAt ? `<span class="tag" title="Due">⏰ ${escapeHtml(dueTxt)}</span>` : ""}
+              </div>
+            </div>
+            <div class="miniBtns noWall">
+              <div class="miniBtn" title="Edit" data-act="edit" data-id="${cid}">✎</div>
+              <div class="miniBtn" title="Delete" data-act="del" data-id="${cid}">🗑</div>
+            </div>
+          </div>
+          ${c.notes ? `<div class="muted" style="margin-top:8px; font-size:12px; line-height:1.35">${escapeHtml(c.notes)}</div>` : ""}
+          <div class="muted" style="margin-top:10px; font-size:11px; display:flex; justify-content:space-between; gap:10px">
+            <span class="mono">updated ${isFinite(updH) ? updH : "—"}h ago</span>
+            ${c.timer?.running ? `<span class="mono">⏱️ ${formatTimer(c.timer)}</span>` : ""}
+          </div>
+        `;
+
+        cardEl.addEventListener("dragstart", ()=>{
+          dragging.cardId = cid;
+          cardEl.classList.add("dragging");
+        });
+        cardEl.addEventListener("dragend", ()=>{
+          dragging.cardId = null;
+          cardEl.classList.remove("dragging");
+        });
+
+        cardsWrap.appendChild(cardEl);
+      });
+
+      // remove hint if cards exist
+      if(visibleIds.length) colEl.querySelector(".dropHint").style.display = "none";
+
+      // header add button
+      colEl.querySelectorAll('[data-act="addHere"]').forEach(btn=>{
+        btn.addEventListener("click", ()=> openCardDialog({ lane }));
+      });
+
+      board.appendChild(colEl);
+    });
+
+    // card action buttons
+    board.querySelectorAll("[data-act='edit']").forEach(b => b.addEventListener("click", ()=> openCardDialog({ id: b.dataset.id })));
+    board.querySelectorAll("[data-act='del']").forEach(b => b.addEventListener("click", ()=> deleteCard(b.dataset.id)));
+  }
+
+  function renderKPIs(){
+    const k = byId("kpis");
+    if(!k) return;
+
+    const counts = {};
+    state.columns.forEach(c => counts[c.id] = (state.lanes[c.id] || []).length);
+
+    // computed: overdue, dueToday, stale, blockedAging
+    let overdue=0, dueToday=0, stale=0, blockedOld=0;
+    const staleH = state.settings.staleHours ?? 6;
+
+    Object.values(state.cards).forEach(card=>{
+      const lane = card.lane;
+      if(lane === "done") return;
+      if(card.dueAt){
+        if(isOverdue(card.dueAt)) overdue++;
+        else if(isDueToday(card.dueAt)) dueToday++;
+      }
+      if(hoursSince(card.updatedAt) >= staleH) stale++;
+      if(lane === "blocked"){
+        const h = hoursSince(card.movedToLaneAt?.blocked || card.updatedAt);
+        if(h >= (state.settings.blockedWarnHours ?? 4)) blockedOld++;
+      }
+    });
+
+    k.innerHTML = `
+      <div class="kpi"><div class="k">Total</div><div class="v">${Object.keys(state.cards).length}</div></div>
+      <div class="kpi"><div class="k">To Do</div><div class="v">${counts.todo ?? 0}</div></div>
+      <div class="kpi"><div class="k">In Progress</div><div class="v">${counts.doing ?? 0}</div></div>
+      <div class="kpi"><div class="k">Blocked</div><div class="v">${counts.blocked ?? 0}</div></div>
+      <div class="kpi"><div class="k">Done</div><div class="v">${counts.done ?? 0}</div></div>
+      <div class="kpi"><div class="k">Due Today</div><div class="v">${dueToday}</div></div>
+      <div class="kpi"><div class="k">Overdue</div><div class="v">${overdue}</div></div>
+      <div class="kpi"><div class="k">Stale</div><div class="v">${stale}</div></div>
+      <div class="kpi"><div class="k">Blocked Aging</div><div class="v">${blockedOld}</div></div>
+    `;
+  }
+
+  // ---------- Timer ----------
+  function ensureTimer(card){
+    if(!card.timer) card.timer = { running:false, startedAt:null, totalMs:0 };
+  }
+  function startTimer(card){
+    ensureTimer(card);
+    if(card.timer.running) return;
+    card.timer.running = true;
+    card.timer.startedAt = iso(now());
+  }
+  function stopTimer(card){
+    ensureTimer(card);
+    if(!card.timer.running) return;
+    const start = new Date(card.timer.startedAt).getTime();
+    const add = now().getTime() - start;
+    card.timer.totalMs += Math.max(0, add);
+    card.timer.running = false;
+    card.timer.startedAt = null;
+  }
+  function formatTimer(cardTimer){
+    ensureTimer({timer:cardTimer});
+    const t = cardTimer;
+    let ms = t.totalMs || 0;
+    if(t.running && t.startedAt){
+      ms += now().getTime() - new Date(t.startedAt).getTime();
+    }
+    const s = Math.floor(ms/1000);
+    const h = Math.floor(s/3600);
+    const m = Math.floor((s%3600)/60);
+    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+  }
+
+  // ---------- Card CRUD ----------
+  let editingId = null;
+  let defaultLaneForNew = "todo";
+
+  function openCardDialog(opts = {}){
+    const dlg = byId("dlgCard");
+    editingId = opts.id || null;
+    defaultLaneForNew = opts.lane || "todo";
+
+    const delBtn = byId("btnDeleteCard");
+    delBtn.style.display = editingId ? "inline-flex" : "none";
+
+    if(editingId){
+      const c = state.cards[editingId];
+      byId("dlgCardTitle").textContent = "Edit Card";
+      byId("dlgCardSub").textContent = `Currently in: ${laneTitle(c.lane)}`;
+      byId("c_title").value = c.title || "";
+      byId("c_owner").value = c.owner || "";
+      byId("c_tag").value = c.tag || "";
+      byId("c_prio").value = c.priority || "normal";
+      byId("c_due").value = toLocalInputValue(c.dueAt);
+      byId("c_notes").value = c.notes || "";
+      byId("c_prompt").value = c.prompt || "none";
+    }else{
+      byId("dlgCardTitle").textContent = "Add Card";
+      byId("dlgCardSub").textContent = `Will add to: ${laneTitle(defaultLaneForNew)}`;
+      byId("c_title").value = "";
+      byId("c_owner").value = "";
+      byId("c_tag").value = "";
+      byId("c_prio").value = "normal";
+      byId("c_due").value = "";
+      byId("c_notes").value = "";
+      byId("c_prompt").value = "none";
+    }
+
+    dlg.showModal();
+    setTimeout(()=> byId("c_title").focus(), 50);
+  }
+
+  function closeCardDialog(){
+    byId("dlgCard").close();
+    editingId = null;
+  }
+
+  function upsertCard(){
+    const title = byId("c_title").value.trim();
+    if(!title){ alert("Title is required."); return; }
+
+    const owner = byId("c_owner").value.trim();
+    const tag = byId("c_tag").value.trim();
+    const prio = byId("c_prio").value;
+    const dueAt = parseLocalDateTime(byId("c_due").value);
+    const notes = byId("c_notes").value.trim();
+    const prompt = byId("c_prompt").value;
+
+    if(editingId){
+      const c = state.cards[editingId];
+      c.title = title;
+      c.owner = owner;
+      c.tag = tag;
+      c.priority = prio;
+      c.dueAt = dueAt;
+      c.notes = notes;
+      c.prompt = prompt;
+      c.updatedAt = iso(now());
+      save();
+      render();
+      closeCardDialog();
+      return;
+    }
+
+    const id = uid();
+    const lane = defaultLaneForNew in state.lanes ? defaultLaneForNew : "todo";
+    const card = {
+      id,
+      title,
+      owner,
+      tag,
+      priority: prio,
+      dueAt,
+      notes,
+      prompt,
+      lane,
+      createdAt: iso(now()),
+      updatedAt: iso(now()),
+      movedToLaneAt: { [lane]: iso(now()) },
+      timer: { running:false, startedAt:null, totalMs:0 }
+    };
+    state.cards[id] = card;
+    state.lanes[lane].unshift(id);
+
+    save();
+    render();
+    closeCardDialog();
+  }
+
+  function deleteCard(id){
+    if(!id || !state.cards[id]) return;
+    if(!confirm("Delete this card?")) return;
+
+    const lane = state.cards[id].lane;
+    state.lanes[lane] = (state.lanes[lane] || []).filter(x => x !== id);
+    delete state.cards[id];
+
+    save();
+    render();
+  }
+
+  // ---------- Move logic + smart prompts ----------
+  function moveCard(id, toLane){
+    const c = state.cards[id];
+    if(!c) return;
+    const fromLane = c.lane;
+    if(fromLane === toLane) return;
+
+    // remove
+    state.lanes[fromLane] = (state.lanes[fromLane] || []).filter(x => x !== id);
+    // add to top
+    state.lanes[toLane] = state.lanes[toLane] || [];
+    state.lanes[toLane].unshift(id);
+
+    // timer behavior
+    ensureTimer(c);
+    if(toLane === "doing"){
+      // if prompt says auto timer OR simply useful: start timer when entering in progress
+      if(c.prompt === "progress") startTimer(c);
+    }else{
+      // stop timer when leaving In Progress
+      if(fromLane === "doing") stopTimer(c);
+    }
+
+    // prompt behaviors
+    if(toLane === "blocked" && c.prompt === "blocked"){
+      const reason = prompt("Blocked reason? (e.g., waiting for parts / client / approval)");
+      if(reason) c.notes = (c.notes ? (c.notes + "\n") : "") + "Blocked: " + reason;
+    }
+    if(toLane === "done" && c.prompt === "done"){
+      const issues = confirm("Any issues found? OK = Yes, Cancel = No");
+      if(issues){
+        const note = prompt("Quick issue note (optional):");
+        if(note) c.notes = (c.notes ? (c.notes + "\n") : "") + "Issues: " + note;
+      }
+      // always stop timer when done
+      stopTimer(c);
+    }
+
+    c.lane = toLane;
+    c.updatedAt = iso(now());
+    c.movedToLaneAt = c.movedToLaneAt || {};
+    c.movedToLaneAt[toLane] = iso(now());
+
+    save();
+    render();
+  }
+
+  // ---------- Columns ----------
+  function openColsDialog(){
+    const dlg = byId("dlgCols");
+    const wrap = byId("colsForm");
+    wrap.innerHTML = "";
+
+    state.columns.forEach((col, idx) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="field">
+          <label>Column ${idx+1} title</label>
+          <input data-col-id="${col.id}" data-k="title" value="${escapeAttr(col.title || "")}" />
+        </div>
+        <div class="field">
+          <label>Hint (small)</label>
+          <input data-col-id="${col.id}" data-k="hint" value="${escapeAttr(col.hint || "")}" />
+        </div>
+      `;
+      wrap.appendChild(row);
+    });
+
+    dlg.showModal();
+  }
+  function closeColsDialog(){ byId("dlgCols").close(); }
+
+  function saveColsDialog(){
+    const inputs = byId("colsForm").querySelectorAll("input[data-col-id]");
+    inputs.forEach(inp => {
+      const id = inp.dataset.colId;
+      const k = inp.dataset.k;
+      const v = inp.value.trim();
+      const col = state.columns.find(c=>c.id===id);
+      if(col) col[k] = v;
+    });
+    save();
+    render();
+    closeColsDialog();
+  }
+
+  // ---------- Archive done ----------
+  function archiveDone(){
+    const doneIds = (state.lanes.done || []).slice();
+    if(!doneIds.length){ alert("No Done cards to archive."); return; }
+
+    // basic archive: delete done cards but keep a JSON backup to clipboard prompt
+    const backup = {
+      archivedAt: iso(now()),
+      cards: doneIds.map(id => state.cards[id]).filter(Boolean)
+    };
+
+    const ok = confirm(`Archive ${doneIds.length} Done cards?\n\nThis removes them from the board.\nTip: use Import/Export to keep full backups.`);
+    if(!ok) return;
+
+    doneIds.forEach(id => { delete state.cards[id]; });
+    state.lanes.done = [];
+
+    save();
+    render();
+
+    // optional copy
+    try{
+      navigator.clipboard?.writeText(JSON.stringify(backup, null, 2));
+    }catch(e){}
+  }
+
+  // ---------- Import/Export ----------
+  function openDataDialog(){
+    byId("jsonBox").value = JSON.stringify(state, null, 2);
+    byId("dlgData").showModal();
+  }
+  function closeDataDialog(){ byId("dlgData").close(); }
+
+  async function copyJson(){
+    const txt = JSON.stringify(state, null, 2);
+    byId("jsonBox").value = txt;
+    try{
+      await navigator.clipboard.writeText(txt);
+      alert("Copied JSON to clipboard.");
+    }catch(e){
+      alert("Copy failed (clipboard blocked). You can manually copy from the box.");
+    }
+  }
+
+  function importJson(){
+    const txt = byId("jsonBox").value.trim();
+    if(!txt){ alert("Paste JSON first."); return; }
+    let s;
+    try{ s = JSON.parse(txt); }catch(e){ alert("Invalid JSON."); return; }
+
+    if(!s || !Array.isArray(s.columns) || !s.lanes || !s.cards){
+      alert("JSON doesn’t look like a whiteboard export.");
+      return;
+    }
+
+    if(!confirm("Import will replace your current board. Continue?")) return;
+    state = s;
+    save();
+    render();
+    closeDataDialog();
+  }
+
+  // ---------- Focus & Wall mode ----------
+  function toggleFocus(){
+    state.settings.focus = !state.settings.focus;
+    save();
+    render();
+  }
+  function toggleWall(){
+    state.settings.wall = !state.settings.wall;
+    save();
+    render();
+  }
+
+  // ---------- Reset ----------
+  function resetAll(){
+    if(!confirm("Reset the board completely? This deletes everything.")) return;
+    localStorage.removeItem(LS_KEY);
+    state = DEFAULT();
+    save();
+    render();
+  }
+
+  // ---------- Search ----------
+  function bindSearch(){
+    const q = byId("q");
+    if(!q) return;
+    q.addEventListener("input", () => render());
+  }
+
+  // ---------- Clock tick & stale updates ----------
+  function tick(){
+    // update clock + rerender smart statuses periodically
+    render();
+  }
+
+  // ---------- Escaping ----------
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function escapeAttr(s){ return escapeHtml(s).replaceAll("\n"," "); }
+
+  // ---------- Buttons ----------
+  function bindButtons(){
+    byId("btnAdd").addEventListener("click", ()=> openCardDialog({ lane:"todo" }));
+    byId("closeCard").addEventListener("click", closeCardDialog);
+    byId("btnCancelCard").addEventListener("click", closeCardDialog);
+    byId("btnSaveCard").addEventListener("click", upsertCard);
+    byId("btnDeleteCard").addEventListener("click", ()=> { if(editingId) deleteCard(editingId); closeCardDialog(); });
+
+    byId("btnColumns").addEventListener("click", openColsDialog);
+    byId("closeCols").addEventListener("click", closeColsDialog);
+    byId("btnCancelCols").addEventListener("click", closeColsDialog);
+    byId("btnSaveCols").addEventListener("click", saveColsDialog);
+
+    byId("btnArchiveDone").addEventListener("click", archiveDone);
+    byId("btnFocus").addEventListener("click", toggleFocus);
+    byId("btnWall").addEventListener("click", toggleWall);
+    byId("btnData").addEventListener("click", openDataDialog);
+    byId("closeData").addEventListener("click", closeDataDialog);
+    byId("btnCloseData2").addEventListener("click", closeDataDialog);
+    byId("btnCopyJson").addEventListener("click", copyJson);
+    byId("btnImportJson").addEventListener("click", importJson);
+    byId("btnReset").addEventListener("click", resetAll);
+  }
+
+  // ---------- Background timer tick (without “async promises”) ----------
+  function setupTimerLoop(){
+    setInterval(() => {
+      // update running timers
+      // no state changes needed; just re-render to update display
+      render();
+    }, 30_000);
+  }
+
+  // ---------- Init ----------
+  function init(){
+    // ensure lanes exist for columns
+    state.columns.forEach(c => { if(!state.lanes[c.id]) state.lanes[c.id] = []; });
+
+    // ensure card lane pointers exist
+    Object.values(state.cards).forEach(c => {
+      if(!c.lane) c.lane = "todo";
+      if(!state.lanes[c.lane]) state.lanes[c.lane] = [];
+      // if card not found in its lane array, re-add
+      const inLane = Object.values(state.lanes).some(arr => arr.includes(c.id));
+      if(!inLane) state.lanes[c.lane].unshift(c.id);
+      if(!c.updatedAt) c.updatedAt = iso(now());
+      if(!c.createdAt) c.createdAt = iso(now());
+      if(!c.movedToLaneAt) c.movedToLaneAt = { [c.lane]: iso(now()) };
+      if(!c.timer) c.timer = { running:false, startedAt:null, totalMs:0 };
+    });
+
+    save();
+    bindButtons();
+    bindSearch();
+
+    // initial render + clock tick
+    render();
+    setInterval(tick, 60_000);
+    setupTimerLoop();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Route Cost Calculator — Smart (Offline)</title>
+  <style>
+    :root{
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(17,24,39,.72);
+      --card2: rgba(17,24,39,.92);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.12);
+      --line2:rgba(255,255,255,.08);
+      --blue:#60a5fa;
+      --blue2:#38bdf8;
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --ring: rgba(96,165,250,.35);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --radius:16px;
+      --max: 1200px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(96,165,250,.22), transparent 55%),
+        radial-gradient(900px 600px at 80% 0%, rgba(167,139,250,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:18px 16px 96px;}
+    header{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:14px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:sticky; top:10px; z-index:10;
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; flex-direction:column; gap:4px}
+    .brand h1{margin:0; font-size:16px; letter-spacing:.2px}
+    .brand p{margin:0; color:var(--muted); font-size:12px}
+    .topActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    button,.btn{
+      appearance:none; border:1px solid var(--line);
+      background: rgba(15,23,42,.55);
+      color:var(--text); padding:10px 12px; border-radius:12px;
+      cursor:pointer; font-weight:600; font-size:13px;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+    }
+    button:hover{border-color:rgba(96,165,250,.45)}
+    button:active{transform: translateY(1px)}
+    button.primary{border-color:rgba(96,165,250,.5); background: rgba(96,165,250,.14)}
+    button.danger{border-color:rgba(251,113,133,.5); background: rgba(251,113,133,.12)}
+    button.ghost{background:transparent}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      header{position:relative; top:0}
+    }
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:12px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
+      border-bottom:1px solid var(--line2);
+    }
+    .card .hd h2{margin:0; font-size:14px}
+    .card .hd .sub{color:var(--muted); font-size:12px}
+    .card .bd{padding:12px}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px}
+    @media (max-width: 560px){ .row{grid-template-columns:1fr} }
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{
+      font-size:12px; color:var(--muted);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .field label small{opacity:.8}
+    input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(3,7,18,.45);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus{border-color:rgba(96,165,250,.55); box-shadow: 0 0 0 3px var(--ring)}
+    textarea{min-height:80px; resize:vertical}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      background: rgba(2,6,23,.35);
+      color:var(--text);
+      font-size:12px;
+    }
+    .muted{color:var(--muted)}
+    .mono{font-family:var(--mono)}
+    .split{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    }
+    .list{display:flex; flex-direction:column; gap:8px}
+    .item{
+      border:1px solid var(--line2);
+      border-radius:14px;
+      padding:10px;
+      background: rgba(2,6,23,.28);
+    }
+    .item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+    .item .name{font-weight:700; font-size:13px}
+    .item .meta{font-size:12px; color:var(--muted)}
+    .kv{
+      display:grid; grid-template-columns: 1fr auto; gap:8px;
+      font-size:13px;
+      padding:8px 0;
+      border-bottom:1px dashed rgba(255,255,255,.08);
+    }
+    .kv:last-child{border-bottom:none}
+    .money{font-variant-numeric: tabular-nums; font-family: var(--mono)}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px; font-weight:700;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+    .b-ok{border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.10)}
+    .b-warn{border-color: rgba(251,191,36,.50); background: rgba(251,191,36,.10)}
+    .b-bad{border-color: rgba(251,113,133,.55); background: rgba(251,113,133,.10)}
+    .stickyBar{
+      position:fixed; left:0; right:0; bottom:0;
+      background: rgba(2,6,23,.82);
+      border-top:1px solid var(--line);
+      backdrop-filter: blur(12px);
+      padding:10px 12px;
+      z-index: 20;
+    }
+    .stickyInner{max-width:var(--max); margin:0 auto; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .bigTotal{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .bigTotal .t{font-size:12px; color:var(--muted)}
+    .bigTotal .v{font-size:18px; font-weight:900; letter-spacing:.2px}
+    .smallActions{display:flex; gap:10px; flex-wrap:wrap}
+    @media print{
+      header, .stickyBar, .noPrint{display:none !important;}
+      body{background:#fff; color:#111}
+      .card{box-shadow:none}
+      input, select, textarea{border:1px solid #ccc}
+      .wrap{padding-bottom:18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Route Cost Calculator — Smart (No AI)</h1>
+        <p>Offline-first • remembers your routes • preloaded tolls (N3/N4) • print-ready quotes</p>
+      </div>
+      <div class="topActions noPrint">
+        <button class="ghost" id="btnLoadDemo">Load Demo</button>
+        <button class="ghost" id="btnSaveRoute">Save Route</button>
+        <button class="ghost" id="btnExportCSV">Export CSV</button>
+        <button class="primary" id="btnPrint">Print / PDF</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Inputs -->
+      <section class="card">
+        <div class="hd">
+          <div>
+            <h2>Inputs</h2>
+            <div class="sub">Set route, vehicle, time, tolls & pricing</div>
+          </div>
+          <span class="pill noPrint" id="smartStatus">Smart mode: ON</span>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label>Route template <small class="muted">Auto distance + tolls</small></label>
+              <select id="tplRoute">
+                <option value="">— Choose a template —</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Vehicle preset <small class="muted">Auto fuel + wear</small></label>
+              <select id="tplVehicle">
+                <option value="">— Choose vehicle type —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Route name</label>
+              <input id="routeName" placeholder="e.g., JHB → Durban (N3)" />
+            </div>
+            <div class="field">
+              <label>Trip type</label>
+              <select id="tripType">
+                <option value="oneway">One-way</option>
+                <option value="round">Round trip</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Distance (km)</label>
+              <input id="distanceKm" type="number" min="0" step="0.1" placeholder="e.g., 560" />
+            </div>
+            <div class="field">
+              <label>Driving profile <small class="muted">Smart time estimate</small></label>
+              <select id="driveProfile">
+                <option value="highway">Highway (avg 100 km/h)</option>
+                <option value="mixed" selected>Mixed (avg 80 km/h)</option>
+                <option value="urban">Urban (avg 50 km/h)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Drive time (hours)</label>
+              <input id="driveHours" type="number" min="0" step="0.01" placeholder="auto if blank" />
+            </div>
+            <div class="field">
+              <label>Load/Unload time (hours)</label>
+              <input id="loadHours" type="number" min="0" step="0.01" value="0.5" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Idle time (hours) <small class="muted">Optional</small></label>
+              <input id="idleHours" type="number" min="0" step="0.01" value="0" />
+            </div>
+            <div class="field">
+              <label>Idle fuel (L/hour) <small class="muted">Optional</small></label>
+              <input id="idleLph" type="number" min="0" step="0.1" value="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Fuel consumption (L/100km)</label>
+              <input id="lPer100" type="number" min="0" step="0.1" placeholder="e.g., 8.5" />
+            </div>
+            <div class="field">
+              <label>Fuel price (R/L)</label>
+              <input id="fuelPrice" type="number" min="0" step="0.01" value="25.00" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Driver rate (R/hour)</label>
+              <input id="driverRate" type="number" min="0" step="1" value="120" />
+            </div>
+            <div class="field">
+              <label>Overhead per trip (R) <small class="muted">Admin/insurance</small></label>
+              <input id="overhead" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Maintenance allowance (R/km)</label>
+              <input id="maintPerKm" type="number" min="0" step="0.01" value="0.80" />
+            </div>
+            <div class="field">
+              <label>Tyres allowance (R/km)</label>
+              <input id="tyresPerKm" type="number" min="0" step="0.01" value="0.20" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Tolls (R) <small class="muted">Auto from templates</small></label>
+              <input id="tolls" type="number" min="0" step="0.01" value="0" />
+            </div>
+            <div class="field">
+              <label>Other costs (R) <small class="muted">Parking, permits</small></label>
+              <input id="otherCosts" type="number" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Pricing mode</label>
+              <select id="pricingMode">
+                <option value="markup" selected>Markup % (cost + %)</option>
+                <option value="target">Target profit (cost + R)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label id="pricingLabel">Markup (%)</label>
+              <input id="pricingValue" type="number" min="0" step="0.1" value="25" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Notes (optional)</label>
+            <textarea id="notes" placeholder="Special instructions, customer, load type, etc."></textarea>
+          </div>
+
+          <div class="split noPrint" style="margin-top:12px">
+            <div class="pill">
+              <span class="muted">Toll class:</span>
+              <select id="tollClass" style="padding:6px 10px; border-radius:999px;">
+                <option value="1" selected>Class 1 (Light)</option>
+                <option value="2">Class 2 (2-axle heavy)</option>
+                <option value="3">Class 3 (3–4 axle)</option>
+                <option value="4">Class 4 (5+ axle)</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button class="ghost" id="btnReset">Reset</button>
+              <button class="ghost" id="btnManageData">Toll Data</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px; background:rgba(2,6,23,.25)">
+            <div class="hd">
+              <div>
+                <h2>Auto Toll Breakdown</h2>
+                <div class="sub">Shows which plazas were used (template routes only)</div>
+              </div>
+              <span class="badge" id="tollBadge">0 plazas</span>
+            </div>
+            <div class="bd" id="tollBreakdown" style="display:flex; flex-direction:column; gap:8px">
+              <div class="muted">Pick a route template to auto-fill tolls.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: Output + saved -->
+      <aside class="card">
+        <div class="hd">
+          <div>
+            <h2>Results</h2>
+            <div class="sub">Cost breakdown + “AI-ish” insights</div>
+          </div>
+          <span class="badge" id="healthBadge">OK</span>
+        </div>
+        <div class="bd">
+          <div class="item">
+            <div class="top">
+              <div>
+                <div class="name">Trip Summary</div>
+                <div class="meta" id="sumMeta">—</div>
+              </div>
+              <div class="badge b-ok" id="profitBadge">Profit: —</div>
+            </div>
+            <div style="margin-top:10px">
+              <div class="kv"><div class="muted">Fuel used</div><div class="money" id="outFuelUsed">—</div></div>
+              <div class="kv"><div class="muted">Total time</div><div class="money" id="outTime">—</div></div>
+              <div class="kv"><div class="muted">Cost per km</div><div class="money" id="outCostPerKm">—</div></div>
+              <div class="kv"><div class="muted">Break-even price</div><div class="money" id="outBreakEven">—</div></div>
+            </div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <div class="name">Cost Breakdown</div>
+            <div style="margin-top:10px">
+              <div class="kv"><div>Fuel</div><div class="money" id="outFuelCost">—</div></div>
+              <div class="kv"><div>Labor</div><div class="money" id="outLaborCost">—</div></div>
+              <div class="kv"><div>Wear (maint+tyres)</div><div class="money" id="outWearCost">—</div></div>
+              <div class="kv"><div>Tolls</div><div class="money" id="outTolls">—</div></div>
+              <div class="kv"><div>Other</div><div class="money" id="outOther">—</div></div>
+              <div class="kv"><div>Overhead</div><div class="money" id="outOverhead">—</div></div>
+              <div class="kv"><div><b>Total Cost</b></div><div class="money" id="outTotalCost"><b>—</b></div></div>
+            </div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <div class="name">Recommended Price</div>
+            <div style="margin-top:10px">
+              <div class="kv"><div class="muted">Mode</div><div class="money" id="outMode">—</div></div>
+              <div class="kv"><div class="muted">Input</div><div class="money" id="outModeVal">—</div></div>
+              <div class="kv"><div><b>Price to charge</b></div><div class="money" id="outPrice"><b>—</b></div></div>
+              <div class="kv"><div class="muted">Profit</div><div class="money" id="outProfit">—</div></div>
+              <div class="kv"><div class="muted">Margin</div><div class="money" id="outMargin">—</div></div>
+            </div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <div class="name">Smart Insights (No AI)</div>
+            <div class="muted" style="margin-top:6px">Rules + sensitivity checks. Fast and offline.</div>
+            <div class="list" id="insights" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card" style="margin-top:12px; background:rgba(2,6,23,.25)">
+            <div class="hd">
+              <div>
+                <h2>Saved Routes</h2>
+                <div class="sub">Stored in your browser (localStorage)</div>
+              </div>
+              <button class="ghost noPrint" id="btnClearSaved">Clear</button>
+            </div>
+            <div class="bd" id="savedRoutes">
+              <div class="muted">No saved routes yet.</div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="stickyBar noPrint">
+    <div class="stickyInner">
+      <div class="bigTotal">
+        <div class="t">Recommended Price</div>
+        <div class="v money" id="stickyPrice">—</div>
+      </div>
+      <div class="smallActions">
+        <button class="ghost" id="btnCopySummary">Copy Summary</button>
+        <button class="primary" id="btnApplySmart">Apply Smart Fixes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toll Data Modal -->
+  <dialog id="dlgData" style="border:none; border-radius:16px; padding:0; width:min(720px, 94vw); background:rgba(2,6,23,.95); color:var(--text); box-shadow:var(--shadow)">
+    <div style="padding:14px 14px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px">
+      <div>
+        <div style="font-weight:900">Toll Data</div>
+        <div class="muted" style="font-size:12px">Built-in dataset + optional online updates</div>
+      </div>
+      <button class="ghost" id="btnCloseDlg">Close</button>
+    </div>
+    <div style="padding:14px">
+      <div class="item">
+        <div class="name">Built-in data</div>
+        <div class="muted" style="margin-top:6px">
+          Includes N3 & N4 template tolls (tariffs effective 1 March 2025). You can update by hosting your own JSON.
+        </div>
+      </div>
+
+      <div class="item" style="margin-top:10px">
+        <div class="name">Update URL (optional)</div>
+        <div class="muted" style="margin-top:6px">Example: https://yourdomain.co.za/data/tolls-sa.json</div>
+        <div class="row" style="margin-top:10px">
+          <div class="field">
+            <label>JSON URL</label>
+            <input id="dataUrl" placeholder="Leave blank to disable online updates" />
+          </div>
+          <div class="field">
+            <label>Actions</label>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button class="ghost" id="btnSaveUrl">Save URL</button>
+              <button class="primary" id="btnFetchData">Fetch & Apply</button>
+            </div>
+          </div>
+        </div>
+        <div class="muted" id="dataMsg" style="margin-top:8px"></div>
+      </div>
+
+      <div class="item" style="margin-top:10px">
+        <div class="name">Expected JSON format</div>
+        <pre class="mono" style="white-space:pre-wrap; margin:10px 0 0; background:rgba(255,255,255,.03); padding:10px; border-radius:12px; border:1px solid var(--line2); font-size:12px">
+{
+  "version": "2026-03-01",
+  "plazas": [
+    {"id":"N3_DEHOEK","name":"De Hoek","corridor":"N3","class":{"1":65,"2":101,"3":154,"4":222}}
+  ],
+  "templates": [
+    {"id":"N3_JHB_DBN","name":"Johannesburg → Durban (N3)","km":560,
+     "plaza_ids":["N3_DEHOEK","N3_WILGE","N3_TUGELA" /* ... */]
+    }
+  ]
+}
+        </pre>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+/* =========================================================
+   SMART ROUTE COST CALCULATOR (NO AI)
+   - offline-first
+   - remembers routes/vehicles
+   - template routes auto-fill distance + tolls
+   - toll class selection
+   - "Apply Smart Fixes" does safe autopopulation
+========================================================= */
+
+const LS = {
+  savedRoutes: "ll_route_calc_saved_routes_v1",
+  lastInputs: "ll_route_calc_last_inputs_v1",
+  tollUpdateUrl: "ll_route_calc_toll_url_v1",
+  tollOverrideData: "ll_route_calc_toll_override_v1"
+};
+
+const fmtMoney = (n)=> {
+  if (!isFinite(n)) return "—";
+  return "R " + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+const fmtNum = (n, d=2)=> isFinite(n) ? n.toFixed(d) : "—";
+const clamp = (n, a, b)=> Math.min(Math.max(n, a), b);
+
+const $ = (id)=> document.getElementById(id);
+
+function getNumber(el, fallback=0){
+  const v = parseFloat(el.value);
+  return isFinite(v) ? v : fallback;
+}
+function setNumber(el, n, d=2){
+  el.value = (isFinite(n) ? Number(n).toFixed(d) : "");
+}
+function setText(el, t){ el.textContent = t; }
+
+function avgSpeed(profile){
+  if (profile === "highway") return 100;
+  if (profile === "urban") return 50;
+  return 80; // mixed
+}
+
+/* ---------------------------------------------------------
+   BUILT-IN TOLL DATA (effective 1 March 2025)
+   Template tolls based on published plaza tariffs pages.
+   Keep it small but expandable. You can replace via update URL.
+--------------------------------------------------------- */
+const builtInTolls = {
+  version: "2025-03-01",
+  plazas: [
+    // N3 (JHB–Durban) sample key plazas (extend anytime)
+    // Values are ZAR for Class 1–4
+    { id:"N3_DEHOEK", name:"De Hoek (Mainline)", corridor:"N3", class:{1:65.00,2:101.00,3:154.00,4:222.00}},
+    { id:"N3_WILGE",  name:"Wilge (Mainline)",   corridor:"N3", class:{1:90.00,2:155.00,3:207.00,4:294.00}},
+    { id:"N3_TUGELA", name:"Tugela (Mainline)",  corridor:"N3", class:{1:96.00,2:159.00,3:251.00,4:347.00}},
+    // N4 (Pretoria–Maputo corridor) sample plazas (from published lists)
+    { id:"N4_DOORNPOORT", name:"Doornpoort (Mainline)", corridor:"N4", class:{1:19.50,2:49.00,3:56.00,4:68.00}},
+    { id:"N4_BRITS",      name:"Brits (Mainline)",      corridor:"N4", class:{1:21.00,2:52.00,3:60.00,4:74.00}},
+    { id:"N4_KROONSTAD",  name:"(Example) Add more N4 plazas", corridor:"N4", class:{1:0,2:0,3:0,4:0}}
+  ],
+  templates: [
+    {
+      id:"N3_JHB_DBN",
+      name:"Johannesburg → Durban (N3) — template",
+      km: 560,
+      plaza_ids:["N3_DEHOEK","N3_WILGE","N3_TUGELA"]
+    },
+    {
+      id:"N3_DBN_JHB",
+      name:"Durban → Johannesburg (N3) — template",
+      km: 560,
+      plaza_ids:["N3_TUGELA","N3_WILGE","N3_DEHOEK"]
+    },
+    {
+      id:"N4_PTA_MPU",
+      name:"Pretoria → Mpumalanga (N4) — template (partial)",
+      km: 320,
+      plaza_ids:["N4_DOORNPOORT","N4_BRITS"]
+    }
+  ]
+};
+
+// Allow online override if user fetched and stored data
+function loadTollData(){
+  try{
+    const raw = localStorage.getItem(LS.tollOverrideData);
+    if(!raw) return builtInTolls;
+    const obj = JSON.parse(raw);
+    if(obj && Array.isArray(obj.plazas) && Array.isArray(obj.templates)) return obj;
+  }catch(e){}
+  return builtInTolls;
+}
+
+let tollData = loadTollData();
+
+function plazaById(id){
+  return tollData.plazas.find(p => p.id === id) || null;
+}
+
+/* ---------------------------------------------------------
+   VEHICLE PRESETS (smart defaults)
+--------------------------------------------------------- */
+const vehiclePresets = [
+  { id:"hatchback", name:"Hatchback / Small car", l100:6.5, maint:0.55, tyres:0.10 },
+  { id:"sedan", name:"Sedan / Compact SUV", l100:8.5, maint:0.70, tyres:0.15 },
+  { id:"bakkie", name:"Bakkie / Light pickup", l100:10.5, maint:0.90, tyres:0.25 },
+  { id:"van", name:"Delivery van", l100:12.5, maint:1.10, tyres:0.30 },
+  { id:"truck2", name:"Truck (2-axle)", l100:28.0, maint:3.00, tyres:1.20 },
+  { id:"truck3", name:"Truck (3–4 axle)", l100:34.0, maint:4.20, tyres:1.60 },
+  { id:"truck4", name:"Truck (5+ axle)", l100:40.0, maint:5.50, tyres:2.10 }
+];
+
+/* ---------------------------------------------------------
+   UI INIT
+--------------------------------------------------------- */
+function fillSelect(el, options, placeholderFirst=false){
+  el.innerHTML = "";
+  if(placeholderFirst){
+    const op = document.createElement("option");
+    op.value = "";
+    op.textContent = "— Choose —";
+    el.appendChild(op);
+  }
+  options.forEach(o=>{
+    const op=document.createElement("option");
+    op.value=o.value;
+    op.textContent=o.label;
+    el.appendChild(op);
+  });
+}
+
+function initTemplates(){
+  const tplRoute = $("tplRoute");
+  const tplVehicle = $("tplVehicle");
+
+  fillSelect(tplRoute, tollData.templates.map(t=>({value:t.id,label:t.name})), true);
+  fillSelect(tplVehicle, vehiclePresets.map(v=>({value:v.id,label:v.name})), true);
+}
+
+function restoreLastInputs(){
+  try{
+    const raw = localStorage.getItem(LS.lastInputs);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    const ids = [
+      "routeName","tripType","distanceKm","driveProfile","driveHours","loadHours","idleHours","idleLph",
+      "lPer100","fuelPrice","driverRate","overhead","maintPerKm","tyresPerKm","tolls","otherCosts",
+      "pricingMode","pricingValue","notes","tollClass"
+    ];
+    ids.forEach(id=>{
+      if(d[id] !== undefined && $(id)){
+        $(id).value = d[id];
+      }
+    });
+  }catch(e){}
+}
+
+function persistInputs(){
+  const ids = [
+    "routeName","tripType","distanceKm","driveProfile","driveHours","loadHours","idleHours","idleLph",
+    "lPer100","fuelPrice","driverRate","overhead","maintPerKm","tyresPerKm","tolls","otherCosts",
+    "pricingMode","pricingValue","notes","tollClass"
+  ];
+  const d = {};
+  ids.forEach(id=> d[id] = $(id).value );
+  localStorage.setItem(LS.lastInputs, JSON.stringify(d));
+}
+
+/* ---------------------------------------------------------
+   SMART AUTO-FILL (No AI)
+--------------------------------------------------------- */
+function applyRouteTemplate(id){
+  const t = tollData.templates.find(x=>x.id===id);
+  if(!t) return;
+  $("routeName").value = t.name.replace("— template","").trim();
+  $("distanceKm").value = t.km;
+  // Auto tolls from plazas
+  const cls = parseInt($("tollClass").value,10) || 1;
+  const plazas = (t.plaza_ids||[]).map(plazaById).filter(Boolean);
+  const total = plazas.reduce((sum,p)=> sum + (Number(p.class[cls])||0), 0);
+  $("tolls").value = total.toFixed(2);
+  renderTollBreakdown(plazas, cls);
+}
+
+function applyVehiclePreset(id){
+  const v = vehiclePresets.find(x=>x.id===id);
+  if(!v) return;
+  $("lPer100").value = v.l100.toFixed(1);
+  $("maintPerKm").value = v.maint.toFixed(2);
+  $("tyresPerKm").value = v.tyres.toFixed(2);
+}
+
+function smartEstimateDriveTime(){
+  const km = getNumber($("distanceKm"), 0);
+  if(km <= 0) return;
+  const profile = $("driveProfile").value;
+  const speed = avgSpeed(profile);
+  const est = km / speed;
+  // only fill if empty or invalid
+  const cur = parseFloat($("driveHours").value);
+  if(!isFinite(cur) || cur <= 0){
+    $("driveHours").value = est.toFixed(2);
+  }
+}
+
+function applySmartFixes(){
+  // estimate drive time if missing
+  smartEstimateDriveTime();
+
+  // if idle time exists but idle fuel empty, give safe default for diesel/petrol small engines
+  const idleH = getNumber($("idleHours"), 0);
+  const idleLph = getNumber($("idleLph"), 0);
+  if(idleH > 0 && idleLph <= 0){
+    $("idleLph").value = "1.2"; // conservative default
+  }
+
+  // If wear costs are unrealistically zero, set small defaults
+  const m = getNumber($("maintPerKm"), 0);
+  const t = getNumber($("tyresPerKm"), 0);
+  if(m === 0 && t === 0){
+    $("maintPerKm").value = "0.80";
+    $("tyresPerKm").value = "0.20";
+  }
+}
+
+/* ---------------------------------------------------------
+   CALCULATION
+--------------------------------------------------------- */
+function calc(){
+  const tripType = $("tripType").value;
+  let km = getNumber($("distanceKm"), 0);
+  if(tripType === "round") km *= 2;
+
+  const l100 = getNumber($("lPer100"), 0);
+  const fuelPrice = getNumber($("fuelPrice"), 0);
+  const driveH = getNumber($("driveHours"), 0);
+  const loadH = getNumber($("loadHours"), 0);
+  const idleH = getNumber($("idleHours"), 0);
+  const idleLph = getNumber($("idleLph"), 0);
+  const driverRate = getNumber($("driverRate"), 0);
+
+  const tolls = getNumber($("tolls"), 0);
+  const other = getNumber($("otherCosts"), 0);
+  const overhead = getNumber($("overhead"), 0);
+  const maint = getNumber($("maintPerKm"), 0);
+  const tyres = getNumber($("tyresPerKm"), 0);
+
+  const fuelUsed = (km * (l100/100)) + (idleH * idleLph);
+  const fuelCost = fuelUsed * fuelPrice;
+
+  const totalTime = driveH + loadH + idleH;
+  const laborCost = totalTime * driverRate;
+
+  const wearCost = km * (maint + tyres);
+
+  const totalCost = fuelCost + laborCost + wearCost + tolls + other + overhead;
+
+  // pricing
+  const mode = $("pricingMode").value;
+  const val = getNumber($("pricingValue"), 0);
+  let price = totalCost;
+  if(mode === "markup"){
+    price = totalCost * (1 + (val/100));
+  }else{
+    price = totalCost + val;
+  }
+  const profit = price - totalCost;
+  const margin = price > 0 ? (profit/price)*100 : 0;
+
+  const costPerKm = km > 0 ? totalCost / km : 0;
+
+  return {
+    km, l100, fuelPrice, driveH, loadH, idleH, idleLph,
+    fuelUsed, fuelCost, totalTime, laborCost, wearCost,
+    tolls, other, overhead, totalCost,
+    mode, val, price, profit, margin, costPerKm
+  };
+}
+
+function healthChecks(r){
+  const issues = [];
+  // time sanity
+  if(r.km > 0 && r.driveH > 0){
+    const avg = r.km / r.driveH;
+    if(avg > 130) issues.push({type:"warn", text:`Your average speed is ${fmtNum(avg,0)} km/h. Check distance/time.`});
+    if(avg < 30) issues.push({type:"warn", text:`Average speed is ${fmtNum(avg,0)} km/h. Are you including long stops?`});
+  }
+  // wear sanity
+  if(r.km > 0){
+    const wearPerKm = (getNumber($("maintPerKm"),0) + getNumber($("tyresPerKm"),0));
+    if(wearPerKm <= 0) issues.push({type:"warn", text:"Wear & tear is R0/km. That’s not realistic for pricing."});
+  }
+  // pricing sanity
+  if(r.price < r.totalCost - 0.01) issues.push({type:"bad", text:"Your price is below break-even. You will lose money."});
+  if(r.margin < 5) issues.push({type:"warn", text:`Margin is only ${fmtNum(r.margin,1)}%. Consider increasing markup.`});
+  // fuel sanity
+  if(r.l100 <= 0) issues.push({type:"bad", text:"Fuel consumption is missing (L/100km)."});
+  if(r.fuelPrice <= 0) issues.push({type:"bad", text:"Fuel price is missing."});
+  // toll sanity
+  if(r.tolls === 0 && $("tplRoute").value){
+    issues.push({type:"warn", text:"Template selected but tolls are zero. Check toll class or plaza list."});
+  }
+  return issues;
+}
+
+function renderInsights(r){
+  const box = $("insights");
+  box.innerHTML = "";
+
+  const ins = [];
+  // biggest cost driver
+  const parts = [
+    {k:"Fuel", v:r.fuelCost},
+    {k:"Labor", v:r.laborCost},
+    {k:"Wear", v:r.wearCost},
+    {k:"Tolls", v:r.tolls},
+    {k:"Other+Overhead", v:(r.other + r.overhead)}
+  ].sort((a,b)=>b.v-a.v);
+  if(parts[0].v > 0){
+    ins.push({type:"info", text:`Biggest cost driver: ${parts[0].k} (${fmtMoney(parts[0].v)}).`});
+  }
+
+  // sensitivity: fuel + R1/L
+  if(r.fuelUsed > 0){
+    const delta = r.fuelUsed * 1;
+    ins.push({type:"info", text:`If fuel increases by R1/L, your cost rises by ${fmtMoney(delta)}.`});
+  }
+
+  // recommend pricing tweak
+  if(r.margin < 10 && r.totalCost > 0){
+    const needed = (r.totalCost / (1 - 0.10)) - r.totalCost; // to achieve 10% margin (approx)
+    ins.push({type:"tip", text:`To target ~10% margin, increase price by about ${fmtMoney(Math.max(0, needed))}.`});
+  }
+
+  // smart estimate hint
+  const cur = parseFloat($("driveHours").value);
+  if(!isFinite(cur) || cur <= 0){
+    ins.push({type:"tip", text:"Drive time is blank — use “Apply Smart Fixes” to auto-estimate from distance."});
+  }
+
+  // add health checks
+  const hc = healthChecks(r);
+  hc.forEach(x=> ins.push({type:x.type, text:x.text}));
+
+  if(ins.length === 0){
+    ins.push({type:"ok", text:"Looks good. Your inputs are consistent."});
+  }
+
+  ins.forEach(i=>{
+    const el = document.createElement("div");
+    const cls = i.type==="bad" ? "b-bad" : i.type==="warn" ? "b-warn" : i.type==="ok" ? "b-ok" : "";
+    el.className = "badge " + cls;
+    el.style.whiteSpace = "normal";
+    el.textContent = i.text;
+    box.appendChild(el);
+  });
+
+  // health badge
+  const worst = ins.some(x=>x.type==="bad") ? "bad" : ins.some(x=>x.type==="warn") ? "warn" : "ok";
+  const hb = $("healthBadge");
+  hb.className = "badge " + (worst==="bad" ? "b-bad" : worst==="warn" ? "b-warn" : "b-ok");
+  hb.textContent = worst==="bad" ? "Action needed" : worst==="warn" ? "Check inputs" : "OK";
+}
+
+function render(r){
+  const name = $("routeName").value.trim() || "Unnamed route";
+  const trip = $("tripType").value === "round" ? "Round trip" : "One-way";
+  setText($("sumMeta"), `${name} • ${trip} • ${fmtNum(r.km,1)} km`);
+
+  setText($("outFuelUsed"), `${fmtNum(r.fuelUsed,2)} L`);
+  setText($("outTime"), `${fmtNum(r.totalTime,2)} hrs`);
+  setText($("outCostPerKm"), r.km>0 ? `${fmtMoney(r.costPerKm)}/km` : "—");
+  setText($("outBreakEven"), fmtMoney(r.totalCost));
+
+  setText($("outFuelCost"), fmtMoney(r.fuelCost));
+  setText($("outLaborCost"), fmtMoney(r.laborCost));
+  setText($("outWearCost"), fmtMoney(r.wearCost));
+  setText($("outTolls"), fmtMoney(r.tolls));
+  setText($("outOther"), fmtMoney(r.other));
+  setText($("outOverhead"), fmtMoney(r.overhead));
+  setText($("outTotalCost"), fmtMoney(r.totalCost));
+
+  setText($("outMode"), r.mode === "markup" ? "Markup %" : "Target profit");
+  setText($("outModeVal"), r.mode === "markup" ? `${fmtNum(r.val,1)}%` : fmtMoney(r.val));
+  setText($("outPrice"), fmtMoney(r.price));
+  setText($("outProfit"), fmtMoney(r.profit));
+  setText($("outMargin"), `${fmtNum(r.margin,1)}%`);
+  setText($("stickyPrice"), fmtMoney(r.price));
+
+  const pb = $("profitBadge");
+  const pOk = r.profit >= 0;
+  pb.className = "badge " + (r.price < r.totalCost ? "b-bad" : (r.margin < 10 ? "b-warn" : "b-ok"));
+  pb.textContent = `Profit: ${fmtMoney(r.profit)}`;
+
+  renderInsights(r);
+}
+
+function renderTollBreakdown(plazas, cls){
+  const box = $("tollBreakdown");
+  box.innerHTML = "";
+  if(!plazas.length){
+    box.innerHTML = `<div class="muted">No plazas for this template.</div>`;
+    $("tollBadge").textContent = "0 plazas";
+    return;
+  }
+  let total = 0;
+  plazas.forEach(p=>{
+    const v = Number(p.class[cls])||0;
+    total += v;
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="top">
+        <div>
+          <div class="name">${p.name}</div>
+          <div class="meta">${p.corridor} • Class ${cls}</div>
+        </div>
+        <div class="money">${fmtMoney(v)}</div>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+  $("tollBadge").textContent = `${plazas.length} plazas • ${fmtMoney(total)}`;
+}
+
+/* ---------------------------------------------------------
+   SAVED ROUTES
+--------------------------------------------------------- */
+function loadSavedRoutes(){
+  try{
+    const raw = localStorage.getItem(LS.savedRoutes);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveSavedRoutes(arr){
+  localStorage.setItem(LS.savedRoutes, JSON.stringify(arr));
+}
+function renderSavedRoutes(){
+  const box = $("savedRoutes");
+  const arr = loadSavedRoutes();
+  box.innerHTML = "";
+  if(!arr.length){
+    box.innerHTML = `<div class="muted">No saved routes yet.</div>`;
+    return;
+  }
+  arr.slice().reverse().forEach((r, idxRev)=>{
+    const idx = arr.length - 1 - idxRev;
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="top">
+        <div>
+          <div class="name">${r.routeName || "Unnamed route"}</div>
+          <div class="meta">${r.tripType==="round"?"Round":"One-way"} • ${fmtNum(r.km,1)} km • ${r.pricingMode==="markup" ? (fmtNum(r.pricingValue,1)+"%") : fmtMoney(r.pricingValue)}</div>
+        </div>
+        <div style="display:flex; gap:8px">
+          <button class="ghost" data-act="load" data-idx="${idx}">Load</button>
+          <button class="danger" data-act="del" data-idx="${idx}">Delete</button>
+        </div>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+
+  box.querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const act = b.dataset.act;
+      const idx = parseInt(b.dataset.idx,10);
+      const arr2 = loadSavedRoutes();
+      if(!arr2[idx]) return;
+      if(act==="load"){
+        applyRouteFromSaved(arr2[idx]);
+      }else if(act==="del"){
+        arr2.splice(idx,1);
+        saveSavedRoutes(arr2);
+        renderSavedRoutes();
+      }
+    });
+  });
+}
+
+function snapshotCurrent(){
+  const r = calc();
+  return {
+    routeName: $("routeName").value,
+    tripType: $("tripType").value,
+    km: r.km,
+    distanceKm: $("distanceKm").value,
+    driveProfile: $("driveProfile").value,
+    driveHours: $("driveHours").value,
+    loadHours: $("loadHours").value,
+    idleHours: $("idleHours").value,
+    idleLph: $("idleLph").value,
+    lPer100: $("lPer100").value,
+    fuelPrice: $("fuelPrice").value,
+    driverRate: $("driverRate").value,
+    overhead: $("overhead").value,
+    maintPerKm: $("maintPerKm").value,
+    tyresPerKm: $("tyresPerKm").value,
+    tolls: $("tolls").value,
+    otherCosts: $("otherCosts").value,
+    pricingMode: $("pricingMode").value,
+    pricingValue: $("pricingValue").value,
+    notes: $("notes").value,
+    tollClass: $("tollClass").value
+  };
+}
+
+function applyRouteFromSaved(s){
+  const ids = [
+    "routeName","tripType","distanceKm","driveProfile","driveHours","loadHours","idleHours","idleLph",
+    "lPer100","fuelPrice","driverRate","overhead","maintPerKm","tyresPerKm","tolls","otherCosts",
+    "pricingMode","pricingValue","notes","tollClass"
+  ];
+  ids.forEach(id=>{
+    if($(id) && s[id] !== undefined) $(id).value = s[id];
+  });
+  // clear template selection to avoid overwriting
+  $("tplRoute").value = "";
+  $("tplVehicle").value = "";
+  recalc();
+}
+
+/* ---------------------------------------------------------
+   EXPORTS
+--------------------------------------------------------- */
+function exportCSV(){
+  const r = calc();
+  const rows = [
+    ["Route", $("routeName").value || ""],
+    ["TripType", $("tripType").value],
+    ["Km", r.km],
+    ["FuelUsed_L", r.fuelUsed],
+    ["FuelCost", r.fuelCost],
+    ["LaborCost", r.laborCost],
+    ["WearCost", r.wearCost],
+    ["Tolls", r.tolls],
+    ["OtherCosts", r.other],
+    ["Overhead", r.overhead],
+    ["TotalCost", r.totalCost],
+    ["PricingMode", r.mode],
+    ["PricingValue", r.val],
+    ["Price", r.price],
+    ["Profit", r.profit],
+    ["MarginPercent", r.margin]
+  ];
+  const csv = rows.map(r=> r.map(x=>{
+    const s = String(x ?? "");
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "route-cost.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function copySummary(){
+  const r = calc();
+  const txt =
+`Route: ${$("routeName").value || "Unnamed"}
+Trip: ${$("tripType").value==="round"?"Round trip":"One-way"}
+Distance: ${fmtNum(r.km,1)} km
+Total cost: ${fmtMoney(r.totalCost)}
+Recommended price: ${fmtMoney(r.price)}
+Profit: ${fmtMoney(r.profit)} (${fmtNum(r.margin,1)}%)
+Fuel: ${fmtMoney(r.fuelCost)} • Labor: ${fmtMoney(r.laborCost)} • Wear: ${fmtMoney(r.wearCost)} • Tolls: ${fmtMoney(r.tolls)}`;
+  try{
+    await navigator.clipboard.writeText(txt);
+    $("smartStatus").textContent = "Copied summary ✓";
+    setTimeout(()=> $("smartStatus").textContent = "Smart mode: ON", 1200);
+  }catch(e){
+    alert("Copy failed (clipboard blocked).");
+  }
+}
+
+/* ---------------------------------------------------------
+   PRICING MODE UI
+--------------------------------------------------------- */
+function updatePricingLabel(){
+  const mode = $("pricingMode").value;
+  $("pricingLabel").textContent = mode === "markup" ? "Markup (%)" : "Target profit (R)";
+  $("pricingValue").step = mode === "markup" ? "0.1" : "1";
+}
+
+/* ---------------------------------------------------------
+   RECALC LOOP
+--------------------------------------------------------- */
+function recalc(){
+  updatePricingLabel();
+  const r = calc();
+  render(r);
+  persistInputs();
+}
+
+function bindRecalc(){
+  const ids = [
+    "routeName","tripType","distanceKm","driveProfile","driveHours","loadHours","idleHours","idleLph",
+    "lPer100","fuelPrice","driverRate","overhead","maintPerKm","tyresPerKm","tolls","otherCosts",
+    "pricingMode","pricingValue","notes","tollClass"
+  ];
+  ids.forEach(id=>{
+    $(id).addEventListener("input", ()=>{
+      // If distance changes and drive time is empty, keep smart time estimate ready
+      if(id==="distanceKm") smartEstimateDriveTime();
+      // If toll class changes and template selected, recompute tolls
+      if(id==="tollClass" && $("tplRoute").value){
+        applyRouteTemplate($("tplRoute").value);
+      }
+      recalc();
+    });
+  });
+
+  $("tplRoute").addEventListener("change", ()=>{
+    const id = $("tplRoute").value;
+    if(id) applyRouteTemplate(id);
+    recalc();
+  });
+
+  $("tplVehicle").addEventListener("change", ()=>{
+    const id = $("tplVehicle").value;
+    if(id) applyVehiclePreset(id);
+    recalc();
+  });
+
+  $("btnApplySmart").addEventListener("click", ()=>{
+    applySmartFixes();
+    recalc();
+  });
+}
+
+/* ---------------------------------------------------------
+   DATA MODAL (fetch override)
+--------------------------------------------------------- */
+function openDataDlg(){
+  $("dataUrl").value = localStorage.getItem(LS.tollUpdateUrl) || "";
+  $("dataMsg").textContent = "";
+  $("dlgData").showModal();
+}
+function closeDataDlg(){ $("dlgData").close(); }
+
+function validateTollJson(obj){
+  if(!obj || typeof obj !== "object") return "Invalid JSON object.";
+  if(!Array.isArray(obj.plazas)) return "Missing plazas[].";
+  if(!Array.isArray(obj.templates)) return "Missing templates[].";
+  // minimal plaza structure
+  for(const p of obj.plazas){
+    if(!p.id || !p.name || !p.class) return "Each plaza needs id, name, class.";
+  }
+  return null;
+}
+
+async function fetchAndApplyTollData(url){
+  $("dataMsg").textContent = "Fetching…";
+  try{
+    const res = await fetch(url, {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const obj = await res.json();
+    const err = validateTollJson(obj);
+    if(err) throw new Error(err);
+    localStorage.setItem(LS.tollOverrideData, JSON.stringify(obj));
+    tollData = obj;
+    initTemplates();
+    $("dataMsg").textContent = "Applied ✓  Version: " + (obj.version || "unknown");
+  }catch(e){
+    $("dataMsg").textContent = "Failed: " + e.message;
+  }
+}
+
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
+function bindButtons(){
+  $("btnPrint").addEventListener("click", ()=> window.print());
+  $("btnExportCSV").addEventListener("click", exportCSV);
+
+  $("btnSaveRoute").addEventListener("click", ()=>{
+    const arr = loadSavedRoutes();
+    arr.push(snapshotCurrent());
+    saveSavedRoutes(arr);
+    renderSavedRoutes();
+    $("smartStatus").textContent = "Saved ✓";
+    setTimeout(()=> $("smartStatus").textContent = "Smart mode: ON", 1200);
+  });
+
+  $("btnClearSaved").addEventListener("click", ()=>{
+    localStorage.removeItem(LS.savedRoutes);
+    renderSavedRoutes();
+  });
+
+  $("btnReset").addEventListener("click", ()=>{
+    localStorage.removeItem(LS.lastInputs);
+    location.reload();
+  });
+
+  $("btnCopySummary").addEventListener("click", copySummary);
+
+  $("btnLoadDemo").addEventListener("click", ()=>{
+    $("tplRoute").value = "N3_JHB_DBN";
+    applyRouteTemplate("N3_JHB_DBN");
+    $("tplVehicle").value = "van";
+    applyVehiclePreset("van");
+    $("fuelPrice").value = "25.00";
+    $("driverRate").value = "140";
+    $("overhead").value = "150";
+    $("pricingMode").value = "markup";
+    $("pricingValue").value = "30";
+    $("otherCosts").value = "80";
+    smartEstimateDriveTime();
+    recalc();
+  });
+
+  $("btnManageData").addEventListener("click", openDataDlg);
+  $("btnCloseDlg").addEventListener("click", closeDataDlg);
+
+  $("btnSaveUrl").addEventListener("click", ()=>{
+    localStorage.setItem(LS.tollUpdateUrl, $("dataUrl").value.trim());
+    $("dataMsg").textContent = "Saved URL ✓";
+  });
+
+  $("btnFetchData").addEventListener("click", async ()=>{
+    const url = $("dataUrl").value.trim();
+    if(!url){ $("dataMsg").textContent = "Enter a URL first."; return; }
+    localStorage.setItem(LS.tollUpdateUrl, url);
+    await fetchAndApplyTollData(url);
+  });
+}
+
+/* ---------------------------------------------------------
+   STARTUP
+--------------------------------------------------------- */
+function start(){
+  // init template lists
+  initTemplates();
+
+  // restore last inputs
+  restoreLastInputs();
+
+  // if user has a stored URL, don't auto fetch (keeps offline); user can fetch manually
+  const url = localStorage.getItem(LS.tollUpdateUrl);
+  if(url){
+    // we don't auto-fetch; only show that a URL exists
+  }
+
+  // render saved
+  renderSavedRoutes();
+
+  bindRecalc();
+  bindButtons();
+
+  // initial smart time estimate if missing
+  smartEstimateDriveTime();
+
+  // initial calc
+  recalc();
+}
+
+start();
+</script>
+</body>
+</html>

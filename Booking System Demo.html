@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Booking System Demo (Single-File)</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#0f172a;
+      --card:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:rgba(255,255,255,.12);
+      --accent:#60a5fa;
+      --ok:#22c55e;
+      --danger:#fb7185;
+      --radius:16px;
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
+      --max: 1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1000px 700px at 20% -10%, rgba(96,165,250,.25), transparent 55%),
+                  radial-gradient(900px 600px at 90% 0%, rgba(167,139,250,.18), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:24px}
+    header{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:18px 18px; background: rgba(15,23,42,.75);
+      border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{
+      width:42px;height:42px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(96,165,250,.9), rgba(167,139,250,.85));
+      box-shadow: 0 10px 30px rgba(96,165,250,.22);
+    }
+    .title{display:flex; flex-direction:column}
+    .title b{font-size:15px}
+    .title span{font-size:12px; color:var(--muted)}
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(17,24,39,.6);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      transition:.15s ease;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(96,165,250,.45)}
+    .btn.primary{background: rgba(96,165,250,.16); border-color: rgba(96,165,250,.35)}
+    .btn.ok{background: rgba(34,197,94,.14); border-color: rgba(34,197,94,.35)}
+    .btn.danger{background: rgba(251,113,133,.12); border-color: rgba(251,113,133,.35)}
+    .btn.small{padding:8px 10px; border-radius:12px; font-size:13px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .card{
+      background: rgba(17,24,39,.72);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+      backdrop-filter: blur(10px);
+    }
+    .card h2{
+      margin:0 0 12px 0;
+      font-size:15px;
+      letter-spacing:.2px;
+    }
+    .muted{color:var(--muted); font-size:13px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex:1}
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px 2px}
+    select,input,textarea{
+      width:100%;
+      background: rgba(2,6,23,.45);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding:10px 11px;
+      outline:none;
+    }
+    textarea{min-height: 74px; resize: vertical}
+    select:focus,input:focus,textarea:focus{border-color: rgba(96,165,250,.55); box-shadow: 0 0 0 4px rgba(96,165,250,.12)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(2,6,23,.35);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .slots{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 520px){
+      .slots{grid-template-columns: repeat(2, minmax(0,1fr))}
+    }
+    .slot{
+      text-align:center;
+      padding:10px 8px;
+      border-radius: 14px;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(2,6,23,.35);
+      transition:.12s ease;
+      user-select:none;
+      font-size:13px;
+    }
+    .slot:hover{border-color: rgba(96,165,250,.5); transform: translateY(-1px)}
+    .slot.selected{border-color: rgba(96,165,250,.8); background: rgba(96,165,250,.14); color:var(--text)}
+    .slot.disabled{opacity:.35; cursor:not-allowed}
+    .hr{height:1px; background: rgba(255,255,255,.10); margin:14px 0}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(2,6,23,.30);
+      border-radius: 14px;
+      padding:12px;
+    }
+    .item b{font-size:13px}
+    .item .meta{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.35}
+    .right{display:flex; gap:8px}
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";
+      font-size:12px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(2,6,23,.35);
+      color:var(--muted);
+    }
+    .toast{
+      position:fixed; right:16px; bottom:16px;
+      max-width: 380px;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(17,24,39,.9);
+      box-shadow: var(--shadow);
+      display:none;
+    }
+    .toast.show{display:block}
+    .toast b{display:block; margin-bottom:4px}
+    .badge{
+      font-size:11px; padding:4px 8px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(2,6,23,.35);
+      color:var(--muted);
+    }
+    .badge.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12); color: #bff0cf}
+    .badge.cancel{border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.10); color: #ffd1d8}
+    .footer-actions{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">
+          <b>Booking System Demo</b>
+          <span>Single-file prototype • localStorage • availability logic</span>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end; gap:10px; flex-wrap:nowrap">
+        <button class="btn small" id="seedBtn" title="Reset demo data">
+          ↺ Reset Demo
+        </button>
+        <button class="btn primary" id="toggleAdminBtn" title="Toggle admin panel">
+          🔐 Admin: <span class="kbd" id="adminState">OFF</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- PUBLIC BOOKING -->
+      <section class="card">
+        <h2>Public Booking</h2>
+        <div class="row">
+          <div>
+            <label>Service</label>
+            <select id="serviceSelect"></select>
+          </div>
+          <div>
+            <label>Staff</label>
+            <select id="staffSelect"></select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>Date</label>
+            <input id="dateInput" type="date" />
+          </div>
+          <div>
+            <label>Slot step (minutes)</label>
+            <select id="stepSelect">
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="30" selected>30</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px; align-items:center; justify-content:space-between">
+          <div class="pill">
+            <span>Hours:</span>
+            <span class="kbd" id="hoursPill">09:00–17:00</span>
+            <span>Break:</span>
+            <span class="kbd" id="breakPill">13:00–14:00</span>
+          </div>
+          <button class="btn primary small" id="refreshSlotsBtn">↻ Refresh slots</button>
+        </div>
+
+        <div class="slots" id="slots"></div>
+
+        <div class="hr"></div>
+
+        <h2 style="margin-top:0">Customer details</h2>
+        <div class="row">
+          <div>
+            <label>Full name</label>
+            <input id="nameInput" placeholder="e.g. Thabo Mokoena" />
+          </div>
+          <div>
+            <label>Phone</label>
+            <input id="phoneInput" placeholder="e.g. 062 000 0000" />
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>Notes (optional)</label>
+            <textarea id="notesInput" placeholder="Any extra info..."></textarea>
+          </div>
+        </div>
+
+        <div class="footer-actions" style="margin-top:12px">
+          <button class="btn" id="clearSelectionBtn">Clear</button>
+          <button class="btn ok" id="bookBtn">✅ Book</button>
+        </div>
+
+        <p class="muted" style="margin:12px 0 0">
+          This demo blocks out existing bookings + staff time-off and won’t allow overlaps.
+        </p>
+      </section>
+
+      <!-- ADMIN -->
+      <aside class="card">
+        <div class="row" style="align-items:center; justify-content:space-between">
+          <h2 style="margin:0">Admin Panel</h2>
+          <span class="badge" id="adminBadge">Locked</span>
+        </div>
+        <p class="muted" style="margin-top:8px">
+          When Admin is ON, you can cancel bookings, add manual bookings, and block time.
+        </p>
+
+        <div id="adminLocked">
+          <div class="pill" style="margin-top:10px">
+            Turn Admin ON to manage bookings.
+          </div>
+        </div>
+
+        <div id="adminOpen" style="display:none">
+          <div class="hr"></div>
+          <h2 style="margin:0 0 10px">Quick actions</h2>
+
+          <div class="row">
+            <div>
+              <label>Block time (start)</label>
+              <input type="datetime-local" id="blockStart" />
+            </div>
+            <div>
+              <label>Block time (end)</label>
+              <input type="datetime-local" id="blockEnd" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Reason</label>
+              <input id="blockReason" placeholder="e.g. Staff meeting" />
+            </div>
+            <div style="flex:0 0 auto; align-self:flex-end">
+              <button class="btn danger" id="addBlockBtn">⛔ Block</button>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <h2 style="margin:0 0 10px">Manual booking</h2>
+          <div class="row">
+            <div>
+              <label>Start</label>
+              <input type="datetime-local" id="manualStart" />
+            </div>
+            <div>
+              <label>Customer</label>
+              <input id="manualCustomer" placeholder="Name" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Service</label>
+              <select id="manualService"></select>
+            </div>
+            <div>
+              <label>Staff</label>
+              <select id="manualStaff"></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Phone</label>
+              <input id="manualPhone" placeholder="Phone" />
+            </div>
+            <div style="flex:0 0 auto; align-self:flex-end">
+              <button class="btn ok" id="addManualBtn">➕ Add</button>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row" style="align-items:center; justify-content:space-between">
+            <h2 style="margin:0">Bookings</h2>
+            <button class="btn small" id="exportBtn">⬇ Export JSON</button>
+          </div>
+          <div class="list" id="bookingList" style="margin-top:10px"></div>
+
+          <div class="hr"></div>
+
+          <div class="footer-actions">
+            <button class="btn" id="clearAllBtn">🧹 Clear all</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <b id="toastTitle"></b>
+    <div class="muted" id="toastMsg"></div>
+  </div>
+
+<script>
+/** =========================
+ *  Demo data + storage
+ *  ========================= */
+const STORAGE_KEY = "booking_demo_v1";
+
+const demoSeed = () => ({
+  org: { name: "Logic Lab Barber (Demo)", timezone: "Africa/Johannesburg" },
+  settings: {
+    // default business hours (Mon-Sun). 0=Sun..6=Sat
+    hoursByDow: {
+      1: { start: "09:00", end: "17:00" },
+      2: { start: "09:00", end: "17:00" },
+      3: { start: "09:00", end: "17:00" },
+      4: { start: "09:00", end: "17:00" },
+      5: { start: "09:00", end: "17:00" },
+      6: { start: "09:00", end: "14:00" },
+      0: null // closed Sunday
+    },
+    breaksByDow: {
+      1: [{ start: "13:00", end: "14:00" }],
+      2: [{ start: "13:00", end: "14:00" }],
+      3: [{ start: "13:00", end: "14:00" }],
+      4: [{ start: "13:00", end: "14:00" }],
+      5: [{ start: "13:00", end: "14:00" }],
+      6: [],
+      0: []
+    },
+    bufferMin: 0 // change to 5/10 if you want gaps between bookings
+  },
+  services: [
+    { id: "svc_cut", name: "Haircut", durationMin: 30, price: 120 },
+    { id: "svc_beard", name: "Beard Trim", durationMin: 20, price: 80 },
+    { id: "svc_cut_beard", name: "Cut + Beard", durationMin: 45, price: 180 }
+  ],
+  staff: [
+    { id: "stf_jabu", name: "Jabu" },
+    { id: "stf_lerato", name: "Lerato" }
+  ],
+  timeOff: [
+    // example: { id:"to1", staffId:"stf_jabu", start:"2026-01-29T10:00", end:"2026-01-29T12:00", reason:"Errand" }
+  ],
+  blocks: [
+    // org-wide blocks
+  ],
+  bookings: [
+    // prefilled bookings for demo
+    // { id, serviceId, staffId, start, end, customer:{name,phone}, notes, status:"confirmed" }
+  ]
+});
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw){
+    const seeded = demoSeed();
+    // add example bookings for today
+    const today = fmtDate(new Date());
+    seeded.bookings.push(
+      makeBooking({
+        serviceId: "svc_cut",
+        staffId: "stf_jabu",
+        start: `${today}T10:00`,
+        customer: { name:"Demo Client", phone:"071 111 1111" },
+        notes: "Prefers fade"
+      }),
+      makeBooking({
+        serviceId: "svc_beard",
+        staffId: "stf_lerato",
+        start: `${today}T11:30`,
+        customer: { name:"Sipho", phone:"082 222 2222" },
+        notes: ""
+      })
+    );
+    saveState(seeded);
+    return seeded;
+  }
+  try { return JSON.parse(raw); }
+  catch {
+    const seeded = demoSeed();
+    saveState(seeded);
+    return seeded;
+  }
+}
+function saveState(state){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function resetDemo(){
+  const seeded = demoSeed();
+  const today = fmtDate(new Date());
+  seeded.bookings.push(
+    makeBooking({ serviceId:"svc_cut", staffId:"stf_jabu", start:`${today}T10:00`, customer:{name:"Demo Client", phone:"071 111 1111"}, notes:"Prefers fade" }),
+    makeBooking({ serviceId:"svc_beard", staffId:"stf_lerato", start:`${today}T11:30`, customer:{name:"Sipho", phone:"082 222 2222"}, notes:"" })
+  );
+  saveState(seeded);
+  return seeded;
+}
+
+/** =========================
+ *  Helpers
+ *  ========================= */
+const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+const pad = (n) => String(n).padStart(2,"0");
+function fmtDate(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function fmtTime(d){ return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function parseLocalDT(s){ // "YYYY-MM-DDTHH:mm"
+  // Browser interprets as local time, good for this demo.
+  return new Date(s);
+}
+function addMin(date, minutes){
+  return new Date(date.getTime() + minutes*60000);
+}
+function overlaps(aStart, aEnd, bStart, bEnd){
+  return aStart < bEnd && bStart < aEnd;
+}
+function sameDay(a, b){
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+function makeBooking({serviceId, staffId, start, customer, notes}){
+  const svc = state.services.find(s=>s.id===serviceId);
+  const startD = parseLocalDT(start);
+  const endD = addMin(startD, svc.durationMin + state.settings.bufferMin);
+  return {
+    id: uid(),
+    serviceId, staffId,
+    start: startD.toISOString(),
+    end: endD.toISOString(),
+    customer,
+    notes: notes || "",
+    status: "confirmed",
+    createdAt: new Date().toISOString()
+  };
+}
+function makeBlock({staffId=null, start, end, reason=""}){
+  return { id: uid(), staffId, start, end, reason, createdAt: new Date().toISOString() };
+}
+function isoToLocal(iso){
+  return new Date(iso);
+}
+
+/** =========================
+ *  Availability engine
+ *  ========================= */
+function getDayConfig(date){
+  const dow = date.getDay();
+  const hours = state.settings.hoursByDow[dow];
+  const breaks = state.settings.breaksByDow[dow] || [];
+  return { dow, hours, breaks };
+}
+
+function buildWindowsForDay(date, staffId){
+  // Base working window (org hours for demo; extend to per-staff later)
+  const { hours, breaks } = getDayConfig(date);
+  if(!hours) return [];
+
+  const dayStr = fmtDate(date);
+  const workStart = parseLocalDT(`${dayStr}T${hours.start}`);
+  const workEnd   = parseLocalDT(`${dayStr}T${hours.end}`);
+
+  // start with one big working window
+  let windows = [{ start: workStart, end: workEnd }];
+
+  // subtract breaks
+  for(const br of breaks){
+    const bStart = parseLocalDT(`${dayStr}T${br.start}`);
+    const bEnd   = parseLocalDT(`${dayStr}T${br.end}`);
+    windows = subtractInterval(windows, { start: bStart, end: bEnd });
+  }
+
+  // subtract org blocks
+  for(const bl of state.blocks){
+    const bStart = isoToLocal(bl.start);
+    const bEnd = isoToLocal(bl.end);
+    if(!sameDay(bStart, date)) continue;
+    if(bl.staffId && bl.staffId !== staffId) continue;
+    windows = subtractInterval(windows, { start: bStart, end: bEnd });
+  }
+
+  // subtract staff time off
+  for(const to of state.timeOff){
+    const tStart = isoToLocal(to.start);
+    const tEnd = isoToLocal(to.end);
+    if(!sameDay(tStart, date)) continue;
+    if(to.staffId && to.staffId !== staffId) continue;
+    windows = subtractInterval(windows, { start: tStart, end: tEnd });
+  }
+
+  // subtract existing bookings for staff
+  for(const bk of state.bookings){
+    if(bk.status === "cancelled") continue;
+    if(bk.staffId !== staffId) continue;
+    const s = isoToLocal(bk.start);
+    const e = isoToLocal(bk.end);
+    if(!sameDay(s, date)) continue;
+    windows = subtractInterval(windows, { start: s, end: e });
+  }
+
+  // remove tiny windows
+  windows = windows.filter(w => w.end - w.start >= 5*60000);
+
+  return windows;
+}
+
+function subtractInterval(windows, cut){
+  const out = [];
+  for(const w of windows){
+    if(!overlaps(w.start, w.end, cut.start, cut.end)){
+      out.push(w); continue;
+    }
+    // left piece
+    if(w.start < cut.start){
+      out.push({ start: w.start, end: new Date(Math.min(cut.start.getTime(), w.end.getTime())) });
+    }
+    // right piece
+    if(cut.end < w.end){
+      out.push({ start: new Date(Math.max(cut.end.getTime(), w.start.getTime())), end: w.end });
+    }
+  }
+  // sanitize (start < end)
+  return out.filter(x => x.start < x.end);
+}
+
+function generateSlots(date, staffId, durationMin, stepMin){
+  const windows = buildWindowsForDay(date, staffId);
+  const slots = [];
+  for(const w of windows){
+    // slot start at w.start, step by stepMin, ensure slotEnd <= w.end
+    let t = new Date(w.start);
+    while(true){
+      const end = addMin(t, durationMin + state.settings.bufferMin);
+      if(end <= w.end){
+        slots.push(new Date(t));
+        t = addMin(t, stepMin);
+      } else break;
+    }
+  }
+  return { windows, slots };
+}
+
+/** =========================
+ *  UI wiring
+ *  ========================= */
+let state = loadState();
+let adminOn = false;
+let selectedSlotISO = null;
+
+const els = {
+  serviceSelect: document.getElementById("serviceSelect"),
+  staffSelect: document.getElementById("staffSelect"),
+  dateInput: document.getElementById("dateInput"),
+  stepSelect: document.getElementById("stepSelect"),
+  slots: document.getElementById("slots"),
+  hoursPill: document.getElementById("hoursPill"),
+  breakPill: document.getElementById("breakPill"),
+
+  nameInput: document.getElementById("nameInput"),
+  phoneInput: document.getElementById("phoneInput"),
+  notesInput: document.getElementById("notesInput"),
+
+  refreshSlotsBtn: document.getElementById("refreshSlotsBtn"),
+  bookBtn: document.getElementById("bookBtn"),
+  clearSelectionBtn: document.getElementById("clearSelectionBtn"),
+
+  toggleAdminBtn: document.getElementById("toggleAdminBtn"),
+  adminState: document.getElementById("adminState"),
+  adminBadge: document.getElementById("adminBadge"),
+  adminLocked: document.getElementById("adminLocked"),
+  adminOpen: document.getElementById("adminOpen"),
+
+  bookingList: document.getElementById("bookingList"),
+  clearAllBtn: document.getElementById("clearAllBtn"),
+  exportBtn: document.getElementById("exportBtn"),
+
+  seedBtn: document.getElementById("seedBtn"),
+
+  blockStart: document.getElementById("blockStart"),
+  blockEnd: document.getElementById("blockEnd"),
+  blockReason: document.getElementById("blockReason"),
+  addBlockBtn: document.getElementById("addBlockBtn"),
+
+  manualStart: document.getElementById("manualStart"),
+  manualCustomer: document.getElementById("manualCustomer"),
+  manualPhone: document.getElementById("manualPhone"),
+  manualService: document.getElementById("manualService"),
+  manualStaff: document.getElementById("manualStaff"),
+  addManualBtn: document.getElementById("addManualBtn"),
+
+  toast: document.getElementById("toast"),
+  toastTitle: document.getElementById("toastTitle"),
+  toastMsg: document.getElementById("toastMsg")
+};
+
+function toast(title, msg){
+  els.toastTitle.textContent = title;
+  els.toastMsg.textContent = msg;
+  els.toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>els.toast.classList.remove("show"), 2600);
+}
+
+function populateSelects(){
+  els.serviceSelect.innerHTML = state.services.map(s => {
+    const price = (s.price != null) ? ` • R${s.price}` : "";
+    return `<option value="${s.id}">${s.name} (${s.durationMin} min${price})</option>`;
+  }).join("");
+
+  els.staffSelect.innerHTML = state.staff.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+
+  // admin manual selects
+  els.manualService.innerHTML = els.serviceSelect.innerHTML;
+  els.manualStaff.innerHTML = els.staffSelect.innerHTML;
+}
+
+function setDefaultDate(){
+  const d = new Date();
+  els.dateInput.value = fmtDate(d);
+  // set admin default datetime inputs
+  const dtLocal = `${fmtDate(d)}T09:00`;
+  els.blockStart.value = dtLocal;
+  els.blockEnd.value = `${fmtDate(d)}T10:00`;
+  els.manualStart.value = `${fmtDate(d)}T09:30`;
+}
+
+function updatePills(){
+  const date = parseLocalDT(`${els.dateInput.value}T00:00`);
+  const { hours, breaks } = getDayConfig(date);
+  els.hoursPill.textContent = hours ? `${hours.start}–${hours.end}` : "Closed";
+  if(!breaks || breaks.length===0){
+    els.breakPill.textContent = "None";
+  } else {
+    // show first break only for pill
+    els.breakPill.textContent = `${breaks[0].start}–${breaks[0].end}`;
+  }
+}
+
+function renderSlots(){
+  selectedSlotISO = null;
+  els.slots.innerHTML = "";
+
+  const serviceId = els.serviceSelect.value;
+  const staffId = els.staffSelect.value;
+  const dateStr = els.dateInput.value;
+
+  if(!serviceId || !staffId || !dateStr){
+    els.slots.innerHTML = `<div class="muted">Select service, staff and date.</div>`;
+    return;
+  }
+
+  const svc = state.services.find(s=>s.id===serviceId);
+  const date = parseLocalDT(`${dateStr}T00:00`);
+  const step = Number(els.stepSelect.value);
+
+  updatePills();
+
+  const { slots } = generateSlots(date, staffId, svc.durationMin, step);
+  if(slots.length === 0){
+    els.slots.innerHTML = `<div class="muted">No availability for this day.</div>`;
+    return;
+  }
+
+  const now = new Date();
+  slots.forEach(t => {
+    const btn = document.createElement("div");
+    const past = t < now && sameDay(t, now);
+    btn.className = "slot" + (past ? " disabled" : "");
+    btn.textContent = fmtTime(t);
+    btn.title = t.toString();
+    if(!past){
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".slot").forEach(x=>x.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedSlotISO = t.toISOString();
+      });
+    }
+    els.slots.appendChild(btn);
+  });
+}
+
+function renderAdmin(){
+  els.adminState.textContent = adminOn ? "ON" : "OFF";
+  els.adminBadge.textContent = adminOn ? "Unlocked" : "Locked";
+  els.adminBadge.className = "badge" + (adminOn ? " ok" : "");
+  els.adminLocked.style.display = adminOn ? "none" : "block";
+  els.adminOpen.style.display = adminOn ? "block" : "none";
+  if(adminOn) renderBookingList();
+}
+
+function renderBookingList(){
+  // show upcoming first
+  const items = [...state.bookings]
+    .sort((a,b)=> new Date(a.start) - new Date(b.start));
+
+  if(items.length === 0){
+    els.bookingList.innerHTML = `<div class="muted">No bookings yet.</div>`;
+    return;
+  }
+
+  els.bookingList.innerHTML = "";
+  for(const b of items){
+    const svc = state.services.find(s=>s.id===b.serviceId);
+    const stf = state.staff.find(s=>s.id===b.staffId);
+    const s = isoToLocal(b.start);
+    const e = isoToLocal(b.end);
+    const statusBadge = b.status === "cancelled"
+      ? `<span class="badge cancel">Cancelled</span>`
+      : `<span class="badge ok">Confirmed</span>`;
+
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div>
+        <b>${svc?.name || "Service"} • ${stf?.name || "Staff"} ${statusBadge}</b>
+        <div class="meta">
+          ${fmtDate(s)} ${fmtTime(s)}–${fmtTime(e)}<br/>
+          ${escapeHtml(b.customer?.name || "Customer")} • ${escapeHtml(b.customer?.phone || "")}<br/>
+          ${b.notes ? escapeHtml(b.notes) : ""}
+        </div>
+      </div>
+      <div class="right">
+        ${b.status !== "cancelled" ? `<button class="btn small danger" data-cancel="${b.id}">Cancel</button>` : ""}
+      </div>
+    `;
+    els.bookingList.appendChild(div);
+  }
+
+  // wire cancel buttons
+  els.bookingList.querySelectorAll("[data-cancel]").forEach(btn=>{
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-cancel");
+      const bk = state.bookings.find(x=>x.id===id);
+      if(!bk) return;
+      bk.status = "cancelled";
+      saveState(state);
+      renderSlots();
+      renderBookingList();
+      toast("Cancelled", "Booking marked as cancelled.");
+    });
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+/** =========================
+ *  Actions
+ *  ========================= */
+els.refreshSlotsBtn.addEventListener("click", renderSlots);
+els.serviceSelect.addEventListener("change", renderSlots);
+els.staffSelect.addEventListener("change", renderSlots);
+els.dateInput.addEventListener("change", () => { updatePills(); renderSlots(); });
+els.stepSelect.addEventListener("change", renderSlots);
+
+els.clearSelectionBtn.addEventListener("click", () => {
+  selectedSlotISO = null;
+  document.querySelectorAll(".slot").forEach(x=>x.classList.remove("selected"));
+  els.nameInput.value = "";
+  els.phoneInput.value = "";
+  els.notesInput.value = "";
+  toast("Cleared", "Selection and customer fields cleared.");
+});
+
+els.bookBtn.addEventListener("click", () => {
+  if(!selectedSlotISO){
+    toast("Pick a time", "Select an available slot first.");
+    return;
+  }
+  const name = els.nameInput.value.trim();
+  const phone = els.phoneInput.value.trim();
+  if(!name || !phone){
+    toast("Missing info", "Customer name and phone are required.");
+    return;
+  }
+
+  const serviceId = els.serviceSelect.value;
+  const staffId = els.staffSelect.value;
+  const start = new Date(selectedSlotISO);
+
+  // Re-check availability to avoid overlaps if state changed
+  const svc = state.services.find(s=>s.id===serviceId);
+  const end = addMin(start, svc.durationMin + state.settings.bufferMin);
+
+  // block overlaps
+  const clash = state.bookings.some(b => {
+    if(b.status === "cancelled") return false;
+    if(b.staffId !== staffId) return false;
+    const s = isoToLocal(b.start);
+    const e = isoToLocal(b.end);
+    return overlaps(start, end, s, e);
+  });
+  if(clash){
+    toast("Slot taken", "That slot is no longer available. Refresh and choose another.");
+    renderSlots();
+    return;
+  }
+
+  const newBk = {
+    id: uid(),
+    serviceId, staffId,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    customer: { name, phone },
+    notes: els.notesInput.value.trim(),
+    status: "confirmed",
+    createdAt: new Date().toISOString()
+  };
+
+  state.bookings.push(newBk);
+  saveState(state);
+
+  toast("Booked ✅", "Booking created and saved (demo).");
+  renderSlots();
+  if(adminOn) renderBookingList();
+
+  // light clear
+  selectedSlotISO = null;
+  document.querySelectorAll(".slot").forEach(x=>x.classList.remove("selected"));
+});
+
+els.toggleAdminBtn.addEventListener("click", () => {
+  adminOn = !adminOn;
+  renderAdmin();
+});
+
+els.seedBtn.addEventListener("click", () => {
+  state = resetDemo();
+  populateSelects();
+  setDefaultDate();
+  renderSlots();
+  if(adminOn) renderBookingList();
+  toast("Reset", "Demo data reset.");
+});
+
+els.clearAllBtn.addEventListener("click", () => {
+  state.bookings = [];
+  state.blocks = [];
+  state.timeOff = [];
+  saveState(state);
+  renderSlots();
+  renderBookingList();
+  toast("Cleared", "All bookings/blocks cleared.");
+});
+
+els.exportBtn.addEventListener("click", () => {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "booking-demo-export.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+els.addBlockBtn.addEventListener("click", () => {
+  const s = els.blockStart.value;
+  const e = els.blockEnd.value;
+  if(!s || !e){
+    toast("Missing dates", "Choose start and end.");
+    return;
+  }
+  const start = parseLocalDT(s);
+  const end = parseLocalDT(e);
+  if(!(start < end)){
+    toast("Invalid range", "End must be after start.");
+    return;
+  }
+  // For demo: org-wide block, could add staff-specific later
+  const block = makeBlock({
+    staffId: null,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    reason: els.blockReason.value.trim()
+  });
+  state.blocks.push(block);
+  saveState(state);
+  renderSlots();
+  renderBookingList();
+  toast("Blocked", "Time blocked successfully.");
+});
+
+els.addManualBtn.addEventListener("click", () => {
+  const dt = els.manualStart.value;
+  const customer = els.manualCustomer.value.trim();
+  const phone = els.manualPhone.value.trim();
+  const serviceId = els.manualService.value;
+  const staffId = els.manualStaff.value;
+
+  if(!dt || !customer || !phone){
+    toast("Missing info", "Start, customer name and phone are required.");
+    return;
+  }
+
+  const svc = state.services.find(s=>s.id===serviceId);
+  const start = parseLocalDT(dt);
+  const end = addMin(start, svc.durationMin + state.settings.bufferMin);
+
+  // check against blocks + timeoff + bookings
+  const day = new Date(start);
+  const { windows } = generateSlots(parseLocalDT(`${fmtDate(day)}T00:00`), staffId, svc.durationMin, 30);
+  const ok = windows.some(w => start >= w.start && end <= w.end);
+
+  if(!ok){
+    toast("Not available", "That manual time conflicts with hours/breaks/blocks/bookings.");
+    return;
+  }
+
+  state.bookings.push({
+    id: uid(),
+    serviceId, staffId,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    customer: { name: customer, phone },
+    notes: "(Manual booking)",
+    status: "confirmed",
+    createdAt: new Date().toISOString()
+  });
+
+  saveState(state);
+  renderSlots();
+  renderBookingList();
+  toast("Added", "Manual booking added.");
+});
+
+/** =========================
+ *  Init
+ *  ========================= */
+populateSelects();
+setDefaultDate();
+updatePills();
+renderSlots();
+renderAdmin();
+</script>
+</body>
+</html>

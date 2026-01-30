@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Spin the Wheel — Logic Lab</title>
+  <style>
+    :root{
+      --bg:#070a12;
+      --bg2:#0b1020;
+      --card: rgba(17,24,39,.70);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+      --blue:#60a5fa;
+      --blue2:#38bdf8;
+      --purple:#a78bfa;
+      --good:#22c55e;
+      --danger:#fb7185;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --radius:18px;
+      --radius2:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 20% 10%, rgba(96,165,250,.18), transparent 60%),
+        radial-gradient(900px 600px at 80% 0%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 60% 110%, rgba(56,189,248,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+      display:grid;
+      gap:18px;
+      grid-template-columns: 1.2fr .8fr;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
+    }
+
+    .top{
+      grid-column:1 / -1;
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo{
+      width:42px;height:42px;
+      border-radius:14px;
+      background:
+        radial-gradient(12px 12px at 28% 28%, rgba(255,255,255,.22), transparent 60%),
+        linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
+      transform: rotate(20deg);
+      animation: sheen 3.8s linear infinite;
+    }
+    @keyframes sheen{
+      0%{transform:translateX(-40%) rotate(20deg)}
+      100%{transform:translateX(40%) rotate(20deg)}
+    }
+
+    h1{
+      margin:0;
+      font-size: clamp(18px, 2.6vw, 26px);
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .pillrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .pill{
+      border:1px solid var(--line2);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: rgba(96,165,250,.9);
+      box-shadow: 0 0 0 4px rgba(96,165,250,.18);
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--line2);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card .hd{
+      padding:16px 16px 14px;
+      border-bottom:1px solid var(--line2);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .card .hd b{font-weight:700}
+    .card .bd{padding:16px}
+
+    /* Wheel area */
+    .wheelStage{
+      display:grid;
+      place-items:center;
+      padding:22px 12px 6px;
+      position:relative;
+    }
+    canvas{
+      width:min(520px, 88vw);
+      height:min(520px, 88vw);
+      max-width:520px;
+      max-height:520px;
+      display:block;
+      border-radius: 999px;
+      background: rgba(0,0,0,.25);
+      box-shadow: 0 18px 65px rgba(0,0,0,.6);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .pointer{
+      position:absolute;
+      top: 10px;
+      width: 0; height:0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 32px solid rgba(255,255,255,.92);
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,.55));
+    }
+    .pointer:after{
+      content:"";
+      position:absolute;
+      left:-6px; top:30px;
+      width:12px;height:12px;border-radius:50%;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 0 0 6px rgba(96,165,250,.18);
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      padding:14px 16px 18px;
+    }
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      color:var(--text);
+      padding:12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      font-weight:700;
+      letter-spacing:.2px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
+    button:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18)}
+    button:active{transform: translateY(1px)}
+    button.primary{
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+      border-color: transparent;
+      box-shadow: 0 16px 35px rgba(96,165,250,.16);
+    }
+    button.primary:hover{filter: brightness(1.04)}
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .resultBox{
+      display:grid;
+      gap:10px;
+    }
+    .result{
+      padding:14px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      min-height:92px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+    }
+    .result .label{
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+    }
+    .result .title{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.25;
+    }
+    .metaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .meta{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .list{
+      display:grid;
+      gap:10px;
+    }
+    textarea{
+      width:100%;
+      min-height:220px;
+      resize:vertical;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding:12px 12px;
+      outline:none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      line-height:1.55;
+    }
+    textarea:focus{
+      border-color: rgba(96,165,250,.38);
+      box-shadow: 0 0 0 6px rgba(96,165,250,.12);
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .row > *{flex:1}
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.72);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 12px 30px rgba(0,0,0,.45);
+      max-width: 92vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .footer{
+      grid-column:1 / -1;
+      padding: 14px 10px 0;
+      color: rgba(148,163,184,.9);
+      font-size: 12px;
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+    }
+    .spark{
+      width:10px;height:10px;border-radius:3px;
+      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
+      box-shadow: 0 0 0 5px rgba(167,139,250,.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Spin the Wheel — Dev Challenge Generator</h1>
+          <div class="sub">Random build challenges for demos • <b>Powered by Logic Lab</b></div>
+        </div>
+      </div>
+
+      <div class="pillrow">
+        <div class="pill"><span class="dot"></span> HTML-first • Fast demos</div>
+        <div class="pill">Press <b>Space</b> to spin</div>
+      </div>
+    </div>
+
+    <!-- LEFT: Wheel -->
+    <section class="card">
+      <div class="hd">
+        <b>Wheel</b>
+        <span class="meta" id="countMeta">0 items</span>
+      </div>
+
+      <div class="wheelStage">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="900" height="900" aria-label="Spin wheel"></canvas>
+      </div>
+
+      <div class="controls">
+        <button class="primary" id="spinBtn">🎯 Spin</button>
+        <button id="shuffleBtn">🔀 Shuffle</button>
+        <button id="copyBtn">📋 Copy Result</button>
+        <button id="resetBtn">↩️ Reset Items</button>
+      </div>
+
+      <div class="bd">
+        <div class="resultBox">
+          <div class="result" role="status" aria-live="polite">
+            <div class="label">Selected challenge</div>
+            <div class="title" id="resultTitle">Spin to get a challenge…</div>
+            <div class="metaRow">
+              <div class="meta" id="resultMeta">Tip: edit the list on the right and hit Shuffle.</div>
+              <div class="meta" id="spinMeta"></div>
+            </div>
+          </div>
+          <div class="tiny">
+            Suggested rule: <b>Time-box it</b> (2–6 hours). Ship a demo link + 3 lessons learned.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Items -->
+    <aside class="card">
+      <div class="hd">
+        <b>Challenge Ideas</b>
+        <span class="meta">one per line</span>
+      </div>
+      <div class="bd">
+        <div class="list">
+          <textarea id="itemsInput" spellcheck="false"></textarea>
+          <div class="row">
+            <button id="applyBtn">✅ Apply List</button>
+            <button id="addBtn">➕ Add Random</button>
+          </div>
+          <div class="tiny">
+            Pro move: keep wheel items <b>clear + shippable</b>. Avoid “build a full app” — aim for demoable tools.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="footer">
+      <div class="badge"><span class="spark"></span> Powered by Logic Lab</div>
+      <div class="meta">Make it public: spin → build → demo → repo</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---------- Challenge List ----------
+    const DEFAULT_ITEMS = [
+      "Build a QR Code Generator with 3 types: Website, WhatsApp, Maps (HTML only)",
+      "Create an Invoice Generator with print mode (no headers/controls on print)",
+      "Make a Booking Form + Admin list (LocalStorage, no backend)",
+      "Build a PNG → ICO Converter tool (client-side)",
+      "Create a 'Website in a Box' landing page generator (export HTML)",
+      "Make a Business Card Generator with bleed + safe guides (export PNG)",
+      "Build a Simple CRM: Contacts + Notes (LocalStorage, searchable)",
+      "Create a 'Fuel & Usage Logbook' tool with export CSV",
+      "Build a PDF Generator for quotes (client-side, printable)",
+      "Make an Offline-First checklist app (service worker optional)",
+      "Create a Password Generator with strength meter (no libs)",
+      "Build a File Rename Helper (drag/drop, rules, export list)",
+      "Make a Color Palette Generator + CSS variables output",
+      "Build a Simple Expense Tracker with monthly totals (LocalStorage)",
+      "Create a Image Compressor tool (client-side, before/after)",
+      "Build a Social Poster Maker (1080x1080) with text overlays (export PNG)",
+      "Make a 'FAQ Schema Generator' (JSON-LD output)",
+      "Build a QR Menu page template (restaurant) + QR generator",
+      "Create a 'Client Onboarding Form' to collect project requirements",
+      "Build a Tiny Admin Dashboard UI (cards, table, filters) with dummy data"
+    ];
+
+    const randomExtras = [
+      "Build a unit converter (length, weight, temp) with copy buttons",
+      "Make a simple Kanban board (To Do / Doing / Done) using LocalStorage",
+      "Build a 'Terms & Conditions' generator for small businesses",
+      "Create a 'Logo placeholder' + brand kit generator (colors, fonts, export CSS)"
+    ];
+
+    const wheelCanvas = document.getElementById("wheel");
+    const ctx = wheelCanvas.getContext("2d");
+
+    const itemsInput = document.getElementById("itemsInput");
+    const countMeta = document.getElementById("countMeta");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultMeta = document.getElementById("resultMeta");
+    const spinMeta = document.getElementById("spinMeta");
+
+    const spinBtn = document.getElementById("spinBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const applyBtn = document.getElementById("applyBtn");
+    const addBtn = document.getElementById("addBtn");
+
+    const toastEl = document.getElementById("toast");
+
+    let items = [];
+    let angle = 0;              // current rotation (radians)
+    let spinning = false;
+    let lastSelectedIndex = null;
+
+    // Base palette (wheel slices)
+    const PALETTE = [
+      "#60a5fa","#38bdf8","#a78bfa","#22c55e",
+      "#fb7185","#fbbf24","#93c5fd","#c4b5fd"
+    ];
+
+    // ---------- Utilities ----------
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+    function showToast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=>toastEl.classList.remove("show"), 1400);
+    }
+
+    function sanitizeList(text){
+      return text
+        .split("\n")
+        .map(s => s.trim())
+        .filter(Boolean)
+        .filter((v,i,arr)=>arr.indexOf(v)===i); // de-dupe
+    }
+
+    function syncInputFromItems(){
+      itemsInput.value = items.join("\n");
+      countMeta.textContent = `${items.length} item${items.length===1?"":"s"}`;
+    }
+
+    function loadDefault(){
+      items = [...DEFAULT_ITEMS];
+      syncInputFromItems();
+      drawWheel();
+      setResult(null);
+    }
+
+    function setResult(index){
+      if(index == null){
+        resultTitle.textContent = "Spin to get a challenge…";
+        resultMeta.textContent = "Tip: edit the list on the right and hit Shuffle.";
+        spinMeta.textContent = "";
+        return;
+      }
+      const title = items[index];
+      resultTitle.textContent = title;
+      resultMeta.textContent = `Selected slice #${index + 1} of ${items.length}`;
+      spinMeta.textContent = "Ship it 🚀";
+      lastSelectedIndex = index;
+    }
+
+    // ---------- Wheel Drawing ----------
+    function drawWheel(){
+      const W = wheelCanvas.width, H = wheelCanvas.height;
+      const cx = W/2, cy = H/2;
+      const r = Math.min(W,H)*0.44;
+
+      ctx.clearRect(0,0,W,H);
+
+      // Background ring
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r+32, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(0,0,0,.18)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.10)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      if(!items.length){
+        // Empty state
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.fillStyle = "rgba(255,255,255,.8)";
+        ctx.font = "700 28px ui-sans-serif, system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText("Add items to spin", 0, -8);
+        ctx.fillStyle = "rgba(148,163,184,.9)";
+        ctx.font = "500 16px ui-sans-serif, system-ui";
+        ctx.fillText("Use the list on the right", 0, 18);
+        ctx.restore();
+        return;
+      }
+
+      const n = items.length;
+      const slice = (Math.PI*2) / n;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      for(let i=0;i<n;i++){
+        const a0 = i*slice;
+        const a1 = a0 + slice;
+
+        // Slice
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.arc(0,0,r,a0,a1);
+        ctx.closePath();
+
+        const c = PALETTE[i % PALETTE.length];
+        ctx.fillStyle = hexToRgba(c, 0.92);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(0,0,0,.25)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Text
+        const mid = a0 + slice/2;
+        ctx.save();
+        ctx.rotate(mid);
+
+        // text box
+        ctx.translate(r*0.62, 0);
+
+        const label = shorten(items[i], 28);
+        ctx.fillStyle = "rgba(7,10,18,.92)";
+        ctx.font = "800 22px ui-sans-serif, system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // text shadow
+        ctx.shadowColor = "rgba(255,255,255,.10)";
+        ctx.shadowBlur = 0;
+        ctx.fillText(label, 0, 0);
+
+        ctx.restore();
+      }
+
+      // Center cap
+      ctx.beginPath();
+      ctx.arc(0,0, r*0.18, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(0,0,0,.55)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.14)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Inner badge
+      ctx.fillStyle = "rgba(229,231,235,.92)";
+      ctx.font = "900 22px ui-sans-serif, system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("LOGIC LAB", 0, -10);
+      ctx.fillStyle = "rgba(148,163,184,.95)";
+      ctx.font = "700 14px ui-sans-serif, system-ui";
+      ctx.fillText("SPIN CHALLENGE", 0, 14);
+
+      ctx.restore();
+
+      // subtle vignette
+      ctx.save();
+      const grd = ctx.createRadialGradient(cx, cy, r*0.4, cx, cy, r+80);
+      grd.addColorStop(0, "rgba(0,0,0,0)");
+      grd.addColorStop(1, "rgba(0,0,0,.35)");
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r+60, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function shorten(str, max){
+      if(str.length <= max) return str;
+      return str.slice(0, max-1).trimEnd() + "…";
+    }
+    function hexToRgba(hex, a){
+      const h = hex.replace("#","");
+      const bigint = parseInt(h, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    // ---------- Spinning Logic ----------
+    function spin(){
+      if(spinning) return;
+      if(items.length < 2){
+        showToast("Add at least 2 items to spin.");
+        return;
+      }
+
+      spinning = true;
+      spinBtn.disabled = true;
+      shuffleBtn.disabled = true;
+      applyBtn.disabled = true;
+      resetBtn.disabled = true;
+
+      const n = items.length;
+      const slice = (Math.PI*2)/n;
+
+      // random target index
+      const targetIndex = Math.floor(Math.random() * n);
+
+      // where is the pointer? pointer is at top (angle = -Math.PI/2 in canvas coordinates)
+      // We want the selected slice to land under pointer.
+      const pointerAngle = -Math.PI/2;
+
+      // The slice center angle (in wheel's local space) that should align with pointer:
+      const sliceCenter = (targetIndex + 0.5) * slice;
+
+      // current normalized angle
+      const current = normalizeAngle(angle);
+
+      // compute delta so that (angle + delta + sliceCenter) == pointerAngle (mod 2π)
+      // => delta = pointerAngle - sliceCenter - angle
+      let delta = pointerAngle - sliceCenter - current;
+
+      // normalize delta to [0, 2π)
+      delta = (delta % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+
+      // add extra spins for drama
+      const extraSpins = 5 + Math.floor(Math.random()*4); // 5..8
+      const total = delta + extraSpins * Math.PI*2;
+
+      const start = performance.now();
+      const duration = 3200 + Math.random()*700; // 3.2s..3.9s
+
+      const startAngle = current;
+      const endAngle = startAngle + total;
+
+      function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+      function frame(now){
+        const t = clamp((now - start) / duration, 0, 1);
+        const e = easeOutCubic(t);
+        angle = startAngle + (endAngle - startAngle) * e;
+        drawWheel();
+
+        if(t < 1){
+          requestAnimationFrame(frame);
+        }else{
+          spinning = false;
+          spinBtn.disabled = false;
+          shuffleBtn.disabled = false;
+          applyBtn.disabled = false;
+          resetBtn.disabled = false;
+
+          // final snap normalize
+          angle = normalizeAngle(angle);
+          drawWheel();
+
+          setResult(targetIndex);
+          showToast("Challenge selected ✅");
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function normalizeAngle(a){
+      const two = Math.PI*2;
+      a = a % two;
+      if(a < 0) a += two;
+      return a;
+    }
+
+    // ---------- Actions ----------
+    function applyList(){
+      const list = sanitizeList(itemsInput.value);
+      if(list.length < 2){
+        showToast("Need at least 2 items.");
+        return;
+      }
+      items = list;
+      syncInputFromItems();
+      drawWheel();
+      showToast("List applied ✅");
+    }
+
+    function shuffle(){
+      // Fisher-Yates
+      for(let i = items.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      syncInputFromItems();
+      drawWheel();
+      showToast("Shuffled 🔀");
+    }
+
+    async function copyResult(){
+      if(lastSelectedIndex == null){
+        showToast("Spin first.");
+        return;
+      }
+      const text = items[lastSelectedIndex];
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast("Copied 📋");
+      }catch{
+        // fallback
+        const tmp = document.createElement("textarea");
+        tmp.value = text;
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand("copy");
+        tmp.remove();
+        showToast("Copied 📋");
+      }
+    }
+
+    function addRandom(){
+      const pick = randomExtras[Math.floor(Math.random() * randomExtras.length)];
+      const set = new Set(items);
+      if(set.has(pick)){
+        showToast("Already in list.");
+        return;
+      }
+      items.push(pick);
+      syncInputFromItems();
+      drawWheel();
+      showToast("Added ➕");
+    }
+
+    // ---------- Events ----------
+    spinBtn.addEventListener("click", spin);
+    shuffleBtn.addEventListener("click", shuffle);
+    copyBtn.addEventListener("click", copyResult);
+    resetBtn.addEventListener("click", () => { loadDefault(); showToast("Reset ↩️"); });
+    applyBtn.addEventListener("click", applyList);
+    addBtn.addEventListener("click", addRandom);
+
+    // Space to spin
+    window.addEventListener("keydown", (e) => {
+      if(e.code === "Space"){
+        e.preventDefault();
+        spin();
+      }
+    });
+
+    // Redraw on resize for crispness (keeps internal resolution constant, but ok)
+    window.addEventListener("resize", () => drawWheel());
+
+    // Init
+    loadDefault();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1802 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Smart Whiteboard — Logic Lab (Offline)</title>
+  <style>
+    /* =========================================================
+       THEME SYSTEM
+       - default: white
+       - options: white | brown
+    ========================================================= */
+    :root{
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+
+      /* Default theme = WHITE */
+      --bg:#f6f7fb;
+      --bg2:#ffffff;
+      --panel: rgba(255,255,255,.86);
+      --panel2: rgba(255,255,255,.96);
+      --text:#0f172a;
+      --muted:#475569;
+      --line:rgba(15,23,42,.14);
+      --line2:rgba(15,23,42,.10);
+      --accent:#2563eb;
+      --accent2:#0ea5e9;
+      --ok:#16a34a;
+      --warn:#d97706;
+      --bad:#dc2626;
+      --ring: rgba(37,99,235,.22);
+      --shadow: 0 18px 55px rgba(2,6,23,.12);
+      --radius:16px;
+      --radius2:20px;
+      --max: 1500px;
+      --cardBg: rgba(248,250,252,.88);
+      --chipBg: rgba(2,6,23,.04);
+      --chipBorder: rgba(2,6,23,.12);
+      --dropBg: rgba(2,6,23,.04);
+      --inputBg: rgba(2,6,23,.04);
+    }
+
+    /* Brown theme */
+    html[data-theme="brown"]{
+      --bg:#1a1411;
+      --bg2:#0f0b08;
+      --panel: rgba(52,36,28,.62);
+      --panel2: rgba(52,36,28,.85);
+      --text:#f5ede6;
+      --muted:#c9b8ab;
+      --line:rgba(245,237,230,.14);
+      --line2:rgba(245,237,230,.10);
+      --accent:#d4a373;
+      --accent2:#f4d58d;
+      --ok:#7fb069;
+      --warn:#f4d35e;
+      --bad:#ee6c4d;
+      --ring: rgba(212,163,115,.30);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --cardBg: rgba(25,18,15,.35);
+      --chipBg: rgba(245,237,230,.05);
+      --chipBorder: rgba(245,237,230,.12);
+      --dropBg: rgba(25,18,15,.22);
+      --inputBg: rgba(25,18,15,.30);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, rgba(37,99,235,.10), transparent 60%),
+        radial-gradient(900px 600px at 85% 0%, rgba(14,165,233,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    html[data-theme="brown"] body{
+      background:
+        radial-gradient(1100px 650px at 15% -10%, rgba(212,163,115,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 0%, rgba(244,213,141,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 14px 18px;}
+
+    header{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 12px;
+      background:linear-gradient(180deg, rgba(2,6,23,.03), rgba(2,6,23,.01));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:sticky; top:10px; z-index:10;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{display:flex; flex-direction:column; gap:2px}
+    .brand .t{font-weight:900; letter-spacing:.2px; font-size:14px}
+    .brand .s{color:var(--muted); font-size:12px}
+
+    .top{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
+    }
+
+    button,.btn{
+      appearance:none; border:1px solid var(--line);
+      background: rgba(2,6,23,.04);
+      color:var(--text); padding:10px 12px; border-radius:14px;
+      cursor:pointer; font-weight:900; font-size:12px;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+      user-select:none;
+    }
+    html[data-theme="brown"] button,
+    html[data-theme="brown"] .btn{
+      background: rgba(25,18,15,.30);
+    }
+
+    button:hover{border-color:rgba(37,99,235,.35)}
+    html[data-theme="brown"] button:hover{border-color: rgba(212,163,115,.55)}
+    button:active{transform: translateY(1px)}
+
+    button.primary{border-color: rgba(37,99,235,.40); background: rgba(37,99,235,.08)}
+    html[data-theme="brown"] button.primary{border-color: rgba(212,163,115,.55); background: rgba(212,163,115,.14)}
+
+    button.ghost{background:transparent}
+
+    button.danger{border-color: rgba(220,38,38,.35); background: rgba(220,38,38,.06)}
+    html[data-theme="brown"] button.danger{border-color: rgba(238,108,77,.45); background: rgba(238,108,77,.10)}
+
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 10px;
+      background: rgba(2,6,23,.03);
+      color:var(--text);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    html[data-theme="brown"] .pill{background: rgba(25,18,15,.22)}
+
+    .mono{font-family:var(--mono)}
+    .muted{color:var(--muted)}
+
+    .board{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 1100px){ .board{grid-template-columns: repeat(2, minmax(260px, 1fr));} }
+    @media (max-width: 650px){
+      .board{grid-template-columns: 1fr;}
+      header{position:relative; top:0}
+    }
+
+    .col{
+      background: var(--panel);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 240px;
+    }
+
+    .colHd{
+      padding:10px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:linear-gradient(180deg, rgba(2,6,23,.03), rgba(2,6,23,.01));
+      border-bottom:1px solid var(--line2);
+    }
+    html[data-theme="brown"] .colHd{
+      background:linear-gradient(180deg, rgba(245,237,230,.05), rgba(245,237,230,.01));
+    }
+
+    .colTitle{display:flex; flex-direction:column; gap:2px; min-width:0;}
+    .colTitle .name{
+      font-weight:1000; font-size:13px;
+      display:flex; gap:8px; align-items:center;
+    }
+    .colTitle .meta{font-size:12px; color:var(--muted)}
+
+    .countBadge{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:24px; height:24px;
+      padding:0 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.03);
+      font-size:12px; font-weight:1000;
+    }
+    html[data-theme="brown"] .countBadge{background: rgba(245,237,230,.05)}
+
+    .colBody{
+      padding:10px;
+      display:flex; flex-direction:column; gap:10px;
+      flex:1;
+    }
+
+    .dropHint{
+      border:1px dashed rgba(2,6,23,.14);
+      border-radius: 16px;
+      padding:10px;
+      color: rgba(15,23,42,.65);
+      background: var(--dropBg);
+      font-size:12px;
+      text-align:center;
+    }
+    html[data-theme="brown"] .dropHint{
+      color: rgba(245,237,230,.75);
+      border-color: rgba(245,237,230,.16);
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background: var(--cardBg);
+      border-radius: 18px;
+      padding:10px;
+      cursor:grab;
+      box-shadow: 0 14px 40px rgba(2,6,23,.10);
+      transition: transform .08s ease, border-color .2s ease, background .2s ease;
+      position:relative;
+    }
+    html[data-theme="brown"] .card{box-shadow: 0 14px 40px rgba(0,0,0,.28);}
+
+    .card:active{cursor:grabbing}
+    .card:hover{border-color: rgba(37,99,235,.30)}
+    html[data-theme="brown"] .card:hover{border-color: rgba(212,163,115,.45)}
+    .card.dragging{opacity:.6; transform: scale(.99)}
+
+    .cardTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .cardTitle{
+      font-weight:1000; font-size:13px; line-height:1.15;
+      word-break:break-word;
+    }
+    .cardMeta{
+      margin-top:6px;
+      display:flex; flex-wrap:wrap; gap:8px;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      border:1px solid var(--chipBorder);
+      background: var(--chipBg);
+      padding:6px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    /* Smart styling classes */
+    .prio-low{border-color: rgba(148,163,184,.35)}
+    .prio-normal{border-color: rgba(37,99,235,.30)}
+    .prio-urgent{border-color: rgba(217,119,6,.38)}
+    html[data-theme="brown"] .prio-normal{border-color: rgba(212,163,115,.55)}
+    html[data-theme="brown"] .prio-urgent{border-color: rgba(244,213,141,.65)}
+
+    .status-overdue{border-color: rgba(220,38,38,.55)}
+    html[data-theme="brown"] .status-overdue{border-color: rgba(238,108,77,.70)}
+
+    .status-due{border-color: rgba(217,119,6,.50)}
+    html[data-theme="brown"] .status-due{border-color: rgba(244,213,141,.65)}
+
+    .status-stale{border-color: rgba(14,165,233,.30)}
+    html[data-theme="brown"] .status-stale{border-color: rgba(244,213,141,.55)}
+
+    .miniBtns{display:flex; gap:8px}
+    .miniBtn{
+      width:32px; height:32px; border-radius:12px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid var(--line2);
+      background: rgba(2,6,23,.03);
+      cursor:pointer;
+      user-select:none;
+    }
+    html[data-theme="brown"] .miniBtn{background: rgba(245,237,230,.05)}
+    .miniBtn:hover{border-color: rgba(37,99,235,.35)}
+    html[data-theme="brown"] .miniBtn:hover{border-color: rgba(212,163,115,.55)}
+
+    .kpiBar{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .kpi{
+      display:flex; flex-direction:column; gap:2px;
+      padding:8px 10px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.03);
+    }
+    html[data-theme="brown"] .kpi{background: rgba(25,18,15,.22)}
+    .kpi .k{font-size:11px; color:var(--muted)}
+    .kpi .v{font-weight:1000; letter-spacing:.2px}
+
+    .rightInfo{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end;}
+    .hint{font-size:12px; color:var(--muted)}
+
+    .search{
+      display:flex; gap:8px; align-items:center;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.03);
+      border-radius: 999px;
+      padding:8px 10px;
+      min-width: 240px;
+    }
+    html[data-theme="brown"] .search{background: rgba(25,18,15,.22)}
+
+    .search input{
+      border:none; outline:none; background:transparent; color:var(--text);
+      width: 100%;
+      font-size:12px;
+    }
+    .search input::placeholder{color: rgba(71,85,105,.75)}
+    html[data-theme="brown"] .search input::placeholder{color: rgba(201,184,171,.75)}
+
+    .foot{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(2,6,23,.02);
+    }
+    html[data-theme="brown"] .foot{background: rgba(25,18,15,.22)}
+
+    dialog{
+      border:none; border-radius: 18px;
+      padding:0;
+      width: min(760px, 94vw);
+      background: var(--panel2);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    dialog::backdrop{background: rgba(2,6,23,.25)}
+    html[data-theme="brown"] dialog::backdrop{background: rgba(0,0,0,.55)}
+
+    .dlgHd{
+      padding:12px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      background: rgba(2,6,23,.02);
+    }
+    html[data-theme="brown"] .dlgHd{background: rgba(245,237,230,.03)}
+
+    .dlgHd .t{font-weight:1000}
+    .dlgBd{padding:12px}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;}
+    @media (max-width: 560px){ .row{grid-template-columns:1fr} }
+
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:10px}
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: var(--inputBg);
+      color: var(--text);
+      outline:none;
+      font-size: 13px;
+    }
+    input:focus, select:focus, textarea:focus{border-color: rgba(37,99,235,.35); box-shadow: 0 0 0 3px var(--ring)}
+    html[data-theme="brown"] input:focus,
+    html[data-theme="brown"] select:focus,
+    html[data-theme="brown"] textarea:focus{border-color: rgba(212,163,115,.55); box-shadow: 0 0 0 3px rgba(212,163,115,.28)}
+
+    textarea{min-height:90px; resize:vertical}
+
+    .dlgActions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; padding:12px; border-top:1px solid var(--line)}
+
+    /* ---------- Toggle Switch ---------- */
+    .toggle{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.03);
+      user-select:none;
+    }
+    html[data-theme="brown"] .toggle{background: rgba(25,18,15,.22)}
+
+    .switch{
+      width:44px; height:26px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(2,6,23,.05);
+      position:relative;
+      cursor:pointer;
+      flex: 0 0 auto;
+    }
+    html[data-theme="brown"] .switch{background: rgba(245,237,230,.06)}
+
+    .knob{
+      width:22px; height:22px; border-radius:999px;
+      background: var(--text);
+      position:absolute; top:1px; left:1px;
+      transition: left .18s ease, background .18s ease;
+    }
+
+    .switch.on{
+      border-color: rgba(37,99,235,.35);
+      background: rgba(37,99,235,.10);
+    }
+    html[data-theme="brown"] .switch.on{
+      border-color: rgba(212,163,115,.55);
+      background: rgba(212,163,115,.18);
+    }
+
+    .switch.on .knob{left:21px; background: #fff}
+
+    /* ---------- Wall mode ---------- */
+    html.wall header, html.wall .foot, html.wall .noWall{display:none !important}
+    html.wall .wrap{max-width: none; padding:12px;}
+    html.wall .board{gap:10px}
+    html.wall .col{min-height: calc(100vh - 24px); border-radius: 22px}
+    html.wall .colHd{padding:14px 14px}
+    html.wall .colTitle .name{font-size:16px}
+    html.wall .colTitle .meta{font-size:12px}
+    html.wall .card{padding:12px}
+    html.wall .cardTitle{font-size:15px}
+    html.wall .tag{font-size:12px; padding:7px 12px}
+    html.wall .colBody{padding:12px}
+
+    /* Wall-mode exit button (always visible in wall mode) */
+    .wallExit{
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.86);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      font-weight: 1000;
+      cursor: pointer;
+    }
+    html[data-theme="brown"] .wallExit{ background: rgba(25,18,15,.72); }
+    html.wall .wallExit{ display: inline-flex; }
+
+    /* ---------- Print / Shift Summary ---------- */
+    @media print{
+      header, .foot, .noPrint, .noWall, .wallExit{display:none !important;}
+      body{background:#fff !important; color:#111 !important}
+      .wrap{padding:0}
+      .col{box-shadow:none; background:#fff; border:1px solid #ddd}
+      .card{box-shadow:none; background:#fff; border:1px solid #ddd}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="t" id="brandTitle">Smart Whiteboard (Offline)</div>
+      <div class="s" id="brandSub">Multiple boards • Lockable wall mode • Shift summary</div>
+    </div>
+
+    <div class="top">
+      <!-- Board selector -->
+      <div class="pill noWall" title="Switch between boards">
+        <span class="muted">Board:</span>
+        <select id="boardSelect" style="padding:6px 10px; border-radius:999px; min-width:170px"></select>
+        <button class="ghost" id="btnNewBoard" title="Create a new board">+</button>
+        <button class="ghost" id="btnRenameBoard" title="Rename current board">Rename</button>
+        <button class="danger" id="btnDeleteBoard" title="Delete current board">Delete</button>
+      </div>
+
+      <!-- Theme selector (WHITE + BROWN only) -->
+      <div class="pill noWall" title="Theme">
+        <span class="muted">Theme:</span>
+        <select id="themeSelect" style="padding:6px 10px; border-radius:999px">
+          <option value="white">White</option>
+          <option value="brown">Brown</option>
+        </select>
+      </div>
+
+      <!-- Search -->
+      <div class="search noWall" title="Search cards by title, owner, tag, notes">
+        <span class="muted">🔎</span>
+        <input id="q" placeholder="Search…" />
+      </div>
+
+      <div class="pill noWall" id="clock">—</div>
+
+      <button class="ghost noWall" id="btnFocus">Focus: Off</button>
+      <button class="ghost noWall" id="btnArchiveDone">Archive Done</button>
+      <button class="ghost noWall" id="btnColumns">Columns</button>
+      <button class="ghost noWall" id="btnShiftSummary">Shift Summary</button>
+      <button class="primary noWall" id="btnAdd">+ Add Card</button>
+
+      <!-- Wall Mode Toggle -->
+      <div class="toggle" title="Wall Mode toggle (ESC to exit)">
+        <span class="muted">Wall</span>
+        <div class="switch" id="wallSwitch" role="switch" aria-checked="false">
+          <div class="knob"></div>
+        </div>
+      </div>
+
+      <button class="ghost noWall" id="btnLock">Lock</button>
+      <button class="ghost" id="btnUnlock" style="display:none">Unlock</button>
+
+      <button class="ghost noWall" id="btnData">Import/Export</button>
+      <button class="danger noWall" id="btnReset">Reset</button>
+    </div>
+  </header>
+
+  <div class="foot noWall">
+    <div class="kpiBar" id="kpis"></div>
+    <div class="rightInfo">
+      <div class="hint">
+        Smart rules: <span class="mono">Due today</span> → yellow • <span class="mono">Overdue</span> → red •
+        <span class="mono">No update</span> → blue • Blocked too long → yellow/red
+      </div>
+    </div>
+  </div>
+
+  <main class="board" id="board"></main>
+</div>
+
+<!-- Always-visible Exit Wall button -->
+<button class="wallExit" id="btnExitWall" title="Exit wall mode (ESC)">
+  ⤺ Exit Wall <span class="muted">(ESC)</span>
+</button>
+
+<!-- Add/Edit Card -->
+<dialog id="dlgCard">
+  <div class="dlgHd">
+    <div>
+      <div class="t" id="dlgCardTitle">Add Card</div>
+      <div class="muted" style="font-size:12px" id="dlgCardSub">Fast, clean, printable.</div>
+    </div>
+    <button class="ghost" id="closeCard">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Title <small class="muted">required</small></label>
+        <input id="c_title" placeholder="e.g., Fix leaking pipe at Site A" />
+      </div>
+      <div class="field">
+        <label>Owner</label>
+        <input id="c_owner" placeholder="e.g., Thabo" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Tag</label>
+        <input id="c_tag" placeholder="e.g., Job / Maintenance / Delivery / Safety" />
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <select id="c_prio">
+          <option value="normal" selected>Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Due date/time</label>
+        <input id="c_due" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label>Status prompt</label>
+        <select id="c_prompt">
+          <option value="none" selected>None</option>
+          <option value="done">When moved to Done → ask “Any issues?”</option>
+          <option value="blocked">When moved to Blocked → ask reason</option>
+          <option value="progress">When moved to In Progress → auto-start timer</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Notes <small class="muted">short</small></label>
+      <textarea id="c_notes" placeholder="Parts needed, customer name, instructions…"></textarea>
+    </div>
+  </div>
+  <div class="dlgActions">
+    <button class="danger" id="btnDeleteCard" style="display:none">Delete</button>
+    <button class="ghost" id="btnCancelCard">Cancel</button>
+    <button class="primary" id="btnSaveCard">Save</button>
+  </div>
+</dialog>
+
+<!-- Columns manager -->
+<dialog id="dlgCols">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Columns</div>
+      <div class="muted" style="font-size:12px">Rename columns (simple, fast)</div>
+    </div>
+    <button class="ghost" id="closeCols">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="muted" style="font-size:12px; margin-bottom:10px">Tip: keep them short for wall screens.</div>
+    <div id="colsForm" style="display:flex; flex-direction:column; gap:10px"></div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCancelCols">Cancel</button>
+    <button class="primary" id="btnSaveCols">Save</button>
+  </div>
+</dialog>
+
+<!-- Import/Export -->
+<dialog id="dlgData">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Import / Export</div>
+      <div class="muted" style="font-size:12px">Backup your boards as JSON</div>
+    </div>
+    <button class="ghost" id="closeData">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="row">
+      <div class="field">
+        <label>Export</label>
+        <button class="ghost" id="btnCopyJson">Copy JSON</button>
+      </div>
+      <div class="field">
+        <label>Import</label>
+        <button class="primary" id="btnImportJson">Import JSON</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Boards JSON</label>
+      <textarea id="jsonBox" class="mono" placeholder='{"activeBoardId":"...","boards":[...],"prefs":{...}}'></textarea>
+    </div>
+    <div class="muted" style="font-size:12px">Import replaces everything.</div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCloseData2">Done</button>
+  </div>
+</dialog>
+
+<!-- Shift Summary -->
+<dialog id="dlgSummary">
+  <div class="dlgHd">
+    <div>
+      <div class="t">Shift Summary</div>
+      <div class="muted" style="font-size:12px" id="sumSub">—</div>
+    </div>
+    <button class="ghost" id="closeSummary">Close</button>
+  </div>
+  <div class="dlgBd" id="sumBody"></div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCopySummary">Copy</button>
+    <button class="primary" id="btnPrintSummary">Print / PDF</button>
+  </div>
+</dialog>
+
+<!-- Lock / Unlock -->
+<dialog id="dlgLock">
+  <div class="dlgHd">
+    <div>
+      <div class="t" id="lockTitle">Lock Board</div>
+      <div class="muted" style="font-size:12px">Prevents edits (perfect for wall TV)</div>
+    </div>
+    <button class="ghost" id="closeLock">Close</button>
+  </div>
+  <div class="dlgBd">
+    <div class="field">
+      <label>Password</label>
+      <input id="lockPass" type="password" placeholder="Set / enter password" />
+    </div>
+    <div class="muted" style="font-size:12px; margin-top:8px" id="lockMsg">Tip: use something simple but not obvious.</div>
+  </div>
+  <div class="dlgActions">
+    <button class="ghost" id="btnCancelLock">Cancel</button>
+    <button class="primary" id="btnConfirmLock">Confirm</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  /* =========================================================
+     MULTI-BOARD SMART WHITEBOARD (Offline)
+     - Multiple boards
+     - Lock/unlock (password)
+     - Wall mode toggle switch + ALWAYS-VISIBLE EXIT
+     - Themes: white / brown (default white)
+     - Shift Summary (printable)
+  ========================================================= */
+
+  const STORAGE_KEY = "ll_whiteboard_multi_v2";
+
+  const now = () => new Date();
+  const iso = (d) => new Date(d).toISOString();
+  const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  const $ = (id) => document.getElementById(id);
+
+  /* ---------------- Defaults ---------------- */
+  const defaultBoard = (name="Workshop Board") => ({
+    id: uid(),
+    name,
+    settings: {
+      focus: false,
+      wall: false,
+      locked: false,
+      passwordHash: "", // naive hash (not crypto), just to stop casual edits
+      staleHours: 6,
+      blockedWarnHours: 4,
+      blockedOverdueHours: 12
+    },
+    columns: [
+      { id: "todo", title: "To Do", hint: "New tasks" },
+      { id: "doing", title: "In Progress", hint: "Currently being worked" },
+      { id: "blocked", title: "Blocked", hint: "Waiting / stuck" },
+      { id: "done", title: "Done", hint: "Completed" }
+    ],
+    lanes: { todo: [], doing: [], blocked: [], done: [] },
+    cards: {}
+  });
+
+  const defaultAppState = () => ({
+    version: 2,
+    prefs: { theme: "white" },
+    activeBoardId: "",
+    boards: [
+      defaultBoard("Workshop Board"),
+      defaultBoard("Dispatch Board"),
+      defaultBoard("Site A Board")
+    ]
+  });
+
+  /* ---------------- Persistence ---------------- */
+  let app = load() || defaultAppState();
+  if(!app.activeBoardId) app.activeBoardId = app.boards[0].id;
+  applyTheme(app.prefs.theme);
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      const s = JSON.parse(raw);
+      if(!s || !Array.isArray(s.boards) || !s.prefs) return null;
+      return s;
+    }catch(e){ return null; }
+  }
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+  }
+
+  function getBoard(){
+    return app.boards.find(b => b.id === app.activeBoardId) || app.boards[0];
+  }
+
+  /* ---------------- Theme (white/brown only) ---------------- */
+  function applyTheme(theme){
+    const t = (theme === "brown") ? "brown" : "white";
+    document.documentElement.setAttribute("data-theme", t);
+    app.prefs.theme = t;
+    save();
+    const sel = $("themeSelect");
+    if(sel && sel.value !== t) sel.value = t;
+  }
+
+  /* ---------------- Simple hash (not crypto) ---------------- */
+  function tinyHash(str){
+    let h = 2166136261;
+    for(let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0).toString(16);
+  }
+
+  /* ---------------- Helpers ---------------- */
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function escapeAttr(s){ return escapeHtml(s).replaceAll("\n"," "); }
+
+  function toLocalInputValue(d){
+    if(!d) return "";
+    const x = new Date(d);
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
+  }
+  function parseLocalDateTime(val){
+    if(!val) return null;
+    const d = new Date(val);
+    return isNaN(d) ? null : d.toISOString();
+  }
+
+  function startOfToday(){
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    return d;
+  }
+  function isDueToday(dueIso){
+    if(!dueIso) return false;
+    const d = new Date(dueIso);
+    const t0 = startOfToday();
+    const t1 = new Date(t0); t1.setDate(t1.getDate()+1);
+    return d >= t0 && d < t1;
+  }
+  function isOverdue(dueIso){
+    if(!dueIso) return false;
+    return new Date(dueIso) < now();
+  }
+  function hoursSince(isoDate){
+    if(!isoDate) return Infinity;
+    const ms = now().getTime() - new Date(isoDate).getTime();
+    return ms / (1000*60*60);
+  }
+
+  function laneTitle(board, colId){
+    return board.columns.find(c=>c.id===colId)?.title ?? colId;
+  }
+
+  /* ---------------- Locking ---------------- */
+  function isLocked(board){
+    return !!board.settings.locked;
+  }
+  function requireUnlocked(board){
+    if(!isLocked(board)) return true;
+    alert("Board is locked. Tap Unlock and enter the password.");
+    return false;
+  }
+
+  /* ---------------- Wall mode toggle switch ---------------- */
+  function setWallSwitchUI(board){
+    const sw = $("wallSwitch");
+    if(!sw) return;
+    const on = !!board.settings.wall;
+    sw.classList.toggle("on", on);
+    sw.setAttribute("aria-checked", on ? "true" : "false");
+  }
+
+  function setWallMode(board, on){
+    board.settings.wall = !!on;
+    document.documentElement.classList.toggle("wall", !!on);
+    setWallSwitchUI(board);
+    save();
+    render();
+  }
+
+  /* ---------------- Timer ---------------- */
+  function ensureTimer(card){
+    if(!card.timer) card.timer = { running:false, startedAt:null, totalMs:0 };
+  }
+  function startTimer(card){
+    ensureTimer(card);
+    if(card.timer.running) return;
+    card.timer.running = true;
+    card.timer.startedAt = iso(now());
+  }
+  function stopTimer(card){
+    ensureTimer(card);
+    if(!card.timer.running) return;
+    const start = new Date(card.timer.startedAt).getTime();
+    const add = now().getTime() - start;
+    card.timer.totalMs += Math.max(0, add);
+    card.timer.running = false;
+    card.timer.startedAt = null;
+  }
+  function formatTimer(cardTimer){
+    const t = cardTimer || {running:false, startedAt:null, totalMs:0};
+    let ms = t.totalMs || 0;
+    if(t.running && t.startedAt){
+      ms += now().getTime() - new Date(t.startedAt).getTime();
+    }
+    const s = Math.floor(ms/1000);
+    const h = Math.floor(s/3600);
+    const m = Math.floor((s%3600)/60);
+    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+  }
+
+  /* ---------------- Smart styling ---------------- */
+  function smartClass(board, card, laneId){
+    const cls = [];
+    if(card.priority === "urgent") cls.push("prio-urgent");
+    else if(card.priority === "low") cls.push("prio-low");
+    else cls.push("prio-normal");
+
+    if(card.dueAt){
+      if(isOverdue(card.dueAt)) cls.push("status-overdue");
+      else if(isDueToday(card.dueAt)) cls.push("status-due");
+    }
+
+    const staleH = board.settings.staleHours ?? 6;
+    if(hoursSince(card.updatedAt) >= staleH && laneId !== "done"){
+      cls.push("status-stale");
+    }
+
+    if(laneId === "blocked"){
+      const h = hoursSince(card.movedToLaneAt?.blocked || card.updatedAt);
+      if(h >= (board.settings.blockedOverdueHours ?? 12)) cls.push("status-overdue");
+      else if(h >= (board.settings.blockedWarnHours ?? 4)) cls.push("status-due");
+    }
+
+    return cls.join(" ");
+  }
+
+  /* ---------------- Board selector ---------------- */
+  function renderBoardSelector(){
+    const sel = $("boardSelect");
+    sel.innerHTML = "";
+    app.boards.forEach(b=>{
+      const op = document.createElement("option");
+      op.value = b.id;
+      op.textContent = b.name;
+      sel.appendChild(op);
+    });
+    sel.value = app.activeBoardId;
+  }
+
+  function switchBoard(id){
+    const b = app.boards.find(x=>x.id===id);
+    if(!b) return;
+    app.activeBoardId = id;
+    save();
+    document.documentElement.classList.toggle("wall", !!b.settings.wall);
+    setWallSwitchUI(b);
+    syncLockButtons(b);
+    render();
+  }
+
+  /* ---------------- Render KPIs ---------------- */
+  function renderKPIs(board){
+    const k = $("kpis");
+    if(!k) return;
+
+    const counts = {};
+    board.columns.forEach(c => counts[c.id] = (board.lanes[c.id] || []).length);
+
+    let overdue=0, dueToday=0, stale=0, blockedOld=0;
+    const staleH = board.settings.staleHours ?? 6;
+
+    Object.values(board.cards).forEach(card=>{
+      const lane = card.lane;
+      if(lane === "done") return;
+      if(card.dueAt){
+        if(isOverdue(card.dueAt)) overdue++;
+        else if(isDueToday(card.dueAt)) dueToday++;
+      }
+      if(hoursSince(card.updatedAt) >= staleH) stale++;
+      if(lane === "blocked"){
+        const h = hoursSince(card.movedToLaneAt?.blocked || card.updatedAt);
+        if(h >= (board.settings.blockedWarnHours ?? 4)) blockedOld++;
+      }
+    });
+
+    k.innerHTML = `
+      <div class="kpi"><div class="k">Total</div><div class="v">${Object.keys(board.cards).length}</div></div>
+      <div class="kpi"><div class="k">To Do</div><div class="v">${counts.todo ?? 0}</div></div>
+      <div class="kpi"><div class="k">In Progress</div><div class="v">${counts.doing ?? 0}</div></div>
+      <div class="kpi"><div class="k">Blocked</div><div class="v">${counts.blocked ?? 0}</div></div>
+      <div class="kpi"><div class="k">Done</div><div class="v">${counts.done ?? 0}</div></div>
+      <div class="kpi"><div class="k">Due Today</div><div class="v">${dueToday}</div></div>
+      <div class="kpi"><div class="k">Overdue</div><div class="v">${overdue}</div></div>
+      <div class="kpi"><div class="k">Stale</div><div class="v">${stale}</div></div>
+      <div class="kpi"><div class="k">Blocked Aging</div><div class="v">${blockedOld}</div></div>
+    `;
+  }
+
+  /* ---------------- Dragging ---------------- */
+  let dragging = { cardId: null };
+
+  /* ---------------- Render board ---------------- */
+  function render(){
+    const board = getBoard();
+
+    // clock
+    const clk = $("clock");
+    if(clk){
+      const d = new Date();
+      clk.textContent = d.toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    }
+
+    // focus button text
+    $("btnFocus").textContent = `Focus: ${board.settings.focus ? "On" : "Off"}`;
+
+    // board name
+    $("brandTitle").textContent = `${board.name} — Smart Whiteboard`;
+    $("brandSub").textContent = isLocked(board)
+      ? "LOCKED • Drag disabled • Unlock to edit"
+      : "Multiple boards • Lockable wall mode • Shift summary";
+
+    renderKPIs(board);
+
+    setWallSwitchUI(board);
+    syncLockButtons(board);
+
+    const q = ($("q")?.value || "").trim().toLowerCase();
+    const focus = !!board.settings.focus;
+
+    const root = $("board");
+    root.innerHTML = "";
+
+    board.columns.forEach(col => {
+      const lane = col.id;
+      const ids = board.lanes[lane] || [];
+
+      const visibleIds = ids.filter(cid => {
+        const c = board.cards[cid];
+        if(!c) return false;
+
+        if(focus){
+          if(lane === "done") return false;
+          if(c.priority === "low") return false;
+        }
+
+        if(q){
+          const blob = `${c.title} ${c.owner||""} ${c.tag||""} ${c.notes||""}`.toLowerCase();
+          if(!blob.includes(q)) return false;
+        }
+        return true;
+      });
+
+      const colEl = document.createElement("section");
+      colEl.className = "col";
+      colEl.dataset.lane = lane;
+
+      colEl.innerHTML = `
+        <div class="colHd">
+          <div class="colTitle">
+            <div class="name">
+              <span>${escapeHtml(col.title || lane)}</span>
+              <span class="countBadge" title="Visible cards">${visibleIds.length}</span>
+            </div>
+            <div class="meta">${escapeHtml(col.hint || "")}</div>
+          </div>
+          <div class="miniBtns noWall">
+            <div class="miniBtn" title="Add card here" data-act="addHere" data-lane="${lane}">＋</div>
+          </div>
+        </div>
+        <div class="colBody" data-dropzone="1">
+          <div class="dropHint">Drop cards here</div>
+          <div class="cards"></div>
+        </div>
+      `;
+
+      const body = colEl.querySelector(".colBody");
+      const cardsWrap = colEl.querySelector(".cards");
+
+      // drop handlers
+      body.addEventListener("dragover", (e)=>{
+        if(isLocked(board)) return;
+        e.preventDefault();
+        body.style.outline = "2px solid rgba(37,99,235,.20)";
+        body.style.outlineOffset="4px";
+      });
+      body.addEventListener("dragleave", ()=>{ body.style.outline = ""; });
+      body.addEventListener("drop", (e)=>{
+        if(isLocked(board)) return;
+        e.preventDefault();
+        body.style.outline = "";
+        const cid = dragging.cardId;
+        if(!cid) return;
+        moveCard(board, cid, lane);
+      });
+
+      // cards
+      visibleIds.forEach(cid => {
+        const c = board.cards[cid];
+        if(!c) return;
+
+        const cardEl = document.createElement("article");
+        cardEl.className = `card ${smartClass(board, c, lane)}`;
+        cardEl.draggable = !isLocked(board);
+        cardEl.dataset.id = cid;
+
+        const dueTxt = c.dueAt
+          ? new Date(c.dueAt).toLocaleString(undefined, { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" })
+          : "—";
+        const updH = Math.floor(hoursSince(c.updatedAt) * 10) / 10;
+
+        cardEl.innerHTML = `
+          <div class="cardTop">
+            <div style="min-width:0">
+              <div class="cardTitle">${escapeHtml(c.title || "")}</div>
+              <div class="cardMeta">
+                ${c.owner ? `<span class="tag" title="Owner">👤 ${escapeHtml(c.owner)}</span>` : ""}
+                ${c.tag ? `<span class="tag" title="Tag">🏷️ ${escapeHtml(c.tag)}</span>` : ""}
+                ${c.dueAt ? `<span class="tag" title="Due">⏰ ${escapeHtml(dueTxt)}</span>` : ""}
+                ${c.timer?.running ? `<span class="tag" title="Timer">⏱️ ${escapeHtml(formatTimer(c.timer))}</span>` : ""}
+              </div>
+            </div>
+
+            <div class="miniBtns noWall">
+              <div class="miniBtn" title="Edit" data-act="edit" data-id="${cid}">✎</div>
+              <div class="miniBtn" title="Delete" data-act="del" data-id="${cid}">🗑</div>
+            </div>
+          </div>
+
+          ${c.notes ? `<div class="muted" style="margin-top:8px; font-size:12px; line-height:1.35">${escapeHtml(c.notes)}</div>` : ""}
+
+          <div class="muted" style="margin-top:10px; font-size:11px; display:flex; justify-content:space-between; gap:10px">
+            <span class="mono">updated ${isFinite(updH) ? updH : "—"}h ago</span>
+            ${c.timer?.running ? `<span class="mono">running</span>` : ""}
+          </div>
+        `;
+
+        if(!isLocked(board)){
+          cardEl.addEventListener("dragstart", ()=>{
+            dragging.cardId = cid;
+            cardEl.classList.add("dragging");
+          });
+          cardEl.addEventListener("dragend", ()=>{
+            dragging.cardId = null;
+            cardEl.classList.remove("dragging");
+          });
+        }
+
+        cardsWrap.appendChild(cardEl);
+      });
+
+      if(visibleIds.length) colEl.querySelector(".dropHint").style.display = "none";
+
+      // add here button
+      colEl.querySelectorAll('[data-act="addHere"]').forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          if(!requireUnlocked(board)) return;
+          openCardDialog({ lane });
+        });
+      });
+
+      root.appendChild(colEl);
+    });
+
+    // actions
+    root.querySelectorAll("[data-act='edit']").forEach(b => b.addEventListener("click", ()=>{
+      if(!requireUnlocked(board)) return;
+      openCardDialog({ id: b.dataset.id });
+    }));
+    root.querySelectorAll("[data-act='del']").forEach(b => b.addEventListener("click", ()=>{
+      if(!requireUnlocked(board)) return;
+      deleteCard(board, b.dataset.id);
+    }));
+  }
+
+  /* ---------------- Ensure board consistency ---------------- */
+  function normalizeBoard(board){
+    board.columns.forEach(c => { if(!board.lanes[c.id]) board.lanes[c.id] = []; });
+    Object.values(board.cards).forEach(c=>{
+      if(!c.lane) c.lane = "todo";
+      if(!board.lanes[c.lane]) board.lanes[c.lane] = [];
+      const inLane = Object.values(board.lanes).some(arr => arr.includes(c.id));
+      if(!inLane) board.lanes[c.lane].unshift(c.id);
+      if(!c.updatedAt) c.updatedAt = iso(now());
+      if(!c.createdAt) c.createdAt = iso(now());
+      if(!c.movedToLaneAt) c.movedToLaneAt = { [c.lane]: iso(now()) };
+      if(!c.timer) c.timer = { running:false, startedAt:null, totalMs:0 };
+    });
+  }
+
+  /* ---------------- Card CRUD ---------------- */
+  let editingId = null;
+  let defaultLaneForNew = "todo";
+
+  function openCardDialog(opts = {}){
+    const board = getBoard();
+    editingId = opts.id || null;
+    defaultLaneForNew = opts.lane || "todo";
+
+    $("btnDeleteCard").style.display = editingId ? "inline-flex" : "none";
+
+    if(editingId){
+      const c = board.cards[editingId];
+      $("dlgCardTitle").textContent = "Edit Card";
+      $("dlgCardSub").textContent = `Currently in: ${laneTitle(board, c.lane)}`;
+      $("c_title").value = c.title || "";
+      $("c_owner").value = c.owner || "";
+      $("c_tag").value = c.tag || "";
+      $("c_prio").value = c.priority || "normal";
+      $("c_due").value = toLocalInputValue(c.dueAt);
+      $("c_notes").value = c.notes || "";
+      $("c_prompt").value = c.prompt || "none";
+    }else{
+      $("dlgCardTitle").textContent = "Add Card";
+      $("dlgCardSub").textContent = `Will add to: ${laneTitle(board, defaultLaneForNew)}`;
+      $("c_title").value = "";
+      $("c_owner").value = "";
+      $("c_tag").value = "";
+      $("c_prio").value = "normal";
+      $("c_due").value = "";
+      $("c_notes").value = "";
+      $("c_prompt").value = "none";
+    }
+
+    $("dlgCard").showModal();
+    setTimeout(()=> $("c_title").focus(), 50);
+  }
+  function closeCardDialog(){
+    $("dlgCard").close();
+    editingId = null;
+  }
+
+  function upsertCard(){
+    const board = getBoard();
+    if(!requireUnlocked(board)) return;
+
+    const title = $("c_title").value.trim();
+    if(!title){ alert("Title is required."); return; }
+
+    const owner = $("c_owner").value.trim();
+    const tag = $("c_tag").value.trim();
+    const prio = $("c_prio").value;
+    const dueAt = parseLocalDateTime($("c_due").value);
+    const notes = $("c_notes").value.trim();
+    const prompt = $("c_prompt").value;
+
+    if(editingId){
+      const c = board.cards[editingId];
+      c.title = title;
+      c.owner = owner;
+      c.tag = tag;
+      c.priority = prio;
+      c.dueAt = dueAt;
+      c.notes = notes;
+      c.prompt = prompt;
+      c.updatedAt = iso(now());
+      save();
+      render();
+      closeCardDialog();
+      return;
+    }
+
+    const id = uid();
+    const lane = (defaultLaneForNew in board.lanes) ? defaultLaneForNew : "todo";
+    const card = {
+      id,
+      title,
+      owner,
+      tag,
+      priority: prio,
+      dueAt,
+      notes,
+      prompt,
+      lane,
+      createdAt: iso(now()),
+      updatedAt: iso(now()),
+      movedToLaneAt: { [lane]: iso(now()) },
+      timer: { running:false, startedAt:null, totalMs:0 }
+    };
+    board.cards[id] = card;
+    board.lanes[lane].unshift(id);
+
+    save();
+    render();
+    closeCardDialog();
+  }
+
+  function deleteCard(board, id){
+    if(!id || !board.cards[id]) return;
+    if(!confirm("Delete this card?")) return;
+
+    const lane = board.cards[id].lane;
+    board.lanes[lane] = (board.lanes[lane] || []).filter(x => x !== id);
+    delete board.cards[id];
+
+    save();
+    render();
+  }
+
+  /* ---------------- Move logic + smart prompts ---------------- */
+  function moveCard(board, id, toLane){
+    if(!requireUnlocked(board)) return;
+    const c = board.cards[id];
+    if(!c) return;
+    const fromLane = c.lane;
+    if(fromLane === toLane) return;
+
+    board.lanes[fromLane] = (board.lanes[fromLane] || []).filter(x => x !== id);
+    board.lanes[toLane] = board.lanes[toLane] || [];
+    board.lanes[toLane].unshift(id);
+
+    ensureTimer(c);
+    if(toLane === "doing"){
+      if(c.prompt === "progress") startTimer(c);
+    }else{
+      if(fromLane === "doing") stopTimer(c);
+    }
+
+    if(toLane === "blocked" && c.prompt === "blocked"){
+      const reason = prompt("Blocked reason? (e.g., waiting for parts / client / approval)");
+      if(reason) c.notes = (c.notes ? (c.notes + "\n") : "") + "Blocked: " + reason;
+    }
+    if(toLane === "done" && c.prompt === "done"){
+      const issues = confirm("Any issues found? OK = Yes, Cancel = No");
+      if(issues){
+        const note = prompt("Quick issue note (optional):");
+        if(note) c.notes = (c.notes ? (c.notes + "\n") : "") + "Issues: " + note;
+      }
+      stopTimer(c);
+    }
+
+    c.lane = toLane;
+    c.updatedAt = iso(now());
+    c.movedToLaneAt = c.movedToLaneAt || {};
+    c.movedToLaneAt[toLane] = iso(now());
+
+    save();
+    render();
+  }
+
+  /* ---------------- Columns ---------------- */
+  function openColsDialog(){
+    const board = getBoard();
+    if(!requireUnlocked(board)) return;
+
+    const wrap = $("colsForm");
+    wrap.innerHTML = "";
+
+    board.columns.forEach((col, idx) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="field">
+          <label>Column ${idx+1} title</label>
+          <input data-col-id="${col.id}" data-k="title" value="${escapeAttr(col.title || "")}" />
+        </div>
+        <div class="field">
+          <label>Hint (small)</label>
+          <input data-col-id="${col.id}" data-k="hint" value="${escapeAttr(col.hint || "")}" />
+        </div>
+      `;
+      wrap.appendChild(row);
+    });
+
+    $("dlgCols").showModal();
+  }
+  function closeColsDialog(){ $("dlgCols").close(); }
+
+  function saveColsDialog(){
+    const board = getBoard();
+    if(!requireUnlocked(board)) return;
+
+    const inputs = $("colsForm").querySelectorAll("input[data-col-id]");
+    inputs.forEach(inp => {
+      const id = inp.dataset.colId;
+      const k = inp.dataset.k;
+      const v = inp.value.trim();
+      const col = board.columns.find(c=>c.id===id);
+      if(col) col[k] = v;
+    });
+    save();
+    render();
+    closeColsDialog();
+  }
+
+  /* ---------------- Archive Done ---------------- */
+  function archiveDone(){
+    const board = getBoard();
+    if(!requireUnlocked(board)) return;
+
+    const doneIds = (board.lanes.done || []).slice();
+    if(!doneIds.length){ alert("No Done cards to archive."); return; }
+
+    const ok = confirm(`Archive ${doneIds.length} Done cards?\n\nThis removes them from the board.`);
+    if(!ok) return;
+
+    doneIds.forEach(id => { delete board.cards[id]; });
+    board.lanes.done = [];
+
+    save();
+    render();
+  }
+
+  /* ---------------- Focus ---------------- */
+  function toggleFocus(){
+    const board = getBoard();
+    if(!requireUnlocked(board)) return;
+    board.settings.focus = !board.settings.focus;
+    save();
+    render();
+  }
+
+  /* ---------------- Shift Summary ---------------- */
+  function openShiftSummary(){
+    const board = getBoard();
+    const dt = new Date().toLocaleString(undefined, { weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    $("sumSub").textContent = `${board.name} • ${dt}`;
+
+    const done = (board.lanes.done || []).map(id => board.cards[id]).filter(Boolean);
+    const blocked = (board.lanes.blocked || []).map(id => board.cards[id]).filter(Boolean);
+    const doing = (board.lanes.doing || []).map(id => board.cards[id]).filter(Boolean);
+    const todo = (board.lanes.todo || []).map(id => board.cards[id]).filter(Boolean);
+
+    const list = (arr) => {
+      if(!arr.length) return `<div class="muted">None</div>`;
+      return `<ol style="margin:8px 0 0; padding-left:18px; line-height:1.45">
+        ${arr.map(c => {
+          const due = c.dueAt ? new Date(c.dueAt).toLocaleString(undefined, { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" }) : "";
+          const bits = [
+            c.owner ? `Owner: ${escapeHtml(c.owner)}` : "",
+            c.tag ? `Tag: ${escapeHtml(c.tag)}` : "",
+            due ? `Due: ${escapeHtml(due)}` : "",
+            c.priority ? `Priority: ${escapeHtml(c.priority)}` : ""
+          ].filter(Boolean).join(" • ");
+          return `<li><b>${escapeHtml(c.title)}</b><div class="muted" style="font-size:12px">${bits}</div></li>`;
+        }).join("")}
+      </ol>`;
+    };
+
+    const overdue = Object.values(board.cards).filter(c => c.lane !== "done" && c.dueAt && isOverdue(c.dueAt));
+    const stale = Object.values(board.cards).filter(c => c.lane !== "done" && hoursSince(c.updatedAt) >= (board.settings.staleHours ?? 6));
+
+    $("sumBody").innerHTML = `
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+        <div class="pill"><span class="muted">Done:</span> <b>${done.length}</b></div>
+        <div class="pill"><span class="muted">Blocked:</span> <b>${blocked.length}</b></div>
+        <div class="pill"><span class="muted">In Progress:</span> <b>${doing.length}</b></div>
+        <div class="pill"><span class="muted">To Do:</span> <b>${todo.length}</b></div>
+        <div class="pill"><span class="muted">Overdue:</span> <b>${overdue.length}</b></div>
+        <div class="pill"><span class="muted">Stale:</span> <b>${stale.length}</b></div>
+      </div>
+
+      <div class="col" style="box-shadow:none; margin-bottom:10px">
+        <div class="colHd"><div class="colTitle"><div class="name">Done</div><div class="meta">Completed this shift</div></div></div>
+        <div class="colBody">${list(done)}</div>
+      </div>
+
+      <div class="col" style="box-shadow:none; margin-bottom:10px">
+        <div class="colHd"><div class="colTitle"><div class="name">Blocked</div><div class="meta">Top focus for next shift</div></div></div>
+        <div class="colBody">${list(blocked)}</div>
+      </div>
+
+      <div class="col" style="box-shadow:none; margin-bottom:10px">
+        <div class="colHd"><div class="colTitle"><div class="name">In Progress</div><div class="meta">Carry-over work</div></div></div>
+        <div class="colBody">${list(doing)}</div>
+      </div>
+
+      <div class="col" style="box-shadow:none">
+        <div class="colHd"><div class="colTitle"><div class="name">To Do</div><div class="meta">Upcoming tasks</div></div></div>
+        <div class="colBody">${list(todo)}</div>
+      </div>
+    `;
+
+    $("dlgSummary").showModal();
+  }
+
+  async function copyShiftSummary(){
+    const board = getBoard();
+    const done = (board.lanes.done || []).map(id => board.cards[id]).filter(Boolean);
+    const blocked = (board.lanes.blocked || []).map(id => board.cards[id]).filter(Boolean);
+
+    const lines = [];
+    lines.push(`Shift Summary — ${board.name}`);
+    lines.push(new Date().toLocaleString());
+    lines.push("");
+    lines.push(`Done (${done.length}):`);
+    done.forEach((c,i)=> lines.push(`${i+1}. ${c.title}${c.owner ? " — " + c.owner : ""}`));
+    lines.push("");
+    lines.push(`Blocked (${blocked.length}):`);
+    blocked.forEach((c,i)=> lines.push(`${i+1}. ${c.title}${c.owner ? " — " + c.owner : ""}`));
+
+    const txt = lines.join("\n");
+    try{
+      await navigator.clipboard.writeText(txt);
+      alert("Copied summary.");
+    }catch(e){
+      alert("Copy failed (clipboard blocked).");
+    }
+  }
+
+  function printShiftSummary(){
+    const html = `
+      <html>
+      <head>
+        <meta charset="UTF-8"/>
+        <title>Shift Summary</title>
+        <style>
+          body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding:24px; color:#111}
+          h1{margin:0 0 6px; font-size:18px}
+          .muted{color:#555}
+          .pill{display:inline-block; padding:6px 10px; border:1px solid #ddd; border-radius:999px; margin:0 8px 8px 0; font-weight:600; font-size:12px}
+          .box{border:1px solid #ddd; border-radius:12px; padding:12px; margin:12px 0}
+          .box h2{margin:0 0 6px; font-size:14px}
+          ol{margin:8px 0 0; padding-left:18px; line-height:1.45}
+          li{margin:4px 0}
+        </style>
+      </head>
+      <body>
+        <h1>${escapeHtml($("sumSub").textContent)}</h1>
+        <div class="muted">Generated by Smart Whiteboard</div>
+        <div>${$("sumBody").innerHTML}</div>
+        <script>window.onload=()=>{window.print();}<\/script>
+      </body></html>
+    `;
+    const w = window.open("", "_blank");
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
+  /* ---------------- Import/Export all boards ---------------- */
+  function openDataDialog(){
+    $("jsonBox").value = JSON.stringify(app, null, 2);
+    $("dlgData").showModal();
+  }
+  function closeDataDialog(){ $("dlgData").close(); }
+
+  async function copyJson(){
+    const txt = JSON.stringify(app, null, 2);
+    $("jsonBox").value = txt;
+    try{
+      await navigator.clipboard.writeText(txt);
+      alert("Copied JSON to clipboard.");
+    }catch(e){
+      alert("Copy failed (clipboard blocked). You can manually copy from the box.");
+    }
+  }
+
+  function importJson(){
+    const txt = $("jsonBox").value.trim();
+    if(!txt){ alert("Paste JSON first."); return; }
+    let s;
+    try{ s = JSON.parse(txt); }catch(e){ alert("Invalid JSON."); return; }
+
+    if(!s || !Array.isArray(s.boards) || !s.prefs){
+      alert("JSON doesn’t look like an export.");
+      return;
+    }
+
+    if(!confirm("Import will replace ALL boards. Continue?")) return;
+    app = s;
+    if(!app.activeBoardId && app.boards[0]) app.activeBoardId = app.boards[0].id;
+
+    app.boards.forEach(normalizeBoard);
+    applyTheme(app.prefs?.theme || "white");
+
+    save();
+    renderBoardSelector();
+    switchBoard(app.activeBoardId);
+    closeDataDialog();
+  }
+
+  /* ---------------- Lock dialog ---------------- */
+  let lockMode = "lock"; // "lock" or "unlock"
+
+  function syncLockButtons(board){
+    const locked = isLocked(board);
+    $("btnLock").style.display = locked ? "none" : "inline-flex";
+    $("btnUnlock").style.display = locked ? "inline-flex" : "none";
+  }
+
+  function openLockDialog(mode){
+    const board = getBoard();
+    lockMode = mode;
+
+    $("lockPass").value = "";
+    if(mode === "lock"){
+      $("lockTitle").textContent = board.settings.passwordHash ? "Lock Board" : "Set Password & Lock";
+      $("lockMsg").textContent = board.settings.passwordHash
+        ? "Enter password to lock (or leave blank to cancel)."
+        : "Set a password. You’ll need it to unlock.";
+    }else{
+      $("lockTitle").textContent = "Unlock Board";
+      $("lockMsg").textContent = "Enter the password to unlock editing.";
+    }
+    $("dlgLock").showModal();
+    setTimeout(()=> $("lockPass").focus(), 50);
+  }
+
+  function closeLockDialog(){ $("dlgLock").close(); }
+
+  function confirmLockDialog(){
+    const board = getBoard();
+    const pass = $("lockPass").value;
+
+    if(lockMode === "lock"){
+      if(!pass && !board.settings.passwordHash){
+        alert("Set a password first.");
+        return;
+      }
+
+      if(board.settings.passwordHash && !pass){
+        closeLockDialog();
+        return;
+      }
+
+      if(!board.settings.passwordHash){
+        board.settings.passwordHash = tinyHash(pass);
+      }else{
+        if(tinyHash(pass) !== board.settings.passwordHash){
+          alert("Wrong password.");
+          return;
+        }
+      }
+
+      board.settings.locked = true;
+      save();
+      syncLockButtons(board);
+      render();
+      closeLockDialog();
+      return;
+    }
+
+    if(!board.settings.passwordHash){
+      alert("No password set. This board isn't protected.");
+      board.settings.locked = false;
+      save();
+      syncLockButtons(board);
+      render();
+      closeLockDialog();
+      return;
+    }
+    if(tinyHash(pass) !== board.settings.passwordHash){
+      alert("Wrong password.");
+      return;
+    }
+    board.settings.locked = false;
+    save();
+    syncLockButtons(board);
+    render();
+    closeLockDialog();
+  }
+
+  /* ---------------- Board management ---------------- */
+  function newBoard(){
+    const name = prompt("New board name?", "New Board");
+    if(!name) return;
+    const b = defaultBoard(name.trim());
+    app.boards.push(b);
+    app.activeBoardId = b.id;
+    save();
+    renderBoardSelector();
+    switchBoard(b.id);
+  }
+
+  function renameBoard(){
+    const b = getBoard();
+    if(!requireUnlocked(b) && isLocked(b)) return;
+    const name = prompt("Rename board:", b.name);
+    if(!name) return;
+    b.name = name.trim();
+    save();
+    renderBoardSelector();
+    render();
+  }
+
+  function deleteBoard(){
+    if(app.boards.length <= 1){
+      alert("You must keep at least one board.");
+      return;
+    }
+    const b = getBoard();
+    const ok = confirm(`Delete board "${b.name}"? This removes all its cards.`);
+    if(!ok) return;
+
+    app.boards = app.boards.filter(x => x.id !== b.id);
+    app.activeBoardId = app.boards[0].id;
+    save();
+    renderBoardSelector();
+    switchBoard(app.activeBoardId);
+  }
+
+  /* ---------------- Reset all ---------------- */
+  function resetAll(){
+    if(!confirm("Reset EVERYTHING? This deletes all boards and cards.")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    app = defaultAppState();
+    app.activeBoardId = app.boards[0].id;
+    applyTheme(app.prefs.theme);
+    save();
+    renderBoardSelector();
+    switchBoard(app.activeBoardId);
+  }
+
+  /* ---------------- Search ---------------- */
+  function bindSearch(){
+    $("q").addEventListener("input", ()=> render());
+  }
+
+  /* ---------------- Dialog binds ---------------- */
+  function bindDialogs(){
+    // Card
+    $("closeCard").addEventListener("click", closeCardDialog);
+    $("btnCancelCard").addEventListener("click", closeCardDialog);
+    $("btnSaveCard").addEventListener("click", upsertCard);
+    $("btnDeleteCard").addEventListener("click", ()=>{
+      const b = getBoard();
+      if(!requireUnlocked(b)) return;
+      if(editingId) deleteCard(b, editingId);
+      closeCardDialog();
+    });
+
+    // Columns
+    $("closeCols").addEventListener("click", closeColsDialog);
+    $("btnCancelCols").addEventListener("click", closeColsDialog);
+    $("btnSaveCols").addEventListener("click", saveColsDialog);
+
+    // Data
+    $("closeData").addEventListener("click", closeDataDialog);
+    $("btnCloseData2").addEventListener("click", closeDataDialog);
+    $("btnCopyJson").addEventListener("click", copyJson);
+    $("btnImportJson").addEventListener("click", importJson);
+
+    // Summary
+    $("closeSummary").addEventListener("click", ()=> $("dlgSummary").close());
+    $("btnCopySummary").addEventListener("click", copyShiftSummary);
+    $("btnPrintSummary").addEventListener("click", printShiftSummary);
+
+    // Lock
+    $("closeLock").addEventListener("click", closeLockDialog);
+    $("btnCancelLock").addEventListener("click", closeLockDialog);
+    $("btnConfirmLock").addEventListener("click", confirmLockDialog);
+  }
+
+  /* ---------------- Main button binds ---------------- */
+  function bindButtons(){
+    $("btnAdd").addEventListener("click", ()=>{
+      const b = getBoard();
+      if(!requireUnlocked(b)) return;
+      openCardDialog({ lane: "todo" });
+    });
+
+    $("btnColumns").addEventListener("click", openColsDialog);
+    $("btnArchiveDone").addEventListener("click", archiveDone);
+    $("btnFocus").addEventListener("click", toggleFocus);
+    $("btnShiftSummary").addEventListener("click", openShiftSummary);
+    $("btnData").addEventListener("click", openDataDialog);
+    $("btnReset").addEventListener("click", resetAll);
+
+    // Board selector
+    $("boardSelect").addEventListener("change", (e)=> switchBoard(e.target.value));
+    $("btnNewBoard").addEventListener("click", newBoard);
+    $("btnRenameBoard").addEventListener("click", renameBoard);
+    $("btnDeleteBoard").addEventListener("click", deleteBoard);
+
+    // Theme
+    $("themeSelect").addEventListener("change", (e)=> applyTheme(e.target.value));
+
+    // Lock / Unlock
+    $("btnLock").addEventListener("click", ()=> openLockDialog("lock"));
+    $("btnUnlock").addEventListener("click", ()=> openLockDialog("unlock"));
+
+    // Wall toggle (works even when locked)
+    $("wallSwitch").addEventListener("click", ()=>{
+      const b = getBoard();
+      setWallMode(b, !b.settings.wall);
+    });
+
+    // Exit wall button (always visible)
+    $("btnExitWall").addEventListener("click", ()=>{
+      const b = getBoard();
+      setWallMode(b, false);
+    });
+  }
+
+  /* ---------------- ESC exits wall mode ---------------- */
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape"){
+      const b = getBoard();
+      if(b?.settings?.wall) setWallMode(b, false);
+    }
+  });
+
+  /* ---------------- Tick / refresh ---------------- */
+  function tick(){
+    render();
+  }
+
+  /* ---------------- Init ---------------- */
+  function init(){
+    app.boards.forEach(normalizeBoard);
+
+    // Ensure selector matches current stored theme
+    $("themeSelect").value = (app.prefs.theme === "brown") ? "brown" : "white";
+
+    renderBoardSelector();
+    switchBoard(app.activeBoardId);
+
+    bindButtons();
+    bindDialogs();
+    bindSearch();
+
+    render();
+    setInterval(tick, 60_000);   // clock + stale indicators
+    setInterval(render, 30_000); // running timers refresh
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
