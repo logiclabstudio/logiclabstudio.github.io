@@ -1239,6 +1239,11 @@ function bindButtons(){
     localStorage.setItem(LS.tollUpdateUrl, url);
     await fetchAndApplyTollData(url);
   });
+
+  $("btnQR").addEventListener("click", openQRDialog);
+$("btnReport").addEventListener("click", ()=> $("dlgReport").showModal());
+$("btnWallScreen").addEventListener("click", openWallScreenWindow);
+
 }
 
 /* ---------------------------------------------------------
