@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b1020" />
-  <title>Ashley Grocery List</title>
+  <title>Ashley Smart Grocery List — Scanner + Price</title>
   <style>
     :root{
       --bg:#f6f7fb; --bg2:#ffffff; --card:rgba(15,23,42,.06);
@@ -31,7 +31,7 @@
       color:var(--text);
     }
 
-    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 88px}
+    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 96px}
     .card{
       background: color-mix(in srgb, var(--bg2) 92%, transparent);
       border:1px solid var(--line);
@@ -41,19 +41,9 @@
     }
 
     header.card{padding:14px}
-    .top{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .brand{
-      display:flex; gap:10px; align-items:center; min-width:240px;
-    }
-    .logo{
-      width:42px;height:42px;border-radius:14px;
-      background:linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: var(--shadow);
-      flex:0 0 auto;
-    }
+    .top{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+    .brand{display:flex; gap:10px; align-items:center; min-width:240px;}
+    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg, var(--accent), var(--accent2));box-shadow: var(--shadow);flex:0 0 auto;}
     h1{margin:0;font-size:18px;line-height:1.1}
     .sub{margin:4px 0 0;color:var(--muted);font-size:12px}
     .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
@@ -69,26 +59,13 @@
       touch-action: manipulation;
     }
     .btn:active{transform:scale(.98); opacity:.92}
-    .btn.primary{
-      border:0;
-      background:linear-gradient(135deg, var(--accent), var(--accent2));
-      color:white;
-      font-weight:800;
-    }
+    .btn.primary{border:0;background:linear-gradient(135deg, var(--accent), var(--accent2));color:white;font-weight:800;}
     .btn.danger{border-color: color-mix(in srgb, var(--bad) 55%, var(--line));}
     .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
+    .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px;}
 
-    .panelHead{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
+    .panelHead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 12px 10px; border-bottom:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
     }
     .panelHead b{font-size:13px}
@@ -97,13 +74,7 @@
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:end}
     .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:140px}
     .label{font-size:12px;color:var(--muted)}
-    .input,.select,.textarea{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      border-radius:14px;
-      padding:10px 12px;
-      outline:none;
-    }
+    .input,.select,.textarea{border:1px solid var(--line); background:rgba(255,255,255,.06); border-radius:14px; padding:10px 12px; outline:none;}
     .textarea{min-height:80px; resize:vertical}
 
     .hint{font-size:12px;color:var(--muted);margin-top:8px}
@@ -120,43 +91,17 @@
       gap:10px;
       align-items:center;
     }
-    .chk{
-      width:22px;height:22px;border-radius:8px;
-      border:1px solid var(--line);
-      display:grid;place-items:center;
-      cursor:pointer;
-      user-select:none;
-      background:rgba(255,255,255,.04);
-    }
-    .chk[data-on="true"]{
-      border-color: color-mix(in srgb, var(--ok) 60%, var(--line));
-      background: color-mix(in srgb, var(--ok) 25%, rgba(255,255,255,.05));
-    }
+    .chk{width:22px;height:22px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;user-select:none;background:rgba(255,255,255,.04);}
+    .chk[data-on="true"]{border-color: color-mix(in srgb, var(--ok) 60%, var(--line));background: color-mix(in srgb, var(--ok) 25%, rgba(255,255,255,.05));}
     .meta{min-width:0}
-    .title{
-      display:flex; align-items:center; gap:8px; min-width:0;
-    }
-    .title b{
-      font-size:14px;
-      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-    }
+    .title{display:flex; align-items:center; gap:8px; min-width:0;}
+    .title b{font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
     .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:5px}
-    .tag{
-      font-size:11px; padding:4px 8px; border-radius:999px;
-      border:1px solid var(--line);
-      color:var(--muted);
-      background:rgba(255,255,255,.04);
-    }
+    .tag{font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); background:rgba(255,255,255,.04);}
     .tag.ok{color: color-mix(in srgb, var(--ok) 65%, var(--text)); border-color: color-mix(in srgb, var(--ok) 40%, var(--line));}
     .tag.warn{color: color-mix(in srgb, var(--warn) 65%, var(--text)); border-color: color-mix(in srgb, var(--warn) 40%, var(--line));}
     .right{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
-    .iconbtn{
-      width:40px;height:40px;border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      cursor:pointer;
-      touch-action: manipulation;
-    }
+    .iconbtn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);cursor:pointer;touch-action: manipulation;}
     .done{opacity:.60}
 
     /* Sticky mobile add bar */
@@ -169,82 +114,34 @@
       -webkit-backdrop-filter: blur(10px);
       z-index:999;
     }
-    .stickyInner{
-      max-width:980px; margin:0 auto;
-      display:flex; gap:10px; align-items:center;
-    }
-    .stickyInner input{
-      flex:1;
-      min-width:0;
-    }
+    .stickyInner{max-width:980px; margin:0 auto; display:flex; gap:10px; align-items:center;}
+    .stickyInner input{flex:1; min-width:0;}
 
     /* Modal */
-    .backdrop{
-      position:fixed; inset:0;
-      display:none;
-      background: rgba(2,6,23,.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index:1000;
-      padding:14px;
-    }
-    .modal{
-      max-width:820px;
-      margin:6vh auto 0;
-      border-radius:22px;
-      border:1px solid var(--line);
-      background: color-mix(in srgb, var(--bg2) 92%, transparent);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .modalHead{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      padding:12px 14px;
-      border-bottom:1px solid var(--line);
-    }
+    .backdrop{position:fixed; inset:0; display:none; background: rgba(2,6,23,.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index:1000; padding:14px;}
+    .modal{max-width:860px; margin:6vh auto 0; border-radius:22px; border:1px solid var(--line); background: color-mix(in srgb, var(--bg2) 92%, transparent); box-shadow: var(--shadow); overflow:hidden;}
+    .modalHead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line);}
     .modalHead b{font-size:14px}
     .modalBody{padding:12px 14px}
-    .modalActions{
-      padding:12px 14px;
-      border-top:1px solid var(--line);
-      display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;
-    }
+    .modalActions{padding:12px 14px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;}
 
     /* Scanner */
-    .videoBox{
-      position:relative;
-      border-radius:18px;
-      overflow:hidden;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.25);
-      aspect-ratio: 3 / 4;
-    }
+    .videoBox{position:relative; border-radius:18px; overflow:hidden; border:1px solid var(--line); background: rgba(0,0,0,.25); aspect-ratio: 3 / 4;}
     video{width:100%;height:100%;object-fit:cover;display:block}
-    .overlay{
-      position:absolute; inset:0; pointer-events:none;
-      display:grid; place-items:center;
-    }
-    .frame{
-      width:min(78%, 360px);
-      aspect-ratio: 1 / 1;
-      border-radius:18px;
-      border:2px solid rgba(255,255,255,.70);
-      box-shadow: 0 0 0 9999px rgba(0,0,0,.18);
-    }
+    .overlay{position:absolute; inset:0; pointer-events:none; display:grid; place-items:center;}
+    .frame{width:min(78%, 360px); aspect-ratio: 1 / 1; border-radius:18px; border:2px solid rgba(255,255,255,.70); box-shadow: 0 0 0 9999px rgba(0,0,0,.18);}    
 
-    .toast{
-      position:fixed; left:50%; bottom:86px; transform:translateX(-50%);
-      background: rgba(15,23,42,.88);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.16);
-      padding:10px 12px;
-      border-radius:999px;
-      box-shadow: 0 18px 55px rgba(0,0,0,.35);
-      opacity:0; pointer-events:none;
-      transition:.18s opacity, .18s transform;
-      max-width:min(720px, calc(100vw - 24px));
-      z-index:1100;
-      font-size:13px;
+    /* Price keypad */
+    .priceGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .priceBig{font-family:var(--mono); font-weight:900; font-size:22px; padding:14px 12px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.06);}
+    .quickPrices{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+
+    /* Toast */
+    .toast{position:fixed; left:50%; bottom:86px; transform:translateX(-50%);
+      background: rgba(15,23,42,.88); color:#fff; border:1px solid rgba(255,255,255,.16);
+      padding:10px 12px; border-radius:999px; box-shadow: 0 18px 55px rgba(0,0,0,.35);
+      opacity:0; pointer-events:none; transition:.18s opacity, .18s transform;
+      max-width:min(720px, calc(100vw - 24px)); z-index:1100; font-size:13px;
     }
     .toast.show{opacity:1; transform:translateX(-50%) translateY(-2px)}
 
@@ -253,6 +150,7 @@
       .actions .btn{flex:1}
       .item{grid-template-columns:28px 1fr}
       .right{grid-column:1 / -1; justify-content:flex-start}
+      .priceGrid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -264,8 +162,8 @@
         <div class="brand">
           <div class="logo" aria-hidden="true"></div>
           <div>
-            <h1>Ashley Grocery List</h1>
-            <div class="sub">Add fast. Scan barcodes. Saves offline.</div>
+            <h1>Ashley Smart Grocery List</h1>
+            <div class="sub">Scan → name (if needed) → price input → added. Saves offline.</div>
           </div>
         </div>
 
@@ -305,6 +203,7 @@
                 <option value="added">Recently added</option>
                 <option value="name">Name</option>
                 <option value="cat">Category</option>
+                <option value="cost">Price</option>
               </select>
             </div>
           </div>
@@ -314,15 +213,16 @@
           <div id="list" class="list"></div>
 
           <div class="hint" id="counts"></div>
+          <div class="hint" id="total" style="font-family:var(--mono)"></div>
           <div class="hint">
-            Camera note: scanning needs <b>HTTPS</b> or <b>localhost</b>. If you opened a file directly, host it (VS Code Live Server).
+            Camera note: scanning needs <b>HTTPS</b> or <b>localhost</b>.
           </div>
         </div>
       </section>
 
       <section class="card">
         <div class="panelHead">
-          <b>Quick Add Defaults</b>
+          <b>Defaults</b>
           <button class="btn small" id="barcodesBtn">Barcodes</button>
         </div>
         <div class="panelBody">
@@ -387,8 +287,8 @@
   "use strict";
 
   const $ = (q) => document.querySelector(q);
+  const KEY = "ashley_smart_list_scanner_v3";
 
-  const KEY = "ashley_list_scanner_v2";
   const els = {
     themeBtn: $("#themeBtn"),
     scanBtn: $("#scanBtn"),
@@ -403,6 +303,7 @@
     sort: $("#sort"),
     list: $("#list"),
     counts: $("#counts"),
+    total: $("#total"),
     status: $("#status"),
 
     cat: $("#cat"),
@@ -428,14 +329,27 @@
     defaults: { cat:"Produce", qty:1, pri:"normal" },
     view: "needed",
     sort: "added",
-    barcodeMap: {} // code -> {name, cat}
+    currency: "R",
+    // code -> {name, cat}
+    barcodeMap: {},
+    // remember last used price for quick repeat
+    lastPrice: ""
   };
 
   let state = load();
 
-  // ===== basic helpers =====
+  // ===== helpers =====
   function uid(){ return Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(2,7); }
   function esc(s){ return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
+  function parseMoney(v){
+    const s = String(v ?? "").replace(/,/g,'.').replace(/[^0-9.]/g,'');
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function money(n){
+    if(!Number.isFinite(n)) return "";
+    return n.toFixed(2);
+  }
   function toast(msg){
     els.toast.textContent = msg;
     els.toast.classList.add("show");
@@ -460,7 +374,7 @@
       if(!raw) return structuredClone(DEFAULT);
       const parsed = JSON.parse(raw);
       return { ...structuredClone(DEFAULT), ...parsed };
-    }catch(e){
+    }catch{
       return structuredClone(DEFAULT);
     }
   }
@@ -492,7 +406,13 @@
     els.mActions.innerHTML = "";
   }
 
-  // ===== list operations =====
+  // ===== list =====
+  function addItemObject(obj){
+    state.items.unshift(obj);
+    save(true);
+    render(true);
+  }
+
   function addItem(name, opts){
     name = (name || "").trim();
     if(!name){ toast("Type an item"); els.quickName.focus(); return; }
@@ -505,12 +425,10 @@
       pri: (opts && opts.pri) || state.defaults.pri || "normal",
       done: false,
       addedAt: Date.now(),
-      barcode: (opts && opts.barcode) || null
+      barcode: (opts && opts.barcode) || null,
+      unitPrice: (opts && Number.isFinite(opts.unitPrice)) ? opts.unitPrice : NaN,
     };
-
-    state.items.unshift(it);
-    save(true);
-    render();
+    addItemObject(it);
     toast("Added ✨");
   }
 
@@ -525,7 +443,7 @@
   function removeItem(id){
     state.items = state.items.filter(x=>x.id!==id);
     save(true);
-    render();
+    render(true);
     toast("Removed");
   }
 
@@ -542,8 +460,7 @@
         <div class="field">
           <div class="label">Category</div>
           <select class="select" id="eCat">
-            ${["Produce","Dairy","Meat","Bakery","Pantry","Frozen","Snacks","Drinks","Household","Health","Other"]
-              .map(c=>`<option ${c===it.cat?"selected":""}>${esc(c)}</option>`).join("")}
+            ${cats().map(c=>`<option ${c===it.cat?"selected":""}>${esc(c)}</option>`).join("")}
           </select>
         </div>
         <div class="field" style="flex:.7">
@@ -559,9 +476,15 @@
           </select>
         </div>
       </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <div class="label">Unit price (${esc(state.currency)})</div>
+          <input class="input" id="ePrice" inputmode="decimal" placeholder="e.g. 29.99" value="${Number.isFinite(it.unitPrice)?esc(money(it.unitPrice)):""}" />
+        </div>
+      </div>
       ${it.barcode ? `<div class="hint">Barcode: <span style="font-family:var(--mono)">${esc(it.barcode)}</span></div>` : ``}
     `, [
-      { text:"Cancel", className:"", onClick: closeModal },
+      { text:"Cancel", onClick: closeModal },
       { text:"Save", className:"primary", onClick: ()=>{
           const n = ($("#eName").value || "").trim();
           if(!n){ toast("Name required"); return; }
@@ -569,6 +492,10 @@
           it.cat = $("#eCat").value;
           it.qty = Math.max(1, Math.floor(Number($("#eQty").value || 1)));
           it.pri = $("#ePri").value;
+
+          const p = parseMoney($("#ePrice").value);
+          it.unitPrice = Number.isFinite(p) ? p : NaN;
+
           save(true);
           closeModal();
           render(true);
@@ -601,6 +528,10 @@
   }
 
   // ===== rendering =====
+  function cats(){
+    return ["Produce","Dairy","Meat","Bakery","Pantry","Frozen","Snacks","Drinks","Household","Health","Other"];
+  }
+
   function priTag(pri){
     if(pri==="urgent") return `<span class="tag warn">Urgent</span>`;
     if(pri==="soon") return `<span class="tag warn">Soon</span>`;
@@ -612,7 +543,6 @@
     const view = els.view.value;
 
     let arr = state.items.slice();
-
     if(view==="needed") arr = arr.filter(x=>!x.done);
     if(view==="done") arr = arr.filter(x=>x.done);
 
@@ -623,6 +553,13 @@
     const sort = els.sort.value;
     if(sort==="name") arr.sort((a,b)=>a.name.localeCompare(b.name));
     else if(sort==="cat") arr.sort((a,b)=>a.cat.localeCompare(b.cat));
+    else if(sort==="cost"){
+      arr.sort((a,b)=>{
+        const ap = Number.isFinite(a.unitPrice)?a.unitPrice:Infinity;
+        const bp = Number.isFinite(b.unitPrice)?b.unitPrice:Infinity;
+        return ap - bp;
+      });
+    }
     else arr.sort((a,b)=>b.addedAt - a.addedAt);
 
     return arr;
@@ -635,25 +572,31 @@
       const doneClass = it.done ? "done" : "";
       const chkOn = it.done ? "true" : "false";
       const barcodeTag = it.barcode ? `<span class="tag">🔎 ${esc(it.barcode)}</span>` : "";
+      const priceTag = Number.isFinite(it.unitPrice)
+        ? `<span class="tag ok">${esc(state.currency)} ${esc(money(it.unitPrice))}</span>`
+        : `<span class="tag">No price</span>`;
+
+      const lineTotal = Number.isFinite(it.unitPrice) ? (it.unitPrice * (it.qty||1)) : NaN;
+      const lineTotalTag = Number.isFinite(lineTotal)
+        ? `<span class="tag">Line: ${esc(state.currency)} ${esc(money(lineTotal))}</span>`
+        : "";
+
       return `
         <div class="item ${doneClass}" data-id="${it.id}">
-          <div class="chk" data-on="${chkOn}" title="Check">
-            ${it.done ? "✓" : ""}
-          </div>
-
+          <div class="chk" data-on="${chkOn}" title="Check">${it.done ? "✓" : ""}</div>
           <div class="meta">
-            <div class="title">
-              <b>${esc(it.name)}</b>
-            </div>
+            <div class="title"><b>${esc(it.name)}</b></div>
             <div class="tags">
               <span class="tag ok">${esc(it.cat)}</span>
               <span class="tag">Qty ${it.qty}</span>
               ${priTag(it.pri)}
+              ${priceTag}
+              ${lineTotalTag}
               ${barcodeTag}
             </div>
           </div>
-
           <div class="right">
+            <button class="iconbtn" data-act="price" title="Set price">💰</button>
             <button class="iconbtn" data-act="edit" title="Edit">✏️</button>
             <button class="iconbtn" data-act="del" title="Delete">🗑️</button>
           </div>
@@ -666,22 +609,161 @@
     const done = state.items.filter(x=>x.done).length;
     els.counts.textContent = `${total} total • ${needed} needed • ${done} checked`;
 
+    // Total cost (only priced items)
+    const sum = state.items
+      .filter(x=>!x.done)
+      .reduce((acc,x)=> acc + (Number.isFinite(x.unitPrice) ? x.unitPrice*(x.qty||1) : 0), 0);
+    els.total.textContent = `Estimated total: ${state.currency} ${money(sum)}`;
+
     if(!soft) save(true);
   }
 
-  // delegated events for list
+  // Delegated list clicks
   function onListClick(e){
     const itemEl = e.target.closest(".item");
     if(!itemEl) return;
     const id = itemEl.getAttribute("data-id");
 
-    if(e.target.closest(".chk")){
-      toggleDone(id);
-      return;
-    }
+    if(e.target.closest(".chk")) return toggleDone(id);
+
     const act = e.target.closest("[data-act]")?.getAttribute("data-act");
-    if(act==="edit"){ editItem(id); return; }
-    if(act==="del"){ removeItem(id); return; }
+    if(act==="edit") return editItem(id);
+    if(act==="del") return removeItem(id);
+    if(act==="price") return promptPriceForItem(id);
+  }
+
+  // ===== SMART PRICE PROMPT (klaar) =====
+  function promptPriceFlow({ code, suggestedName, suggestedCat, requireName }){
+    // One single flow: name (if needed) + price required
+
+    openModal("Scan details", `
+      <div class="hint">Barcode: <b style="font-family:var(--mono)">${esc(code)}</b></div>
+
+      <div class="sep"></div>
+
+      <div class="priceGrid">
+        <div class="field">
+          <div class="label">Item name ${requireName?"(required)":""}</div>
+          <input class="input" id="pName" placeholder="e.g. 2L Milk" value="${esc(suggestedName||"")}" />
+        </div>
+
+        <div class="field">
+          <div class="label">Category</div>
+          <select class="select" id="pCat">
+            ${cats().map(c=>`<option ${c===(suggestedCat||state.defaults.cat)?"selected":""}>${esc(c)}</option>`).join("")}
+          </select>
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <div class="label">Price (${esc(state.currency)}) — required</div>
+          <input class="priceBig" id="pPrice" inputmode="decimal" placeholder="e.g. 29.99" value="${esc(state.lastPrice||"")}" />
+          <div class="quickPrices" aria-label="quick prices">
+            ${["9.99","14.99","19.99","24.99","29.99","49.99","79.99","99.99"].map(v=>`<button class="btn small" data-qprice="${v}">${state.currency} ${v}</button>`).join("")}
+            <button class="btn small" data-qprice="last">Last</button>
+            <button class="btn small" data-qprice="clear">Clear</button>
+          </div>
+          <div class="hint">Tip: tap a quick price, or type. We won’t add without a price. Klaar.</div>
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <div class="label">Qty</div>
+          <input class="input" id="pQty" type="number" min="1" step="1" value="1" />
+        </div>
+      </div>
+    `, [
+      { text:"Cancel", onClick: closeModal },
+      { text:"Add", className:"primary", onClick: ()=>{
+          const name = ($("#pName").value || "").trim();
+          const cat = $("#pCat").value;
+          const qty = Math.max(1, Math.floor(Number($("#pQty").value || 1)));
+          const p = parseMoney($("#pPrice").value);
+
+          if(requireName && !name){ toast("Name required"); return; }
+          if(!name){ toast("Name required"); return; }
+          if(!Number.isFinite(p) || p<=0){ toast("Price required"); return; }
+
+          // learn barcode
+          state.barcodeMap[code] = { name, cat };
+          state.lastPrice = money(p);
+          save(true);
+
+          closeModal();
+          addItem(name, { cat, qty, pri: state.defaults.pri, barcode: code, unitPrice: p });
+        }
+      }
+    ]);
+
+    // quick price buttons
+    els.mBody.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-qprice]");
+      if(!b) return;
+      const v = b.getAttribute("data-qprice");
+      if(v==="clear") $("#pPrice").value = "";
+      else if(v==="last") $("#pPrice").value = state.lastPrice || "";
+      else $("#pPrice").value = v;
+      $("#pPrice").focus();
+    });
+
+    // enter to add
+    setTimeout(()=>{
+      const nameEl = $("#pName");
+      const priceEl = $("#pPrice");
+      if(requireName || !nameEl.value) nameEl.focus();
+      else priceEl.focus();
+
+      [nameEl, priceEl, $("#pQty")].forEach(el=>{
+        el.addEventListener("keydown", (ev)=>{
+          if(ev.key === "Enter"){
+            ev.preventDefault();
+            els.mActions.querySelector(".primary")?.click();
+          }
+        });
+      });
+    }, 50);
+  }
+
+  function promptPriceForItem(id){
+    const it = state.items.find(x=>x.id===id);
+    if(!it) return;
+
+    openModal("Set price", `
+      <div class="hint">Item: <b>${esc(it.name)}</b></div>
+      <div class="sep"></div>
+      <div class="field">
+        <div class="label">Unit price (${esc(state.currency)}) — required</div>
+        <input class="priceBig" id="setPrice" inputmode="decimal" placeholder="e.g. 29.99" value="${Number.isFinite(it.unitPrice)?esc(money(it.unitPrice)):(esc(state.lastPrice||""))}" />
+        <div class="quickPrices">
+          ${["9.99","14.99","19.99","24.99","29.99","49.99","79.99","99.99"].map(v=>`<button class="btn small" data-sprice="${v}">${state.currency} ${v}</button>`).join("")}
+          <button class="btn small" data-sprice="last">Last</button>
+          <button class="btn small" data-sprice="clear">Clear</button>
+        </div>
+      </div>
+    `, [
+      { text:"Cancel", onClick: closeModal },
+      { text:"Save", className:"primary", onClick: ()=>{
+          const p = parseMoney($("#setPrice").value);
+          if(!Number.isFinite(p) || p<=0){ toast("Price required"); return; }
+          it.unitPrice = p;
+          state.lastPrice = money(p);
+          save(true);
+          closeModal();
+          render(true);
+          toast("Price set ✅");
+        }
+      }
+    ]);
+
+    els.mBody.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-sprice]");
+      if(!b) return;
+      const v = b.getAttribute("data-sprice");
+      if(v==="clear") $("#setPrice").value = "";
+      else if(v==="last") $("#setPrice").value = state.lastPrice || "";
+      else $("#setPrice").value = v;
+      $("#setPrice").focus();
+    });
+
+    setTimeout(()=>$("#setPrice").focus(), 50);
   }
 
   // ===== share =====
@@ -689,6 +771,7 @@
     const needed = state.items.filter(x=>!x.done);
     if(!needed.length){ toast("Nothing to share"); return; }
 
+    // Group by category
     const grouped = new Map();
     for(const it of needed){
       if(!grouped.has(it.cat)) grouped.set(it.cat, []);
@@ -698,16 +781,24 @@
     let msg = "🛒 Ashley Grocery List\n\n";
     for(const [cat, items] of Array.from(grouped.entries()).sort((a,b)=>a[0].localeCompare(b[0]))){
       msg += `• ${cat}\n`;
-      items.forEach(it => { msg += `  - ${it.name}${it.qty>1?` x${it.qty}`:""}\n`; });
+      for(const it of items){
+        const price = Number.isFinite(it.unitPrice) ? ` (${state.currency} ${money(it.unitPrice)} ea)` : "";
+        msg += `  - ${it.name}${it.qty>1?` x${it.qty}`:""}${price}\n`;
+      }
       msg += "\n";
     }
+
+    // Total
+    const sum = needed.reduce((acc,x)=> acc + (Number.isFinite(x.unitPrice) ? x.unitPrice*(x.qty||1) : 0), 0);
+    msg += `Estimated total: ${state.currency} ${money(sum)}`;
+
     msg = msg.trim();
 
     try{
       await navigator.clipboard.writeText(msg);
       toast("Copied ✅ (paste on WhatsApp)");
     }catch{
-      openModal("Copy this", `<textarea class="textarea" style="width:100%">${esc(msg)}</textarea>`,
+      openModal("Copy this", `<textarea class=\"textarea\" style=\"width:100%\">${esc(msg)}</textarea>`,
         [{ text:"Close", onClick: closeModal }]
       );
     }
@@ -747,7 +838,7 @@
       openModal("Scanner needs HTTPS", `
         <p style="margin:0;color:var(--muted);font-size:13px">
           Camera access usually won’t work on <b>file://</b> or plain http.
-          Use <b>https</b> hosting or <b>localhost</b> (VS Code Live Server).
+          Use <b>https</b hosting or <b>localhost</b> (VS Code Live Server).
         </p>
       `, [{ text:"Close", onClick: closeModal }]);
       return;
@@ -794,9 +885,7 @@
     }catch(err){
       $("#scanStatus").textContent = "Camera blocked";
       openModal("Camera permission needed", `
-        <p style="margin:0;color:var(--muted);font-size:13px">
-          Allow camera permission, then try again.
-        </p>
+        <p style="margin:0;color:var(--muted);font-size:13px">Allow camera permission, then try again.</p>
         <div class="hint" style="font-family:var(--mono)">${esc(err?.message || String(err))}</div>
       `, [{ text:"Close", onClick: closeModal }]);
     }
@@ -813,7 +902,6 @@
           if(code !== lastCode || (now - lastAt) > 1200){
             lastCode = code;
             lastAt = now;
-            // stop camera before prompting / adding
             stopScanner();
             closeModal();
             handleBarcode(code);
@@ -829,42 +917,14 @@
 
   function handleBarcode(code){
     const hit = state.barcodeMap[code];
-    if(hit && hit.name){
-      addItem(hit.name, { cat: hit.cat || "Other", qty: 1, pri: "normal", barcode: code });
-      return;
-    }
 
-    openModal("New barcode", `
-      <div class="hint">Barcode: <b style="font-family:var(--mono)">${esc(code)}</b></div>
-      <div class="row" style="margin-top:10px">
-        <div class="field">
-          <div class="label">Item name</div>
-          <input class="input" id="bName" placeholder="e.g. 2L Milk" />
-        </div>
-        <div class="field">
-          <div class="label">Category</div>
-          <select class="select" id="bCat">
-            ${["Produce","Dairy","Meat","Bakery","Pantry","Frozen","Snacks","Drinks","Household","Health","Other"]
-              .map(c=>`<option ${c===state.defaults.cat?"selected":""}>${esc(c)}</option>`).join("")}
-          </select>
-        </div>
-      </div>
-      <div class="hint">We’ll remember this barcode on this device.</div>
-    `, [
-      { text:"Cancel", onClick: closeModal },
-      { text:"Save & Add", className:"primary", onClick: ()=>{
-          const n = ($("#bName").value || "").trim();
-          const c = $("#bCat").value;
-          if(!n){ toast("Enter a name"); return; }
-          state.barcodeMap[code] = { name:n, cat:c };
-          save(true);
-          closeModal();
-          addItem(n, { cat:c, qty:1, pri:"normal", barcode: code });
-        }
-      }
-    ]);
-
-    setTimeout(()=>$("#bName").focus(), 50);
+    // Smart flow: always require price input
+    promptPriceFlow({
+      code,
+      suggestedName: hit?.name || "",
+      suggestedCat: hit?.cat || state.defaults.cat,
+      requireName: !hit?.name
+    });
   }
 
   // ===== barcode manager =====
@@ -915,7 +975,6 @@
       }
     ]);
 
-    // delete barcode
     els.mBody.addEventListener("click", (e)=>{
       const code = e.target.closest("[data-delcode]")?.getAttribute("data-delcode");
       if(!code) return;
@@ -926,7 +985,7 @@
     }, { once:true });
   }
 
-  // ===== UI sync =====
+  // ===== UI =====
   function syncUIFromState(){
     applyTheme();
     els.view.value = state.view || "needed";
@@ -938,7 +997,6 @@
     els.pri.value = state.defaults.pri || "normal";
   }
 
-  // ===== wire buttons (THIS is where your last version likely failed) =====
   function wireEvents(){
     els.themeBtn.addEventListener("click", ()=>{
       state.theme = (state.theme === "light") ? "dark" : "light";
@@ -958,15 +1016,13 @@
     });
 
     els.quickName.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){
-        e.preventDefault();
-        els.addBtn.click();
-      }
+      if(e.key === "Enter"){ e.preventDefault(); els.addBtn.click(); }
     });
 
     els.list.addEventListener("click", onListClick);
 
     els.search.addEventListener("input", ()=>render(true));
+
     els.view.addEventListener("change", ()=>{
       state.view = els.view.value;
       save(true);
@@ -1005,6 +1061,7 @@
   syncUIFromState();
   wireEvents();
   render(true);
+
 })();
 </script>
 </body>
