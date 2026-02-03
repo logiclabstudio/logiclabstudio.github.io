@@ -198,6 +198,7 @@
     .stage{
       flex:1;
       display:flex;
+      position: relative;
       align-items:center;
       justify-content:center;
       padding:16px;
@@ -1276,6 +1277,7 @@
         paper.style.left = "50%";
         paper.style.top = "50%";
         paper.style.margin = "0";
+        paper.style.transformOrigin = "center center";
         paper.style.transform = `translate(-50%, -50%) scale(${z})`;
         return;
       }
@@ -1283,6 +1285,7 @@
       paper.style.left = "";
       paper.style.top = "";
       paper.style.margin = "";
+      paper.style.transformOrigin = "top left";
       paper.style.transform = `scale(${z})`;
     }
 
