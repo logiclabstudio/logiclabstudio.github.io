@@ -97,8 +97,20 @@
     .brandText span{color:var(--muted); font-size:12px}
 
     .topActions{
-      display:flex; align-items:center; justify-content:flex-end;
-      gap:10px; flex-wrap:wrap;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      gap:8px;
+      min-width: min(520px, 55vw);
+    }
+    .topActions .btn{justify-content:center}
+    .topActions .btnPrimary{grid-column: span 2;}
+    @media (max-width: 900px){
+      .topActions{
+        min-width: 0;
+        grid-template-columns: 1fr;
+        width: 100%;
+      }
+      .topActions .btnPrimary{grid-column: auto;}
     }
 
     /* Buttons */
@@ -214,6 +226,38 @@
     .grid{display:grid;gap:10px;}
     .row{display:grid;grid-template-columns: 1fr 1fr; gap:10px;}
     @media (max-width: 520px){ .row{grid-template-columns:1fr;} }
+    .actionBlock{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      border-radius: 14px;
+      padding: 12px;
+      display:grid;
+      gap:10px;
+    }
+    .actionBlock h4{
+      margin:0;
+      font-size:12px;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .actionGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .actionGrid .btn{
+      width:100%;
+      justify-content:center;
+      text-align:center;
+    }
+    .actionSingle .btn{
+      width:100%;
+      justify-content:center;
+    }
+    @media (max-width: 560px){
+      .actionGrid{ grid-template-columns: 1fr; }
+    }
 
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:800;letter-spacing:.2px;}
     .help{color: rgba(151,166,191,.9); font-size:12px; margin-top:6px; line-height:1.35;}
@@ -458,6 +502,26 @@
               </div>
             </div>
 
+            <div>
+              <label for="backBullets">Back side bullet points (one per line)</label>
+              <textarea id="backBullets">Custom Software Development
+Mobile Apps & Web Platforms
+Cloud Integrations
+Support & Maintenance</textarea>
+              <div class="help">These show as bulleted highlights on the back card.</div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="linkedin">LinkedIn</label>
+                <input id="linkedin" type="url" value="linkedin.com/in/yourprofile" />
+              </div>
+              <div>
+                <label for="instagram">Instagram</label>
+                <input id="instagram" type="text" value="@yourhandle" />
+              </div>
+            </div>
+
             <div class="divider"></div>
 
             <div class="row">
@@ -571,6 +635,56 @@
                 <div class="help">Guides show bleed + trim + safe area.</div>
               </div>
             </div>
+
+            <div class="row">
+              <div>
+                <label for="texture">Background texture</label>
+                <select id="texture">
+                  <option value="soft" selected>Soft glow</option>
+                  <option value="mesh">Mesh pattern</option>
+                  <option value="grid">Micro grid</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+              <div>
+                <label for="backStyle">Back style</label>
+                <select id="backStyle">
+                  <option value="ring" selected>Ring + centered logo</option>
+                  <option value="stripe">Diagonal stripe</option>
+                  <option value="minimal">Minimal clean</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div>
+                <label for="backCompanyColor">Back company color</label>
+                <input id="backCompanyColor" type="color" value="#e5e7eb" />
+              </div>
+              <div>
+                <label for="backTaglineColor">Back tagline color</label>
+                <input id="backTaglineColor" type="color" value="#cbd5e1" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label for="backWebsiteColor">Back website color</label>
+                <input id="backWebsiteColor" type="color" value="#60a5fa" />
+              </div>
+              <div>
+                <label for="backBulletColor">Back bullet text color</label>
+                <input id="backBulletColor" type="color" value="#e5e7eb" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label for="backBulletDotColor">Back bullet dot color</label>
+                <input id="backBulletDotColor" type="color" value="#60a5fa" />
+              </div>
+              <div></div>
+            </div>
           </div>
         </section>
 
@@ -631,41 +745,84 @@
                 </select>
               </div>
             </div>
+
+            <div class="row">
+              <div>
+                <label for="qrDark">QR dark color</label>
+                <input id="qrDark" type="color" value="#000000" />
+              </div>
+              <div>
+                <label for="qrLight">QR light color</label>
+                <input id="qrLight" type="color" value="#ffffff" />
+              </div>
+            </div>
           </div>
         </section>
 
         <!-- EXPORT TAB -->
         <section id="tab-export" class="tabPanel" role="tabpanel" aria-labelledby="t-export">
           <div class="grid">
-            <div class="row">
-              <div>
-                <label for="exportMode">Export mode</label>
-                <select id="exportMode">
-                  <option value="withBleed" selected>With bleed (recommended)</option>
-                  <option value="trimOnly">Trim only (no bleed)</option>
-                </select>
-                <div class="help">Print shops usually prefer bleed.</div>
+            <div class="actionBlock">
+              <h4>File Settings</h4>
+              <div class="row">
+                <div>
+                  <label for="exportMode">Export mode</label>
+                  <select id="exportMode">
+                    <option value="withBleed" selected>With bleed (recommended)</option>
+                    <option value="trimOnly">Trim only (no bleed)</option>
+                  </select>
+                  <div class="help">Print shops usually prefer bleed.</div>
+                </div>
+                <div>
+                  <label for="fileName">File base name</label>
+                  <input id="fileName" type="text" value="business-card" />
+                </div>
               </div>
-              <div>
-                <label for="fileName">File base name</label>
-                <input id="fileName" type="text" value="business-card" />
+            </div>
+
+            <div class="actionBlock">
+              <h4>Quick Exports</h4>
+              <div class="actionGrid">
+                <button class="btn btnPrimary" id="downloadFront" type="button"><span class="btnIcon i-download"></span>Front PNG</button>
+                <button class="btn" id="downloadBack" type="button"><span class="btnIcon i-download"></span>Back PNG</button>
+                <button class="btn" id="downloadVcf" type="button">vCard (.vcf)</button>
+                <button class="btn" id="exportSheet" type="button">A4 Sheet PNG</button>
               </div>
             </div>
 
-            <div class="divider"></div>
-
-            <div class="row">
-              <button class="btn btnPrimary" id="downloadFront" type="button"><span class="btnIcon i-download"></span>Download Front PNG</button>
-              <button class="btn" id="downloadBack" type="button"><span class="btnIcon i-download"></span>Download Back PNG</button>
+            <div class="actionBlock">
+              <h4>Sheet Print Options</h4>
+              <div class="row">
+                <div>
+                  <label for="sheetSide">Sheet side</label>
+                  <select id="sheetSide">
+                    <option value="front" selected>Front</option>
+                    <option value="back">Back</option>
+                    <option value="both">Front + Back</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="sheetDpi">Sheet DPI</label>
+                  <select id="sheetDpi">
+                    <option value="300" selected>300 (print)</option>
+                    <option value="200">200</option>
+                    <option value="150">150</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div class="row">
-              <button class="btn" id="copyLink" type="button"><span class="btnIcon i-share"></span>Copy share link</button>
-              <button class="btn btnDanger" id="reset" type="button">Reset</button>
-            </div>
-
-            <div class="help">
-              Share link stores your settings in the URL (no server). Presets save to your browser (localStorage).
+            <div class="actionBlock">
+              <h4>Preset & Sharing</h4>
+              <div class="actionGrid">
+                <button class="btn" id="savePresetPanel" type="button">Save preset</button>
+                <button class="btn" id="loadPresetPanel" type="button">Load preset</button>
+                <button class="btn" id="copyLink" type="button"><span class="btnIcon i-share"></span>Copy share link</button>
+                <button class="btn btnDanger" id="reset" type="button">Reset all</button>
+              </div>
+              <div class="help">
+                Share link stores your settings in the URL (no server). Presets save to your browser (localStorage).
+              </div>
             </div>
           </div>
         </section>
@@ -728,7 +885,7 @@
         <button class="btn" id="closeHelp" type="button">Close</button>
       </header>
       <div class="body">
-        <p><strong>Logo</strong>: Drag on the front card. Scroll to resize. Hold <span class="kbd">Shift</span> to drag faster.</p>
+        <p><strong>Drag mode</strong>: You can drag almost any text block, logo, bullets, and QR on both front/back. Scroll over logo to resize. Hold <span class="kbd">Shift</span> to move faster.</p>
         <p><strong>QR</strong>: Set to vCard for best results. It will encode your name, phone, email, website, and address.</p>
         <p><strong>Keyboard</strong>:
           <span class="kbd">Ctrl</span>+<span class="kbd">S</span> save preset,
@@ -737,6 +894,7 @@
           <span class="kbd">Esc</span> close this window.
         </p>
         <p><strong>Print</strong>: Use 300 DPI and “With bleed” unless your printer requests otherwise.</p>
+        <p><strong>Pro features</strong>: Export an A4 print sheet, download a .vcf contact file, and customize QR dark/light colors.</p>
       </div>
     </div>
   </div>
@@ -762,6 +920,12 @@
     s = (s || "").toString();
     if (s.length > max) return s.slice(0, max-1) + "…";
     return s;
+  }
+  function ensureUrl(s){
+    s = (s || "").trim();
+    if(!s) return "";
+    if (s.startsWith("http://") || s.startsWith("https://")) return s;
+    return `https://${s.replace(/^@/,"")}`;
   }
 
   function fontStack(kind){
@@ -800,6 +964,17 @@
     // simple contrast: choose near-white or near-black
     return luminance(bgHex) > 0.45 ? "#0b1020" : "#e5e7eb";
   }
+  function ensurePos(key){
+    if (!state.positions[key]) state.positions[key] = { x: 0, y: 0 };
+    return state.positions[key];
+  }
+  function offsetPx(key, w, h){
+    const p = ensurePos(key);
+    return { x: p.x * w, y: p.y * h };
+  }
+  function addHit(side, key, x, y, w, h, type="offset"){
+    state.hitRegions[side].push({ key, x, y, w, h, type });
+  }
 
   // ========= Card sizes / export =========
   const SIZES = {
@@ -826,6 +1001,9 @@
     email: $("email"),
     website: $("website"),
     address: $("address"),
+    backBullets: $("backBullets"),
+    linkedin: $("linkedin"),
+    instagram: $("instagram"),
 
     layout: $("layout"),
     icons: $("icons"),
@@ -839,6 +1017,13 @@
     accent: $("accent"),
     text: $("text"),
     preset: $("preset"),
+    texture: $("texture"),
+    backStyle: $("backStyle"),
+    backCompanyColor: $("backCompanyColor"),
+    backTaglineColor: $("backTaglineColor"),
+    backWebsiteColor: $("backWebsiteColor"),
+    backBulletColor: $("backBulletColor"),
+    backBulletDotColor: $("backBulletDotColor"),
     guides: $("guides"),
     backSide: $("backSide"),
 
@@ -849,16 +1034,24 @@
     qrSize: $("qrSize"),
     qrLabel: $("qrLabel"),
     qrOnBack: $("qrOnBack"),
+    qrDark: $("qrDark"),
+    qrLight: $("qrLight"),
 
     exportMode: $("exportMode"),
     fileName: $("fileName"),
+    sheetSide: $("sheetSide"),
+    sheetDpi: $("sheetDpi"),
 
     // actions
     downloadFront: $("downloadFront"),
     downloadBack: $("downloadBack"),
+    downloadVcf: $("downloadVcf"),
+    exportSheet: $("exportSheet"),
     downloadFrontTop: $("downloadFrontTop"),
     savePreset: $("savePreset"),
     loadPreset: $("loadPreset"),
+    savePresetPanel: $("savePresetPanel"),
+    loadPresetPanel: $("loadPresetPanel"),
     copyLink: $("copyLink"),
     reset: $("reset"),
 
@@ -883,6 +1076,11 @@
     logoScale: 0.22, // relative width fraction of canvas
     dragging: false,
     dragOff: { x: 0, y: 0 },
+    dragRegion: null,
+    dragCanvas: null,
+    dragStart: null,
+    positions: {},
+    hitRegions: { front: [], back: [] },
 
     // internally cached QR canvas (per side)
     qrCache: { front: null, back: null, keyFront: "", keyBack: "" }
@@ -922,6 +1120,10 @@
     els.bg2.value = p.bg2;
     els.accent.value = p.accent;
     els.text.value = p.text;
+    if (name === "mono"){ els.texture.value = "none"; els.backStyle.value = "minimal"; }
+    if (name === "sunset"){ els.texture.value = "mesh"; els.backStyle.value = "stripe"; }
+    if (name === "emerald"){ els.texture.value = "soft"; els.backStyle.value = "ring"; }
+    if (name === "midnight"){ els.texture.value = "grid"; els.backStyle.value = "ring"; }
     toast("ok","Preset applied", name);
     redrawAll();
   }
@@ -937,6 +1139,9 @@
       email: els.email.value,
       website: els.website.value,
       address: els.address.value,
+      backBullets: els.backBullets.value,
+      linkedin: els.linkedin.value,
+      instagram: els.instagram.value,
 
       layout: els.layout.value,
       icons: els.icons.value,
@@ -949,20 +1154,32 @@
       bg2: els.bg2.value,
       accent: els.accent.value,
       text: els.text.value,
+      texture: els.texture.value,
+      backStyle: els.backStyle.value,
+      backCompanyColor: els.backCompanyColor.value,
+      backTaglineColor: els.backTaglineColor.value,
+      backWebsiteColor: els.backWebsiteColor.value,
+      backBulletColor: els.backBulletColor.value,
+      backBulletDotColor: els.backBulletDotColor.value,
       guides: !!els.guides.checked,
       backSide: !!els.backSide.checked,
 
       logoMode: els.logoMode.value,
       logoPos: state.logoPos,
       logoScale: state.logoScale,
+      positions: state.positions,
 
       qrMode: els.qrMode.value,
       qrSize: +els.qrSize.value,
       qrLabel: els.qrLabel.value,
       qrOnBack: els.qrOnBack.value,
+      qrDark: els.qrDark.value,
+      qrLight: els.qrLight.value,
 
       exportMode: els.exportMode.value,
       fileName: els.fileName.value,
+      sheetSide: els.sheetSide.value,
+      sheetDpi: +els.sheetDpi.value,
     };
   }
 
@@ -978,6 +1195,9 @@
     if (cfg.email != null) els.email.value = cfg.email;
     if (cfg.website != null) els.website.value = cfg.website;
     if (cfg.address != null) els.address.value = cfg.address;
+    if (cfg.backBullets != null) els.backBullets.value = cfg.backBullets;
+    if (cfg.linkedin != null) els.linkedin.value = cfg.linkedin;
+    if (cfg.instagram != null) els.instagram.value = cfg.instagram;
 
     // style
     if (cfg.layout) els.layout.value = cfg.layout;
@@ -991,6 +1211,13 @@
     if (cfg.bg2) els.bg2.value = cfg.bg2;
     if (cfg.accent) els.accent.value = cfg.accent;
     if (cfg.text) els.text.value = cfg.text;
+    if (cfg.texture) els.texture.value = cfg.texture;
+    if (cfg.backStyle) els.backStyle.value = cfg.backStyle;
+    if (cfg.backCompanyColor) els.backCompanyColor.value = cfg.backCompanyColor;
+    if (cfg.backTaglineColor) els.backTaglineColor.value = cfg.backTaglineColor;
+    if (cfg.backWebsiteColor) els.backWebsiteColor.value = cfg.backWebsiteColor;
+    if (cfg.backBulletColor) els.backBulletColor.value = cfg.backBulletColor;
+    if (cfg.backBulletDotColor) els.backBulletDotColor.value = cfg.backBulletDotColor;
     if (cfg.guides != null) els.guides.checked = !!cfg.guides;
     if (cfg.backSide != null) els.backSide.checked = !!cfg.backSide;
 
@@ -998,16 +1225,21 @@
     if (cfg.logoMode) els.logoMode.value = cfg.logoMode;
     if (cfg.logoPos && typeof cfg.logoPos.x === "number" && typeof cfg.logoPos.y === "number") state.logoPos = cfg.logoPos;
     if (cfg.logoScale && typeof cfg.logoScale === "number") state.logoScale = clamp(cfg.logoScale, 0.10, 0.42);
+    if (cfg.positions && typeof cfg.positions === "object") state.positions = cfg.positions;
 
     // qr
     if (cfg.qrMode) els.qrMode.value = cfg.qrMode;
     if (cfg.qrSize) els.qrSize.value = String(cfg.qrSize);
     if (cfg.qrLabel != null) els.qrLabel.value = cfg.qrLabel;
     if (cfg.qrOnBack) els.qrOnBack.value = cfg.qrOnBack;
+    if (cfg.qrDark) els.qrDark.value = cfg.qrDark;
+    if (cfg.qrLight) els.qrLight.value = cfg.qrLight;
 
     // export
     if (cfg.exportMode) els.exportMode.value = cfg.exportMode;
     if (cfg.fileName) els.fileName.value = cfg.fileName;
+    if (cfg.sheetSide) els.sheetSide.value = cfg.sheetSide;
+    if (cfg.sheetDpi) els.sheetDpi.value = String(cfg.sheetDpi);
 
     setupCanvases();
     redrawAll();
@@ -1173,6 +1405,30 @@
       ctx.beginPath();
       ctx.moveTo(cx, y+s*0.64);
       ctx.lineTo(cx, y+s*0.92);
+      ctx.stroke();
+    } else if(kind === "linkedin"){
+      ctx.beginPath();
+      roundedRect(ctx, x+s*0.12, y+s*0.12, s*0.76, s*0.76, s*0.12);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x+s*0.30, y+s*0.44);
+      ctx.lineTo(x+s*0.30, y+s*0.70);
+      ctx.moveTo(x+s*0.30, y+s*0.30);
+      ctx.arc(x+s*0.30, y+s*0.30, s*0.03, 0, Math.PI*2);
+      ctx.moveTo(x+s*0.45, y+s*0.70);
+      ctx.lineTo(x+s*0.45, y+s*0.50);
+      ctx.quadraticCurveTo(x+s*0.52, y+s*0.40, x+s*0.62, y+s*0.50);
+      ctx.lineTo(x+s*0.62, y+s*0.70);
+      ctx.stroke();
+    } else if(kind === "instagram"){
+      ctx.beginPath();
+      roundedRect(ctx, x+s*0.12, y+s*0.12, s*0.76, s*0.76, s*0.20);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx, cy, s*0.18, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x+s*0.68, y+s*0.32, s*0.04, 0, Math.PI*2);
       ctx.stroke();
     }
     ctx.restore();
@@ -1471,7 +1727,7 @@
       return out;
     }
 
-    function makeQRCanvas(text){
+    function makeQRCanvas(text, dark="#000", light="#fff"){
       const bytes = bytesFromString(text);
       const version = chooseVersion(bytes.length);
       const cap = CAP[version];
@@ -1487,7 +1743,7 @@
       setFormat(matrixObj);
 
       // Render
-      return renderToCanvas(matrixObj, 6, 4, "#000", "#fff");
+      return renderToCanvas(matrixObj, 6, 4, dark, light);
     }
 
     return { makeQRCanvas };
@@ -1500,8 +1756,11 @@
     const title = safeText(els.title.value, 70);
     const tel = safeText(els.phone.value, 40);
     const email = safeText(els.email.value, 70);
-    const url = safeText(els.website.value, 120);
+    const url = safeText(ensureUrl(els.website.value), 120);
     const adr = safeText(els.address.value, 120);
+    const li = safeText(ensureUrl(els.linkedin.value), 120);
+    const igRaw = (els.instagram.value || "").trim();
+    const ig = igRaw ? safeText(ensureUrl(`instagram.com/${igRaw.replace(/^@/,"")}`), 120) : "";
 
     // vCard 3.0 (widely compatible)
     const lines = [
@@ -1513,6 +1772,8 @@
       tel ? `TEL;TYPE=CELL:${tel}` : "",
       email ? `EMAIL;TYPE=INTERNET:${email}` : "",
       url ? `URL:${url}` : "",
+      li ? `URL;TYPE=LinkedIn:${li}` : "",
+      ig ? `URL;TYPE=Instagram:${ig}` : "",
       adr ? `ADR;TYPE=WORK:;;${adr};;;;` : "",
       "END:VCARD"
     ].filter(Boolean);
@@ -1524,9 +1785,7 @@
     const mode = els.qrMode.value;
     if (mode === "off") return "";
     if (mode === "website"){
-      const w = (els.website.value || "").trim();
-      if (!w) return "";
-      return w.startsWith("http") ? w : `https://${w}`;
+      return ensureUrl(els.website.value);
     }
     if (mode === "email"){
       const e = (els.email.value || "").trim();
@@ -1545,16 +1804,16 @@
   function getQrCanvas(side){
     const txt = qrText();
     if (!txt) return null;
-    const key = `${side}|${txt}|${els.qrSize.value}`;
+    const key = `${side}|${txt}|${els.qrSize.value}|${els.qrDark.value}|${els.qrLight.value}`;
     if (side === "front"){
       if (state.qrCache.keyFront === key && state.qrCache.front) return state.qrCache.front;
-      const c = QR.makeQRCanvas(txt);
+      const c = QR.makeQRCanvas(txt, els.qrDark.value, els.qrLight.value);
       state.qrCache.front = c;
       state.qrCache.keyFront = key;
       return c;
     } else {
       if (state.qrCache.keyBack === key && state.qrCache.back) return state.qrCache.back;
-      const c = QR.makeQRCanvas(txt);
+      const c = QR.makeQRCanvas(txt, els.qrDark.value, els.qrLight.value);
       state.qrCache.back = c;
       state.qrCache.keyBack = key;
       return c;
@@ -1572,21 +1831,49 @@
     const bleedIn = exportMode === "trimOnly" ? 0 : BLEED_IN;
 
     ctx.clearRect(0,0,w,h);
+    state.hitRegions.front = [];
 
     // Background
     ctx.save();
     ctx.fillStyle = linearGradient(ctx, w, h, els.bg1.value, els.bg2.value);
     ctx.fillRect(0,0,w,h);
 
-    // subtle texture
-    ctx.globalAlpha = 0.10;
-    ctx.fillStyle = els.accent.value;
-    ctx.beginPath();
-    ctx.ellipse(w*0.15, h*0.18, w*0.36, h*0.26, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(w*0.90, h*0.86, w*0.45, h*0.33, 0, 0, Math.PI*2);
-    ctx.fill();
+    // texture
+    const texture = els.texture.value;
+    if (texture === "soft"){
+      ctx.globalAlpha = 0.10;
+      ctx.fillStyle = els.accent.value;
+      ctx.beginPath();
+      ctx.ellipse(w*0.15, h*0.18, w*0.36, h*0.26, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(w*0.90, h*0.86, w*0.45, h*0.33, 0, 0, Math.PI*2);
+      ctx.fill();
+    } else if (texture === "mesh"){
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = els.accent.value;
+      ctx.lineWidth = Math.max(1, Math.round(w*0.0025));
+      const gap = Math.round(Math.min(w,h)*0.085);
+      for(let x=0; x<w+gap; x+=gap){
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x - h*0.35, h);
+        ctx.stroke();
+      }
+      for(let y=0; y<h+gap; y+=gap){
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y + w*0.35);
+        ctx.stroke();
+      }
+    } else if (texture === "grid"){
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = els.accent.value;
+      ctx.lineWidth = 1;
+      const step = Math.max(10, Math.round(Math.min(w,h)*0.04));
+      for(let x=0; x<w; x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for(let y=0; y<h; y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+    }
     ctx.restore();
 
     const bleed = px(bleedIn, dpi);
@@ -1632,12 +1919,24 @@
     ctx.fillStyle = els.text.value;
     ctx.textAlign = textAlign;
     ctx.font = `900 ${companySize}px ${font}`;
-    ctx.fillText(company, infoX, sy + sh*(layout==="split" ? 0.22 : 0.20));
+    const companyPos = offsetPx("front.company", w, h);
+    const companyX = infoX + companyPos.x;
+    const companyY = sy + sh*(layout==="split" ? 0.22 : 0.20) + companyPos.y;
+    ctx.fillText(company, companyX, companyY);
+    const companyW = Math.max(40, ctx.measureText(company || "Company").width);
+    addHit("front","front.company", companyX - (textAlign==="center" ? companyW/2 : 0), companyY - companySize, companyW, companySize + 10);
 
     // Tagline
     ctx.fillStyle = "rgba(229,231,235,.82)";
     ctx.font = `700 ${taglineSize}px ${font}`;
-    if (tagline) ctx.fillText(tagline, infoX, sy + sh*(layout==="split" ? 0.31 : 0.29));
+    const tagPos = offsetPx("front.tagline", w, h);
+    const tagX = infoX + tagPos.x;
+    const tagY = sy + sh*(layout==="split" ? 0.31 : 0.29) + tagPos.y;
+    if (tagline) {
+      ctx.fillText(tagline, tagX, tagY);
+      const tagW = Math.max(40, ctx.measureText(tagline).width);
+      addHit("front","front.tagline", tagX - (textAlign==="center" ? tagW/2 : 0), tagY - taglineSize, tagW, taglineSize + 10);
+    }
     ctx.restore();
 
     // Name + title
@@ -1645,12 +1944,21 @@
     ctx.fillStyle = els.text.value;
     ctx.textAlign = textAlign;
     ctx.font = `900 ${nameSize}px ${font}`;
-    const nameY = sy + sh*(layout==="centered" ? 0.52 : (layout==="split" ? 0.44 : 0.54));
-    ctx.fillText(name || "Your Name", infoX, nameY);
+    const namePos = offsetPx("front.name", w, h);
+    const nameX = infoX + namePos.x;
+    const nameY = sy + sh*(layout==="centered" ? 0.52 : (layout==="split" ? 0.44 : 0.54)) + namePos.y;
+    ctx.fillText(name || "Your Name", nameX, nameY);
+    const nameW = Math.max(40, ctx.measureText(name || "Your Name").width);
+    addHit("front","front.name", nameX - (textAlign==="center" ? nameW/2 : 0), nameY - nameSize, nameW, nameSize + 10);
 
     ctx.fillStyle = "rgba(229,231,235,.80)";
     ctx.font = `800 ${titleSize}px ${font}`;
-    ctx.fillText(title || "Your Title", infoX, nameY + sh*0.10);
+    const titlePos = offsetPx("front.title", w, h);
+    const titleX = infoX + titlePos.x;
+    const titleY = nameY + sh*0.10 + titlePos.y;
+    ctx.fillText(title || "Your Title", titleX, titleY);
+    const titleW = Math.max(40, ctx.measureText(title || "Your Title").width);
+    addHit("front","front.title", titleX - (textAlign==="center" ? titleW/2 : 0), titleY - titleSize, titleW, titleSize + 10);
     ctx.restore();
 
     // Contact list
@@ -1659,6 +1967,8 @@
       ["EMAIL", (els.email.value||"").trim(), "mail"],
       ["WEB", (els.website.value||"").trim(), "web"],
       ["ADDR", (els.address.value||"").trim(), "pin"],
+      ["LINKEDIN", (els.linkedin.value||"").trim(), "linkedin"],
+      ["INSTAGRAM", (els.instagram.value||"").trim(), "instagram"],
     ].filter(x => x[1].length);
 
     ctx.save();
@@ -1667,7 +1977,9 @@
     const baseY = sy + sh*(layout==="split" ? 0.68 : 0.74);
     const lineH = Math.round(sh*0.075);
     items.forEach((it, i) => {
-      const y = baseY + i*lineH;
+      const contactPos = offsetPx(`front.contact${i}`, w, h);
+      const localBaseX = baseX + contactPos.x;
+      const y = baseY + i*lineH + contactPos.y;
       const label = it[0];
       const val = it[1];
       const iconKind = it[2];
@@ -1681,14 +1993,14 @@
       ctx.save();
       ctx.globalAlpha = 0.95;
       ctx.fillStyle = "rgba(255,255,255,.08)";
-      roundedRect(ctx, baseX, y - pillH + 6, labelW, pillH, 999);
+      roundedRect(ctx, localBaseX, y - pillH + 6, labelW, pillH, 999);
       ctx.fill();
       ctx.restore();
 
       // icon
       const iconsOn = els.icons.value === "on";
       const iconSize = Math.round(pillH*0.66);
-      const iconX = baseX + labelW + Math.round(sw*0.018);
+      const iconX = localBaseX + labelW + Math.round(sw*0.018);
       const iconY = y - iconSize + 3;
       if (iconsOn){
         drawIcon(ctx, iconKind, iconX, iconY, iconSize, "rgba(229,231,235,.75)");
@@ -1696,13 +2008,15 @@
 
       // label
       ctx.fillStyle = els.accent.value;
-      ctx.fillText(label, baseX + padX, y);
+      ctx.fillText(label, localBaseX + padX, y);
 
       // value
       ctx.fillStyle = "rgba(229,231,235,.88)";
       ctx.font = `800 ${infoValueSize}px ${font}`;
-      const valueX = iconsOn ? (iconX + iconSize + Math.round(sw*0.012)) : (baseX + labelW + Math.round(sw*0.02));
+      const valueX = iconsOn ? (iconX + iconSize + Math.round(sw*0.012)) : (localBaseX + labelW + Math.round(sw*0.02));
       ctx.fillText(val, valueX, y);
+      const rowW = Math.max(80, (valueX - localBaseX) + ctx.measureText(val).width + 8);
+      addHit("front", `front.contact${i}`, localBaseX, y - pillH, rowW, pillH + 12);
     });
     ctx.restore();
 
@@ -1734,7 +2048,10 @@
       ctx.globalAlpha = 0.95;
       ctx.fillStyle = els.accent.value;
       ctx.font = `900 ${Math.round(r*0.72)}px ${fontStack(els.font.value)}`;
-      ctx.fillText("LL", w*0.80 - r*0.55, h*0.28 + r*0.25);
+      const px = w*0.80 - r*0.55;
+      const py = h*0.28 + r*0.25;
+      ctx.fillText("LL", px, py);
+      addHit("front","front.logo", w*0.80-r, h*0.28-r, r*2, r*2, "logo");
       ctx.restore();
       return;
     }
@@ -1765,6 +2082,7 @@
     }
 
     ctx.drawImage(img, x, y, targetW, targetH);
+    addHit("front","front.logo", x-14, y-14, targetW+28, targetH+28, "logo");
   }
 
   function drawQR(ctx, side, w, h, radius){
@@ -1779,12 +2097,12 @@
     const sizePx = Math.round(Math.min(w,h) * scaleFrac);
 
     const pad = Math.round(Math.min(w,h) * 0.045);
-    const x = w - pad - sizePx;
-    const y = h - pad - sizePx;
+    const qrPos = offsetPx(`${side}.qr`, w, h);
+    const x = w - pad - sizePx + qrPos.x;
+    const y = h - pad - sizePx + qrPos.y;
 
     // plate with contrast
-    const bg = "#ffffff";
-    const fg = "#000000";
+    const bg = els.qrLight.value;
 
     ctx.save();
     // QR plate
@@ -1810,6 +2128,7 @@
       ctx.fillText(label, x + sizePx, y - Math.round(w*0.02));
       ctx.textAlign = "left";
     }
+    addHit(side, `${side}.qr`, x-10, y-10, sizePx+20, sizePx+20);
     ctx.restore();
   }
 
@@ -1820,6 +2139,7 @@
     const w = c.width, h = c.height;
 
     ctx.clearRect(0,0,w,h);
+    state.hitRegions.back = [];
 
     // Background
     ctx.fillStyle = linearGradient(ctx, w, h, els.bg2.value, els.bg1.value);
@@ -1827,16 +2147,27 @@
 
     const font = fontStack(els.font.value);
     const radius = +els.radius.value;
+    const backStyle = els.backStyle.value;
 
-    // Brand mark ring
-    ctx.save();
-    ctx.globalAlpha = 0.55;
-    ctx.strokeStyle = els.accent.value;
-    ctx.lineWidth = Math.max(8, Math.round(w*0.016));
-    ctx.beginPath();
-    ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.18, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.restore();
+    if (backStyle === "ring"){
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = els.accent.value;
+      ctx.lineWidth = Math.max(8, Math.round(w*0.016));
+      ctx.beginPath();
+      ctx.arc(w*0.5, h*0.42, Math.min(w,h)*0.18, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    } else if (backStyle === "stripe"){
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = els.accent.value;
+      ctx.translate(w*0.15, -h*0.35);
+      ctx.rotate(-0.28);
+      roundedRect(ctx, 0, 0, w*0.7, h*1.6, Math.round(w*0.06));
+      ctx.fill();
+      ctx.restore();
+    }
 
     // Logo centered or placeholder
     if (state.logoImg){
@@ -1844,17 +2175,21 @@
       const maxW = w*0.34;
       const aspect = img.width / img.height;
       const hh = maxW / aspect;
+      const logoPos = offsetPx("back.logo", w, h);
+      const lx = w*0.5 - maxW/2 + logoPos.x;
+      const ly = h*0.42 - hh/2 + logoPos.y;
 
       if (els.logoMode.value === "plate"){
         ctx.save();
         ctx.globalAlpha = 0.85;
         ctx.fillStyle = "rgba(0,0,0,.22)";
-        roundedRect(ctx, w*0.5 - maxW/2 - 12, h*0.42 - hh/2 - 12, maxW + 24, hh + 24, Math.max(14, radius));
+        roundedRect(ctx, lx - 12, ly - 12, maxW + 24, hh + 24, Math.max(14, radius));
         ctx.fill();
         ctx.restore();
       }
 
-      ctx.drawImage(img, w*0.5 - maxW/2, h*0.42 - hh/2, maxW, hh);
+      ctx.drawImage(img, lx, ly, maxW, hh);
+      addHit("back","back.logo", lx-14, ly-14, maxW+28, hh+28, "offset");
     } else {
       ctx.save();
       ctx.fillStyle = "rgba(255,255,255,.12)";
@@ -1872,21 +2207,73 @@
     // Company + tagline
     ctx.save();
     ctx.textAlign = "center";
-    ctx.fillStyle = els.text.value;
-    ctx.font = `900 ${Math.round(w*0.06)}px ${font}`;
-    ctx.fillText(safeText(els.company.value, 32) || "Company", w*0.5, h*0.70);
+    ctx.fillStyle = els.backCompanyColor.value;
+    const companyY = backStyle === "minimal" ? h*0.52 : h*0.70;
+    const taglineY = backStyle === "minimal" ? h*0.60 : h*0.78;
+    const websiteY = backStyle === "minimal" ? h*0.70 : h*0.88;
+    const companySize = backStyle === "minimal" ? 0.075 : 0.06;
+    const tagSize = backStyle === "minimal" ? 0.036 : 0.028;
+    const webSize = backStyle === "minimal" ? 0.040 : 0.03;
+    ctx.font = `900 ${Math.round(w*companySize)}px ${font}`;
+    const backCompanyPos = offsetPx("back.company", w, h);
+    const companyX = w*0.5 + backCompanyPos.x;
+    const companyY2 = companyY + backCompanyPos.y;
+    const companyTxt = safeText(els.company.value, 32) || "Company";
+    ctx.fillText(companyTxt, companyX, companyY2);
+    const compW = Math.max(40, ctx.measureText(companyTxt).width);
+    addHit("back","back.company", companyX - compW/2, companyY2 - Math.round(w*companySize), compW, Math.round(w*companySize) + 10);
 
-    ctx.fillStyle = "rgba(229,231,235,.82)";
-    ctx.font = `800 ${Math.round(w*0.028)}px ${font}`;
+    ctx.fillStyle = els.backTaglineColor.value;
+    ctx.font = `800 ${Math.round(w*tagSize)}px ${font}`;
     const tag = safeText(els.tagline.value, 50);
-    if (tag) ctx.fillText(tag, w*0.5, h*0.78);
+    if (tag) {
+      const backTagPos = offsetPx("back.tagline", w, h);
+      const tx = w*0.5 + backTagPos.x;
+      const ty = taglineY + backTagPos.y;
+      ctx.fillText(tag, tx, ty);
+      const tw = Math.max(40, ctx.measureText(tag).width);
+      addHit("back","back.tagline", tx - tw/2, ty - Math.round(w*tagSize), tw, Math.round(w*tagSize) + 10);
+    }
 
     // Website
     const web = (els.website.value || "").trim();
     if (web){
-      ctx.fillStyle = els.accent.value;
-      ctx.font = `900 ${Math.round(w*0.03)}px ${font}`;
-      ctx.fillText(web, w*0.5, h*0.88);
+      ctx.fillStyle = els.backWebsiteColor.value;
+      ctx.font = `900 ${Math.round(w*webSize)}px ${font}`;
+      const backWebPos = offsetPx("back.website", w, h);
+      const wx = w*0.5 + backWebPos.x;
+      const wy = websiteY + backWebPos.y;
+      ctx.fillText(web, wx, wy);
+      const ww = Math.max(40, ctx.measureText(web).width);
+      addHit("back","back.website", wx - ww/2, wy - Math.round(w*webSize), ww, Math.round(w*webSize) + 10);
+    }
+
+    // Back bullets
+    const bulletLines = (els.backBullets.value || "")
+      .split(/\r?\n/)
+      .map(s=>s.trim())
+      .filter(Boolean)
+      .slice(0,6);
+    if (bulletLines.length){
+      const bulletPos = offsetPx("back.bullets", w, h);
+      const startX = w*0.18 + bulletPos.x;
+      let startY = h*0.58 + bulletPos.y;
+      const lh = Math.round(h*0.08);
+      const bFont = Math.round(w*0.026);
+      ctx.fillStyle = els.backBulletColor.value;
+      ctx.font = `700 ${bFont}px ${font}`;
+      let maxW = 0;
+      bulletLines.forEach(line=>{
+        ctx.fillStyle = els.backBulletDotColor.value;
+        ctx.beginPath();
+        ctx.arc(startX, startY - bFont*0.35, Math.max(3, bFont*0.15), 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = els.backBulletColor.value;
+        ctx.fillText(line, startX + 16, startY);
+        maxW = Math.max(maxW, ctx.measureText(line).width + 22);
+        startY += lh;
+      });
+      addHit("back","back.bullets", startX - 6, h*0.58 + bulletPos.y - bFont, maxW + 16, lh * bulletLines.length + 8);
     }
     ctx.restore();
 
@@ -1927,70 +2314,96 @@
     a.href = canvas.toDataURL("image/png");
     a.click();
   }
+  function snapshotCard(side){
+    const oldGuides = !!els.guides.checked;
+    els.guides.checked = false;
+    drawFront();
+    const src = side === "back" ? els.backCanvas : els.frontCanvas;
+    const snap = document.createElement("canvas");
+    snap.width = src.width;
+    snap.height = src.height;
+    snap.getContext("2d").drawImage(src, 0, 0);
+    els.guides.checked = oldGuides;
+    drawFront();
+    return snap;
+  }
 
-  // ========= Drag / resize logo =========
-  function getMousePos(evt){
-    const rect = els.frontCanvas.getBoundingClientRect();
-    const x = (evt.clientX - rect.left) * (els.frontCanvas.width / rect.width);
-    const y = (evt.clientY - rect.top) * (els.frontCanvas.height / rect.height);
+  // ========= Drag / move elements =========
+  function getCanvasPos(canvas, evt){
+    const rect = canvas.getBoundingClientRect();
+    const x = (evt.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (evt.clientY - rect.top) * (canvas.height / rect.height);
     return {x,y};
   }
+  function findHit(side, x, y){
+    const list = state.hitRegions[side] || [];
+    for(let i=list.length-1; i>=0; i--){
+      const r = list[i];
+      if(x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return r;
+    }
+    return null;
+  }
+  function pointerDownOnCanvas(side, canvas, e){
+    const p = getCanvasPos(canvas, e);
+    const hit = findHit(side, p.x, p.y);
+    if(!hit) return;
+    state.dragging = true;
+    state.dragRegion = hit;
+    state.dragCanvas = canvas;
+    state.dragStart = { x: p.x, y: p.y };
+    canvas.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+  }
+  function pointerMoveGlobal(e){
+    if(!state.dragging || !state.dragRegion || !state.dragCanvas) return;
+    const p = getCanvasPos(state.dragCanvas, e);
+    const dx = p.x - state.dragStart.x;
+    const dy = p.y - state.dragStart.y;
+    const w = state.dragCanvas.width || 1;
+    const h = state.dragCanvas.height || 1;
+    const speed = e.shiftKey ? 1.8 : 1;
 
-  function isOverLogo(mx, my){
-    if(!state.logoImg) return false;
-    const w = els.frontCanvas.width, h = els.frontCanvas.height;
-    const img = state.logoImg;
-    const targetW = w * state.logoScale;
-    const aspect = img.width / img.height;
-    const targetH = targetW / aspect;
-    const cx = w * state.logoPos.x;
-    const cy = h * state.logoPos.y;
-    const x = cx - targetW/2;
-    const y = cy - targetH/2;
-    return mx >= x-18 && mx <= x+targetW+18 && my >= y-18 && my <= y+targetH+18;
+    if(state.dragRegion.type === "logo" && state.dragRegion.key === "front.logo"){
+      state.logoPos.x = clamp(state.logoPos.x + (dx / w) * speed, 0.02, 0.98);
+      state.logoPos.y = clamp(state.logoPos.y + (dy / h) * speed, 0.02, 0.98);
+      localStorage.setItem("bc_logo_pos_v2", JSON.stringify(state.logoPos));
+    } else {
+      const pos = ensurePos(state.dragRegion.key);
+      pos.x = clamp(pos.x + (dx / w) * speed, -0.45, 0.45);
+      pos.y = clamp(pos.y + (dy / h) * speed, -0.45, 0.45);
+    }
+    state.dragStart = { x: p.x, y: p.y };
+    drawFront();
+  }
+  function pointerUpGlobal(){
+    state.dragging = false;
+    state.dragRegion = null;
+    state.dragCanvas = null;
+  }
+  function updateCanvasCursor(side, canvas, e){
+    const p = getCanvasPos(canvas, e);
+    const hit = findHit(side, p.x, p.y);
+    canvas.style.cursor = hit ? "grab" : "default";
   }
 
-  els.frontCanvas.addEventListener("mousedown", (e) => {
-    const p = getMousePos(e);
-    if (!isOverLogo(p.x, p.y)) return;
-    state.dragging = true;
+  els.frontCanvas.addEventListener("pointerdown", (e)=> pointerDownOnCanvas("front", els.frontCanvas, e));
+  els.backCanvas.addEventListener("pointerdown", (e)=> pointerDownOnCanvas("back", els.backCanvas, e));
+  window.addEventListener("pointermove", pointerMoveGlobal);
+  window.addEventListener("pointerup", pointerUpGlobal);
+  els.frontCanvas.addEventListener("pointermove", (e)=> updateCanvasCursor("front", els.frontCanvas, e));
+  els.backCanvas.addEventListener("pointermove", (e)=> updateCanvasCursor("back", els.backCanvas, e));
 
-    const w = els.frontCanvas.width, h = els.frontCanvas.height;
-    state.dragOff.x = (p.x / w) - state.logoPos.x;
-    state.dragOff.y = (p.y / h) - state.logoPos.y;
-  });
-
-  window.addEventListener("mousemove", (e) => {
-    if(!state.dragging) return;
-    const rect = els.frontCanvas.getBoundingClientRect();
-    const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-    if(!inside) return;
-
-    const p = getMousePos(e);
-    const w = els.frontCanvas.width, h = els.frontCanvas.height;
-
-    const speed = e.shiftKey ? 2.0 : 1.0;
-    const nx = (p.x / w) - state.dragOff.x;
-    const ny = (p.y / h) - state.dragOff.y;
-
-    state.logoPos.x = clamp(state.logoPos.x + (nx - state.logoPos.x) * 0.35 * speed, 0.05, 0.95);
-    state.logoPos.y = clamp(state.logoPos.y + (ny - state.logoPos.y) * 0.35 * speed, 0.05, 0.95);
-
-    localStorage.setItem("bc_logo_pos_v2", JSON.stringify(state.logoPos));
-    drawFront();
-  });
-
-  window.addEventListener("mouseup", () => { state.dragging = false; });
-
-  els.frontCanvas.addEventListener("wheel", (e) => {
-    if(!state.logoImg) return;
-    const p = getMousePos(e);
-    if(!isOverLogo(p.x, p.y)) return;
+  function handleLogoWheel(side, canvas, e){
+    const p = getCanvasPos(canvas, e);
+    const hit = findHit(side, p.x, p.y);
+    if(!hit || !hit.key.includes("logo")) return;
     e.preventDefault();
     const delta = Math.sign(e.deltaY);
     state.logoScale = clamp(state.logoScale + delta * 0.015, 0.10, 0.42);
     drawFront();
-  }, { passive: false });
+  }
+  els.frontCanvas.addEventListener("wheel", (e)=> handleLogoWheel("front", els.frontCanvas, e), { passive:false });
+  els.backCanvas.addEventListener("wheel", (e)=> handleLogoWheel("back", els.backCanvas, e), { passive:false });
 
   // ========= Logo upload =========
   els.logo.addEventListener("change", (e) => {
@@ -2035,7 +2448,7 @@
   // ========= Actions =========
   function exportFront(){
     const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
-    downloadCanvas(els.frontCanvas, `${base}-front.png`);
+    downloadCanvas(snapshotCard("front"), `${base}-front.png`);
     toast("ok","Exported","Front PNG downloaded.");
   }
 
@@ -2045,8 +2458,72 @@
       return;
     }
     const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
-    downloadCanvas(els.backCanvas, `${base}-back.png`);
+    downloadCanvas(snapshotCard("back"), `${base}-back.png`);
     toast("ok","Exported","Back PNG downloaded.");
+  }
+
+  function downloadVcf(){
+    const payload = vcardPayload();
+    const blob = new Blob([payload], { type: "text/vcard;charset=utf-8" });
+    const a = document.createElement("a");
+    const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
+    a.download = `${base}.vcf`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("ok","vCard exported","Contact file downloaded.");
+  }
+
+  function exportSheet(){
+    const sheetDpi = +els.sheetDpi.value || 300;
+    const sheetW = px(8.27, sheetDpi); // A4
+    const sheetH = px(11.69, sheetDpi);
+    const margin = px(0.35, sheetDpi);
+    const gap = px(0.2, sheetDpi);
+    const side = els.sheetSide.value === "both" ? "both" : (els.sheetSide.value === "back" ? "back" : "front");
+    if ((side === "back" || side === "both") && !els.backSide.checked){
+      toast("warn","Back disabled","Enable back side first.");
+      return;
+    }
+
+    const cols = 2;
+    const rows = 5;
+    const usableW = sheetW - margin*2 - gap*(cols-1);
+    const usableH = sheetH - margin*2 - gap*(rows-1);
+    const cardW = Math.floor(usableW / cols);
+    const cardH = Math.floor(usableH / rows);
+
+    const makeSheet = (cardSide) => {
+      const source = snapshotCard(cardSide);
+      const sheet = document.createElement("canvas");
+      sheet.width = sheetW;
+      sheet.height = sheetH;
+      const ctx = sheet.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0,0,sheetW,sheetH);
+
+      for(let r=0; r<rows; r++){
+        for(let c=0; c<cols; c++){
+          const x = margin + c*(cardW + gap);
+          const y = margin + r*(cardH + gap);
+          ctx.drawImage(source, 0, 0, source.width, source.height, x, y, cardW, cardH);
+          ctx.strokeStyle = "rgba(0,0,0,.25)";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, cardW, cardH);
+        }
+      }
+      return sheet;
+    };
+
+    const base = (els.fileName.value || "business-card").trim().replace(/\s+/g,"-");
+    if (side === "both"){
+      downloadCanvas(makeSheet("front"), `${base}-sheet-front-a4.png`);
+      setTimeout(()=> downloadCanvas(makeSheet("back"), `${base}-sheet-back-a4.png`), 120);
+      toast("ok","Sheets exported","Front + back A4 sheets downloaded.");
+    } else {
+      downloadCanvas(makeSheet(side), `${base}-sheet-${side}-a4.png`);
+      toast("ok","Sheet exported","A4 print sheet downloaded.");
+    }
   }
 
   function resetAll(){
@@ -2061,6 +2538,9 @@
     els.email.value = "hello@yourdomain.com";
     els.website.value = "logiclabstudio.github.io";
     els.address.value = "Johannesburg, South Africa";
+    els.backBullets.value = "Custom Software Development\nMobile Apps & Web Platforms\nCloud Integrations\nSupport & Maintenance";
+    els.linkedin.value = "linkedin.com/in/yourprofile";
+    els.instagram.value = "@yourhandle";
 
     els.layout.value = "classic";
     els.icons.value = "on";
@@ -2073,6 +2553,13 @@
     els.accent.value = "#60a5fa";
     els.text.value = "#e5e7eb";
     els.preset.value = "custom";
+    els.texture.value = "soft";
+    els.backStyle.value = "ring";
+    els.backCompanyColor.value = "#e5e7eb";
+    els.backTaglineColor.value = "#cbd5e1";
+    els.backWebsiteColor.value = "#60a5fa";
+    els.backBulletColor.value = "#e5e7eb";
+    els.backBulletDotColor.value = "#60a5fa";
 
     els.guides.checked = true;
     els.backSide.checked = false;
@@ -2081,6 +2568,7 @@
     state.logoImg = null;
     state.logoPos = { x: 0.77, y: 0.24 };
     state.logoScale = 0.22;
+    state.positions = {};
     localStorage.removeItem("bc_logo_pos_v2");
     els.logo.value = "";
 
@@ -2088,9 +2576,13 @@
     els.qrSize.value = "0.24";
     els.qrLabel.value = "Scan to save contact";
     els.qrOnBack.value = "front";
+    els.qrDark.value = "#000000";
+    els.qrLight.value = "#ffffff";
 
     els.exportMode.value = "withBleed";
     els.fileName.value = "business-card";
+    els.sheetSide.value = "front";
+    els.sheetDpi.value = "300";
 
     // clear qr cache
     state.qrCache = { front: null, back: null, keyFront: "", keyBack: "" };
@@ -2102,12 +2594,13 @@
 
   // ========= Inputs -> redraw =========
   const redrawIds = [
-    "company","tagline","name","title","phone","email","website","address",
+    "company","tagline","name","title","phone","email","website","address","backBullets",
+    "linkedin","instagram",
     "layout","icons",
-    "size","dpi","font","radius","bg1","bg2","accent","text","guides","backSide","exportMode",
+    "size","dpi","font","radius","bg1","bg2","accent","text","preset","texture","backStyle","backCompanyColor","backTaglineColor","backWebsiteColor","backBulletColor","backBulletDotColor","guides","backSide","exportMode",
     "logoMode",
-    "qrMode","qrSize","qrLabel","qrOnBack",
-    "fileName"
+    "qrMode","qrSize","qrLabel","qrOnBack","qrDark","qrLight",
+    "fileName","sheetSide","sheetDpi"
   ];
 
   redrawIds.forEach(id=>{
@@ -2136,10 +2629,14 @@
   // Buttons
   els.downloadFront.addEventListener("click", exportFront);
   els.downloadBack.addEventListener("click", exportBack);
+  els.downloadVcf.addEventListener("click", downloadVcf);
+  els.exportSheet.addEventListener("click", exportSheet);
   els.downloadFrontTop.addEventListener("click", exportFront);
   els.copyLink.addEventListener("click", copyShareLink);
   els.savePreset.addEventListener("click", savePreset);
   els.loadPreset.addEventListener("click", loadPreset);
+  els.savePresetPanel.addEventListener("click", savePreset);
+  els.loadPresetPanel.addEventListener("click", loadPreset);
   els.reset.addEventListener("click", resetAll);
 
   // ========= Help modal =========
