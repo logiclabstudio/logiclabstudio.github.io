@@ -1,0 +1,2276 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Logic Lab Whiteboard — Canva-style</title>
+
+  <style>
+    :root{
+      --bg:#f3f5fb;
+      --panel:#ffffff;
+      --panel2:#f7f8fc;
+      --text:#0b1020;
+      --muted:#667085;
+      --line:rgba(2,6,23,.12);
+      --shadow: 0 18px 55px rgba(2,6,23,.10);
+      --radius:16px;
+
+      --brand:#0b1020;
+      --accent:#2563eb;
+      --accent2:#38bdf8;
+      --danger:#ef4444;
+
+      --gridA: rgba(2,6,23,.06);
+      --gridB: rgba(2,6,23,.03);
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow:hidden;
+    }
+
+    .app{
+      height:100%;
+      display:grid;
+      grid-template-rows: auto auto 1fr;
+      gap:10px;
+      padding:12px;
+    }
+
+    /* ===== Top header ===== */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 260px;
+    }
+    .logo{
+      width:40px; height:40px; border-radius: 14px;
+      background: radial-gradient(120% 120% at 20% 20%, var(--accent2), var(--accent) 45%, var(--brand));
+      box-shadow: 0 12px 30px rgba(2,6,23,.15);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      transform: rotate(25deg);
+      animation: shine 3.2s linear infinite;
+    }
+    @keyframes shine{
+      0%{transform: translateX(-35%) rotate(25deg)}
+      100%{transform: translateX(35%) rotate(25deg)}
+    }
+    .brand h1{margin:0; font-size:14px; line-height:1.1}
+    .brand p{margin:2px 0 0; font-size:12px; color: var(--muted)}
+
+    .search{
+      flex:1;
+      max-width: 520px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      background: var(--panel2);
+      border:1px solid rgba(2,6,23,.08);
+    }
+    .search input{
+      width:100%;
+      border:none;
+      outline:none;
+      background: transparent;
+      font-weight:600;
+      color: var(--text);
+    }
+
+    .top-actions{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition: transform .06s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn:hover{border-color: rgba(37,99,235,.35); box-shadow: 0 12px 32px rgba(2,6,23,.10)}
+    .btn.primary{
+      border-color: rgba(37,99,235,.35);
+      background: linear-gradient(180deg, rgba(37,99,235,.16), rgba(37,99,235,.08));
+    }
+    .btn.danger{
+      border-color: rgba(239,68,68,.35);
+      background: linear-gradient(180deg, rgba(239,68,68,.14), rgba(239,68,68,.06));
+    }
+    .btn.on{
+      outline: 2px solid rgba(37,99,235,.22);
+      border-color: rgba(37,99,235,.55);
+    }
+    .btn.ghost{
+      background: transparent;
+      border-color: rgba(2,6,23,.10);
+    }
+
+    /* ===== Tool row ===== */
+    .toolrow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow:auto;
+    }
+
+    .pill{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid rgba(2,6,23,.10);
+      border-radius: 999px;
+      background: var(--panel2);
+      white-space:nowrap;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:800;
+    }
+    .pill input[type="color"]{
+      width:28px;height:22px;border:none;background:transparent;padding:0;cursor:pointer;
+    }
+    .pill input[type="range"]{width:110px}
+    .pill label{display:flex;align-items:center;gap:8px;cursor:pointer}
+    .pill input[type="checkbox"]{transform: translateY(1px)}
+
+    /* ===== Main layout: left + stage + right ===== */
+    .main{
+      min-height:0;
+      display:grid;
+      grid-template-columns: 320px 1fr 320px;
+      gap:10px;
+    }
+
+    .panel{
+      min-height:0;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .panelHead{
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(2,6,23,.08);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panelHead .title{
+      font-weight:1000;
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+
+    .panelBody{
+      padding:12px;
+      overflow:auto;
+      min-height:0;
+    }
+
+    /* LEFT (Elements) */
+    .leftTabs{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(2,6,23,.08);
+    }
+    .tab{
+      appearance:none;
+      border:1px solid rgba(2,6,23,.10);
+      background: var(--panel2);
+      color: var(--text);
+      padding:8px 10px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:12px;
+      transition: border-color .12s ease, box-shadow .12s ease;
+      white-space:nowrap;
+    }
+    .tab.on{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 10px 22px rgba(37,99,235,.10);
+      background: linear-gradient(180deg, rgba(37,99,235,.16), rgba(37,99,235,.08));
+    }
+
+    .leftSearch{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius: 14px;
+      background: var(--panel2);
+      border:1px solid rgba(2,6,23,.10);
+      margin-bottom:10px;
+    }
+    .leftSearch input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      font-weight:700;
+      color: var(--text);
+    }
+
+    .secTitle{
+      margin:14px 0 10px;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:1000;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+
+    .elementsGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:10px;
+    }
+
+    .card{
+      border:1px solid rgba(2,6,23,.10);
+      background: var(--panel);
+      border-radius: 16px;
+      padding:10px;
+      cursor:pointer;
+      transition: transform .06s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .card:hover{
+      border-color: rgba(37,99,235,.35);
+      box-shadow: 0 14px 34px rgba(2,6,23,.10);
+    }
+    .card:active{transform: translateY(1px)}
+    .card .thumb{
+      height:74px;
+      border-radius: 14px;
+      background: var(--panel2);
+      border:1px dashed rgba(2,6,23,.14);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+    .card .name{
+      margin-top:8px;
+      font-weight:1000;
+      font-size:12px;
+    }
+    .card .meta{
+      margin-top:2px;
+      color: var(--muted);
+      font-weight:800;
+      font-size:11px;
+    }
+
+    .ico{
+      width:52px;height:52px;
+      border-radius: 16px;
+      background: radial-gradient(120% 120% at 20% 20%, rgba(37,99,235,.18), rgba(37,99,235,.06));
+      border: 1px solid rgba(37,99,235,.16);
+      display:grid;
+      place-items:center;
+      color: rgba(2,6,23,.75);
+      font-weight:1000;
+    }
+    .ico svg{width:28px;height:28px; opacity:.9}
+
+    .tmpl{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border-radius: 16px;
+      border:1px solid rgba(2,6,23,.10);
+      background: var(--panel);
+      cursor:pointer;
+      margin-bottom:10px;
+      transition: border-color .12s ease, box-shadow .12s ease, transform .06s ease;
+    }
+    .tmpl:hover{border-color: rgba(37,99,235,.35); box-shadow: 0 14px 34px rgba(2,6,23,.10)}
+    .tmpl:active{transform: translateY(1px)}
+    .tmpl .tName{font-weight:1000; font-size:12px}
+    .tmpl .tMeta{font-weight:800; font-size:11px; color: var(--muted); margin-top:2px}
+
+    /* RIGHT (Properties) */
+    .hint{
+      font-size:12px;
+      color: var(--muted);
+      font-weight:800;
+      line-height:1.35;
+    }
+
+    .propRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .field{
+      border:1px solid rgba(2,6,23,.10);
+      background: var(--panel2);
+      border-radius: 14px;
+      padding:10px;
+    }
+    .field label{
+      display:block;
+      font-size:11px;
+      color: var(--muted);
+      font-weight:1000;
+      margin-bottom:6px;
+      letter-spacing:.2px;
+    }
+    .field input[type="number"],
+    .field input[type="text"],
+    .field select{
+      width:100%;
+      padding:10px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(2,6,23,.12);
+      background: var(--panel);
+      outline:none;
+      font-weight:900;
+      color: var(--text);
+    }
+    .field input[type="range"]{width:100%}
+    .field input[type="color"]{width:100%; height:40px; border:none; background:transparent; padding:0; cursor:pointer}
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:10px;
+    }
+
+    .mini{
+      font-size:11px;
+      color: var(--muted);
+      font-weight:900;
+    }
+
+    .divider{
+      height:1px;
+      background: rgba(2,6,23,.08);
+      margin:14px 0;
+    }
+
+    /* ===== Stage ===== */
+    .stage{
+      position:relative;
+      border-radius: var(--radius);
+      overflow:hidden;
+      border:1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      min-height:0;
+    }
+
+    .grid{
+      position:absolute; inset:0;
+      pointer-events:none;
+      transform-origin: 0 0;
+      background:
+        linear-gradient(var(--gridA) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gridA) 1px, transparent 1px),
+        linear-gradient(var(--gridB) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gridB) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+    }
+
+    canvas{position:absolute; inset:0; width:100%; height:100%; touch-action:none;}
+    .overlay{position:absolute; inset:0; transform-origin:0 0;}
+
+    /* ===== Items ===== */
+    .item{
+      position:absolute;
+      border-radius: 14px;
+      user-select:none;
+      pointer-events:auto;
+    }
+    .item.selected{outline:2px solid rgba(37,99,235,.40); box-shadow: 0 16px 40px rgba(37,99,235,.10)}
+    .handle{
+      position:absolute; width:12px;height:12px;border-radius:999px;
+      background: var(--panel);
+      border:2px solid rgba(37,99,235,.65);
+      box-shadow: 0 10px 20px rgba(37,99,235,.18);
+      display:none;
+    }
+    .item.selected .handle{display:block}
+    .handle.nw{left:-6px;top:-6px;cursor:nwse-resize}
+    .handle.ne{right:-6px;top:-6px;cursor:nesw-resize}
+    .handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+    .handle.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+
+    .note{
+      background:#fff4a3;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 14px 36px rgba(2,6,23,.12);
+      padding:12px 12px 10px;
+      transform: rotate(-.4deg);
+      min-width: 160px; min-height: 120px;
+    }
+    .note .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-size:12px; font-weight:1000; color: rgba(31,41,55,.8);
+      margin-bottom:8px;
+    }
+    .note textarea{
+      width:100%;
+      height: calc(100% - 22px);
+      border:none; outline:none; resize:none;
+      background: transparent;
+      font-family: var(--sans);
+      font-size:14px;
+      color:#1f2937;
+    }
+
+    .textbox{
+      background: rgba(255,255,255,.72);
+      border:1px solid rgba(2,6,23,.12);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 12px 30px rgba(2,6,23,.10);
+      padding:10px 12px;
+      min-width: 140px; min-height: 48px;
+      cursor:text;
+      user-select:text;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .textbox:focus{outline:2px solid rgba(37,99,235,.25)}
+
+    .shape{
+      border:2px solid rgba(2,6,23,.35);
+      background: rgba(37,99,235,.10);
+      box-shadow: 0 14px 34px rgba(2,6,23,.10);
+      border-radius: 16px;
+    }
+    .shape.circle{border-radius:999px}
+    .shape.diamond{transform: rotate(45deg); border-radius: 14px}
+
+    .footerMark{
+      position:absolute;
+      left:14px;
+      bottom:14px;
+      padding:8px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:1000;
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(2,6,23,.10);
+      backdrop-filter: blur(10px);
+      color: rgba(2,6,23,.75);
+      pointer-events:none;
+    }
+
+    .kbd{
+      font-family: var(--mono);
+      border:1px solid rgba(2,6,23,.14);
+      border-bottom-width:3px;
+      padding:2px 7px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      color: var(--text);
+      font-size:11px;
+      font-weight:1000;
+    }
+
+    @media (max-width: 1220px){
+      .main{grid-template-columns: 320px 1fr}
+      .right{display:none}
+      .search{display:none}
+      .brand{min-width:unset}
+    }
+    @media (max-width: 980px){
+      .main{grid-template-columns: 1fr}
+      .left{display:none}
+      .right{display:none}
+      .search{display:none}
+      .brand{min-width:unset}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Logic Lab Whiteboard</h1>
+          <p>Canva-style • Infinite canvas feel • <b>Powered by Logic Lab</b></p>
+        </div>
+      </div>
+
+      <div class="search" title="(UI only) Search">
+        🔎 <input value="Search elements (demo UI)" readonly />
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="helpBtn">Shortcuts</button>
+        <button class="btn danger" id="clearBtn">Clear</button>
+        <button class="btn primary" id="exportPngBtn">Export PNG</button>
+      </div>
+    </div>
+
+    <div class="toolrow" id="toolrow">
+      <button class="btn on" data-tool="select">Select</button>
+      <button class="btn" data-tool="pen">Draw</button>
+      <button class="btn" data-tool="eraser">Erase</button>
+      <button class="btn" data-tool="pan">Hand</button>
+
+      <div class="pill">
+        <span>Stroke</span>
+        <input type="color" id="strokeColor" value="#2563eb" />
+      </div>
+
+      <div class="pill">
+        <span>Size</span>
+        <input type="range" id="strokeSize" min="1" max="28" value="4" />
+        <span id="strokeSizeVal">4</span>
+      </div>
+
+      <div class="pill">
+        <label><input type="checkbox" id="snap" checked /> Snap to grid</label>
+      </div>
+
+      <div class="pill">
+        <button class="btn" id="undoBtn">Undo</button>
+        <button class="btn" id="redoBtn">Redo</button>
+      </div>
+
+      <div class="pill">
+        <button class="btn" id="saveBtn">Save JSON</button>
+        <button class="btn" id="loadBtn">Load JSON</button>
+        <input type="file" id="jsonFile" accept="application/json" hidden />
+      </div>
+
+      <div class="pill">
+        <span>Zoom</span>
+        <button class="btn" id="zoomOut">−</button>
+        <button class="btn" id="zoomIn">+</button>
+        <button class="btn" id="zoomReset">Reset</button>
+      </div>
+
+      <div class="pill">
+        <span>Tip:</span>
+        <span><span class="kbd">Space</span> drag = pan</span>
+        <span>•</span>
+        <span><span class="kbd">Ctrl</span> + wheel = zoom</span>
+      </div>
+    </div>
+
+    <div class="main">
+      <!-- LEFT ELEMENTS PANEL -->
+      <aside class="panel left" id="leftPanel">
+        <div class="panelHead">
+          <div class="title">Elements</div>
+          <button class="btn ghost" id="collapseLeft" title="Collapse">⟷</button>
+        </div>
+
+        <div class="leftTabs" id="tabs">
+          <button class="tab on" data-tab="basic">Basic</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="shapes">Shapes</button>
+          <button class="tab" data-tab="flow">Flow</button>
+          <button class="tab" data-tab="templates">Templates</button>
+        </div>
+
+        <div class="panelBody">
+          <div class="leftSearch">
+            🔎 <input id="elSearch" placeholder="Search elements..." />
+          </div>
+
+          <div class="tabPane" data-pane="basic">
+            <div class="secTitle">Quick add</div>
+            <div class="elementsGrid" id="basicGrid"></div>
+          </div>
+
+          <div class="tabPane" data-pane="notes" hidden>
+            <div class="secTitle">Sticky notes</div>
+            <div class="elementsGrid" id="notesGrid"></div>
+          </div>
+
+          <div class="tabPane" data-pane="shapes" hidden>
+            <div class="secTitle">Shapes</div>
+            <div class="elementsGrid" id="shapesGrid"></div>
+          </div>
+
+          <div class="tabPane" data-pane="flow" hidden>
+            <div class="secTitle">Flowchart</div>
+            <div class="elementsGrid" id="flowGrid"></div>
+          </div>
+
+          <div class="tabPane" data-pane="templates" hidden>
+            <div class="secTitle">Board templates</div>
+
+            <div class="tmpl" data-template="brainstorm">
+              <div class="ico" aria-hidden="true">🧠</div>
+              <div>
+                <div class="tName">Brainstorm board</div>
+                <div class="tMeta">3 columns + sticky notes starter</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="kanban">
+              <div class="ico" aria-hidden="true">🗂️</div>
+              <div>
+                <div class="tName">Mini Kanban</div>
+                <div class="tMeta">To do / Doing / Done</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="flow">
+              <div class="ico" aria-hidden="true">🔁</div>
+              <div>
+                <div class="tName">Flow diagram</div>
+                <div class="tMeta">Start → Process → Decision → End</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="swot">
+              <div class="ico" aria-hidden="true">📊</div>
+              <div>
+                <div class="tName">SWOT Analysis</div>
+                <div class="tMeta">Strengths / Weaknesses / Opportunities / Threats</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="timeline">
+              <div class="ico" aria-hidden="true">📅</div>
+              <div>
+                <div class="tName">Timeline</div>
+                <div class="tMeta">Horizontal timeline with milestones</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="mindmap">
+              <div class="ico" aria-hidden="true">🌳</div>
+              <div>
+                <div class="tName">Mind Map</div>
+                <div class="tMeta">Central idea with branching thoughts</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="journey">
+              <div class="ico" aria-hidden="true">🚶</div>
+              <div>
+                <div class="tName">User Journey</div>
+                <div class="tMeta">User experience flow steps</div>
+              </div>
+            </div>
+
+            <div class="tmpl" data-template="agenda">
+              <div class="ico" aria-hidden="true">📋</div>
+              <div>
+                <div class="tName">Meeting Agenda</div>
+                <div class="tMeta">Structured meeting template</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </aside>
+
+      <!-- STAGE -->
+      <div class="stage" id="stage">
+        <div class="grid" id="grid"></div>
+        <canvas id="ink"></canvas>
+        <div class="overlay" id="overlay"></div>
+        <div class="footerMark">Powered by Logic Lab</div>
+      </div>
+
+      <!-- RIGHT PROPERTIES PANEL -->
+      <aside class="panel right" id="rightPanel">
+        <div class="panelHead">
+          <div class="title">Properties</div>
+          <button class="btn ghost" id="collapseRight" title="Collapse">⟷</button>
+        </div>
+
+        <div class="panelBody">
+          <div class="hint" id="propHint">
+            Select an item to edit its properties (position, size, colors, text).
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="secTitle">Transform</div>
+          <div class="propRow">
+            <div class="field">
+              <label for="px">X</label>
+              <input id="px" type="number" step="1" />
+            </div>
+            <div class="field">
+              <label for="py">Y</label>
+              <input id="py" type="number" step="1" />
+            </div>
+            <div class="field">
+              <label for="pw">Width</label>
+              <input id="pw" type="number" step="1" />
+            </div>
+            <div class="field">
+              <label for="ph">Height</label>
+              <input id="ph" type="number" step="1" />
+            </div>
+          </div>
+
+          <div class="row">
+            <span class="mini">Snap</span>
+            <button class="btn" id="nudgeLeft">←</button>
+            <button class="btn" id="nudgeUp">↑</button>
+            <button class="btn" id="nudgeDown">↓</button>
+            <button class="btn" id="nudgeRight">→</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="secTitle">Style</div>
+          <div class="field">
+            <label for="stroke">Border / Stroke</label>
+            <input id="stroke" type="color" />
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label for="fill">Fill</label>
+            <input id="fill" type="color" />
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="secTitle">Text</div>
+          <div class="field">
+            <label for="tvalue">Content</label>
+            <input id="tvalue" type="text" />
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label for="fontSize">Font size</label>
+            <input id="fontSize" type="range" min="10" max="60" value="20" />
+            <div class="row" style="margin-top:8px;">
+              <span class="mini" id="fontSizeVal">20</span>
+              <select id="fontWeight">
+                <option value="400">Regular</option>
+                <option value="700">Bold</option>
+                <option value="900" selected>Extra Bold</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="secTitle">Actions</div>
+          <div class="row">
+            <button class="btn" id="dupBtn">Duplicate</button>
+            <button class="btn danger" id="delBtn">Delete</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const $ = (s, r=document) => r.querySelector(s);
+      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+      const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
+      const uid = () => Math.random().toString(36).slice(2,10);
+
+      const stage = $("#stage");
+      const grid = $("#grid");
+      const ink = $("#ink");
+      const ctx = ink.getContext("2d");
+      const overlay = $("#overlay");
+
+      const strokeColor = $("#strokeColor");
+      const strokeSize = $("#strokeSize");
+      const strokeSizeVal = $("#strokeSizeVal");
+      const snapCb = $("#snap");
+
+      // Right panel controls
+      const propHint = $("#propHint");
+      const px = $("#px"), py = $("#py"), pw = $("#pw"), ph = $("#ph");
+      const stroke = $("#stroke"), fill = $("#fill");
+      const tvalue = $("#tvalue");
+      const fontSize = $("#fontSize"), fontSizeVal = $("#fontSizeVal");
+      const fontWeight = $("#fontWeight");
+      const delBtn = $("#delBtn"), dupBtn = $("#dupBtn");
+      const nudgeLeft = $("#nudgeLeft"), nudgeRight = $("#nudgeRight"), nudgeUp = $("#nudgeUp"), nudgeDown = $("#nudgeDown");
+
+      const state = {
+        tool: "select",
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+
+        isDown:false,
+        drag:null,
+        resize:null,
+        currentStroke:null,
+
+        items: [],
+        selectedId: null,
+
+        strokes: [],
+
+        undo: [],
+        redo: [],
+
+        spaceDown:false
+      };
+
+      const GRID = 20;
+
+      // PAN_ZOOM_START
+      let needsRedraw = false;
+
+      function scheduleRedraw() {
+        if (!needsRedraw) {
+          needsRedraw = true;
+          requestAnimationFrame(() => {
+            redraw();
+            needsRedraw = false;
+          });
+        }
+      }
+
+      function updateCursor() {
+        const canPan = state.tool === "pan" || state.spaceDown;
+        stage.style.cursor = canPan ? "grab" : "";
+      }
+
+      function updateGrid(){
+        const major = 80 * state.zoom;
+        const minor = 20 * state.zoom;
+        const oxMajor = ((state.panX % major) + major) % major;
+        const oyMajor = ((state.panY % major) + major) % major;
+        const oxMinor = ((state.panX % minor) + minor) % minor;
+        const oyMinor = ((state.panY % minor) + minor) % minor;
+        grid.style.backgroundPosition =
+            `${oxMajor}px ${oyMajor}px, ${oxMajor}px ${oyMajor}px, ${oxMinor}px ${oyMinor}px, ${oxMinor}px ${oyMinor}px`;
+        grid.style.transform = `scale(${state.zoom})`;
+      }
+
+      function updateView(){
+        overlay.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+        updateGrid();
+      }
+      // PAN_ZOOM_END
+      const snap = (v) => snapCb.checked ? Math.round(v/GRID)*GRID : v;
+
+      // ===== Left panel data =====
+      const ELEMENTS = [
+        {tab:"basic", key:"note", name:"Sticky note", meta:"Editable note", icon:"note"},
+        {tab:"basic", key:"text", name:"Text box", meta:"Editable text", icon:"text"},
+        {tab:"basic", key:"rect", name:"Rectangle", meta:"Resizable shape", icon:"rect"},
+        {tab:"basic", key:"circle", name:"Circle", meta:"Resizable shape", icon:"circle"},
+
+        {tab:"notes", key:"note_yellow", name:"Yellow sticky", meta:"Classic", icon:"note", color:"#fff4a3"},
+        {tab:"notes", key:"note_blue", name:"Blue sticky", meta:"Idea", icon:"note", color:"#c7e7ff"},
+        {tab:"notes", key:"note_green", name:"Green sticky", meta:"Done", icon:"note", color:"#c9f7d4"},
+        {tab:"notes", key:"note_pink", name:"Pink sticky", meta:"Hot", icon:"note", color:"#ffd2e1"},
+
+        {tab:"shapes", key:"rect", name:"Rectangle", meta:"", icon:"rect"},
+        {tab:"shapes", key:"circle", name:"Circle", meta:"", icon:"circle"},
+        {tab:"shapes", key:"diamond", name:"Diamond", meta:"Decision", icon:"diamond"},
+
+        {tab:"flow", key:"flow_start", name:"Start / End", meta:"Pill", icon:"pill"},
+        {tab:"flow", key:"flow_process", name:"Process", meta:"Rectangle", icon:"rect"},
+        {tab:"flow", key:"flow_decision", name:"Decision", meta:"Diamond", icon:"diamond"},
+        {tab:"flow", key:"flow_note", name:"Annotation", meta:"Sticky", icon:"note"},
+      ];
+
+      function iconSVG(type){
+        const base = {
+          note: `<svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12v14l-4 2H6V4Z" stroke="currentColor" stroke-width="2"/><path d="M14 18v2" stroke="currentColor" stroke-width="2"/></svg>`,
+          text: `<svg viewBox="0 0 24 24" fill="none"><path d="M6 6h12M9 6v12m6-12v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+          rect: `<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="7" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/></svg>`,
+          circle:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="6.5" stroke="currentColor" stroke-width="2"/></svg>`,
+          diamond:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 4 20 12 12 20 4 12 12 4Z" stroke="currentColor" stroke-width="2"/></svg>`,
+          pill:`<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="9" width="14" height="6" rx="3" stroke="currentColor" stroke-width="2"/></svg>`,
+        };
+        return base[type] || base.rect;
+      }
+
+      function mountElements(){
+        const makeCard = (elDef) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.dataset.name = elDef.name.toLowerCase();
+          div.innerHTML = `
+            <div class="thumb">
+              <div class="ico" aria-hidden="true">${iconSVG(elDef.icon)}</div>
+            </div>
+            <div class="name">${elDef.name}</div>
+            <div class="meta">${elDef.meta || ""}</div>
+          `;
+          div.addEventListener("click", () => addFromElement(elDef));
+          return div;
+        };
+
+        const basicGrid = $("#basicGrid");
+        const notesGrid = $("#notesGrid");
+        const shapesGrid = $("#shapesGrid");
+        const flowGrid = $("#flowGrid");
+
+        [basicGrid, notesGrid, shapesGrid, flowGrid].forEach(g => g.innerHTML = "");
+
+        for (const def of ELEMENTS){
+          const card = makeCard(def);
+          if (def.tab === "basic") basicGrid.appendChild(card);
+          if (def.tab === "notes") notesGrid.appendChild(card);
+          if (def.tab === "shapes") shapesGrid.appendChild(card);
+          if (def.tab === "flow") flowGrid.appendChild(card);
+        }
+      }
+
+      function filterElements(q){
+        q = (q||"").trim().toLowerCase();
+        const activeTab = $("#tabs .tab.on")?.dataset.tab || "basic";
+        const pane = $(`.tabPane[data-pane="${activeTab}"]`);
+        if (!pane) return;
+        const cards = $$(".card", pane);
+        for (const c of cards){
+          const hit = !q || c.dataset.name.includes(q);
+          c.style.display = hit ? "" : "none";
+        }
+      }
+
+      function switchTab(tab){
+        $$("#tabs .tab").forEach(t => t.classList.toggle("on", t.dataset.tab === tab));
+        $$(".tabPane").forEach(p => p.hidden = p.dataset.pane !== tab);
+        $("#elSearch").value = "";
+        filterElements("");
+      }
+
+      $("#tabs").addEventListener("click", (e) => {
+        const btn = e.target.closest(".tab");
+        if (!btn) return;
+        switchTab(btn.dataset.tab);
+      });
+
+      $("#elSearch").addEventListener("input", (e) => filterElements(e.target.value));
+
+      $$(".tmpl").forEach(t => t.addEventListener("click", () => applyTemplate(t.dataset.template)));
+
+      $("#collapseLeft").addEventListener("click", () => {
+        $("#leftPanel").style.display = "none";
+        alert("Left panel hidden in this demo. Refresh to show again (or add a toggle).");
+      });
+
+      $("#collapseRight").addEventListener("click", () => {
+        $("#rightPanel").style.display = "none";
+        alert("Right panel hidden in this demo. Refresh to show again (or add a toggle).");
+      });
+
+      // ===== Canvas sizing =====
+      function resizeCanvas(){
+        const r = stage.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        ink.width = Math.floor(r.width*dpr);
+        ink.height = Math.floor(r.height*dpr);
+        ink.style.width = r.width+"px";
+        ink.style.height = r.height+"px";
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        scheduleRedraw();
+      }
+      window.addEventListener("resize", resizeCanvas);
+
+     function applyTransforms(){
+  overlay.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  // grid transform handled by applyGridTransform()
+}
+
+
+      function screenToWorld(cx, cy){
+        const r = stage.getBoundingClientRect();
+        return {
+          x: (cx - r.left - state.panX) / state.zoom,
+          y: (cy - r.top  - state.panY) / state.zoom
+        };
+      }
+
+      function fitToContent(padding=120){
+  if (!state.items.length && !state.strokes.length) return;
+
+  // bounds from items (strokes ignored for simplicity)
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  for (const it of state.items){
+    minX = Math.min(minX, it.x);
+    minY = Math.min(minY, it.y);
+    maxX = Math.max(maxX, it.x + it.w);
+    maxY = Math.max(maxY, it.y + it.h);
+  }
+
+  const w = maxX - minX;
+  const h = maxY - minY;
+
+  const r = stage.getBoundingClientRect();
+  const zx = (r.width - padding) / w;
+  const zy = (r.height - padding) / h;
+  state.zoom = Math.max(0.25, Math.min(3, Math.min(zx, zy)));
+
+  // center bounds in viewport
+  const cx = minX + w/2;
+  const cy = minY + h/2;
+  state.panX = r.width/2 - cx * state.zoom;
+  state.panY = r.height/2 - cy * state.zoom;
+
+  scheduleRedraw();
+}
+
+
+      function setTool(t){
+        state.tool = t;
+        $$("#toolrow [data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === t));
+        updateCursor();
+      }
+
+      function snapshot(){
+        state.undo.push(JSON.stringify(serialize()));
+        if (state.undo.length > 60) state.undo.shift();
+        state.redo.length = 0;
+        updateUndoRedo();
+      }
+      function updateUndoRedo(){
+        $("#undoBtn").disabled = state.undo.length === 0;
+        $("#redoBtn").disabled = state.redo.length === 0;
+      }
+      function undo(){
+        if (!state.undo.length) return;
+        state.redo.push(JSON.stringify(serialize()));
+        const prev = state.undo.pop();
+        load(JSON.parse(prev), true);
+        updateUndoRedo();
+      }
+      function redo(){
+        if (!state.redo.length) return;
+        state.undo.push(JSON.stringify(serialize()));
+        const next = state.redo.pop();
+        load(JSON.parse(next), true);
+        updateUndoRedo();
+      }
+
+      function beginStroke(p){
+        state.currentStroke = {
+          id: uid(),
+          mode: state.tool,
+          color: strokeColor.value,
+          size: Number(strokeSize.value),
+          points: [p]
+        };
+      }
+      function addPoint(p){ state.currentStroke?.points.push(p); }
+      function endStroke(){
+        if (!state.currentStroke) return;
+        state.strokes.push(state.currentStroke);
+        state.currentStroke = null;
+        snapshot();
+        redraw();
+      }
+      function drawStroke(s, c){
+        if (!s.points?.length) return;
+        c.save();
+        c.lineJoin="round";
+        c.lineCap="round";
+        c.lineWidth = s.size;
+        if (s.mode === "eraser"){
+          c.globalCompositeOperation = "destination-out";
+          c.strokeStyle = "rgba(0,0,0,1)";
+        } else {
+          c.globalCompositeOperation = "source-over";
+          c.strokeStyle = s.color;
+        }
+        c.beginPath();
+        c.moveTo(s.points[0].x, s.points[0].y);
+        for (let i=1;i<s.points.length;i++) c.lineTo(s.points[i].x, s.points[i].y);
+        c.stroke();
+        c.restore();
+      }
+      function clearCanvas(){
+        const r = stage.getBoundingClientRect();
+        ctx.clearRect(0,0,r.width,r.height);
+      }
+
+      function redraw(){
+        clearCanvas();
+        ctx.save();
+        ctx.translate(state.panX, state.panY);
+        ctx.scale(state.zoom, state.zoom);
+        for (const s of state.strokes) drawStroke(s, ctx);
+        if (state.currentStroke) drawStroke(state.currentStroke, ctx);
+        ctx.restore();
+        syncOverlay();
+        updateView();
+        syncProps(); // keep right panel updated
+      }
+
+      function setSelected(id){
+        state.selectedId = id;
+        syncOverlay();
+        syncProps();
+      }
+      function deselect(){
+        state.selectedId = null;
+        syncOverlay();
+        syncProps();
+      }
+      function getItem(id){ return state.items.find(x => x.id === id) || null; }
+
+      function ensureHandles(el, id){
+        if (el.querySelector(".handle")) return;
+        ["nw","ne","sw","se"].forEach(c => {
+          const h = document.createElement("div");
+          h.className = `handle ${c}`;
+          h.addEventListener("pointerdown", (e)=>startResize(e, id, c));
+          el.appendChild(h);
+        });
+      }
+
+      // ===== Right panel sync / apply =====
+      let propLock = false;
+
+      function syncProps(){
+        const it = getItem(state.selectedId);
+        propLock = true;
+
+        const has = !!it;
+        propHint.textContent = has
+          ? `Editing: ${prettyType(it)}`
+          : "Select an item to edit its properties (position, size, colors, text).";
+
+        [px,py,pw,ph,stroke,fill,tvalue,fontSize,fontWeight,delBtn,dupBtn,nudgeLeft,nudgeRight,nudgeUp,nudgeDown]
+          .forEach(el => el.disabled = !has);
+
+        if (!has){
+          px.value = py.value = pw.value = ph.value = "";
+          stroke.value = "#2563eb";
+          fill.value = "#c7ddff";
+          tvalue.value = "";
+          fontSize.value = 20;
+          fontSizeVal.textContent = "20";
+          fontWeight.value = "900";
+          propLock = false;
+          return;
+        }
+
+        px.value = Math.round(it.x);
+        py.value = Math.round(it.y);
+        pw.value = Math.round(it.w);
+        ph.value = Math.round(it.h);
+
+        // colors
+        if (it.type === "note"){
+          stroke.value = (it.stroke || "#111827");
+          fill.value = (it.bg || "#fff4a3");
+        } else if (["rect","circle","diamond","pill"].includes(it.type)){
+          stroke.value = toHex(it.stroke || strokeColor.value);
+          fill.value = toHex(it.fill || "rgba(37,99,235,.10)");
+        } else {
+          stroke.value = toHex(it.stroke || strokeColor.value);
+          fill.value = toHex(it.fill || "rgba(37,99,235,.10)");
+        }
+
+        // text
+        if (it.type === "text"){
+          tvalue.value = it.text || "";
+          fontSize.value = it.fontSize || 20;
+          fontWeight.value = String(it.fontWeight || 900);
+        } else if (it.type === "note"){
+          tvalue.value = it.text || "";
+          fontSize.value = it.fontSize || 14;
+          fontWeight.value = String(it.fontWeight || 400);
+        } else {
+          tvalue.value = it.label || "";
+          fontSize.value = it.fontSize || 20;
+          fontWeight.value = String(it.fontWeight || 900);
+        }
+        fontSizeVal.textContent = String(fontSize.value);
+
+        propLock = false;
+      }
+
+      function prettyType(it){
+        const map = { note:"Sticky note", text:"Text", rect:"Rectangle", circle:"Circle", diamond:"Diamond", pill:"Pill" };
+        return map[it.type] || it.type;
+      }
+
+      function applyProp(fn){
+        const it = getItem(state.selectedId);
+        if (!it) return;
+        snapshot();
+        fn(it);
+        scheduleRedraw();
+      }
+
+      function toHex(anyColor){
+        // Accept #RRGGBB or rgba(...) — best-effort conversion for demo
+        if (!anyColor) return "#2563eb";
+        if (typeof anyColor !== "string") return "#2563eb";
+        const c = anyColor.trim();
+        if (c.startsWith("#") && (c.length === 7 || c.length === 4)) return normalizeHex(c);
+        const m = c.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+        if (m){
+          const r = Number(m[1]).toString(16).padStart(2,"0");
+          const g = Number(m[2]).toString(16).padStart(2,"0");
+          const b = Number(m[3]).toString(16).padStart(2,"0");
+          return `#${r}${g}${b}`;
+        }
+        return "#2563eb";
+      }
+
+      function normalizeHex(h){
+        if (h.length === 7) return h.toLowerCase();
+        // #rgb -> #rrggbb
+        const r = h[1], g = h[2], b = h[3];
+        return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+      }
+
+      function hexToRGBA(hex, alpha=0.12){
+        const h = normalizeHex(hex);
+        const r = parseInt(h.slice(1,3),16);
+        const g = parseInt(h.slice(3,5),16);
+        const b = parseInt(h.slice(5,7),16);
+        return `rgba(${r},${g},${b},${alpha})`;
+      }
+
+      // Transform inputs
+      [px,py,pw,ph].forEach(inp => {
+        inp.addEventListener("input", () => {
+          if (propLock) return;
+          applyProp(it => {
+            it.x = snap(Number(px.value || it.x));
+            it.y = snap(Number(py.value || it.y));
+            it.w = Math.max(60, snap(Number(pw.value || it.w)));
+            it.h = Math.max(40, snap(Number(ph.value || it.h)));
+          });
+        });
+      });
+
+      // Style inputs
+      stroke.addEventListener("input", () => {
+        if (propLock) return;
+        applyProp(it => {
+          if (it.type === "note"){
+            it.stroke = stroke.value;
+          } else {
+            it.stroke = stroke.value;
+          }
+        });
+      });
+
+      fill.addEventListener("input", () => {
+        if (propLock) return;
+        applyProp(it => {
+          if (it.type === "note"){
+            it.bg = fill.value;
+          } else {
+            // keep Canva-ish translucent fill
+            it.fill = hexToRGBA(fill.value, 0.14);
+          }
+        });
+      });
+
+      // Text inputs
+      tvalue.addEventListener("input", () => {
+        if (propLock) return;
+        applyProp(it => {
+          if (it.type === "text"){
+            it.text = tvalue.value;
+          } else if (it.type === "note"){
+            it.text = tvalue.value;
+          } else {
+            it.label = tvalue.value;
+          }
+        });
+      });
+
+      fontSize.addEventListener("input", () => {
+        fontSizeVal.textContent = String(fontSize.value);
+        if (propLock) return;
+        applyProp(it => it.fontSize = Number(fontSize.value));
+      });
+
+      fontWeight.addEventListener("change", () => {
+        if (propLock) return;
+        applyProp(it => it.fontWeight = Number(fontWeight.value));
+      });
+
+      // Nudge buttons
+      const nudge = (dx, dy) => applyProp(it => { it.x = snap(it.x + dx); it.y = snap(it.y + dy); });
+      nudgeLeft.addEventListener("click", ()=> nudge(-GRID, 0));
+      nudgeRight.addEventListener("click", ()=> nudge(GRID, 0));
+      nudgeUp.addEventListener("click", ()=> nudge(0, -GRID));
+      nudgeDown.addEventListener("click", ()=> nudge(0, GRID));
+
+      // Actions
+      delBtn.addEventListener("click", () => {
+        if (!state.selectedId) return;
+        const idx = state.items.findIndex(it => it.id === state.selectedId);
+        if (idx >= 0){
+          snapshot();
+          state.items.splice(idx,1);
+          state.selectedId = null;
+          scheduleRedraw();
+        }
+      });
+
+      dupBtn.addEventListener("click", () => {
+        const it = getItem(state.selectedId);
+        if (!it) return;
+        snapshot();
+        const copy = JSON.parse(JSON.stringify(it));
+        copy.id = uid();
+        copy.x = snap(copy.x + 40);
+        copy.y = snap(copy.y + 40);
+        state.items.push(copy);
+        setSelected(copy.id);
+        scheduleRedraw();
+      });
+
+      // ===== Overlay rendering =====
+      function syncOverlay(){
+        for (const el of $$(".item", overlay)){
+          if (!state.items.some(it => it.id === el.dataset.id)) el.remove();
+        }
+
+        for (const it of state.items){
+          let el = $(`.item[data-id="${it.id}"]`, overlay);
+          if (!el){
+            el = document.createElement("div");
+            el.className = "item";
+            el.dataset.id = it.id;
+            el.addEventListener("pointerdown", onItemDown);
+            el.addEventListener("dblclick", onItemDbl);
+            overlay.appendChild(el);
+          }
+
+          el.style.left = it.x + "px";
+          el.style.top  = it.y + "px";
+          el.style.width  = it.w + "px";
+          el.style.height = it.h + "px";
+          el.classList.toggle("selected", state.selectedId === it.id);
+
+          el.classList.toggle("note", it.type === "note");
+          el.classList.toggle("textbox", it.type === "text");
+          el.classList.toggle("shape", ["rect","circle","diamond","pill"].includes(it.type));
+          el.classList.toggle("circle", it.type === "circle");
+          el.classList.toggle("diamond", it.type === "diamond");
+
+          if (it.type === "note"){
+            el.style.background = it.bg || "#fff4a3";
+            if (!el.querySelector("textarea")){
+              el.innerHTML = `
+                <div class="top"><span>${it.label || "Sticky"}</span><span>📌</span></div>
+                <textarea spellcheck="false" placeholder="Type..."></textarea>
+              `;
+              const ta = el.querySelector("textarea");
+              ta.value = it.text || "";
+              ta.addEventListener("input", ()=> { it.text = ta.value; syncProps(); });
+              ta.addEventListener("change", ()=> snapshot());
+            } else {
+              const ta = el.querySelector("textarea");
+              if (ta.value !== (it.text||"")) ta.value = it.text||"";
+              const title = el.querySelector(".top span:first-child");
+              if (title) title.textContent = it.label || "Sticky";
+            }
+            if (it.fontSize) el.querySelector("textarea").style.fontSize = it.fontSize + "px";
+            if (it.fontWeight) el.querySelector("textarea").style.fontWeight = it.fontWeight;
+          }
+
+          if (it.type === "text"){
+            if (!el.dataset.inited){
+              el.dataset.inited = "1";
+              el.textContent = it.text || "Double-click to edit";
+            } else if (!el.isContentEditable){
+              el.textContent = it.text || "";
+            }
+            el.style.fontSize = (it.fontSize || 20) + "px";
+            el.style.fontWeight = (it.fontWeight || 900);
+          }
+
+          if (["rect","circle","diamond","pill"].includes(it.type)){
+            el.style.borderColor = it.stroke || "rgba(2,6,23,.35)";
+            el.style.background = it.fill || "rgba(37,99,235,.10)";
+            if (it.type === "pill"){
+              el.style.borderRadius = "999px";
+              el.style.transform = "none";
+              // optional label display
+              el.textContent = it.label || "";
+              el.style.display = "grid";
+              el.style.placeItems = "center";
+              el.style.fontSize = (it.fontSize || 18) + "px";
+              el.style.fontWeight = (it.fontWeight || 900);
+              el.style.color = "rgba(2,6,23,.85)";
+            } else {
+              // ensure shapes don't keep pill text
+              if (it.type !== "note" && it.type !== "text"){
+                el.textContent = "";
+                el.style.display = "";
+              }
+            }
+          }
+
+          ensureHandles(el, it.id);
+        }
+      }
+
+      // ===== Item interactions =====
+      function onItemDown(e){
+        if (state.tool !== "select" && !state.spaceDown) return;
+        if (state.spaceDown) return;
+
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it) return;
+
+        if (e.target.tagName.toLowerCase() === "textarea" || e.target.isContentEditable) return;
+
+        setSelected(it.id);
+        const p = screenToWorld(e.clientX, e.clientY);
+        state.drag = { id: it.id, sx: p.x, sy: p.y, ox: it.x, oy: it.y };
+        el.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+      }
+
+      function onItemDbl(e){
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it || it.type !== "text") return;
+
+        el.contentEditable = "true";
+        el.focus();
+
+        const done = () => {
+          el.contentEditable = "false";
+          it.text = el.textContent || "";
+          snapshot();
+          syncProps();
+          el.removeEventListener("blur", done);
+          el.removeEventListener("keydown", onKey);
+        };
+        const onKey = (ev) => {
+          if (ev.key === "Escape"){ el.textContent = it.text || ""; el.blur(); }
+          if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); el.blur(); }
+        };
+        el.addEventListener("blur", done);
+        el.addEventListener("keydown", onKey);
+      }
+
+      function startResize(e, id, corner){
+        if (state.tool !== "select") return;
+        const it = getItem(id);
+        if (!it) return;
+        setSelected(id);
+
+        const p = screenToWorld(e.clientX, e.clientY);
+        state.resize = { id, corner, sx: p.x, sy: p.y, ox: it.x, oy: it.y, ow: it.w, oh: it.h };
+
+        e.currentTarget.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      overlay.addEventListener("pointermove", (e) => {
+        if (state.drag){
+          const it = getItem(state.drag.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          it.x = snap(state.drag.ox + (p.x - state.drag.sx));
+          it.y = snap(state.drag.oy + (p.y - state.drag.sy));
+          syncOverlay();
+          syncProps();
+        }
+        if (state.resize){
+          const it = getItem(state.resize.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          const dx = p.x - state.resize.sx;
+          const dy = p.y - state.resize.sy;
+
+          let x=state.resize.ox, y=state.resize.oy, w=state.resize.ow, h=state.resize.oh;
+          const c = state.resize.corner;
+          if (c.includes("e")) w = state.resize.ow + dx;
+          if (c.includes("s")) h = state.resize.oh + dy;
+          if (c.includes("w")) { w = state.resize.ow - dx; x = state.resize.ox + dx; }
+          if (c.includes("n")) { h = state.resize.oh - dy; y = state.resize.oy + dy; }
+
+          w = Math.max(80, w); h = Math.max(50, h);
+          it.x = snap(x); it.y = snap(y); it.w = snap(w); it.h = snap(h);
+          syncOverlay();
+          syncProps();
+        }
+      });
+
+      overlay.addEventListener("pointerup", () => {
+        if (state.drag){ state.drag = null; snapshot(); }
+        if (state.resize){ state.resize = null; snapshot(); }
+      });
+
+      // ===== Add items =====
+      function addItem(type, opts={}){
+        const center = screenToWorld(stage.getBoundingClientRect().left + stage.clientWidth*0.5,
+                                     stage.getBoundingClientRect().top + stage.clientHeight*0.5);
+
+        const it = { id: uid(), type, x: snap(center.x-120), y: snap(center.y-80), w: 240, h: 160 };
+
+        if (type === "note"){
+          it.w = 240; it.h = 170; it.text = "";
+          it.bg = opts.bg || "#fff4a3";
+          it.label = opts.label || "Sticky";
+          it.fontSize = opts.fontSize || 14;
+          it.fontWeight = opts.fontWeight || 400;
+        }
+        if (type === "text"){
+          it.w = 260; it.h = 80;
+          it.text = opts.text || "Double-click to edit";
+          it.fontSize = opts.fontSize || 20;
+          it.fontWeight = opts.fontWeight || 900;
+        }
+        if (type === "circle" || type === "diamond"){
+          it.w = 170; it.h = 170;
+        }
+        if (type === "pill"){
+          it.w = 220; it.h = 70;
+          it.label = opts.label || "Start / End";
+          it.fontSize = opts.fontSize || 18;
+          it.fontWeight = opts.fontWeight || 900;
+        }
+        if (["rect","circle","diamond","pill"].includes(type)){
+          it.stroke = opts.stroke || strokeColor.value;
+          it.fill = opts.fill || "rgba(37,99,235,.10)";
+        }
+
+        state.items.push(it);
+        snapshot();
+        setSelected(it.id);
+        scheduleRedraw();
+
+        if (type === "note"){
+          setTimeout(()=> $(`.item[data-id="${it.id}"] textarea`, overlay)?.focus(), 0);
+        }
+      }
+
+      function addFromElement(def){
+        if (def.key.startsWith("note_")){
+          addItem("note", { bg: def.color || "#fff4a3", label: def.name.replace(" sticky","") });
+          return;
+        }
+        if (def.key === "note"){ addItem("note"); return; }
+        if (def.key === "text"){ addItem("text"); return; }
+        if (def.key === "rect"){ addItem("rect"); return; }
+        if (def.key === "circle"){ addItem("circle"); return; }
+        if (def.key === "diamond"){ addItem("diamond"); return; }
+        if (def.key === "flow_start"){
+          addItem("pill", { fill:"rgba(22,163,74,.12)", stroke:"rgba(22,163,74,.55)", label:"Start / End" });
+          return;
+        }
+        if (def.key === "flow_process"){
+          addItem("rect", { fill:"rgba(37,99,235,.12)", stroke:"rgba(37,99,235,.55)" });
+          addItem("text", { text:"Process" });
+          return;
+        }
+        if (def.key === "flow_decision"){
+          addItem("diamond", { fill:"rgba(245,158,11,.14)", stroke:"rgba(245,158,11,.65)" });
+          addItem("text", { text:"Decision" });
+          return;
+        }
+        if (def.key === "flow_note"){
+          addItem("note", { bg:"#c7e7ff", label:"Note" });
+          return;
+        }
+      }
+
+      // ===== Zoom/pan =====
+      function setZoom(z, anchor){
+        z = clamp(z, 0.25, 3.0);
+        if (anchor){
+          const before = screenToWorld(anchor.x, anchor.y);
+          state.zoom = z;
+          const after = screenToWorld(anchor.x, anchor.y);
+          state.panX += (after.x - before.x) * state.zoom;
+          state.panY += (after.y - before.y) * state.zoom;
+        } else {
+          state.zoom = z;
+        }
+        scheduleRedraw();
+      }
+
+      // Stage drawing/pan/select
+      stage.addEventListener("pointerdown", (e) => {
+        if (e.target.closest(".item")) return;
+
+        state.isDown = true;
+        const tool = state.spaceDown ? "pan" : state.tool;
+
+        if (tool === "select"){ deselect(); return; }
+
+        if (tool === "pan"){
+          stage.setPointerCapture(e.pointerId);
+          state.drag = { mode:"pan", cx:e.clientX, cy:e.clientY, px: state.panX, py: state.panY };
+          stage.style.cursor = "grabbing";
+          return;
+        }
+
+        const p = screenToWorld(e.clientX, e.clientY);
+        if (tool === "pen" || tool === "eraser"){
+          stage.setPointerCapture(e.pointerId);
+          beginStroke(p);
+          scheduleRedraw();
+        }
+      });
+
+      stage.addEventListener("pointermove", (e) => {
+        if (!state.isDown) return;
+
+        const tool = state.spaceDown ? "pan" : state.tool;
+
+        if (state.drag && state.drag.mode === "pan"){
+          state.panX = state.drag.px + (e.clientX - state.drag.cx);
+          state.panY = state.drag.py + (e.clientY - state.drag.cy);
+          scheduleRedraw();
+          return;
+        }
+
+        if (tool === "pen" || tool === "eraser"){
+          const p = screenToWorld(e.clientX, e.clientY);
+          addPoint(p);
+          scheduleRedraw();
+        }
+      });
+
+      stage.addEventListener("pointerup", () => {
+        state.isDown = false;
+        if (state.drag && state.drag.mode === "pan"){ 
+          state.drag = null; 
+          updateCursor();
+          return; 
+        }
+        if (state.tool === "pen" || state.tool === "eraser") endStroke();
+      });
+      stage.addEventListener("pointercancel", () => { 
+        state.isDown=false; 
+        state.drag=null; 
+        updateCursor();
+      });
+
+      stage.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const factor = Math.exp(-e.deltaY * 0.0015);
+        setZoom(state.zoom * factor, {x:e.clientX, y:e.clientY});
+      }, {passive:false});
+
+      // ===== Templates (simple) =====
+      function applyTemplate(name){
+        if (!confirm("Apply template? This will add elements to the board.")) return;
+        snapshot();
+
+        const center = screenToWorld(stage.getBoundingClientRect().left + stage.clientWidth*0.5,
+                                     stage.getBoundingClientRect().top + stage.clientHeight*0.5);
+
+        const baseX = center.x - 380;
+        const baseY = center.y - 240;
+
+        const addText = (text, x, y) => {
+          state.items.push({ id: uid(), type:"text", x:snap(x), y:snap(y), w:240, h:70, text, fontSize:20, fontWeight:900 });
+        };
+
+        const addColumn = (title, x) => {
+          addText(title, x, baseY);
+          state.items.push({
+            id: uid(), type:"rect",
+            x:snap(x), y:snap(baseY+70), w:snap(260), h:snap(360),
+            stroke:"rgba(2,6,23,.20)", fill:"rgba(2,6,23,.03)"
+          });
+        };
+
+        if (name === "brainstorm" || name === "kanban"){
+          addColumn(name === "brainstorm" ? "Ideas" : "To do", baseX);
+          addColumn(name === "brainstorm" ? "Build" : "Doing", baseX+290);
+          addColumn(name === "brainstorm" ? "Next" : "Done", baseX+580);
+
+          const colors = name === "brainstorm"
+            ? ["#fff4a3","#c7e7ff","#c9f7d4","#ffd2e1"]
+            : ["#fff4a3","#c7e7ff","#c9f7d4"];
+
+          for (let i=0;i<6;i++){
+            state.items.push({
+              id: uid(), type:"note",
+              x:snap(baseX + 20 + (i%3)*290),
+              y:snap(baseY + 120 + Math.floor(i/3)*140),
+              w:240, h:170,
+              text:"",
+              bg: colors[i%colors.length],
+              label: name === "brainstorm" ? "Sticky" : "Task",
+              fontSize:14,
+              fontWeight:400
+            });
+          }
+        }
+
+        if (name === "flow"){
+          state.items.push({
+            id: uid(), type:"pill",
+            x:snap(baseX+40), y:snap(baseY+140), w:220, h:70,
+            stroke:"rgba(22,163,74,.55)", fill:"rgba(22,163,74,.12)",
+            label:"Start", fontSize:18, fontWeight:900
+          });
+
+          state.items.push({
+            id: uid(), type:"rect",
+            x:snap(baseX+320), y:snap(baseY+140), w:260, h:100,
+            stroke:"rgba(37,99,235,.55)", fill:"rgba(37,99,235,.12)"
+          });
+          addText("Process", baseX+352, baseY+166);
+
+          state.items.push({
+            id: uid(), type:"diamond",
+            x:snap(baseX+650), y:snap(baseY+120), w:170, h:170,
+            stroke:"rgba(245,158,11,.65)", fill:"rgba(245,158,11,.14)"
+          });
+          addText("Decision?", baseX+645, baseY+166);
+
+          state.items.push({
+            id: uid(), type:"pill",
+            x:snap(baseX+880), y:snap(baseY+140), w:220, h:70,
+            stroke:"rgba(22,163,74,.55)", fill:"rgba(22,163,74,.12)",
+            label:"End", fontSize:18, fontWeight:900
+          });
+        }
+
+        if (name === "swot"){
+          // SWOT quadrants
+          const quadrants = [
+            { title: "Strengths", x: baseX, y: baseY, color: "rgba(34,197,94,.15)", stroke: "rgba(34,197,94,.5)" },
+            { title: "Weaknesses", x: baseX+350, y: baseY, color: "rgba(239,68,68,.15)", stroke: "rgba(239,68,68,.5)" },
+            { title: "Opportunities", x: baseX, y: baseY+250, color: "rgba(59,130,246,.15)", stroke: "rgba(59,130,246,.5)" },
+            { title: "Threats", x: baseX+350, y: baseY+250, color: "rgba(245,158,11,.15)", stroke: "rgba(245,158,11,.5)" }
+          ];
+
+          quadrants.forEach(q => {
+            addText(q.title, q.x + 20, q.y + 20);
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(q.x), y:snap(q.y+60), w:320, h:180,
+              stroke: q.stroke, fill: q.color
+            });
+          });
+        }
+
+        if (name === "timeline"){
+          // Horizontal timeline
+          state.items.push({
+            id: uid(), type:"rect",
+            x:snap(baseX), y:snap(baseY+100), w:800, h:8,
+            stroke:"rgba(2,6,23,.3)", fill:"rgba(2,6,23,.2)"
+          });
+
+          const milestones = [
+            { label: "Start", x: baseX+50, date: "Q1 2024" },
+            { label: "Phase 1", x: baseX+250, date: "Q2 2024" },
+            { label: "Milestone", x: baseX+450, date: "Q3 2024" },
+            { label: "Phase 2", x: baseX+650, date: "Q4 2024" }
+          ];
+
+          milestones.forEach(m => {
+            // Timeline marker
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(m.x-2), y:snap(baseY+90), w:4, h:28,
+              stroke:"rgba(37,99,235,.7)", fill:"rgba(37,99,235,.5)"
+            });
+            // Label
+            addText(m.label, m.x-40, baseY+160);
+            // Date
+            state.items.push({
+              id: uid(), type:"text",
+              x:snap(m.x-40), y:snap(baseY+190), w:80, h:30,
+              text: m.date, fontSize:12, fontWeight:600
+            });
+          });
+        }
+
+        if (name === "mindmap"){
+          // Central idea
+          state.items.push({
+            id: uid(), type:"circle",
+            x:snap(baseX+350), y:snap(baseY+150), w:120, h:120,
+            stroke:"rgba(37,99,235,.6)", fill:"rgba(37,99,235,.15)"
+          });
+          addText("Main Idea", baseX+365, baseY+175);
+
+          // Branches
+          const branches = [
+            { text: "Branch 1", x: baseX+150, y: baseY+50, angle: -45 },
+            { text: "Branch 2", x: baseX+550, y: baseY+50, angle: 45 },
+            { text: "Branch 3", x: baseX+150, y: baseY+250, angle: -135 },
+            { text: "Branch 4", x: baseX+550, y: baseY+250, angle: 135 }
+          ];
+
+          branches.forEach(b => {
+            // Connecting line (simplified as rect)
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(b.x+40), y:snap(b.y+25), w:120, h:4,
+              stroke:"rgba(2,6,23,.3)", fill:"rgba(2,6,23,.2)"
+            });
+            // Branch node
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(b.x), y:snap(b.y), w:100, h:60,
+              stroke:"rgba(245,158,11,.5)", fill:"rgba(245,158,11,.15)"
+            });
+            addText(b.text, b.x+10, b.y+25);
+          });
+        }
+
+        if (name === "journey"){
+          // User journey steps
+          const steps = [
+            { label: "Awareness", icon: "👀", x: baseX },
+            { label: "Consideration", icon: "🤔", x: baseX+200 },
+            { label: "Purchase", icon: "🛒", x: baseX+400 },
+            { label: "Retention", icon: "💝", x: baseX+600 },
+            { label: "Advocacy", icon: "📣", x: baseX+800 }
+          ];
+
+          steps.forEach((s, i) => {
+            // Step circle
+            state.items.push({
+              id: uid(), type:"circle",
+              x:snap(s.x), y:snap(baseY+100), w:80, h:80,
+              stroke:"rgba(37,99,235,.5)", fill:"rgba(37,99,235,.15)"
+            });
+            // Icon
+            state.items.push({
+              id: uid(), type:"text",
+              x:snap(s.x+25), y:snap(baseY+125), w:30, h:30,
+              text: s.icon, fontSize:24
+            });
+            // Label
+            addText(s.label, s.x-10, baseY+200);
+          });
+
+          // Connecting arrows
+          for (let i = 0; i < steps.length - 1; i++) {
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(steps[i].x + 90), y:snap(baseY+130), w:100, h:4,
+              stroke:"rgba(2,6,23,.3)", fill:"rgba(2,6,23,.2)"
+            });
+            // Arrow head
+            state.items.push({
+              id: uid(), type:"text",
+              x:snap(steps[i].x + 175), y:snap(baseY+115), w:20, h:20,
+              text: "→", fontSize:16
+            });
+          }
+        }
+
+        if (name === "agenda"){
+          // Meeting agenda sections
+          addText("Meeting Agenda", baseX+20, baseY+20);
+
+          const sections = [
+            { title: "Attendees", y: baseY+80 },
+            { title: "Objectives", y: baseY+140 },
+            { title: "Discussion Points", y: baseY+200 },
+            { title: "Action Items", y: baseY+320 },
+            { title: "Next Steps", y: baseY+380 }
+          ];
+
+          sections.forEach(s => {
+            addText(s.title, baseX+20, s.y);
+            state.items.push({
+              id: uid(), type:"rect",
+              x:snap(baseX+20), y:snap(s.y+30), w:760, h:50,
+              stroke:"rgba(2,6,23,.2)", fill:"rgba(2,6,23,.03)"
+            });
+          });
+        }
+
+        scheduleRedraw();
+      }
+
+      // ===== Export PNG =====
+      function roundRect(c, x, y, w, h, r){
+        const rr = Math.min(r, w/2, h/2);
+        c.beginPath();
+        c.moveTo(x+rr, y);
+        c.arcTo(x+w, y, x+w, y+h, rr);
+        c.arcTo(x+w, y+h, x, y+h, rr);
+        c.arcTo(x, y+h, x, y, rr);
+        c.arcTo(x, y, x+w, y, rr);
+        c.closePath();
+      }
+
+      async function exportPNG(){
+        const r = stage.getBoundingClientRect();
+        const scale = 2;
+
+        const out = document.createElement("canvas");
+        out.width = Math.floor(r.width*scale);
+        out.height = Math.floor(r.height*scale);
+        const octx = out.getContext("2d");
+
+        octx.fillStyle = "#ffffff";
+        octx.fillRect(0,0,out.width,out.height);
+
+        octx.strokeStyle = "rgba(2,6,23,.04)";
+        octx.lineWidth = 1;
+        for (let x=0; x<out.width; x+=40){ octx.beginPath(); octx.moveTo(x,0); octx.lineTo(x,out.height); octx.stroke(); }
+        for (let y=0; y<out.height; y+=40){ octx.beginPath(); octx.moveTo(0,y); octx.lineTo(out.width,y); octx.stroke(); }
+
+        octx.save();
+        octx.translate(state.panX*scale, state.panY*scale);
+        octx.scale(state.zoom*scale, state.zoom*scale);
+        for (const s of state.strokes) drawStroke(s, octx);
+        octx.restore();
+
+        octx.save();
+        octx.translate(state.panX*scale, state.panY*scale);
+        octx.scale(state.zoom*scale, state.zoom*scale);
+
+        for (const it of state.items){
+          if (it.type === "note"){
+            octx.fillStyle = it.bg || "#fff4a3";
+            octx.strokeStyle = "rgba(0,0,0,.12)";
+            roundRect(octx, it.x, it.y, it.w, it.h, 14);
+            octx.fill(); octx.stroke();
+
+            octx.fillStyle = "rgba(31,41,55,.8)";
+            octx.font = "1000 12px system-ui";
+            octx.fillText(it.label || "Sticky", it.x+12, it.y+20);
+
+            octx.fillStyle = "#1f2937";
+            octx.font = `${it.fontWeight||400} ${it.fontSize||14}px system-ui`;
+            const lines = (it.text||"").split("\n");
+            let yy = it.y + 44;
+            for (const line of lines){
+              if (yy > it.y + it.h - 10) break;
+              octx.fillText(line.slice(0, 64), it.x+12, yy);
+              yy += (it.fontSize||14) + 6;
+            }
+          }
+
+          if (it.type === "text"){
+            octx.fillStyle = "#0b1020";
+            octx.font = `${it.fontWeight||900} ${it.fontSize||20}px system-ui`;
+            const lines = (it.text||"").split("\n");
+            let yy = it.y + (it.fontSize||20) + 6;
+            for (const line of lines){
+              octx.fillText(line, it.x+12, yy);
+              yy += (it.fontSize||20) + 8;
+            }
+          }
+
+          if (["rect","circle","diamond","pill"].includes(it.type)){
+            octx.strokeStyle = it.stroke || "#2563eb";
+            octx.lineWidth = 2;
+            octx.fillStyle = it.fill || "rgba(37,99,235,.10)";
+
+            if (it.type === "circle"){
+              octx.beginPath();
+              octx.ellipse(it.x+it.w/2, it.y+it.h/2, it.w/2, it.h/2, 0, 0, Math.PI*2);
+              octx.fill(); octx.stroke();
+            } else if (it.type === "diamond"){
+              octx.save();
+              octx.translate(it.x+it.w/2, it.y+it.h/2);
+              octx.rotate(Math.PI/4);
+              octx.translate(-(it.x+it.w/2), -(it.y+it.h/2));
+              roundRect(octx, it.x, it.y, it.w, it.h, 14);
+              octx.fill(); octx.stroke();
+              octx.restore();
+            } else {
+              roundRect(octx, it.x, it.y, it.w, it.h, it.type==="pill" ? 999 : 16);
+              octx.fill(); octx.stroke();
+              if (it.type === "pill" && it.label){
+                octx.fillStyle = "rgba(2,6,23,.85)";
+                octx.font = `${it.fontWeight||900} ${it.fontSize||18}px system-ui`;
+                octx.fillText(it.label, it.x+18, it.y + Math.floor(it.h*0.62));
+              }
+            }
+          }
+        }
+
+        octx.globalAlpha = 0.65;
+        octx.fillStyle = "#0b1020";
+        octx.font = "1000 14px system-ui";
+        octx.fillText("Powered by Logic Lab", 18, out.height-18);
+        octx.restore();
+
+        const a = document.createElement("a");
+        a.href = out.toDataURL("image/png");
+        a.download = `logiclab-whiteboard-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      // ===== Save/load =====
+      function serialize(){
+        return {
+          app: "logiclab-whiteboard-canva-style",
+          version: 4,
+          ts: new Date().toISOString(),
+          view: { zoom: state.zoom, panX: state.panX, panY: state.panY },
+          strokes: state.strokes,
+          items: state.items
+        };
+      }
+
+      function load(obj, skipSnapshot=false){
+        if (!skipSnapshot) snapshot();
+        state.items = Array.isArray(obj.items) ? obj.items : [];
+        state.strokes = Array.isArray(obj.strokes) ? obj.strokes : [];
+        state.selectedId = null;
+        if (obj.view){
+          state.zoom = obj.view.zoom ?? 1;
+          state.panX = obj.view.panX ?? 0;
+          state.panY = obj.view.panY ?? 0;
+        }
+        scheduleRedraw();
+      }
+
+      function download(name, text, mime){
+        const blob = new Blob([text], {type:mime});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 800);
+      }
+
+      // ===== UI wiring =====
+      $$("#toolrow [data-tool]").forEach(b => b.addEventListener("click", ()=> setTool(b.dataset.tool)));
+      strokeSize.addEventListener("input", ()=> strokeSizeVal.textContent = strokeSize.value);
+
+      $("#undoBtn").addEventListener("click", undo);
+      $("#redoBtn").addEventListener("click", redo);
+
+      $("#zoomIn").addEventListener("click", ()=> setZoom(state.zoom*1.12));
+      $("#zoomOut").addEventListener("click", ()=> setZoom(state.zoom/1.12));
+      $("#zoomReset").addEventListener("click", ()=> { state.zoom=1; state.panX=0; state.panY=0; scheduleRedraw(); });
+
+      $("#helpBtn").addEventListener("click", ()=> {
+        alert(`Shortcuts
+V = Select
+D = Draw
+E = Erase
+H = Hand
+Delete = remove selected item
+Ctrl+Z = undo
+Ctrl+Y / Ctrl+Shift+Z = redo
+Space (hold) = pan
+Ctrl + wheel = zoom`);
+      });
+
+      $("#clearBtn").addEventListener("click", ()=> {
+        if (!confirm("Clear the entire board?")) return;
+        snapshot();
+        state.items = [];
+        state.strokes = [];
+        state.selectedId = null;
+        scheduleRedraw();
+      });
+
+      $("#saveBtn").addEventListener("click", ()=> {
+        download(`logiclab-board-${Date.now()}.json`, JSON.stringify(serialize(), null, 2), "application/json");
+      });
+      $("#loadBtn").addEventListener("click", ()=> $("#jsonFile").click());
+      $("#jsonFile").addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const txt = await file.text();
+        try{ load(JSON.parse(txt)); }
+        catch{ alert("Invalid JSON file."); }
+        finally{ e.target.value = ""; }
+      });
+
+      $("#exportPngBtn").addEventListener("click", exportPNG);
+
+      // ===== Keyboard =====
+      window.addEventListener("keydown", (e) => {
+        if (e.key === " ") { state.spaceDown = true; updateCursor(); }
+
+        const tag = (e.target?.tagName || "").toLowerCase();
+        const typing = tag === "input" || tag === "textarea" || e.target?.isContentEditable;
+        if (typing) return;
+
+        const k = e.key.toLowerCase();
+        if (k === "v") setTool("select");
+        if (k === "d") setTool("pen");
+        if (k === "e") setTool("eraser");
+        if (k === "h") setTool("pan");
+
+        const isMac = navigator.platform.toLowerCase().includes("mac");
+        const mod = isMac ? e.metaKey : e.ctrlKey;
+
+        if (mod && k === "z" && !e.shiftKey){ e.preventDefault(); undo(); }
+        if ((mod && k === "y") || (mod && k === "z" && e.shiftKey)){ e.preventDefault(); redo(); }
+
+        if ((e.key === "Delete" || e.key === "Backspace") && state.selectedId){
+          delBtn.click();
+        }
+        if (e.key === "Escape") deselect();
+      });
+
+      window.addEventListener("keyup", (e)=> { if (e.key === " ") { state.spaceDown = false; updateCursor(); } });
+
+      // ===== Overlay drag/resize =====
+      function onItemDown(e){
+        if (state.tool !== "select" && !state.spaceDown) return;
+        if (state.spaceDown) return;
+
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it) return;
+        if (e.target.tagName.toLowerCase() === "textarea" || e.target.isContentEditable) return;
+
+        setSelected(it.id);
+        const p = screenToWorld(e.clientX, e.clientY);
+        state.drag = { id: it.id, sx: p.x, sy: p.y, ox: it.x, oy: it.y };
+        el.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+      }
+
+      function onItemDbl(e){
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it || it.type !== "text") return;
+
+        el.contentEditable = "true";
+        el.focus();
+
+        const done = () => {
+          el.contentEditable = "false";
+          it.text = el.textContent || "";
+          snapshot();
+          syncProps();
+          el.removeEventListener("blur", done);
+          el.removeEventListener("keydown", onKey);
+        };
+        const onKey = (ev) => {
+          if (ev.key === "Escape"){ el.textContent = it.text || ""; el.blur(); }
+          if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); el.blur(); }
+        };
+        el.addEventListener("blur", done);
+        el.addEventListener("keydown", onKey);
+      }
+
+      function startResize(e, id, corner){
+        if (state.tool !== "select") return;
+        const it = getItem(id);
+        if (!it) return;
+        setSelected(id);
+
+        const p = screenToWorld(e.clientX, e.clientY);
+        state.resize = { id, corner, sx: p.x, sy: p.y, ox: it.x, oy: it.y, ow: it.w, oh: it.h };
+
+        e.currentTarget.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      overlay.addEventListener("pointermove", (e) => {
+        if (state.drag){
+          const it = getItem(state.drag.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          it.x = snap(state.drag.ox + (p.x - state.drag.sx));
+          it.y = snap(state.drag.oy + (p.y - state.drag.sy));
+          syncOverlay();
+          syncProps();
+        }
+        if (state.resize){
+          const it = getItem(state.resize.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          const dx = p.x - state.resize.sx;
+          const dy = p.y - state.resize.sy;
+
+          let x=state.resize.ox, y=state.resize.oy, w=state.resize.ow, h=state.resize.oh;
+          const c = state.resize.corner;
+          if (c.includes("e")) w = state.resize.ow + dx;
+          if (c.includes("s")) h = state.resize.oh + dy;
+          if (c.includes("w")) { w = state.resize.ow - dx; x = state.resize.ox + dx; }
+          if (c.includes("n")) { h = state.resize.oh - dy; y = state.resize.oy + dy; }
+
+          w = Math.max(80, w); h = Math.max(50, h);
+          it.x = snap(x); it.y = snap(y); it.w = snap(w); it.h = snap(h);
+          syncOverlay();
+          syncProps();
+        }
+      });
+
+      overlay.addEventListener("pointerup", () => {
+        if (state.drag){ state.drag = null; snapshot(); }
+        if (state.resize){ state.resize = null; snapshot(); }
+      });
+
+      // ===== Init =====
+      mountElements();
+      switchTab("basic");
+      setTool("select");
+      resizeCanvas();
+      updateView();
+      snapshot();
+      updateUndoRedo();
+      scheduleRedraw();
+      syncProps();
+      updateCursor();
+    })();
+  </script>
+</body>
+</html>

@@ -353,6 +353,10 @@
       .col{box-shadow:none; background:#fff; border:1px solid #ddd}
       .card{box-shadow:none; background:#fff; border:1px solid #ddd}
     }
+
+    @media (prefers-reduced-motion: reduce){
+      *{transition:none !important; scroll-behavior:auto !important}
+    }
   </style>
 </head>
 
@@ -399,7 +403,7 @@
 
       <div class="toggle" title="Wall Mode toggle (ESC to exit)">
         <span class="muted">Wall</span>
-        <div class="switch" id="wallSwitch" role="switch" aria-checked="false">
+        <div class="switch" id="wallSwitch" role="switch" aria-checked="false" tabindex="0">
           <div class="knob"></div>
         </div>
       </div>
@@ -553,12 +557,11 @@
       </div>
       <div class="field">
         <label>Priority</label>
-       <select id="c_prio">
-  <option value="normal" selected>Normal</option>
-  <option value="urgent">Urgent</option>
-  <option value="low">Low</option>
-</select>
-
+        <select id="c_prio">
+          <option value="normal" selected>Normal</option>
+          <option value="urgent">Urgent</option>
+          <option value="low">Low</option>
+        </select>
       </div>
     </div>
 
@@ -681,22 +684,27 @@
 <script>
 (() => {
   /* =========================================================
-     MULTI-BOARD SMART WHITEBOARD (Offline)
-     - Multiple boards
-     - Lock/unlock (password)
-     - Wall mode toggle + ALWAYS-VISIBLE EXIT
-     - Themes: white / brown
-     - Shift Summary (printable)
-     - QR board access (normal + wall/read-only link)
-     - Export report (Print/PDF + CSV)
-     - Open Wall Screen (new window)
+     MULTI-BOARD SMART WHITEBOARD (Offline) — v4
+     Improvements applied:
+     1) Data integrity fix in normalizeBoard() (uses entry id)
+     2) Event delegation for edit/delete/addHere (no per-render click wiring)
+     3) Delegated DnD drop handlers (no per-render listeners)
+     4) Readonly links no longer persist wall toggle to storage
+     5) Lightweight tick updates for clock + running timers (full render less often)
+     6) Keyboard support for wall switch
   ========================================================= */
 
-  const STORAGE_KEY = "ll_whiteboard_multi_v3";
+  const STORAGE_KEY = "ll_whiteboard_multi_v4";
 
   const now = () => new Date();
   const iso = (d) => new Date(d).toISOString();
-  const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+
+  function uid(){
+    try{ if(crypto?.randomUUID) return crypto.randomUUID(); }catch(e){}
+    // fallback
+    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  }
+
   const $ = (id) => document.getElementById(id);
 
   /* ---------------- Defaults ---------------- */
@@ -723,7 +731,7 @@
   });
 
   const defaultAppState = () => ({
-    version: 3,
+    version: 4,
     prefs: { theme: "white" },
     activeBoardId: "",
     boards: [
@@ -736,7 +744,6 @@
   /* ---------------- Persistence ---------------- */
   let app = load() || defaultAppState();
   if(!app.activeBoardId) app.activeBoardId = app.boards[0].id;
-  applyTheme(app.prefs.theme);
 
   // query flags for special modes
   const QS = new URLSearchParams(location.search);
@@ -752,6 +759,7 @@
       return s;
     }catch(e){ return null; }
   }
+
   function save(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
   }
@@ -765,7 +773,7 @@
     const t = (theme === "brown") ? "brown" : "white";
     document.documentElement.setAttribute("data-theme", t);
     app.prefs.theme = t;
-    save();
+    if(!qsReadonly) save();
     const sel = $("themeSelect");
     if(sel && sel.value !== t) sel.value = t;
   }
@@ -789,7 +797,6 @@
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
   }
-  function escapeAttr(s){ return escapeHtml(s).replaceAll("\n"," "); }
 
   function toLocalInputValue(d){
     if(!d) return "";
@@ -827,7 +834,7 @@
     return board.columns.find(c=>c.id===colId)?.title ?? colId;
   }
 
-  /* ---------------- Locking ---------------- */
+  /* ---------------- Locking / Readonly ---------------- */
   function isLocked(board){ return !!board.settings.locked; }
   function isReadonly(){ return document.documentElement.classList.contains("readonly"); }
 
@@ -846,18 +853,24 @@
   }
 
   /* ---------------- Wall mode toggle ---------------- */
-  function setWallSwitchUI(board){
+  function setWallSwitchUI(on){
     const sw = $("wallSwitch");
     if(!sw) return;
-    const on = !!board.settings.wall;
-    sw.classList.toggle("on", on);
+    sw.classList.toggle("on", !!on);
     sw.setAttribute("aria-checked", on ? "true" : "false");
   }
 
   function setWallMode(board, on){
-    board.settings.wall = !!on;
+    // View state always updates
     document.documentElement.classList.toggle("wall", !!on);
-    setWallSwitchUI(board);
+    setWallSwitchUI(!!on);
+
+    // If opened via readonly link, don't persist to storage
+    if(qsReadonly){
+      return;
+    }
+
+    board.settings.wall = !!on;
     save();
     render();
   }
@@ -932,9 +945,9 @@
     const b = app.boards.find(x=>x.id===id);
     if(!b) return;
     app.activeBoardId = id;
-    save();
+    if(!qsReadonly) save();
     document.documentElement.classList.toggle("wall", !!b.settings.wall);
-    setWallSwitchUI(b);
+    setWallSwitchUI(!!b.settings.wall);
     syncLockButtons(b);
     render();
   }
@@ -977,34 +990,26 @@
     `;
   }
 
-  /* ---------------- Dragging ---------------- */
-  let dragging = { cardId: null };
+  /* ---------------- Dragging (single shared state) ---------------- */
+  const dragging = { cardId: null };
 
   /* ---------------- Render board ---------------- */
   function render(){
     const board = getBoard();
+    normalizeBoard(board);
 
-    // clock
-    const clk = $("clock");
-    if(clk){
-      const d = new Date();
-      clk.textContent = d.toLocaleString(undefined, {
-        weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"
-      });
-    }
+    renderClock();
 
-    // focus button
     const focusBtn = $("btnFocus");
     if(focusBtn) focusBtn.textContent = `Focus: ${board.settings.focus ? "On" : "Off"}`;
 
-    // brand
     $("brandTitle").textContent = `${board.name} — Smart Whiteboard`;
     const lockedText = isLocked(board) ? "LOCKED" : "UNLOCKED";
     const roText = isReadonly() ? "READ-ONLY" : "EDITABLE";
     $("brandSub").textContent = `${roText} • ${lockedText} • Wall mode available`;
 
     renderKPIs(board);
-    setWallSwitchUI(board);
+    setWallSwitchUI(!!board.settings.wall);
     syncLockButtons(board);
 
     const q = ($("q")?.value || "").trim().toLowerCase();
@@ -1047,36 +1052,17 @@
             <div class="meta">${escapeHtml(col.hint || "")}</div>
           </div>
           <div class="miniBtns noWall noReadonly">
-            <div class="miniBtn" title="Add card here" data-act="addHere" data-lane="${lane}">＋</div>
+            <div class="miniBtn" title="Add card here" aria-label="Add card" data-act="addHere" data-lane="${lane}">＋</div>
           </div>
         </div>
-        <div class="colBody" data-dropzone="1">
+        <div class="colBody" data-dropzone="1" data-lane="${lane}">
           <div class="dropHint">Drop cards here</div>
           <div class="cards"></div>
         </div>
       `;
 
-      const body = colEl.querySelector(".colBody");
       const cardsWrap = colEl.querySelector(".cards");
 
-      // drop handlers (disabled if locked/readonly)
-      body.addEventListener("dragover", (e)=>{
-        if(isLocked(board) || isReadonly()) return;
-        e.preventDefault();
-        body.style.outline = "2px solid rgba(37,99,235,.20)";
-        body.style.outlineOffset="4px";
-      });
-      body.addEventListener("dragleave", ()=>{ body.style.outline = ""; });
-      body.addEventListener("drop", (e)=>{
-        if(isLocked(board) || isReadonly()) return;
-        e.preventDefault();
-        body.style.outline = "";
-        const cid = dragging.cardId;
-        if(!cid) return;
-        moveCard(board, cid, lane);
-      });
-
-      // cards
       visibleIds.forEach(cid=>{
         const c = board.cards[cid];
         if(!c) return;
@@ -1099,13 +1085,13 @@
                 ${c.owner ? `<span class="tag" title="Owner">👤 ${escapeHtml(c.owner)}</span>` : ""}
                 ${c.tag ? `<span class="tag" title="Tag">🏷️ ${escapeHtml(c.tag)}</span>` : ""}
                 ${c.dueAt ? `<span class="tag" title="Due">⏰ ${escapeHtml(dueTxt)}</span>` : ""}
-                ${c.timer?.running ? `<span class="tag" title="Timer">⏱️ ${escapeHtml(formatTimer(c.timer))}</span>` : ""}
+                ${c.timer?.running ? `<span class="tag" title="Timer" data-timer="${cid}">⏱️ ${escapeHtml(formatTimer(c.timer))}</span>` : ""}
               </div>
             </div>
 
             <div class="miniBtns noWall noReadonly">
-              <div class="miniBtn" title="Edit" data-act="edit" data-id="${cid}">✎</div>
-              <div class="miniBtn" title="Delete" data-act="del" data-id="${cid}">🗑</div>
+              <div class="miniBtn" title="Edit" aria-label="Edit" data-act="edit" data-id="${cid}">✎</div>
+              <div class="miniBtn" title="Delete" aria-label="Delete" data-act="del" data-id="${cid}">🗑</div>
             </div>
           </div>
 
@@ -1133,41 +1119,37 @@
 
       if(visibleIds.length) colEl.querySelector(".dropHint").style.display = "none";
 
-      // add here
-      colEl.querySelectorAll('[data-act="addHere"]').forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          if(!requireUnlocked(board)) return;
-          openCardDialog({ lane });
-        });
-      });
-
       root.appendChild(colEl);
     });
-
-    // edit/delete actions
-    root.querySelectorAll("[data-act='edit']").forEach(b => b.addEventListener("click", ()=>{
-      if(!requireUnlocked(getBoard())) return;
-      openCardDialog({ id: b.dataset.id });
-    }));
-    root.querySelectorAll("[data-act='del']").forEach(b => b.addEventListener("click", ()=>{
-      if(!requireUnlocked(getBoard())) return;
-      deleteCard(getBoard(), b.dataset.id);
-    }));
   }
 
-  /* ---------------- Ensure board consistency ---------------- */
+  /* ---------------- Ensure board consistency (FIXED) ---------------- */
   function normalizeBoard(board){
+    board.columns = board.columns || [
+      { id: "todo", title: "To Do", hint: "New tasks" },
+      { id: "doing", title: "In Progress", hint: "Currently being worked" },
+      { id: "blocked", title: "Blocked", hint: "Waiting / stuck" },
+      { id: "done", title: "Done", hint: "Completed" }
+    ];
+
+    board.lanes = board.lanes || {};
+    board.cards = board.cards || {};
+
     board.columns.forEach(c => { if(!board.lanes[c.id]) board.lanes[c.id] = []; });
-    Object.values(board.cards).forEach(c=>{
+
+    for(const [id, c] of Object.entries(board.cards)){
+      c.id = c.id || id;
       if(!c.lane) c.lane = "todo";
       if(!board.lanes[c.lane]) board.lanes[c.lane] = [];
-      const inLane = Object.values(board.lanes).some(arr => arr.includes(c.id));
-      if(!inLane) board.lanes[c.lane].unshift(c.id);
-      if(!c.updatedAt) c.updatedAt = iso(now());
-      if(!c.createdAt) c.createdAt = iso(now());
-      if(!c.movedToLaneAt) c.movedToLaneAt = { [c.lane]: iso(now()) };
-      if(!c.timer) c.timer = { running:false, startedAt:null, totalMs:0 };
-    });
+
+      const inLane = Object.values(board.lanes).some(arr => Array.isArray(arr) && arr.includes(id));
+      if(!inLane) board.lanes[c.lane].unshift(id);
+
+      c.updatedAt ||= iso(now());
+      c.createdAt ||= iso(now());
+      c.movedToLaneAt ||= { [c.lane]: iso(now()) };
+      c.timer ||= { running:false, startedAt:null, totalMs:0 };
+    }
   }
 
   /* ---------------- Card CRUD ---------------- */
@@ -1207,6 +1189,7 @@
     $("dlgCard").showModal();
     setTimeout(()=> $("c_title").focus(), 50);
   }
+
   function closeCardDialog(){
     $("dlgCard").close();
     editingId = null;
@@ -1236,7 +1219,7 @@
       c.notes = notes;
       c.prompt = prompt;
       c.updatedAt = iso(now());
-      save();
+      if(!qsReadonly) save();
       render();
       closeCardDialog();
       return;
@@ -1257,7 +1240,7 @@
     board.cards[id] = card;
     board.lanes[lane].unshift(id);
 
-    save();
+    if(!qsReadonly) save();
     render();
     closeCardDialog();
   }
@@ -1270,7 +1253,7 @@
     board.lanes[lane] = (board.lanes[lane] || []).filter(x => x !== id);
     delete board.cards[id];
 
-    save();
+    if(!qsReadonly) save();
     render();
   }
 
@@ -1311,7 +1294,7 @@
     c.movedToLaneAt = c.movedToLaneAt || {};
     c.movedToLaneAt[toLane] = iso(now());
 
-    save();
+    if(!qsReadonly) save();
     render();
   }
 
@@ -1323,19 +1306,35 @@
     const wrap = $("colsForm");
     wrap.innerHTML = "";
 
+    // Build form via DOM API (safer than innerHTML for values)
     board.columns.forEach((col, idx)=>{
       const row = document.createElement("div");
       row.className = "row";
-      row.innerHTML = `
-        <div class="field">
-          <label>Column ${idx+1} title</label>
-          <input data-col-id="${col.id}" data-k="title" value="${escapeAttr(col.title || "")}" />
-        </div>
-        <div class="field">
-          <label>Hint (small)</label>
-          <input data-col-id="${col.id}" data-k="hint" value="${escapeAttr(col.hint || "")}" />
-        </div>
-      `;
+
+      const f1 = document.createElement("div");
+      f1.className = "field";
+      const l1 = document.createElement("label");
+      l1.textContent = `Column ${idx+1} title`;
+      const i1 = document.createElement("input");
+      i1.dataset.colId = col.id;
+      i1.dataset.k = "title";
+      i1.value = col.title || "";
+      f1.appendChild(l1);
+      f1.appendChild(i1);
+
+      const f2 = document.createElement("div");
+      f2.className = "field";
+      const l2 = document.createElement("label");
+      l2.textContent = "Hint (small)";
+      const i2 = document.createElement("input");
+      i2.dataset.colId = col.id;
+      i2.dataset.k = "hint";
+      i2.value = col.hint || "";
+      f2.appendChild(l2);
+      f2.appendChild(i2);
+
+      row.appendChild(f1);
+      row.appendChild(f2);
       wrap.appendChild(row);
     });
 
@@ -1356,7 +1355,7 @@
       if(col) col[k] = v;
     });
 
-    save();
+    if(!qsReadonly) save();
     render();
     closeColsDialog();
   }
@@ -1375,7 +1374,7 @@
     doneIds.forEach(id => { delete board.cards[id]; });
     board.lanes.done = [];
 
-    save();
+    if(!qsReadonly) save();
     render();
   }
 
@@ -1384,7 +1383,7 @@
     const board = getBoard();
     if(!requireUnlocked(board)) return;
     board.settings.focus = !board.settings.focus;
-    save();
+    if(!qsReadonly) save();
     render();
   }
 
@@ -1425,52 +1424,52 @@
     $("sumBody").innerHTML = `
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
     <div class="pill"><span class="muted">Overdue</span> <b class="mono">${overdue.length}</b></div>
-        <div class="pill"><span class="muted">Stale</span> <b class="mono">${stale.length}</b></div>
-        <div class="pill"><span class="muted">Done</span> <b class="mono">${done.length}</b></div>
-        <div class="pill"><span class="muted">In Progress</span> <b class="mono">${doing.length}</b></div>
-        <div class="pill"><span class="muted">Blocked</span> <b class="mono">${blocked.length}</b></div>
-      </div>
+    <div class="pill"><span class="muted">Stale</span> <b class="mono">${stale.length}</b></div>
+    <div class="pill"><span class="muted">Done</span> <b class="mono">${done.length}</b></div>
+    <div class="pill"><span class="muted">In Progress</span> <b class="mono">${doing.length}</b></div>
+    <div class="pill"><span class="muted">Blocked</span> <b class="mono">${blocked.length}</b></div>
+  </div>
 
-      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0">
-        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
-          <div class="colTitle">
-            <div class="name">✅ Completed</div>
-            <div class="meta">What was finished this shift</div>
-          </div>
-        </div>
-        <div class="colBody" style="padding:0">${list(done)}</div>
+  <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0">
+    <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+      <div class="colTitle">
+        <div class="name">✅ Completed</div>
+        <div class="meta">What was finished this shift</div>
       </div>
+    </div>
+    <div class="colBody" style="padding:0">${list(done)}</div>
+  </div>
 
-      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
-        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
-          <div class="colTitle">
-            <div class="name">⛔ Blocked</div>
-            <div class="meta">Anything stuck / waiting</div>
-          </div>
-        </div>
-        <div class="colBody" style="padding:0">${list(blocked)}</div>
+  <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+    <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+      <div class="colTitle">
+        <div class="name">⛔ Blocked</div>
+        <div class="meta">Anything stuck / waiting</div>
       </div>
+    </div>
+    <div class="colBody" style="padding:0">${list(blocked)}</div>
+  </div>
 
-      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
-        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
-          <div class="colTitle">
-            <div class="name">🟦 In Progress</div>
-            <div class="meta">Still being worked</div>
-          </div>
-        </div>
-        <div class="colBody" style="padding:0">${list(doing)}</div>
+  <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+    <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+      <div class="colTitle">
+        <div class="name">🟦 In Progress</div>
+        <div class="meta">Still being worked</div>
       </div>
+    </div>
+    <div class="colBody" style="padding:0">${list(doing)}</div>
+  </div>
 
-      <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
-        <div class="colHd" style="border-radius:18px; margin-bottom:10px">
-          <div class="colTitle">
-            <div class="name">📝 To Do</div>
-            <div class="meta">Next tasks / upcoming</div>
-          </div>
-        </div>
-        <div class="colBody" style="padding:0">${list(todo)}</div>
+  <div class="col" style="box-shadow:none; background:transparent; border:none; padding:0; margin-top:14px">
+    <div class="colHd" style="border-radius:18px; margin-bottom:10px">
+      <div class="colTitle">
+        <div class="name">📝 To Do</div>
+        <div class="meta">Next tasks / upcoming</div>
       </div>
-    `;
+    </div>
+    <div class="colBody" style="padding:0">${list(todo)}</div>
+  </div>
+`;
 
     $("dlgSummary").showModal();
   }
@@ -1644,7 +1643,6 @@ ${fmt(todo)}
 
   /* ---------------- QR (Normal + Wall/Read-only) ---------------- */
   function currentBoardUrl(){
-    // keep same file; just change query params
     const u = new URL(location.href);
     u.searchParams.delete("wall");
     u.searchParams.delete("readonly");
@@ -1662,7 +1660,7 @@ ${fmt(todo)}
     const wall = currentWallUrl();
     $("qrLinkNormal").value = normal;
     $("qrLinkWall").value = wall;
-    drawQR("qrCanvas", normal); // default show normal
+    drawQR("qrCanvas", normal);
     $("dlgQR").showModal();
   }
 
@@ -1728,7 +1726,7 @@ ${fmt(todo)}
       if(!app.activeBoardId && app.boards[0]) app.activeBoardId = app.boards[0].id;
       app.prefs = app.prefs || { theme:"white" };
       applyTheme(app.prefs.theme);
-      save();
+      if(!qsReadonly) save();
       renderBoardSelector();
       switchBoard(app.activeBoardId);
       $("dlgData").close();
@@ -1746,7 +1744,7 @@ ${fmt(todo)}
     const b = defaultBoard(name.trim());
     app.boards.unshift(b);
     app.activeBoardId = b.id;
-    save();
+    if(!qsReadonly) save();
     renderBoardSelector();
     switchBoard(b.id);
   }
@@ -1757,7 +1755,7 @@ ${fmt(todo)}
     const name = prompt("Rename board:", b.name);
     if(!name) return;
     b.name = name.trim();
-    save();
+    if(!qsReadonly) save();
     renderBoardSelector();
     render();
   }
@@ -1770,7 +1768,7 @@ ${fmt(todo)}
     if(!ok) return;
     app.boards = app.boards.filter(x=>x.id !== b.id);
     app.activeBoardId = app.boards[0].id;
-    save();
+    if(!qsReadonly) save();
     renderBoardSelector();
     switchBoard(app.activeBoardId);
   }
@@ -1787,10 +1785,6 @@ ${fmt(todo)}
     const locked = isLocked(board);
     $("btnLock").style.display = locked ? "none" : "inline-flex";
     $("btnUnlock").style.display = locked ? "inline-flex" : "none";
-
-    // disable add/edit controls visually when locked/readonly
-// keep readonly state driven by setReadonly(), not hard-forced here
-// document.documentElement.classList.toggle("readonly", !!qsReadonly);
   }
 
   function openLockDialog(mode){
@@ -1815,7 +1809,7 @@ ${fmt(todo)}
       if(!pass){ alert("Password required."); return; }
       board.settings.passwordHash = tinyHash(pass);
       board.settings.locked = true;
-      save();
+      if(!qsReadonly) save();
       render();
       $("dlgLock").close();
       alert("Locked.");
@@ -1824,9 +1818,9 @@ ${fmt(todo)}
 
     // unlock
     if(!board.settings.passwordHash){
-      // if no password stored, allow unlock
       board.settings.locked = false;
-      save(); render();
+      if(!qsReadonly) save();
+      render();
       $("dlgLock").close();
       return;
     }
@@ -1835,7 +1829,7 @@ ${fmt(todo)}
       return;
     }
     board.settings.locked = false;
-    save();
+    if(!qsReadonly) save();
     render();
     $("dlgLock").close();
     alert("Unlocked.");
@@ -1851,36 +1845,96 @@ ${fmt(todo)}
 
   /* ---------------- Wall exit ---------------- */
   function exitWall(){
-  const board = getBoard();
-  const u = new URL(location.href);
+    const board = getBoard();
+    const u = new URL(location.href);
 
-  if(u.searchParams.get("wall")==="1" || u.searchParams.get("readonly")==="1"){
-    u.searchParams.delete("wall");
-    u.searchParams.delete("readonly");
-    location.href = u.toString();
-    return;
+    if(u.searchParams.get("wall")==="1" || u.searchParams.get("readonly")==="1"){
+      u.searchParams.delete("wall");
+      u.searchParams.delete("readonly");
+      location.href = u.toString();
+      return;
+    }
+
+    setWallMode(board, false);
+    setReadonly(false);
   }
 
-  setWallMode(board, false);
-  setReadonly(false);
-}
+  /* ---------------- Delegated actions ---------------- */
+  function wireDelegates(){
+    const root = $("board");
 
+    // Click delegation
+    root.addEventListener("click", (e)=>{
+      const el = e.target.closest("[data-act]");
+      if(!el) return;
 
-  /* ---------------- Init: apply query modes ---------------- */
-  (function initModes(){
+      const act = el.dataset.act;
+      const id = el.dataset.id;
+      const lane = el.dataset.lane;
+      const board = getBoard();
+
+      if((act === "edit" || act === "del" || act === "addHere") && !requireUnlocked(board)) return;
+
+      if(act === "edit") openCardDialog({ id });
+      if(act === "del") deleteCard(board, id);
+      if(act === "addHere") openCardDialog({ lane });
+    });
+
+    // Drag-over / drop delegation (works because events bubble)
+    root.addEventListener("dragover", (e)=>{
+      const dz = e.target.closest("[data-dropzone='1']");
+      if(!dz) return;
+      const board = getBoard();
+      if(isLocked(board) || isReadonly()) return;
+      e.preventDefault();
+      dz.style.outline = "2px solid rgba(37,99,235,.20)";
+      dz.style.outlineOffset = "4px";
+    });
+
+    root.addEventListener("dragleave", (e)=>{
+      const dz = e.target.closest("[data-dropzone='1']");
+      if(!dz) return;
+      dz.style.outline = "";
+    });
+
+    root.addEventListener("drop", (e)=>{
+      const dz = e.target.closest("[data-dropzone='1']");
+      if(!dz) return;
+      const board = getBoard();
+      if(isLocked(board) || isReadonly()) return;
+      e.preventDefault();
+      dz.style.outline = "";
+      const cid = dragging.cardId;
+      if(!cid) return;
+      const toLane = dz.dataset.lane;
+      moveCard(board, cid, toLane);
+    });
+  }
+
+  /* ---------------- UI ticks (no full render) ---------------- */
+  function renderClock(){
+    const clk = $("clock");
+    if(!clk) return;
+    const d = new Date();
+    clk.textContent = d.toLocaleString(undefined, {
+      weekday:"short", year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"
+    });
+  }
+
+  function tickTimers(){
     const board = getBoard();
-    normalizeBoard(board);
+    // update clock
+    renderClock();
 
-    // If opened via URL flags:
-    if(qsWall){
-      document.documentElement.classList.add("wall");
-      board.settings.wall = true; // local UI
-    }
-    setReadonly(!!qsReadonly);
-
-    // If readonly, make sure locked buttons hidden from wall/readonly UI already
-    applyTheme(app.prefs.theme || "white");
-  })();
+    // update running timer badges only
+    const tags = document.querySelectorAll("[data-timer]");
+    tags.forEach(tag=>{
+      const id = tag.getAttribute("data-timer");
+      const c = board.cards[id];
+      if(!c || !c.timer?.running) return;
+      tag.innerHTML = `⏱️ ${escapeHtml(formatTimer(c.timer))}`;
+    });
+  }
 
   /* ---------------- Events wiring ---------------- */
   function wire(){
@@ -1953,8 +2007,16 @@ ${fmt(todo)}
     // wall switch
     $("wallSwitch").addEventListener("click", ()=>{
       const board = getBoard();
-      // if readonly, allow viewing wall but don't store if from qsReadonly? still ok
-      setWallMode(board, !board.settings.wall);
+      // if readonly, we still allow viewing wall but don't persist
+      setWallMode(board, !document.documentElement.classList.contains("wall"));
+    });
+
+    // keyboard support for switch
+    $("wallSwitch").addEventListener("keydown", (e)=>{
+      if(e.key === " " || e.key === "Enter"){
+        e.preventDefault();
+        $("wallSwitch").click();
+      }
     });
 
     // exit wall
@@ -1980,25 +2042,44 @@ ${fmt(todo)}
     // ESC to exit wall + close dialogs
     window.addEventListener("keydown", (e)=>{
       if(e.key === "Escape"){
-        // if any dialog open, browser handles first; if not, exit wall
         if(document.querySelector("dialog[open]")) return;
         if(document.documentElement.classList.contains("wall")) exitWall();
       }
     });
 
-    // periodic refresh for timers / clock / stale statuses
-    setInterval(()=> {
-      // just rerender lightweight
+    // delegates (click + DnD)
+    wireDelegates();
+
+    // periodic UI ticks
+    setInterval(tickTimers, 10_000);
+
+    // full render occasionally to refresh stale/overdue styling without user interaction
+    setInterval(()=>{
       render();
-    }, 30_000);
+    }, 120_000);
   }
+
+  /* ---------------- Init: apply query modes ---------------- */
+  (function initModes(){
+    const board = getBoard();
+    normalizeBoard(board);
+
+    // URL flags
+    if(qsWall){
+      document.documentElement.classList.add("wall");
+      board.settings.wall = true;
+    }
+    setReadonly(!!qsReadonly);
+
+    applyTheme(app.prefs.theme || "white");
+
+    // ensure wall switch UI matches current view
+    setWallSwitchUI(document.documentElement.classList.contains("wall"));
+  })();
 
   /* ---------------- QR generator (offline) ----------------
      Lightweight QR via "qrcode-generator" (Kazuhiko Arase) compacted.
   --------------------------------------------------------- */
-  // Minimal qrcode-generator (MIT)
-  // Source: https://github.com/kazuhikoarase/qrcode-generator (concept)
-  // (trimmed/compact for this single-file offline tool)
   function QRCode(typeNumber, errorCorrectionLevel) {
     const PAD0 = 0xEC, PAD1 = 0x11;
     const _typeNumber = typeNumber;
@@ -2016,14 +2097,6 @@ ${fmt(todo)}
       M: [
         [], [1,26,16],[1,44,28],[1,70,44],[2,50,32],[2,67,43],[4,43,27],[4,49,31],[2,60,38],[3,58,36],[4,69,43],
         [1,80,50],[6,58,36],[8,59,37],[4,64,40],[5,65,41],[7,73,45],[10,74,46],[9,69,43],[3,70,44],[3,67,41]
-      ],
-      Q: [
-        [], [1,26,13],[1,44,22],[2,35,17],[2,50,24],[2,33,15,2,34,16],[4,43,19],[2,32,14,4,33,15],[4,40,18,2,41,19],[4,36,16,4,37,17],[6,43,19,2,44,20],
-        [4,50,22,4,51,23],[4,46,20,6,47,21],[8,44,20,4,45,21],[11,36,16,5,37,17],[5,54,24,7,55,25],[15,43,19,2,44,20],[1,50,22,15,51,23],[17,50,22,1,51,23],[17,47,21,4,48,22],[15,54,24,5,55,25]
-      ],
-      H: [
-        [], [1,26,9],[1,44,16],[2,35,13],[4,25,9],[2,33,11,2,34,12],[4,43,15],[4,39,13,1,40,14],[4,40,14,2,41,15],[4,36,12,4,37,13],[6,43,15,2,44,16],
-        [3,36,12,8,37,13],[7,42,14,4,43,15],[12,33,11,4,34,12],[11,36,12,5,37,13],[11,36,12,7,37,13],[3,45,15,13,46,16],[2,42,14,17,43,15],[2,42,14,19,43,15],[9,39,13,16,40,14],[15,43,15,10,44,16]
       ]
     };
 
@@ -2079,7 +2152,7 @@ ${fmt(todo)}
     };
 
     function QR8bitByte(data){
-      this.mode = 1; // 8bit
+      this.mode = 1;
       this.data = data;
       this.parsed = [];
       for(let i=0;i<data.length;i++){
@@ -2118,16 +2191,14 @@ ${fmt(todo)}
       const buffer = new QRBitBuffer();
       for(let i=0;i<dataList.length;i++){
         const data = dataList[i];
-        buffer.put(0b0100, 4); // mode 8bit
+        buffer.put(0b0100, 4);
         buffer.put(data.getLength(), typeNumber < 10 ? 8 : 16);
         data.write(buffer);
       }
-      // terminator
       const totalDataCount = rsBlocks.reduce((s,b)=>s+b.dataCount,0);
       if(buffer.length + 4 <= totalDataCount * 8) buffer.put(0, 4);
       while(buffer.length % 8 != 0) buffer.putBit(false);
 
-      // padding
       while(buffer.buffer.length < totalDataCount){
         buffer.put(PAD0, 8);
         if(buffer.buffer.length >= totalDataCount) break;
@@ -2136,8 +2207,8 @@ ${fmt(todo)}
       return buffer.buffer;
     }
 
-    function makeImpl(test, maskPattern){
-      _moduleCount = _typeNumber * 4 + 17;
+    function makeImpl(test, maskPattern, typeNumber){
+      _moduleCount = typeNumber * 4 + 17;
       _modules = new Array(_moduleCount);
       for(let r=0;r<_moduleCount;r++){
         _modules[r] = new Array(_moduleCount);
@@ -2147,11 +2218,11 @@ ${fmt(todo)}
       setupPositionProbePattern(0, 0);
       setupPositionProbePattern(_moduleCount - 7, 0);
       setupPositionProbePattern(0, _moduleCount - 7);
-      setupPositionAdjustPattern();
+      setupPositionAdjustPattern(typeNumber);
       setupTimingPattern();
       setupTypeInfo(test, maskPattern);
 
-      if(_dataCache == null) _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      if(_dataCache == null) _dataCache = createData(typeNumber, _errorCorrectionLevel, _dataList);
       mapData(_dataCache, maskPattern);
     }
 
@@ -2178,8 +2249,8 @@ ${fmt(todo)}
       }
     }
 
-    function setupPositionAdjustPattern(){
-      const pos = getPatternPosition(_typeNumber);
+    function setupPositionAdjustPattern(typeNumber){
+      const pos = getPatternPosition(typeNumber);
       for(let i=0;i<pos.length;i++){
         for(let j=0;j<pos.length;j++){
           const row = pos[i], col = pos[j];
@@ -2199,18 +2270,15 @@ ${fmt(todo)}
 
     function setupTypeInfo(test, maskPattern){
       const data = (_errorCorrectionLevel === "L" ? 1 :
-                   _errorCorrectionLevel === "M" ? 0 :
-                   _errorCorrectionLevel === "Q" ? 3 : 2);
+                   _errorCorrectionLevel === "M" ? 0 : 0);
       const bits = getBCHTypeInfo((data << 3) | maskPattern);
 
       for(let i=0;i<15;i++){
         const mod = (!test && ((bits >> i) & 1) == 1);
-        // vertical
         if(i < 6) _modules[i][8] = mod;
         else if(i < 8) _modules[i + 1][8] = mod;
         else _modules[_moduleCount - 15 + i][8] = mod;
 
-        // horizontal
         if(i < 8) _modules[8][_moduleCount - i - 1] = mod;
         else if(i < 9) _modules[8][15 - i - 1 + 1] = mod;
         else _modules[8][15 - i - 1] = mod;
@@ -2247,37 +2315,10 @@ ${fmt(todo)}
       }
     }
 
-    function getBestMaskPattern(){
-      // simple pick 0 (good enough for our use)
-      return 0;
-    }
-
     this.addData = function(data){ _dataList.push(new QR8bitByte(data)); _dataCache = null; };
-    this.make = function(){
-      // choose a safe typeNumber automatically (<= 10 is enough for URLs normally)
-      // try type 4..10
-       let t = _typeNumber || 0;
-      if(!t){
-        for(let n=4;n<=10;n++){
-          try{
-            _dataCache = null;
-            createData(n, _errorCorrectionLevel, _dataList);
-            t = n; break;
-          }catch(e){}
-        }
-        if(!t) t = 10;
-      }
-      // override internal type
-      // (quick hack for this minimal port)
-      // eslint-disable-next-line no-unused-vars
-      const __ = t;
-    };
 
-    this.getModuleCount = function(){ return _moduleCount; };
-    this.isDark = function(r,c){ return _modules[r][c]; };
-
-    this.make2 = function(){
-      // auto typeNumber selection (simple)
+    this.build = function(){
+      // auto choose type 4..10
       let chosen = _typeNumber || 0;
       if(!chosen){
         for(let n=4;n<=10;n++){
@@ -2289,33 +2330,11 @@ ${fmt(todo)}
         }
         if(!chosen) chosen = 10;
       }
-      // rebuild with chosen
-      // re-init internal by recreating object state we rely on
-      // (we keep chosen via closure by overwriting _typeNumber use)
-      // For this trimmed version: just set global-ish by reassigning through a hack:
-      // NOTE: For our use (URLs), n=6~10 is typical.
-      // We'll rebuild by calling makeImpl with chosen via a quick proxy:
-      // Create a temp QRCode with chosen as constructor param.
-      return chosen;
+      makeImpl(false, 0, chosen);
     };
 
-    this._build = function(realType){
-      // rebuild using realType as _typeNumber
-      // we "simulate" by creating a new QRCode and copying modules
-      const tmp = new QRCode(realType, _errorCorrectionLevel);
-      tmp.addData(_dataList[0].data);
-      tmp._finalize();
-      _modules = tmp._modules;
-      _moduleCount = tmp._moduleCount;
-    };
-
-    this._finalize = function(){
-      const mask = getBestMaskPattern();
-      makeImpl(false, mask);
-      // expose internals for _build copy
-      this._modules = _modules;
-      this._moduleCount = _moduleCount;
-    };
+    this.getModuleCount = function(){ return _moduleCount; };
+    this.isDark = function(r,c){ return _modules[r][c]; };
   }
 
   function drawQR(canvasId, text){
@@ -2325,8 +2344,7 @@ ${fmt(todo)}
 
     const qr = new QRCode(0, "M");
     qr.addData(text);
-    const t = qr.make2();
-    qr._build(t);
+    qr.build();
 
     const count = qr.getModuleCount();
     const size = canvas.width;
@@ -2334,7 +2352,6 @@ ${fmt(todo)}
     const cell = Math.floor((size - margin*2) / count);
     const offset = Math.floor((size - cell*count) / 2);
 
-    // background
     ctx.fillStyle = "#fff";
     ctx.fillRect(0,0,size,size);
 
@@ -2349,6 +2366,7 @@ ${fmt(todo)}
   }
 
   /* ---------------- Boot ---------------- */
+  applyTheme(app.prefs.theme);
   wire();
   render();
 

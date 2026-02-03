@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Digital Flyer Maker Pro</title>
+  <script src="./qrcode.min.js"></script>
   <style>
     :root{
       --bg:#0b0f19;
@@ -106,6 +107,29 @@
       border-radius:12px;
       padding:10px 10px;
       outline:none;
+    }
+    select{
+      background-color:#0f172a;
+      color:#f8fafc;
+      font-weight:700;
+    }
+    select:focus{
+      border-color: rgba(96,165,250,.6);
+      box-shadow: 0 0 0 3px rgba(96,165,250,.2);
+    }
+    select option{
+      background:#0b1220;
+      color:#e5e7eb;
+      font-weight:600;
+    }
+    select option:checked{
+      background:#1d4ed8;
+      color:#ffffff;
+    }
+    select optgroup{
+      background:#0b1220;
+      color:#93c5fd;
+      font-weight:800;
     }
     textarea{min-height:84px; resize:vertical}
     input[type="color"]{
@@ -289,6 +313,21 @@
     .iconBtn svg{width:16px; height:16px; opacity:.9}
     .iconBtn.warn{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.10)}
 
+    /* Asset Grid */
+    .assetGrid{display:grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap:8px; margin-top:8px;}
+    .assetItem{
+      width:60px; height:60px; border-radius:8px; border:1px solid var(--line);
+      background: rgba(255,255,255,.03); cursor:pointer; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .assetItem:hover{border-color: rgba(96,165,250,.45)}
+    .assetItem img{width:100%; height:100%; object-fit:cover;}
+    .assetItem svg{width:24px; height:24px; opacity:.7}
+
+    /* Logo Preview */
+    #logoPreview{margin-top:8px;}
+    #logoPreview img{max-width:100%; max-height:80px; border-radius:8px;}
+
     /* =========================
        Mobile / Tablet Responsive
        ========================= */
@@ -350,6 +389,10 @@
         <div class="tabs">
           <div class="tab active" id="tabDesign">Design</div>
           <div class="tab" id="tabLayers">Layers</div>
+          <div class="tab" id="tabAssets">Assets</div>
+          <div class="tab" id="tabEffects">Effects</div>
+          <div class="tab" id="tabTemplates">Templates</div>
+          <div class="tab" id="tabBrand">Brand</div>
         </div>
 
         <!-- DESIGN TAB -->
@@ -584,6 +627,11 @@
                 </div>
               </div>
 
+              <div id="iconControls" style="display:none">
+                <label>Icon Color</label>
+                <input id="iconColor" type="color" value="#ffffff">
+              </div>
+
               <div class="divider"></div>
 
               <label>Arrange</label>
@@ -593,13 +641,29 @@
                 <button type="button" id="alignLeft">Align Left</button>
                 <button type="button" id="alignCenter">Align Center</button>
                 <button type="button" id="alignRight">Align Right</button>
+                <button type="button" id="distributeHoriz">Distribute H</button>
+                <button type="button" id="distributeVert">Distribute V</button>
+                <button type="button" id="matchWidth">Match Width</button>
+                <button type="button" id="matchHeight">Match Height</button>
               </div>
 
               <div class="divider"></div>
 
               <div class="btns">
+                <button type="button" id="groupEl">Group</button>
+                <button type="button" id="ungroupEl">Ungroup</button>
                 <button type="button" class="danger" id="deleteEl">Delete</button>
                 <button type="button" id="duplicateEl">Duplicate</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <label>Templates</label>
+              <div class="btns">
+                <button type="button" id="addHeaderTemplate">Header Block</button>
+                <button type="button" id="addHeroTemplate">Hero Section</button>
+                <button type="button" id="addCallToAction">Call to Action</button>
+                <button type="button" id="addFooterTemplate">Footer Block</button>
               </div>
             </div>
           </div>
@@ -617,6 +681,179 @@
               <button type="button" class="warn" id="moveDown">Move Down</button>
               <button type="button" class="danger" id="deleteLayer">Delete</button>
               <button type="button" class="danger" id="clearAll">Clear Canvas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASSETS TAB -->
+        <div id="assetsTab" style="display:none">
+          <div class="group">
+            <h2>Asset Library</h2>
+            <div class="btns">
+              <button type="button" class="primary" id="addIcon">Add Icon</button>
+              <button type="button" id="addShapeAsset">Add Shape</button>
+              <button type="button" id="addPattern">Add Pattern</button>
+            </div>
+            <div class="divider"></div>
+            <h2>Stock Images</h2>
+            <div class="btns">
+              <button type="button" id="searchStock">Search Stock</button>
+              <button type="button" id="uploadAsset">Upload Asset</button>
+            </div>
+            <input id="stockSearch" type="text" placeholder="Search for images..." />
+            <div id="stockResults" class="assetGrid"></div>
+            <div class="divider"></div>
+            <h2>Templates</h2>
+            <div class="btns">
+              <button type="button" id="addHeaderTemplate">Header Block</button>
+              <button type="button" id="addHeroTemplate">Hero Section</button>
+              <button type="button" id="addCallToAction">Call to Action</button>
+              <button type="button" id="addFooterTemplate">Footer Block</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EFFECTS TAB -->
+        <div id="effectsTab" style="display:none">
+          <div class="group">
+            <h2>Effects Panel</h2>
+            <div id="noSelectionEffect" class="hint">Select an element to apply effects.</div>
+            <div id="effectsPanel" style="display:none">
+              <label>Shadow</label>
+              <div class="row3">
+                <div><input id="shadowX" type="number" placeholder="X" /></div>
+                <div><input id="shadowY" type="number" placeholder="Y" /></div>
+                <div><input id="shadowBlur" type="number" placeholder="Blur" /></div>
+              </div>
+              <input id="shadowColor" type="color" value="#000000" />
+              <input id="shadowAlpha" type="number" min="0" max="1" step="0.05" value="0.5" />
+
+              <div class="divider"></div>
+              <label>Blur</label>
+              <input id="blurAmount" type="number" min="0" max="20" step="0.5" value="0" />
+
+              <div class="divider"></div>
+              <label>Blend Mode</label>
+              <select id="blendMode">
+                <option value="normal">Normal</option>
+                <option value="multiply">Multiply</option>
+                <option value="screen">Screen</option>
+                <option value="overlay">Overlay</option>
+                <option value="darken">Darken</option>
+                <option value="lighten">Lighten</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEMPLATES TAB -->
+        <div id="templatesTab" style="display:none">
+          <div class="group">
+            <h2>Template Engine</h2>
+            <div class="btns">
+              <button type="button" class="primary" id="eventTemplate">Event Template</button>
+              <button type="button" id="businessTemplate">Business Template</button>
+              <button type="button" id="churchTemplate">Church Template</button>
+              <button type="button" id="saleTemplate">Sale Template</button>
+            </div>
+            <div class="divider"></div>
+            <h2>Quick Actions</h2>
+            <div class="btns">
+              <button type="button" id="socialResize">Social Resize</button>
+              <button type="button" id="addQR">Add QR Code</button>
+              <button type="button" id="addDataBlock">Add Data Block</button>
+            </div>
+            <div class="divider"></div>
+            <h2>QR Code Options</h2>
+            <div class="row">
+              <div>
+                <label>QR Size</label>
+                <select id="qrSize">
+                  <option value="100">Small (100px)</option>
+                  <option value="150" selected>Medium (150px)</option>
+                  <option value="200">Large (200px)</option>
+                  <option value="300">Extra Large (300px)</option>
+                </select>
+              </div>
+              <div>
+                <label>Error Correction</label>
+                <select id="qrErrorLevel">
+                  <option value="L">Low (7%)</option>
+                  <option value="M" selected>Medium (15%)</option>
+                  <option value="Q">Quartile (25%)</option>
+                  <option value="H">High (30%)</option>
+                </select>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <h2>QR Code Presets</h2>
+            <div class="btns">
+              <button type="button" id="qrWebsite">Website</button>
+              <button type="button" id="qrPhone">Phone</button>
+              <button type="button" id="qrEmail">Email</button>
+              <button type="button" id="qrLocation">Location</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRAND TAB -->
+        <div id="brandTab" style="display:none">
+          <div class="group">
+            <h2>Brand Kit</h2>
+            <div class="btns">
+              <button type="button" class="primary" id="saveBrand">Save Brand</button>
+              <button type="button" id="loadBrand">Load Brand</button>
+              <button type="button" id="resetBrandForm">Reset</button>
+            </div>
+            <div class="divider"></div>
+            <label>Brand Colors</label>
+            <div class="row3" id="brandColors">
+              <input type="color" id="brandColor1" value="#60a5fa" />
+              <input type="color" id="brandColor2" value="#a78bfa" />
+              <input type="color" id="brandColor3" value="#22c55e" />
+            </div>
+            <div class="divider"></div>
+            <label>Brand Fonts</label>
+            <select id="brandFont1">
+              <option value="ui-sans-serif, system-ui">System Sans</option>
+              <option value="Georgia, serif">Serif</option>
+              <option value="ui-monospace, monospace">Monospace</option>
+            </select>
+            <select id="brandFont2">
+              <option value="ui-sans-serif, system-ui">System Sans</option>
+              <option value="Georgia, serif">Serif</option>
+              <option value="ui-monospace, monospace">Monospace</option>
+            </select>
+            <div class="divider"></div>
+            <label>Logo Upload</label>
+            <input id="logoUpload" type="file" accept="image/*" />
+            <div id="logoPreview"></div>
+            <div class="btns" style="margin-top:8px">
+              <button type="button" id="addLogoToCanvas">Add Logo to Canvas</button>
+            </div>
+            <div class="divider"></div>
+            <label>Business Details</label>
+            <input id="brandName" type="text" placeholder="Business name" value="Your Business Name" />
+            <input id="brandTagline" type="text" placeholder="Tagline" value="Quality service you can trust" />
+            <div class="row">
+              <input id="brandPhone" type="text" placeholder="Phone" value="(555) 123-4567" />
+              <input id="brandWebsite" type="text" placeholder="Website" value="www.example.com" />
+            </div>
+            <input id="brandCtaText" type="text" placeholder="Call to action text" value="Get Started Today" />
+            <div class="divider"></div>
+            <label>Quick Presets</label>
+            <div class="btns">
+              <button type="button" id="brandPresetCorporate">Corporate</button>
+              <button type="button" id="brandPresetWarm">Warm</button>
+              <button type="button" id="brandPresetBold">Bold</button>
+            </div>
+            <div class="divider"></div>
+            <label>Brand Actions</label>
+            <div class="btns">
+              <button type="button" class="primary" id="applyBrandSelected">Apply to Selected</button>
+              <button type="button" id="applyBrandAll">Apply to All Elements</button>
+              <button type="button" id="addBrandHeader">Add Brand Header</button>
+              <button type="button" id="addBrandContact">Add Contact Block</button>
             </div>
           </div>
         </div>
@@ -657,6 +894,7 @@
   </div>
 
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
     // ===== Utilities =====
     const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -707,11 +945,26 @@
 
     const layersList = document.getElementById("layersList");
 
+    // New tab elements
+    const noSelectionEffect = document.getElementById("noSelectionEffect");
+    const effectsPanel = document.getElementById("effectsPanel");
+    const stockSearch = document.getElementById("stockSearch");
+    const stockResults = document.getElementById("stockResults");
+    const logoPreview = document.getElementById("logoPreview");
+
     // Tabs
     const tabDesign = document.getElementById("tabDesign");
     const tabLayers = document.getElementById("tabLayers");
+    const tabAssets = document.getElementById("tabAssets");
+    const tabEffects = document.getElementById("tabEffects");
+    const tabTemplates = document.getElementById("tabTemplates");
+    const tabBrand = document.getElementById("tabBrand");
     const designTab = document.getElementById("designTab");
     const layersTab = document.getElementById("layersTab");
+    const assetsTab = document.getElementById("assetsTab");
+    const effectsTab = document.getElementById("effectsTab");
+    const templatesTab = document.getElementById("templatesTab");
+    const brandTab = document.getElementById("brandTab");
 
     // Selected edit
     const noSelection = document.getElementById("noSelection");
@@ -747,6 +1000,18 @@
     const imgFit = document.getElementById("imgFit");
     const imgRadius = document.getElementById("imgRadius");
 
+    // Icon controls
+    const iconColor = document.getElementById("iconColor");
+
+    // Effects controls
+    const shadowX = document.getElementById("shadowX");
+    const shadowY = document.getElementById("shadowY");
+    const shadowBlur = document.getElementById("shadowBlur");
+    const shadowColor = document.getElementById("shadowColor");
+    const shadowAlpha = document.getElementById("shadowAlpha");
+    const blurAmount = document.getElementById("blurAmount");
+    const blendMode = document.getElementById("blendMode");
+
     // ===== State =====
     const EDIT_DPI = 96;
     const BLEED_IN = 0.125;
@@ -758,13 +1023,147 @@
 
     let elements = [];
     let selectedId = null;
+    let selectedIds = new Set(); // Multi-select support
     let drag = null;
     let resize = null;
+    let rotate = null; // Rotation support
     let zCounter = 1;
+
+    // ===== Snapping & Alignment =====
+    let alignmentGuides = [];
+    let snapThreshold = 8;
+
+    function getSnapLines(element){
+      const lines = [];
+      // Element edges and center
+      lines.push(
+        { type: 'vertical', pos: element.x, element: element.id },
+        { type: 'vertical', pos: element.x + element.w/2, element: element.id },
+        { type: 'vertical', pos: element.x + element.w, element: element.id },
+        { type: 'horizontal', pos: element.y, element: element.id },
+        { type: 'horizontal', pos: element.y + element.h/2, element: element.id },
+        { type: 'horizontal', pos: element.y + element.h, element: element.id }
+      );
+      return lines;
+    }
+
+    function findSnap(element, excludeIds = new Set()){
+      const snapLines = [];
+      const allLines = [];
+
+      // Collect all snap lines from other elements
+      for(const el of elements){
+        if(excludeIds.has(el.id)) continue;
+        allLines.push(...getSnapLines(el));
+      }
+
+      // Check for snaps
+      const elementLines = getSnapLines(element);
+      for(const elLine of elementLines){
+        for(const otherLine of allLines){
+          if(elLine.type === otherLine.type){
+            const distance = Math.abs(elLine.pos - otherLine.pos);
+            if(distance <= snapThreshold){
+              snapLines.push({
+                type: elLine.type,
+                pos: otherLine.pos,
+                distance: distance,
+                elementLine: elLine,
+                otherElement: otherLine.element
+              });
+            }
+          }
+        }
+      }
+
+      return snapLines;
+    }
+
+    function applySnap(element, snapLines){
+      let snappedX = element.x;
+      let snappedY = element.y;
+
+      for(const snap of snapLines){
+        if(snap.type === 'vertical'){
+          snappedX = snap.pos - (snap.elementLine.pos - element.x);
+        } else if(snap.type === 'horizontal'){
+          snappedY = snap.pos - (snap.elementLine.pos - element.y);
+        }
+      }
+
+      return { x: snappedX, y: snappedY };
+    }
+
+    // ===== Undo/Redo System =====
+    let history = [];
+    let historyIndex = -1;
+    const MAX_HISTORY = 50;
+
+    function saveState(){
+      const state = JSON.stringify({
+        elements: JSON.parse(JSON.stringify(elements)),
+        selectedId,
+        selectedIds: Array.from(selectedIds),
+        zCounter,
+        canvasPresetKey,
+        canvasLandscape,
+        bgColor: bgColor.value
+      });
+
+      // Remove future history if we're not at the end
+      history = history.slice(0, historyIndex + 1);
+
+      history.push(state);
+      historyIndex++;
+
+      // Limit history size
+      if(history.length > MAX_HISTORY){
+        history.shift();
+        historyIndex--;
+      }
+    }
+
+    function undo(){
+      if(historyIndex > 0){
+        historyIndex--;
+        loadState(history[historyIndex]);
+        render();
+        renderLayers();
+        updateEditPanel();
+        setStatus("Undid", "Ready");
+      }
+    }
+
+    function redo(){
+      if(historyIndex < history.length - 1){
+        historyIndex++;
+        loadState(history[historyIndex]);
+        render();
+        renderLayers();
+        updateEditPanel();
+        setStatus("Redid", "Ready");
+      }
+    }
+
+    function loadState(stateStr){
+      const state = JSON.parse(stateStr);
+      elements = state.elements;
+      selectedId = state.selectedId;
+      selectedIds = new Set(state.selectedIds || []);
+      zCounter = state.zCounter;
+      canvasPresetKey = state.canvasPresetKey || "a4";
+      canvasLandscape = state.canvasLandscape || false;
+      if(state.bgColor) bgColor.value = state.bgColor;
+      paper.style.background = bgColor.value;
+    }
 
     // ===== Helpers =====
     function setStatus(left, right){ statusLeft.textContent = left; statusRight.textContent = right; }
     function getSelected(){ return elements.find(e=>e.id===selectedId) || null; }
+    function getSelectedElements(){
+      if(selectedId) return [getSelected()].filter(Boolean);
+      return Array.from(selectedIds).map(id => elements.find(e => e.id === id)).filter(Boolean);
+    }
     function snap(n){ return snapToGrid.checked ? Math.round(n / SNAP) * SNAP : n; }
 
     function currentCanvasInches(){
@@ -885,11 +1284,14 @@
         id,
         name: opts.name ?? "Text",
         hidden:false,
+        locked: false,
         type:"text",
+        groupId: null,
         x: opts.x ?? 70,
         y: opts.y ?? 90,
         w: opts.w ?? 520,
         h: opts.h ?? 90,
+        rotation: 0,
         z: ++zCounter,
         text: opts.text ?? "",
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
@@ -901,7 +1303,12 @@
         color: opts.color ?? "#ffffff",
         align: opts.align ?? "left",
         bg: opts.bg ?? "#000000",
-        bgAlpha: opts.bgAlpha ?? 0
+        bgAlpha: opts.bgAlpha ?? 0,
+        textShadow: { x: 0, y: 0, blur: 0, color: "#000000", alpha: 1 },
+        // Effects
+        shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+        blur: 0,
+        blendMode: "normal"
       };
       elements.push(el);
       render();
@@ -916,18 +1323,25 @@
         id,
         name: opts.name ?? (kind === "circle" ? "Circle" : "Rectangle"),
         hidden:false,
+        locked: false,
         type:"shape",
+        groupId: null,
         kind,
         x: opts.x ?? 60,
         y: opts.y ?? 60,
         w: opts.w ?? (kind === "circle" ? 180 : 680),
         h: opts.h ?? (kind === "circle" ? 180 : 140),
+        rotation: 0,
         z: ++zCounter,
         fill: opts.fill ?? "#60a5fa",
         alpha: opts.alpha ?? 0.18,
         border: opts.border ?? "#60a5fa",
         borderW: opts.borderW ?? 1,
         radius: opts.radius ?? 12,
+        // Effects
+        shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+        blur: 0,
+        blendMode: "normal"
       };
       elements.push(el);
       render();
@@ -941,11 +1355,14 @@
         id,
         name: opts.name ?? "Button",
         hidden:false,
+        locked: false,
         type:"text",
+        groupId: null,
         x: opts.x ?? 70,
         y: opts.y ?? Math.max(70, paper.clientHeight - 220),
         w: opts.w ?? 520,
         h: opts.h ?? 86,
+        rotation: 0,
         z: ++zCounter,
         text: opts.text ?? "",
         fontFamily: opts.fontFamily ?? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
@@ -957,7 +1374,12 @@
         color: opts.color ?? "#0b1220",
         align: opts.align ?? "center",
         bg: opts.bg ?? "#60a5fa",
-        bgAlpha: opts.bgAlpha ?? 1
+        bgAlpha: opts.bgAlpha ?? 1,
+        textShadow: { x: 0, y: 0, blur: 0, color: "#000000", alpha: 1 },
+        // Effects
+        shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+        blur: 0,
+        blendMode: "normal"
       };
       elements.push(el);
       render();
@@ -972,15 +1394,22 @@
         id,
         name: opts.name ?? "Image",
         hidden:false,
+        locked: false,
         type:"image",
+        groupId: null,
         x: opts.x ?? Math.max(40, paper.clientWidth - 280),
         y: opts.y ?? 220,
         w: opts.w ?? 240,
         h: opts.h ?? 240,
+        rotation: 0,
         z: ++zCounter,
         src: dataUrl,
         fit: opts.fit ?? "cover",
-        radius: opts.radius ?? 12
+        radius: opts.radius ?? 12,
+        // Effects
+        shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+        blur: 0,
+        blendMode: "normal"
       };
       elements.push(el);
       render();
@@ -998,29 +1427,194 @@
       setStatus("Canvas cleared", "Ready");
     }
 
+    // ===== Templates =====
+    function addHeaderTemplate(){
+      console.log("addHeaderTemplate called");
+      // Add title
+      addText({
+        name: "Header Title",
+        x: 40, y: 40, w: 720, h: 80,
+        text: "Your Company Name",
+        fontSize: 48, fontWeight: 900,
+        align: "center",
+        color: "#ffffff",
+        bgAlpha: 0
+      });
+
+      // Add subtitle
+      addText({
+        name: "Header Subtitle",
+        x: 40, y: 140, w: 720, h: 50,
+        text: "Professional Services & Solutions",
+        fontSize: 24, fontWeight: 400,
+        align: "center",
+        color: "#cbd5e1",
+        bgAlpha: 0
+      });
+
+      setStatus("Header template added", "Ready");
+    }
+
+    function addHeroTemplate(){
+      // Add background shape
+      addShape("rect", {
+        name: "Hero Background",
+        x: 20, y: 200, w: 760, h: 300,
+        fill: "#60a5fa", alpha: 0.1,
+        border: "#60a5fa", borderW: 2,
+        radius: 24
+      });
+
+      // Add hero title
+      addText({
+        name: "Hero Title",
+        x: 60, y: 240, w: 680, h: 80,
+        text: "Welcome to Our Services",
+        fontSize: 42, fontWeight: 800,
+        align: "center",
+        color: "#ffffff",
+        bgAlpha: 0
+      });
+
+      // Add hero description
+      addText({
+        name: "Hero Description",
+        x: 80, y: 340, w: 640, h: 120,
+        text: "We provide exceptional solutions tailored to your needs. Our team of experts is dedicated to delivering quality results that exceed expectations.",
+        fontSize: 18, fontWeight: 400, lineHeight: 1.6,
+        align: "center",
+        color: "#e2e8f0",
+        bgAlpha: 0
+      });
+
+      setStatus("Hero template added", "Ready");
+    }
+
+    function addCallToAction(){
+      // Add CTA button
+      addButton({
+        name: "CTA Button",
+        x: 200, y: 520, w: 400, h: 70,
+        text: "Get Started Today",
+        fontSize: 24, fontWeight: 700,
+        align: "center",
+        color: "#0f172a",
+        bg: "#60a5fa", bgAlpha: 1
+      });
+
+      // Add CTA text
+      addText({
+        name: "CTA Text",
+        x: 100, y: 480, w: 600, h: 40,
+        text: "Ready to transform your business?",
+        fontSize: 20, fontWeight: 600,
+        align: "center",
+        color: "#ffffff",
+        bgAlpha: 0
+      });
+
+      setStatus("Call-to-action template added", "Ready");
+    }
+
+    function addFooterTemplate(){
+      // Add footer background
+      addShape("rect", {
+        name: "Footer Background",
+        x: 0, y: 600, w: 800, h: 100,
+        fill: "#1e293b", alpha: 0.9,
+        border: "#334155", borderW: 1,
+        radius: 0
+      });
+
+      // Add footer text
+      addText({
+        name: "Footer Text",
+        x: 40, y: 620, w: 720, h: 60,
+        text: "© 2024 Your Company. All rights reserved. | Contact us: info@company.com | Phone: (555) 123-4567",
+        fontSize: 14, fontWeight: 400,
+        align: "center",
+        color: "#cbd5e1",
+        bgAlpha: 0
+      });
+
+      setStatus("Footer template added", "Ready");
+    }
+
     // ===== Pointer Drag/Resize (mobile + desktop) =====
     function startDragPointer(e, id){
       const el = elements.find(x=>x.id===id);
       if(!el) return;
-      drag = { id, startX: e.clientX, startY: e.clientY, elX: el.x, elY: el.y };
+
+      // Get all elements to drag (single, multi-selection, or group with children)
+      let elementsToDrag = [];
+      if(selectedId === id && el.type === "group"){
+        // If dragging a group, include all children
+        elementsToDrag = [el, ...elements.filter(e=>el.children.includes(e.id))];
+      } else if(selectedId === id){
+        elementsToDrag = [el];
+      } else {
+        // Multi-selection
+        elementsToDrag = Array.from(selectedIds).map(id => elements.find(e => e.id === id)).filter(Boolean);
+      }
+
+      drag = {
+        elements: elementsToDrag,
+        startX: e.clientX,
+        startY: e.clientY,
+        initialPositions: elementsToDrag.map(el => ({ x: el.x, y: el.y })),
+        excludeIds: new Set(elementsToDrag.map(el => el.id))
+      };
       window.addEventListener("pointermove", onDragMovePointer);
       window.addEventListener("pointerup", onDragEndPointer, { once:true });
     }
+
     function onDragMovePointer(e){
       if(!drag) return;
-      const el = elements.find(x=>x.id===drag.id);
-      if(!el) return;
+
       const dx = e.clientX - drag.startX;
       const dy = e.clientY - drag.startY;
-      el.x = snap(clamp(drag.elX + dx, 0, paper.clientWidth - 10));
-      el.y = snap(clamp(drag.elY + dy, 0, paper.clientHeight - 10));
+
+      // Calculate new positions
+      const newElements = drag.elements.map((el, i) => ({
+        ...el,
+        x: drag.initialPositions[i].x + dx,
+        y: drag.initialPositions[i].y + dy
+      }));
+
+      // Find snaps for the primary element (first one)
+      const primaryEl = newElements[0];
+      const snapLines = findSnap(primaryEl, drag.excludeIds);
+      alignmentGuides = snapLines.map(snap => ({ type: snap.type, pos: snap.pos }));
+
+      // Apply snapping to all elements
+      if(snapLines.length > 0){
+        const snapped = applySnap(primaryEl, snapLines);
+        const snapDx = snapped.x - primaryEl.x;
+        const snapDy = snapped.y - primaryEl.y;
+
+        drag.elements.forEach((el, i) => {
+          el.x = drag.initialPositions[i].x + dx + snapDx;
+          el.y = drag.initialPositions[i].y + dy + snapDy;
+        });
+      } else {
+        alignmentGuides = [];
+        drag.elements.forEach((el, i) => {
+          el.x = drag.initialPositions[i].x + dx;
+          el.y = drag.initialPositions[i].y + dy;
+        });
+      }
+
       render();
       updateEditPanelQuiet();
-      setStatus("Moving", `x:${Math.round(el.x)} y:${Math.round(el.y)}`);
+      const movingEl = drag.elements[0];
+      setStatus("Moving", `x:${Math.round(movingEl.x)} y:${Math.round(movingEl.y)}`);
     }
+
     function onDragEndPointer(){
+      alignmentGuides = [];
       drag = null;
       window.removeEventListener("pointermove", onDragMovePointer);
+      render();
       renderLayers();
       setStatus("Moved", "Ready");
     }
@@ -1031,6 +1625,7 @@
       resize = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
       window.addEventListener("pointermove", onResizeMovePointer);
       window.addEventListener("pointerup", onResizeEndPointer, { once:true });
+      window.addEventListener("pointercancel", onResizeEndPointer, { once:true });
     }
     function onResizeMovePointer(e){
       if(!resize) return;
@@ -1050,10 +1645,50 @@
       renderLayers();
       setStatus("Resized", "Ready");
     }
+    function startRotatePointer(e, id){
+      const el = elements.find(x=>x.id===id);
+      if(!el) return;
+      const rect = paper.getBoundingClientRect();
+      const centerX = el.x + el.w/2;
+      const centerY = el.y + el.h/2;
+
+      rotate = {
+        id,
+        startAngle: Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX),
+        startRotation: el.rotation || 0
+      };
+      window.addEventListener("pointermove", onRotateMovePointer);
+      window.addEventListener("pointerup", onRotateEndPointer, { once:true });
+    }
+
+    function onRotateMovePointer(e){
+      if(!rotate) return;
+      const el = elements.find(x=>x.id===rotate.id);
+      if(!el) return;
+
+      const rect = paper.getBoundingClientRect();
+      const centerX = el.x + el.w/2;
+      const centerY = el.y + el.h/2;
+      const currentAngle = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
+
+      el.rotation = rotate.startRotation + (currentAngle - rotate.startAngle) * (180 / Math.PI);
+      el.rotation = ((el.rotation % 360) + 360) % 360; // Normalize to 0-360
+
+      render();
+      updateEditPanelQuiet();
+      setStatus("Rotating", `${Math.round(el.rotation)}°`);
+    }
+
+    function onRotateEndPointer(){
+      rotate = null;
+      window.removeEventListener("pointermove", onRotateMovePointer);
+      renderLayers();
+      setStatus("Rotated", "Ready");
+    }
 
     // ===== Render =====
     function render(){
-      paper.querySelectorAll(".item").forEach(n=>n.remove());
+      paper.querySelectorAll(".item, .alignment-guide").forEach(n=>n.remove());
       paper.style.background = bgColor.value;
 
       const sorted = [...elements].sort((a,b)=>a.z-b.z);
@@ -1066,12 +1701,29 @@
         node.style.width = el.w + "px";
         node.style.height = el.h + "px";
         node.style.zIndex = el.z;
+        node.style.transform = `rotate(${el.rotation || 0}deg)`;
+        node.style.transformOrigin = "center center";
 
         if(el.hidden) node.classList.add("hidden");
-        if(el.id === selectedId) node.classList.add("selected");
+        if(el.locked) node.classList.add("locked");
+
+        // Check if element is selected (directly or via group)
+        const isSelected = selectedIds.has(el.id) || el.id === selectedId;
+        const isInSelectedGroup = Array.from(selectedIds).some(id => {
+          const group = elements.find(e => e.id === id && e.type === "group");
+          return group && group.children.includes(el.id);
+        });
+        if(isSelected || isInSelectedGroup) node.classList.add("selected");
 
         const content = document.createElement("div");
         content.className = "content";
+
+        if(el.type === "group"){
+          // Groups are invisible containers - just show selection outline
+          content.style.background = "transparent";
+          content.style.border = "1px dashed #60a5fa";
+          content.style.opacity = "0.5";
+        }
 
         if(el.type === "text"){
           const t = document.createElement("div");
@@ -1086,11 +1738,32 @@
           t.style.color = el.color;
           t.style.textAlign = el.align;
           t.style.background = rgba(el.bg, el.bgAlpha);
+
+          // Text shadow
+          if(el.textShadow && (el.textShadow.x || el.textShadow.y || el.textShadow.blur)) {
+            t.style.textShadow = `${el.textShadow.x || 0}px ${el.textShadow.y || 0}px ${el.textShadow.blur || 0}px ${rgba(el.textShadow.color, el.textShadow.alpha)}`;
+          }
+
           t.style.width = "100%";
           t.style.height = "100%";
           t.style.display = "flex";
           t.style.alignItems = "center";
           t.style.justifyContent = el.align === "left" ? "flex-start" : (el.align === "center" ? "center" : "flex-end");
+
+          // Combine filters
+          let filters = [];
+          if(el.shadowX || el.shadowY || el.shadowBlur) {
+            t.style.boxShadow = `${el.shadowX || 0}px ${el.shadowY || 0}px ${el.shadowBlur || 0}px ${rgba(el.shadowColor, el.shadowAlpha)}`;
+          }
+          if(el.blur > 0) {
+            filters.push(`blur(${el.blur}px)`);
+          }
+          if(filters.length > 0) {
+            t.style.filter = filters.join(" ");
+          }
+          if(el.blendMode && el.blendMode !== "normal") {
+            t.style.mixBlendMode = el.blendMode;
+          }
           content.appendChild(t);
         }
 
@@ -1102,6 +1775,21 @@
           s.style.width = "100%";
           s.style.height = "100%";
           s.style.borderRadius = el.kind === "circle" ? "999px" : (el.radius ?? 12) + "px";
+
+          // Combine filters
+          let filters = [];
+          if(el.shadowX || el.shadowY || el.shadowBlur) {
+            s.style.boxShadow = `${el.shadowX || 0}px ${el.shadowY || 0}px ${el.shadowBlur || 0}px ${rgba(el.shadowColor, el.shadowAlpha)}`;
+          }
+          if(el.blur > 0) {
+            filters.push(`blur(${el.blur}px)`);
+          }
+          if(filters.length > 0) {
+            s.style.filter = filters.join(" ");
+          }
+          if(el.blendMode && el.blendMode !== "normal") {
+            s.style.mixBlendMode = el.blendMode;
+          }
           content.appendChild(s);
         }
 
@@ -1111,7 +1799,72 @@
           img.src = el.src;
           img.style.objectFit = el.fit || "cover";
           img.style.borderRadius = (el.radius ?? 12) + "px";
+
+          // Combine filters
+          let filters = [];
+          if(el.shadowX || el.shadowY || el.shadowBlur) {
+            img.style.boxShadow = `${el.shadowX || 0}px ${el.shadowY || 0}px ${el.shadowBlur || 0}px ${rgba(el.shadowColor, el.shadowAlpha)}`;
+          }
+          if(el.blur > 0) {
+            filters.push(`blur(${el.blur}px)`);
+          }
+          if(filters.length > 0) {
+            img.style.filter = filters.join(" ");
+          }
+          if(el.blendMode && el.blendMode !== "normal") {
+            img.style.mixBlendMode = el.blendMode;
+          }
           content.appendChild(img);
+        }
+
+        if(el.type === "icon"){
+          const iconDiv = document.createElement("div");
+          iconDiv.innerHTML = el.svg;
+          iconDiv.style.width = "100%";
+          iconDiv.style.height = "100%";
+          iconDiv.style.display = "flex";
+          iconDiv.style.alignItems = "center";
+          iconDiv.style.justifyContent = "center";
+          iconDiv.style.color = el.color || "#ffffff";
+
+          // Combine filters
+          let filters = [];
+          if(el.shadowX || el.shadowY || el.shadowBlur) {
+            iconDiv.style.filter = `drop-shadow(${el.shadowX || 0}px ${el.shadowY || 0}px ${el.shadowBlur || 0}px ${rgba(el.shadowColor, el.shadowAlpha)})`;
+          }
+          if(el.blur > 0) {
+            filters.push(`blur(${el.blur}px)`);
+          }
+          if(filters.length > 0) {
+            iconDiv.style.filter = (iconDiv.style.filter ? iconDiv.style.filter + " " : "") + filters.join(" ");
+          }
+          if(el.blendMode && el.blendMode !== "normal") {
+            iconDiv.style.mixBlendMode = el.blendMode;
+          }
+          const svg = iconDiv.querySelector("svg");
+          if(svg){
+            svg.style.width = "80%";
+            svg.style.height = "80%";
+          }
+          content.appendChild(iconDiv);
+        }
+
+        // Add rotation handle
+        if((selectedIds.has(el.id) || el.id === selectedId) && !el.locked){
+          const rotateHandle = document.createElement("div");
+          rotateHandle.className = "rotate-handle";
+          rotateHandle.style.position = "absolute";
+          rotateHandle.style.top = "-20px";
+          rotateHandle.style.left = "50%";
+          rotateHandle.style.transform = "translateX(-50%)";
+          rotateHandle.style.width = "12px";
+          rotateHandle.style.height = "12px";
+          rotateHandle.style.borderRadius = "50%";
+          rotateHandle.style.background = "#60a5fa";
+          rotateHandle.style.border = "2px solid white";
+          rotateHandle.style.cursor = "alias";
+          rotateHandle.title = "Rotate";
+          node.appendChild(rotateHandle);
         }
 
         const handle = document.createElement("div");
@@ -1122,31 +1875,58 @@
 
         // ✅ Pointer events: works for mouse + touch
         node.addEventListener("pointerdown", (e) => {
-          if(el.hidden) return;
+          if(el.hidden || el.locked) return;
 
           // keep receiving moves even if finger leaves the element
           node.setPointerCapture?.(e.pointerId);
 
+          const isRotateHandle = e.target.classList.contains("rotate-handle");
           const isHandle = e.target.classList.contains("handle");
+
+          if(isRotateHandle){
+            e.preventDefault();
+            select(el.id);
+            startRotatePointer(e, el.id);
+            return;
+          }
+
           if(isHandle){
             e.preventDefault();
             select(el.id);
             startResizePointer(e, el.id);
             return;
           }
+
           e.preventDefault();
-          select(el.id);
+          if(e.shiftKey){
+            // Multi-select
+            select(el.id, true);
+          } else {
+            select(el.id);
+          }
           startDragPointer(e, el.id);
+        });
+
+        // Double-click for inline editing
+        node.addEventListener("dblclick", (e) => {
+          if(el.type === "text" && !el.locked){
+            e.preventDefault();
+            startInlineEdit(el);
+          }
         });
 
         paper.appendChild(node);
       }
 
+      // Render alignment guides
+      renderAlignmentGuides();
+
       // deselect when clicking blank area
       paper.onpointerdown = (e) => {
         const t = e.target;
-        if(t === paper || t.classList.contains("gridOverlay") || t.classList.contains("guides") || t.classList.contains("guide-bleed") || t.classList.contains("guide-safe") || t.classList.contains("centerGuides")){
+        if(t === paper || t.classList.contains("gridOverlay") || t.classList.contains("guides") || t.classList.contains("guide-bleed") || t.classList.contains("guide-safe") || t.classList.contains("centerGuides") || t.classList.contains("alignment-guide")){
           selectedId = null;
+          selectedIds.clear();
           updateEditPanel();
           renderLayers();
           render();
@@ -1155,13 +1935,120 @@
       };
     }
 
-    function select(id){
-      selectedId = id;
+    function renderAlignmentGuides(){
+      // Clear existing guides
+      paper.querySelectorAll(".alignment-guide").forEach(g => g.remove());
+
+      if(alignmentGuides.length === 0) return;
+
+      for(const guide of alignmentGuides){
+        const guideEl = document.createElement("div");
+        guideEl.className = "alignment-guide";
+
+        if(guide.type === "vertical"){
+          guideEl.style.position = "absolute";
+          guideEl.style.left = guide.pos + "px";
+          guideEl.style.top = "0";
+          guideEl.style.width = "1px";
+          guideEl.style.height = "100%";
+          guideEl.style.background = "rgba(96, 165, 250, 0.8)";
+          guideEl.style.pointerEvents = "none";
+          guideEl.style.zIndex = "1000";
+        } else if(guide.type === "horizontal"){
+          guideEl.style.position = "absolute";
+          guideEl.style.top = guide.pos + "px";
+          guideEl.style.left = "0";
+          guideEl.style.width = "100%";
+          guideEl.style.height = "1px";
+          guideEl.style.background = "rgba(96, 165, 250, 0.8)";
+          guideEl.style.pointerEvents = "none";
+          guideEl.style.zIndex = "1000";
+        }
+
+        paper.appendChild(guideEl);
+      }
+    }
+
+    function select(id, multiSelect = false){
+      if(multiSelect){
+        if(selectedIds.has(id)){
+          selectedIds.delete(id);
+          if(selectedIds.size === 0){
+            selectedId = null;
+          } else if(selectedIds.size === 1){
+            selectedId = [...selectedIds][0];
+          }
+        } else {
+          selectedIds.add(id);
+          selectedId = null;
+        }
+      } else {
+        selectedId = id;
+        selectedIds.clear();
+        if(id) selectedIds.add(id);
+      }
       updateEditPanel();
       renderLayers();
       render();
       const el = getSelected();
       if(el) setStatus("Selected", el.name || "");
+    }
+
+    function startInlineEdit(el){
+      const node = paper.querySelector(`[data-id="${el.id}"] .textBox`);
+      if(!node) return;
+
+      const textarea = document.createElement("textarea");
+      textarea.value = el.text || "";
+      textarea.style.position = "absolute";
+      textarea.style.left = el.x + "px";
+      textarea.style.top = el.y + "px";
+      textarea.style.width = el.w + "px";
+      textarea.style.height = el.h + "px";
+      textarea.style.fontFamily = el.fontFamily;
+      textarea.style.fontSize = el.fontSize + "px";
+      textarea.style.fontWeight = el.fontWeight;
+      textarea.style.lineHeight = String(el.lineHeight);
+      textarea.style.letterSpacing = (el.letterSpacing ?? 0) + "px";
+      textarea.style.padding = (el.pad ?? 12) + "px";
+      textarea.style.color = el.color;
+      textarea.style.textAlign = el.align;
+      textarea.style.background = rgba(el.bg, el.bgAlpha);
+      textarea.style.border = "2px solid #60a5fa";
+      textarea.style.borderRadius = "8px";
+      textarea.style.resize = "none";
+      textarea.style.outline = "none";
+      textarea.style.zIndex = "2000";
+
+      // Hide the original text
+      node.style.visibility = "hidden";
+
+      textarea.focus();
+      textarea.select();
+
+      const finishEdit = () => {
+        el.text = textarea.value;
+        textarea.remove();
+        node.style.visibility = "visible";
+        render();
+        updateEditPanel();
+        setStatus("Text edited", "Ready");
+      };
+
+      textarea.addEventListener("blur", finishEdit);
+      textarea.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" && !e.shiftKey){
+          e.preventDefault();
+          finishEdit();
+        }
+        if(e.key === "Escape"){
+          e.preventDefault();
+          textarea.remove();
+          node.style.visibility = "visible";
+        }
+      });
+
+      paper.appendChild(textarea);
     }
 
     // ===== Edit panel =====
@@ -1170,10 +2057,14 @@
       if(!el){
         noSelection.style.display = "block";
         editPanel.style.display = "none";
+        noSelectionEffect.style.display = "block";
+        effectsPanel.style.display = "none";
         return;
       }
       noSelection.style.display = "none";
       editPanel.style.display = "block";
+      noSelectionEffect.style.display = "none";
+      effectsPanel.style.display = "block";
 
       elName.value = el.name || "";
       elType.value = el.type + (el.type==="shape" ? ` (${el.kind})` : "");
@@ -1211,6 +2102,26 @@
         imgFit.value = el.fit || "cover";
         imgRadius.value = el.radius ?? 12;
       }
+
+      // Icon controls
+      const iconControls = document.getElementById("iconControls");
+      if(iconControls){
+        if(el.type === "icon"){
+          iconControls.style.display = "block";
+          document.getElementById("iconColor").value = el.color || "#ffffff";
+        } else {
+          iconControls.style.display = "none";
+        }
+      }
+
+      // Effects (for all element types)
+      shadowX.value = el.shadowX ?? 0;
+      shadowY.value = el.shadowY ?? 0;
+      shadowBlur.value = el.shadowBlur ?? 0;
+      shadowColor.value = el.shadowColor ?? "#000000";
+      shadowAlpha.value = el.shadowAlpha ?? 0.5;
+      blurAmount.value = el.blur ?? 0;
+      blendMode.value = el.blendMode ?? "normal";
     }
     function updateEditPanelQuiet(){
       const el = getSelected();
@@ -1266,6 +2177,18 @@
     // image
     bindInput(imgFit, (el)=> el.fit = imgFit.value);
     bindInput(imgRadius, (el)=> el.radius = clamp(Number(imgRadius.value)||0, 0, 160));
+
+    // icon
+    bindInput(iconColor, (el)=> el.color = iconColor.value);
+
+    // effects
+    bindInput(shadowX, (el)=> el.shadowX = Number(shadowX.value)||0);
+    bindInput(shadowY, (el)=> el.shadowY = Number(shadowY.value)||0);
+    bindInput(shadowBlur, (el)=> el.shadowBlur = Number(shadowBlur.value)||0);
+    bindInput(shadowColor, (el)=> el.shadowColor = shadowColor.value);
+    bindInput(shadowAlpha, (el)=> el.shadowAlpha = clamp(Number(shadowAlpha.value)||0, 0, 1));
+    bindInput(blurAmount, (el)=> el.blur = clamp(Number(blurAmount.value)||0, 0, 20));
+    bindInput(blendMode, (el)=> el.blendMode = blendMode.value);
 
     // ===== Layers =====
     const ICON_EYE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`;
@@ -1344,7 +2267,452 @@
       }
     }
 
-    // ===== Export PNG =====
+    // ===== Asset Library =====
+    const ICONS = [
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>', // help
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>', // heart
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>', // document
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', // users
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>', // image
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>', // video
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', // message
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' // phone
+    ];
+
+    function renderAssetGrid(){
+      stockResults.innerHTML = "";
+      ICONS.forEach((iconSvg, i) => {
+        const item = document.createElement("div");
+        item.className = "assetItem";
+        item.innerHTML = iconSvg;
+        item.onclick = () => addIconAsset(iconSvg);
+        stockResults.appendChild(item);
+      });
+    }
+
+    function addIconAsset(svgContent){
+      const id = uid();
+      const el = {
+        id,
+        name: "Icon",
+        hidden:false,
+        locked: false,
+        type:"icon",
+        groupId: null,
+        x: 100,
+        y: 100,
+        w: 48,
+        h: 48,
+        rotation: 0,
+        z: ++zCounter,
+        svg: svgContent,
+        color: "#ffffff",
+        // Effects
+        shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+        blur: 0,
+        blendMode: "normal"
+      };
+      elements.push(el);
+      render();
+      select(id);
+      renderLayers();
+    }
+
+    // ===== Templates =====
+    function createEventTemplate(){
+      clearAll();
+      // Background
+      addShape("rect", { name:"Background", x:0, y:0, w:paper.clientWidth, h:paper.clientHeight, fill:"#1a1a2e", alpha:1, borderW:0 });
+      // Title
+      addText({ name:"Event Title", text:"EVENT TITLE", x:50, y:100, w:paper.clientWidth-100, h:80, fontSize:48, color:"#ffffff", align:"center" });
+      // Date
+      addText({ name:"Date", text:"December 25, 2024", x:50, y:200, w:paper.clientWidth-100, h:40, fontSize:24, color:"#60a5fa", align:"center" });
+      // Description
+      addText({ name:"Description", text:"Join us for an amazing event!", x:50, y:260, w:paper.clientWidth-100, h:60, fontSize:18, color:"#cccccc", align:"center" });
+      // CTA Button
+      addButton({ name:"CTA", text:"RSVP Now", x:paper.clientWidth/2-100, y:paper.clientHeight-120, w:200, h:60 });
+    }
+
+    function createBusinessTemplate(){
+      clearAll();
+      // Header
+      addShape("rect", { name:"Header", x:0, y:0, w:paper.clientWidth, h:120, fill:"#60a5fa", alpha:1, borderW:0 });
+      addText({ name:"Company", text:"COMPANY NAME", x:50, y:30, w:300, h:60, fontSize:32, color:"#ffffff" });
+      // Content
+      addText({ name:"Headline", text:"Professional Services", x:50, y:160, w:paper.clientWidth-100, h:50, fontSize:36, color:"#000000" });
+      addText({ name:"Subtext", text:"We provide quality solutions for your business needs.", x:50, y:230, w:paper.clientWidth-100, h:40, fontSize:18, color:"#666666" });
+      // Contact
+      addText({ name:"Contact", text:"Call us: (555) 123-4567\nEmail: info@company.com", x:50, y:paper.clientHeight-100, w:300, h:60, fontSize:16, color:"#333333" });
+    }
+
+    function createChurchTemplate(){
+      clearAll();
+      // Background with gradient
+      addShape("rect", { name:"Background", x:0, y:0, w:paper.clientWidth, h:paper.clientHeight, fill:"#2d5a27", alpha:1, borderW:0 });
+      // Church name
+      addText({ name:"Church Name", text:"Grace Community Church", x:50, y:80, w:paper.clientWidth-100, h:60, fontSize:42, color:"#ffffff", align:"center" });
+      // Service info
+      addText({ name:"Service", text:"Sunday Service\n9:00 AM & 11:00 AM", x:50, y:180, w:paper.clientWidth-100, h:80, fontSize:28, color:"#f0f0f0", align:"center" });
+      // Verse
+      addText({ name:"Verse", text:"\"For where two or three gather in my name, there am I with them.\"\n- Matthew 18:20", x:50, y:300, w:paper.clientWidth-100, h:100, fontSize:20, color:"#e8e8e8", align:"center" });
+      // Address
+      addText({ name:"Address", text:"123 Faith Street\nAnytown, USA 12345", x:50, y:paper.clientHeight-120, w:paper.clientWidth-100, h:60, fontSize:18, color:"#cccccc", align:"center" });
+    }
+
+    function createSaleTemplate(){
+      clearAll();
+      // Sale banner
+      addShape("rect", { name:"Sale Banner", x:0, y:0, w:paper.clientWidth, h:150, fill:"#dc2626", alpha:1, borderW:0 });
+      addText({ name:"Sale", text:"BIG SALE!", x:50, y:40, w:paper.clientWidth-100, h:70, fontSize:56, color:"#ffffff", align:"center" });
+      // Discount
+      addText({ name:"Discount", text:"Up to 50% OFF", x:50, y:180, w:paper.clientWidth-100, h:50, fontSize:36, color:"#000000", align:"center" });
+      // Products
+      addText({ name:"Products", text:"All Items on Sale\nLimited Time Offer", x:50, y:260, w:paper.clientWidth-100, h:60, fontSize:24, color:"#333333", align:"center" });
+      // CTA
+      addButton({ name:"Shop Now", text:"Shop Now", x:paper.clientWidth/2-120, y:paper.clientHeight-100, w:240, h:60, bg:"#dc2626" });
+    }
+
+    // ===== Brand Kit =====
+    const DEFAULT_BRAND_KIT = {
+      colors: ["#60a5fa", "#a78bfa", "#22c55e"],
+      fonts: ["ui-sans-serif, system-ui", "Georgia, serif"],
+      logo: null,
+      profile: {
+        name: "Your Business Name",
+        tagline: "Quality service you can trust",
+        phone: "(555) 123-4567",
+        website: "www.example.com",
+        ctaText: "Get Started Today"
+      }
+    };
+
+    let brandKit = JSON.parse(JSON.stringify(DEFAULT_BRAND_KIT));
+
+    function normalizeBrandKit(input){
+      const safe = input && typeof input === "object" ? input : {};
+      return {
+        colors: Array.isArray(safe.colors) && safe.colors.length >= 3
+          ? [safe.colors[0], safe.colors[1], safe.colors[2]]
+          : [...DEFAULT_BRAND_KIT.colors],
+        fonts: Array.isArray(safe.fonts) && safe.fonts.length >= 2
+          ? [safe.fonts[0], safe.fonts[1]]
+          : [...DEFAULT_BRAND_KIT.fonts],
+        logo: safe.logo || null,
+        profile: {
+          name: safe.profile?.name || DEFAULT_BRAND_KIT.profile.name,
+          tagline: safe.profile?.tagline || DEFAULT_BRAND_KIT.profile.tagline,
+          phone: safe.profile?.phone || DEFAULT_BRAND_KIT.profile.phone,
+          website: safe.profile?.website || DEFAULT_BRAND_KIT.profile.website,
+          ctaText: safe.profile?.ctaText || DEFAULT_BRAND_KIT.profile.ctaText
+        }
+      };
+    }
+
+    function updateBrandPreview(){
+      logoPreview.innerHTML = brandKit.logo
+        ? `<img src="${brandKit.logo}" style="max-width:100%; max-height:80px; border-radius:8px;">`
+        : "";
+    }
+
+    function applyBrandKitToForm(){
+      document.getElementById("brandColor1").value = brandKit.colors[0];
+      document.getElementById("brandColor2").value = brandKit.colors[1];
+      document.getElementById("brandColor3").value = brandKit.colors[2];
+      document.getElementById("brandFont1").value = brandKit.fonts[0];
+      document.getElementById("brandFont2").value = brandKit.fonts[1];
+      document.getElementById("brandName").value = brandKit.profile.name;
+      document.getElementById("brandTagline").value = brandKit.profile.tagline;
+      document.getElementById("brandPhone").value = brandKit.profile.phone;
+      document.getElementById("brandWebsite").value = brandKit.profile.website;
+      document.getElementById("brandCtaText").value = brandKit.profile.ctaText;
+      updateBrandPreview();
+    }
+
+    function updateBrandKitFromForm(){
+      brandKit = normalizeBrandKit({
+        ...brandKit,
+        colors: [
+          document.getElementById("brandColor1").value,
+          document.getElementById("brandColor2").value,
+          document.getElementById("brandColor3").value
+        ],
+        fonts: [
+          document.getElementById("brandFont1").value,
+          document.getElementById("brandFont2").value
+        ],
+        profile: {
+          name: document.getElementById("brandName").value.trim(),
+          tagline: document.getElementById("brandTagline").value.trim(),
+          phone: document.getElementById("brandPhone").value.trim(),
+          website: document.getElementById("brandWebsite").value.trim(),
+          ctaText: document.getElementById("brandCtaText").value.trim()
+        }
+      });
+      updateBrandPreview();
+    }
+
+    function saveBrandKit(){
+      updateBrandKitFromForm();
+      localStorage.setItem("flyerBrandKit", JSON.stringify(brandKit));
+      setStatus("Brand kit saved", "Ready");
+    }
+
+    function loadBrandKit(){
+      const saved = localStorage.getItem("flyerBrandKit");
+      if(!saved){
+        setStatus("No saved brand", "Nothing in local storage");
+        return;
+      }
+      brandKit = normalizeBrandKit(JSON.parse(saved));
+      applyBrandKitToForm();
+      setStatus("Brand kit loaded", "Ready");
+    }
+
+    function resetBrandForm(){
+      brandKit = JSON.parse(JSON.stringify(DEFAULT_BRAND_KIT));
+      applyBrandKitToForm();
+      setStatus("Brand reset", "Defaults restored");
+    }
+
+    function setBrandPreset(preset){
+      const presets = {
+        corporate: {
+          colors: ["#1d4ed8", "#0f172a", "#38bdf8"],
+          fonts: ["ui-sans-serif, system-ui", "Georgia, serif"]
+        },
+        warm: {
+          colors: ["#ea580c", "#7c2d12", "#f59e0b"],
+          fonts: ["Georgia, serif", "ui-sans-serif, system-ui"]
+        },
+        bold: {
+          colors: ["#e11d48", "#111827", "#22c55e"],
+          fonts: ["ui-monospace, monospace", "ui-sans-serif, system-ui"]
+        }
+      };
+      const p = presets[preset];
+      if(!p) return;
+      brandKit = normalizeBrandKit({ ...brandKit, colors: p.colors, fonts: p.fonts });
+      applyBrandKitToForm();
+      setStatus("Preset applied", preset);
+    }
+
+    function addBrandLogoToCanvas(){
+      updateBrandKitFromForm();
+      if(!brandKit.logo){
+        alert("Upload a logo first in the Brand tab.");
+        return;
+      }
+      addImage(brandKit.logo, {
+        name: "Brand Logo",
+        x: 40, y: 40, w: 180, h: 120,
+        fit: "contain",
+        radius: 6
+      });
+      setStatus("Logo added", "Brand logo placed");
+    }
+
+    function applyBrandToList(list){
+      if(!Array.isArray(list) || list.length === 0){
+        setStatus("Brand apply", "Nothing selected");
+        return;
+      }
+      updateBrandKitFromForm();
+      const [primary, secondary] = brandKit.colors;
+      const [fontPrimary] = brandKit.fonts;
+
+      list.forEach(el => {
+        if(el.type === "text"){
+          const isButtonLike = (el.bgAlpha ?? 0) > 0.75 || /button|cta/i.test(el.name || "");
+          el.fontFamily = fontPrimary;
+          if(isButtonLike){
+            el.bg = primary;
+            el.bgAlpha = 1;
+            el.color = "#ffffff";
+            el.align = "center";
+          } else {
+            el.color = secondary;
+          }
+        } else if(el.type === "shape"){
+          el.fill = primary;
+          el.border = secondary;
+        } else if(el.type === "icon"){
+          el.color = secondary;
+        }
+      });
+
+      render();
+      renderLayers();
+      updateEditPanel();
+      setStatus("Brand applied", `${list.length} element(s) updated`);
+    }
+
+    function applyBrandSelected(){
+      const selected = getSelectedElements();
+      applyBrandToList(selected);
+    }
+
+    function applyBrandAll(){
+      applyBrandToList(elements);
+    }
+
+    function addBrandHeader(){
+      updateBrandKitFromForm();
+      const [primary, secondary] = brandKit.colors;
+      const [fontPrimary] = brandKit.fonts;
+
+      addText({
+        name: "Brand Name",
+        text: brandKit.profile.name,
+        x: 40, y: 40, w: Math.max(320, paper.clientWidth - 80), h: 70,
+        fontFamily: fontPrimary, fontSize: 46, fontWeight: 900,
+        color: primary, align: "center", bgAlpha: 0
+      });
+      addText({
+        name: "Brand Tagline",
+        text: brandKit.profile.tagline,
+        x: 60, y: 108, w: Math.max(320, paper.clientWidth - 120), h: 44,
+        fontFamily: fontPrimary, fontSize: 22, fontWeight: 600,
+        color: secondary, align: "center", bgAlpha: 0
+      });
+      setStatus("Brand header added", "Ready");
+    }
+
+    function addBrandContact(){
+      updateBrandKitFromForm();
+      const [primary] = brandKit.colors;
+      const [fontPrimary] = brandKit.fonts;
+      addText({
+        name: "Brand Contact",
+        text: `${brandKit.profile.phone}\n${brandKit.profile.website}`,
+        x: 40,
+        y: Math.max(40, paper.clientHeight - 130),
+        w: Math.max(300, paper.clientWidth - 80),
+        h: 90,
+        fontFamily: fontPrimary,
+        fontSize: 22,
+        fontWeight: 700,
+        color: primary,
+        align: "center",
+        bg: "#000000",
+        bgAlpha: 0
+      });
+      setStatus("Contact block added", "Ready");
+    }
+
+    // ===== QR Code & Data Blocks =====
+    let qrLibPromise = null;
+    function ensureQrLib(){
+      if (window.QRCode && typeof window.QRCode.toCanvas === "function") {
+        return Promise.resolve();
+      }
+      if (qrLibPromise) return qrLibPromise;
+
+      const cdnList = [
+        "./qrcode.min.js",
+        "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js",
+        "https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.js"
+      ];
+
+      qrLibPromise = new Promise((resolve, reject) => {
+        let i = 0;
+        const tryNext = () => {
+          if (window.QRCode && typeof window.QRCode.toCanvas === "function") return resolve();
+          if (i >= cdnList.length) return reject(new Error("QR library failed to load."));
+          const s = document.createElement("script");
+          s.src = cdnList[i++];
+          s.async = true;
+          s.onload = () => {
+            if (window.QRCode && typeof window.QRCode.toCanvas === "function") resolve();
+            else tryNext();
+          };
+          s.onerror = tryNext;
+          document.head.appendChild(s);
+        };
+        tryNext();
+      });
+      return qrLibPromise;
+    }
+
+    async function generateQRCode(qrText){
+      const qrSize = parseInt(document.getElementById("qrSize").value) || 150;
+      const qrErrorLevel = document.getElementById("qrErrorLevel").value || "M";
+      try {
+        await ensureQrLib();
+      } catch (err) {
+        console.error(err);
+        setStatus("QR failed", "Could not load QR library");
+        alert("QR code library could not load. Check internet connection and refresh.");
+        return;
+      }
+
+      // Create a temporary canvas to generate QR code
+      const tempCanvas = document.createElement("canvas");
+      window.QRCode.toCanvas(tempCanvas, qrText, {
+        width: qrSize,
+        height: qrSize,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        },
+        errorCorrectionLevel: qrErrorLevel
+      }, function (error) {
+        if (error) {
+          console.error(error);
+          alert("Failed to generate QR code. Please try again.");
+          return;
+        }
+
+        // Convert canvas to data URL
+        const qrDataUrl = tempCanvas.toDataURL("image/png");
+
+        const id = uid();
+        const el = {
+          id,
+          name: "QR Code",
+          hidden:false,
+          type:"image",
+          x: paper.clientWidth - qrSize - 50,
+          y: 50,
+          w: qrSize,
+          h: qrSize,
+          z: ++zCounter,
+          src: qrDataUrl,
+          fit: "contain",
+          radius: 8,
+          shadowX: 0, shadowY: 0, shadowBlur: 0, shadowColor: "#000000", shadowAlpha: 0.5,
+          blur: 0,
+          blendMode: "normal"
+        };
+        elements.push(el);
+        render();
+        select(id);
+        renderLayers();
+        setStatus("QR Code added", `${qrSize}px, ${qrErrorLevel} error correction`);
+      });
+    }
+
+    function addDataBlock(){
+      const blockType = prompt("Choose data block type: address, contact, schedule, map", "address");
+      let text = "";
+      switch(blockType){
+        case "address":
+          text = "123 Main Street\nCity, State 12345\nUnited States";
+          break;
+        case "contact":
+          text = "Phone: (555) 123-4567\nEmail: info@example.com\nWebsite: www.example.com";
+          break;
+        case "schedule":
+          text = "Monday - Friday: 9AM - 5PM\nSaturday: 10AM - 4PM\nSunday: Closed";
+          break;
+        case "map":
+          text = "📍 Find us at:\nGPS: 40.7128° N, 74.0060° W";
+          break;
+        default:
+          text = "Custom data block";
+      }
+
+      addText({ name:`${blockType} Block`, text, x:50, y:paper.clientHeight/2, w:300, h:120, fontSize:16, color:"#333333", bg:"#f0f0f0", bgAlpha:0.8 });
+    }
     async function exportToPng(){
       const exportDpiVal = Number(exportDpi.value) || 300;
       const scale = exportDpiVal / EDIT_DPI;
@@ -1411,7 +2779,7 @@
     // ===== Save/Load =====
     function toJSON(){
       return JSON.stringify({
-        version: 4,
+        version: 5, // Updated version for new features
         editDpi: EDIT_DPI,
         presetKey: canvasPresetKey,
         landscape: canvasLandscape,
@@ -1419,7 +2787,8 @@
         showGuides: !!showGuides.checked,
         showCenters: !!showCenters.checked,
         snapToGrid: !!snapToGrid.checked,
-        elements
+        elements,
+        brandKit // Include brand kit
       }, null, 2);
     }
     function download(filename, text){
@@ -1452,20 +2821,88 @@
 
     // Tabs
     function setTab(which){
-      const design = (which === "design");
-      tabDesign.classList.toggle("active", design);
-      tabLayers.classList.toggle("active", !design);
-      designTab.style.display = design ? "block" : "none";
-      layersTab.style.display = design ? "none" : "block";
+      tabDesign.classList.toggle("active", which === "design");
+      tabLayers.classList.toggle("active", which === "layers");
+      tabAssets.classList.toggle("active", which === "assets");
+      tabEffects.classList.toggle("active", which === "effects");
+      tabTemplates.classList.toggle("active", which === "templates");
+      tabBrand.classList.toggle("active", which === "brand");
+
+      designTab.style.display = (which === "design") ? "block" : "none";
+      layersTab.style.display = (which === "layers") ? "block" : "none";
+      assetsTab.style.display = (which === "assets") ? "block" : "none";
+      effectsTab.style.display = (which === "effects") ? "block" : "none";
+      templatesTab.style.display = (which === "templates") ? "block" : "none";
+      brandTab.style.display = (which === "brand") ? "block" : "none";
     }
     tabDesign.onclick = ()=>setTab("design");
     tabLayers.onclick = ()=>setTab("layers");
+    tabAssets.onclick = ()=>setTab("assets");
+    tabEffects.onclick = ()=>setTab("effects");
+    tabTemplates.onclick = ()=>setTab("templates");
+    tabBrand.onclick = ()=>setTab("brand");
 
     // Buttons
     document.getElementById("addText").onclick = () => addText({ name:"Text", x:70, y:90, w:520, h:90 });
     document.getElementById("addCta").onclick = () => addButton({ name:"Button" });
     document.getElementById("addRect").onclick = () => addShape("rect",{});
     document.getElementById("addCircle").onclick = () => addShape("circle",{ w:220, h:220, x:Math.max(40, paper.clientWidth - 280), y:220 });
+
+    // New buttons
+    document.getElementById("addIcon").onclick = () => setTab("assets");
+    document.getElementById("addShapeAsset").onclick = () => addShape("rect", { name:"Shape Asset", x:100, y:100, w:200, h:150 });
+    document.getElementById("addPattern").onclick = () => addShape("rect", { name:"Pattern", x:50, y:50, w:paper.clientWidth-100, h:paper.clientHeight-100, fill:"#f0f0f0", alpha:0.1 });
+    document.getElementById("searchStock").onclick = () => renderAssetGrid();
+    document.getElementById("uploadAsset").onclick = () => document.getElementById("imgUpload").click();
+
+    // Template buttons
+    document.getElementById("eventTemplate").onclick = createEventTemplate;
+    document.getElementById("businessTemplate").onclick = createBusinessTemplate;
+    document.getElementById("churchTemplate").onclick = createChurchTemplate;
+    document.getElementById("saleTemplate").onclick = createSaleTemplate;
+    document.getElementById("socialResize").onclick = () => alert("Social resize feature - convert to Instagram/Facebook formats");
+    document.getElementById("addQR").onclick = () => {
+      const qrText = prompt("Enter URL or text for QR code:", "https://example.com");
+      if(qrText) generateQRCode(qrText);
+    };
+    document.getElementById("addDataBlock").onclick = addDataBlock;
+
+    // New template buttons (bind all matches because these IDs appear in multiple tabs)
+    document.querySelectorAll("#addHeaderTemplate").forEach(btn => btn.onclick = addHeaderTemplate);
+    document.querySelectorAll("#addHeroTemplate").forEach(btn => btn.onclick = addHeroTemplate);
+    document.querySelectorAll("#addCallToAction").forEach(btn => btn.onclick = addCallToAction);
+    document.querySelectorAll("#addFooterTemplate").forEach(btn => btn.onclick = addFooterTemplate);
+
+    // QR Code preset buttons
+    document.getElementById("qrWebsite").onclick = () => {
+      const url = prompt("Enter website URL:", "https://example.com");
+      if(url) generateQRCode(url);
+    };
+    document.getElementById("qrPhone").onclick = () => {
+      const phone = prompt("Enter phone number:", "+1234567890");
+      if(phone) generateQRCode(`tel:${phone}`);
+    };
+    document.getElementById("qrEmail").onclick = () => {
+      const email = prompt("Enter email address:", "info@example.com");
+      if(email) generateQRCode(`mailto:${email}`);
+    };
+    document.getElementById("qrLocation").onclick = () => {
+      const location = prompt("Enter location (address or coordinates):", "123 Main St, City, State");
+      if(location) generateQRCode(`geo:0,0?q=${encodeURIComponent(location)}`);
+    };
+
+    // Brand buttons
+    document.getElementById("saveBrand").onclick = saveBrandKit;
+    document.getElementById("loadBrand").onclick = loadBrandKit;
+    document.getElementById("resetBrandForm").onclick = resetBrandForm;
+    document.getElementById("applyBrandSelected").onclick = applyBrandSelected;
+    document.getElementById("applyBrandAll").onclick = applyBrandAll;
+    document.getElementById("addLogoToCanvas").onclick = addBrandLogoToCanvas;
+    document.getElementById("addBrandHeader").onclick = addBrandHeader;
+    document.getElementById("addBrandContact").onclick = addBrandContact;
+    document.getElementById("brandPresetCorporate").onclick = ()=> setBrandPreset("corporate");
+    document.getElementById("brandPresetWarm").onclick = ()=> setBrandPreset("warm");
+    document.getElementById("brandPresetBold").onclick = ()=> setBrandPreset("bold");
 
     document.getElementById("exportPng").onclick = exportToPng;
     document.getElementById("exportPdf").onclick = exportPdf;
@@ -1499,6 +2936,12 @@
           elements = data.elements;
           zCounter = elements.reduce((m,x)=>Math.max(m, x.z||1), 1);
 
+          // Load brand kit if available
+          if(data.brandKit){
+            brandKit = normalizeBrandKit(data.brandKit);
+            applyBrandKitToForm();
+          }
+
           applyCanvasSize({ presetKey: canvasPresetKey, landscape: canvasLandscape, scale:false });
 
           selectedId=null;
@@ -1522,6 +2965,25 @@
       reader.readAsDataURL(f);
       e.target.value = "";
     });
+
+    // Logo upload
+    document.getElementById("logoUpload").addEventListener("change", (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        brandKit.logo = reader.result;
+        updateBrandPreview();
+        setStatus("Logo uploaded", "Ready");
+      };
+      reader.readAsDataURL(f);
+      e.target.value = "";
+    });
+
+    applyBrandKitToForm();
+
+    // Initialize asset grid
+    renderAssetGrid();
 
     // Grid / Guides / Centers
     toggleGrid.onclick = ()=> paper.classList.toggle("show-grid");
@@ -1555,27 +3017,149 @@
       render(); renderLayers();
     };
     document.getElementById("alignLeft").onclick = ()=>{
-      const el = getSelected(); if(!el) return;
-      el.x = snap(20);
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length === 0) return;
+      const leftmost = Math.min(...selectedElements.map(el => el.x));
+      selectedElements.forEach(el => el.x = snap(leftmost));
       render(); updateEditPanelQuiet(); renderLayers();
     };
     document.getElementById("alignCenter").onclick = ()=>{
-      const el = getSelected(); if(!el) return;
-      el.x = snap(Math.round((paper.clientWidth - el.w)/2));
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length === 0) return;
+      const centerX = Math.round(paper.clientWidth / 2);
+      selectedElements.forEach(el => el.x = snap(centerX - el.w / 2));
       render(); updateEditPanelQuiet(); renderLayers();
     };
     document.getElementById("alignRight").onclick = ()=>{
-      const el = getSelected(); if(!el) return;
-      el.x = snap(Math.round(paper.clientWidth - el.w - 20));
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length === 0) return;
+      const rightmost = Math.max(...selectedElements.map(el => el.x + el.w));
+      selectedElements.forEach(el => el.x = snap(rightmost - el.w));
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+
+    document.getElementById("distributeHoriz").onclick = ()=>{
+      console.log("distributeHoriz clicked");
+      const selectedElements = getSelectedElements();
+      console.log("selectedElements for distribute:", selectedElements.length);
+      if(selectedElements.length < 3) return;
+      const sorted = selectedElements.sort((a,b)=>a.x - b.x);
+      const leftmost = sorted[0].x;
+      const rightmost = sorted[sorted.length-1].x + sorted[sorted.length-1].w;
+      const totalWidth = rightmost - leftmost;
+      const totalElementsWidth = sorted.reduce((sum, el) => sum + el.w, 0);
+      const spacing = (totalWidth - totalElementsWidth) / (sorted.length - 1);
+      
+      let currentX = leftmost;
+      sorted.forEach(el => {
+        el.x = snap(currentX);
+        currentX += el.w + spacing;
+      });
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+
+    document.getElementById("distributeVert").onclick = ()=>{
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length < 3) return;
+      const sorted = selectedElements.sort((a,b)=>a.y - b.y);
+      const topmost = sorted[0].y;
+      const bottommost = sorted[sorted.length-1].y + sorted[sorted.length-1].h;
+      const totalHeight = bottommost - topmost;
+      const totalElementsHeight = sorted.reduce((sum, el) => sum + el.h, 0);
+      const spacing = (totalHeight - totalElementsHeight) / (sorted.length - 1);
+      
+      let currentY = topmost;
+      sorted.forEach(el => {
+        el.y = snap(currentY);
+        currentY += el.h + spacing;
+      });
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+
+    document.getElementById("matchWidth").onclick = ()=>{
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length < 2) return;
+      const targetWidth = selectedElements[0].w;
+      selectedElements.slice(1).forEach(el => el.w = targetWidth);
+      render(); updateEditPanelQuiet(); renderLayers();
+    };
+
+    document.getElementById("matchHeight").onclick = ()=>{
+      const selectedElements = getSelectedElements();
+      if(selectedElements.length < 2) return;
+      const targetHeight = selectedElements[0].h;
+      selectedElements.slice(1).forEach(el => el.h = targetHeight);
       render(); updateEditPanelQuiet(); renderLayers();
     };
 
     function removeSelected(){
-      if(!selectedId) return;
-      elements = elements.filter(e=>e.id !== selectedId);
-      selectedId = null;
+      if(selectedId){
+        elements = elements.filter(e=>e.id !== selectedId);
+        selectedId = null;
+      } else if(selectedIds.size > 0){
+        elements = elements.filter(e=>!selectedIds.has(e.id));
+        selectedIds.clear();
+      }
       render(); renderLayers(); updateEditPanel();
       setStatus("Deleted", "Ready");
+    }
+
+    function groupSelected(){
+      console.log("groupSelected called, selectedIds.size:", selectedIds.size);
+      if(selectedIds.size < 2) return;
+
+      const selectedElements = elements.filter(e=>selectedIds.has(e.id));
+      console.log("selectedElements:", selectedElements.length);
+      if(selectedElements.length < 2) return;
+
+      // Calculate group bounds
+      const minX = Math.min(...selectedElements.map(e=>e.x));
+      const minY = Math.min(...selectedElements.map(e=>e.y));
+      const maxX = Math.max(...selectedElements.map(e=>e.x + e.w));
+      const maxY = Math.max(...selectedElements.map(e=>e.y + e.h));
+
+      // Create group element
+      const group = {
+        id: uid(),
+        type: "group",
+        name: "Group",
+        x: minX,
+        y: minY,
+        w: maxX - minX,
+        h: maxY - minY,
+        z: ++zCounter,
+        children: selectedElements.map(e=>e.id),
+        bg: "#ffffff",
+        bgAlpha: 0,
+        locked: false,
+        hidden: false
+      };
+
+      // Remove individual elements and add group
+      elements = elements.filter(e=>!selectedIds.has(e.id));
+      elements.push(group);
+
+      select(group.id);
+      render(); renderLayers(); updateEditPanel();
+      setStatus("Grouped", "Ready");
+    }
+
+    function ungroupSelected(){
+      const el = getSelected();
+      if(!el || el.type !== "group") return;
+
+      // Get child elements
+      const children = elements.filter(e=>el.children.includes(e.id));
+      if(children.length === 0) return;
+
+      // Remove group and add children back
+      elements = elements.filter(e=>e.id !== el.id);
+      elements.push(...children);
+
+      // Select the first child
+      select(children[0].id);
+      render(); renderLayers(); updateEditPanel();
+      setStatus("Ungrouped", "Ready");
     }
     function duplicateSelected(){
       const el = getSelected(); if(!el) return;
@@ -1592,6 +3176,9 @@
     }
     document.getElementById("deleteEl").onclick = removeSelected;
     document.getElementById("duplicateEl").onclick = duplicateSelected;
+    document.getElementById("groupEl").onclick = groupSelected;
+    console.log("groupEl button:", document.getElementById("groupEl"));
+    document.getElementById("ungroupEl").onclick = ungroupSelected;
 
     // Layer actions
     document.getElementById("moveUp").onclick = ()=> selectedId && moveLayer(selectedId, +1);
@@ -1672,6 +3259,7 @@
     autoFitToScreen();
     window.addEventListener("resize", ()=> autoFitToScreen());
     window.addEventListener("orientationchange", ()=> setTimeout(()=>autoFitToScreen(true), 150));
+    });
   </script>
 </body>
 </html>

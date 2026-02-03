@@ -5,38 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
   <title>Grace Community Church | Welcome Home</title>
-  <meta name="description" content="A warm, modern demo church website with Word of the Day, events, sermons, prayer requests, and plan-a-visit." />
+  <meta name="description" content="Grace Community Church - A vibrant faith community in Your City. Join us for contemporary worship, life-changing sermons, and authentic fellowship. All are welcome!" />
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     :root{
-      --bg:#070a12;
-      --bg2:#0b1020;
-      --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.09);
-      --text:#e9edf5;
-      --muted:#a6b2c7;
-      --line: rgba(255,255,255,.14);
-      --brand:#60a5fa;
-      --brand2:#a78bfa;
-      --ok:#22c55e;
-      --warn:#fbbf24;
-      --danger:#fb7185;
-      --shadow: 0 18px 50px rgba(0,0,0,.55);
-      --radius: 18px;
-      --max: 1120px;
+      --bg:#fafafa;
+      --bg2:#f5f7fa;
+      --card: rgba(255,255,255,.98);
+      --card2: rgba(248,250,252,.99);
+      --text:#1a202c;
+      --muted:#4a5568;
+      --line: rgba(26,32,44,.08);
+      --brand:#2d5a27;
+      --brand2:#38a169;
+      --ok:#38a169;
+      --warn:#dd6b20;
+      --danger:#e53e3e;
+      --accent:#e07a5f;
+      --warm:#fef5e7;
+      --shadow: 0 10px 40px rgba(26,32,44,.06);
+      --radius: 12px;
+      --max: 1200px;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 800px at 20% -10%, rgba(96,165,250,.22), transparent 55%),
-        radial-gradient(900px 700px at 90% 0%, rgba(167,139,250,.18), transparent 45%),
+        radial-gradient(1200px 800px at 20% -10%, rgba(224,122,95,.04), transparent 55%),
+        radial-gradient(900px 700px at 90% 0%, rgba(45,90,39,.03), transparent 45%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       overflow-x:hidden;
+      line-height: 1.6;
     }
 
     a{color:inherit; text-decoration:none}
@@ -56,9 +60,9 @@
     /* Header */
     header{
       position: sticky; top:0; z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(7,10,18,.65);
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(16px);
+      background: rgba(250,250,250,.9);
+      border-bottom: 1px solid rgba(26,32,44,.06);
     }
     .nav{
       display:flex; align-items:center; justify-content:space-between;
@@ -70,12 +74,12 @@
       font-weight:800; letter-spacing:.2px;
     }
     .logo{
-      width:38px; height:38px; border-radius:12px;
+      width:42px; height:42px; border-radius:14px;
       background:
-        radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.35), transparent 70%),
-        linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.95));
-      box-shadow: 0 12px 30px rgba(96,165,250,.22);
-      border: 1px solid rgba(255,255,255,.22);
+        radial-gradient(20px 20px at 30% 30%, rgba(255,255,255,.9), transparent 70%),
+        linear-gradient(135deg, rgba(45,90,39,.95), rgba(224,122,95,.85));
+      box-shadow: 0 8px 32px rgba(45,90,39,.2);
+      border: 1px solid rgba(45,90,39,.2);
       position: relative;
       overflow:hidden;
     }
@@ -98,26 +102,27 @@
     nav a:hover{color:var(--text); background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.10)}
     .ctaRow{display:flex; gap:10px; align-items:center}
     .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border:1px solid rgba(26,32,44,.08);
+      background: rgba(255,255,255,.9);
       color: var(--text);
-      font-weight: 700;
+      font-weight: 600;
       font-size: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-      transition: .2s ease;
+      box-shadow: 0 4px 16px rgba(26,32,44,.04);
+      transition: all .2s ease;
       cursor:pointer;
       user-select:none;
     }
-    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.95); box-shadow: 0 8px 24px rgba(26,32,44,.08)}
     .btn.primary{
-      border-color: rgba(96,165,250,.45);
-      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.85));
-      box-shadow: 0 18px 42px rgba(96,165,250,.22);
+      border-color: rgba(45,90,39,.2);
+      background: linear-gradient(135deg, rgba(45,90,39,.95), rgba(56,161,105,.9));
+      color: white;
+      box-shadow: 0 8px 24px rgba(45,90,39,.15);
     }
-    .btn.primary:hover{filter: brightness(1.05)}
+    .btn.primary:hover{filter: brightness(1.05); box-shadow: 0 12px 32px rgba(45,90,39,.2)}
     .btn.ghost{
       background: transparent;
       border-color: rgba(255,255,255,.14);
@@ -158,24 +163,24 @@
       .heroGrid{grid-template-columns: 1fr; }
     }
     .heroCard{
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(26,32,44,.06);
       border-radius: var(--radius);
       background:
-        radial-gradient(900px 220px at 30% 0%, rgba(96,165,250,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        radial-gradient(600px 300px at 30% 0%, rgba(224,122,95,.06), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.99), rgba(248,250,252,.98));
       box-shadow: var(--shadow);
-      padding: 22px;
+      padding: 32px;
       overflow:hidden;
       position:relative;
     }
     .heroCard:after{
       content:"";
       position:absolute;
-      width: 420px; height: 420px;
-      right:-220px; top:-240px;
-      background: radial-gradient(circle at 30% 30%, rgba(167,139,250,.35), transparent 60%);
-      filter: blur(6px);
-      opacity:.85;
+      width: 320px; height: 320px;
+      right:-160px; top:-180px;
+      background: radial-gradient(circle at 30% 30%, rgba(45,90,39,.15), transparent 60%);
+      filter: blur(4px);
+      opacity:.7;
     }
     .hero h1{
       font-size: clamp(28px, 3.8vw, 44px);
@@ -192,15 +197,15 @@
     .meta .pill{background: rgba(255,255,255,.03)}
     .sideStack{display:grid; gap: 18px}
     .card{
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(26,32,44,.06);
       border-radius: var(--radius);
-      background: rgba(255,255,255,.05);
-      box-shadow: 0 14px 40px rgba(0,0,0,.38);
+      background: rgba(255,255,255,.98);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
     .cardHeader{
-      padding: 16px 16px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(26,32,44,.06);
       display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
     }
     .cardHeader h3{margin:0; font-size: 16px}
@@ -214,9 +219,9 @@
       margin: 0 0 6px;
     }
     .definition{color: var(--muted); line-height:1.55; font-size: 14px; margin:0}
-    .verse{margin: 12px 0 0; padding: 12px; border-radius: 14px;
-      border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18);
-      color: var(--text); line-height:1.55; font-size: 14px
+    .verse{margin: 16px 0 0; padding: 16px; border-radius: 10px;
+      border:1px solid rgba(224,122,95,.15); background: rgba(254,245,231,.7);
+      color: var(--text); line-height:1.6; font-size: 14px
     }
     .verse small{display:block; color: var(--muted); margin-top:8px; font-size: 12.5px}
     .miniActions{display:flex; gap:10px; margin-top: 12px; flex-wrap:wrap}
@@ -235,11 +240,11 @@
     @media (max-width: 980px){ .grid3{grid-template-columns: 1fr} .grid2{grid-template-columns: 1fr} }
 
     .infoCard{
-      padding: 16px;
+      padding: 20px;
       border-radius: var(--radius);
-      background: rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 40px rgba(0,0,0,.30);
+      background: rgba(255,255,255,.98);
+      border:1px solid rgba(26,32,44,.06);
+      box-shadow: var(--shadow);
     }
     .infoCard h4{margin:0 0 6px; font-size: 16px}
     .infoCard p{margin:0; color: var(--muted); font-size: 14px; line-height:1.55}
@@ -258,13 +263,13 @@
 
     /* Sermons */
     .sermonCard{
-      padding: 16px;
+      padding: 20px;
       border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(26,32,44,.06);
       background:
-        radial-gradient(600px 220px at 10% 0%, rgba(96,165,250,.15), transparent 55%),
-        rgba(255,255,255,.05);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+        radial-gradient(400px 200px at 10% 0%, rgba(224,122,95,.05), transparent 55%),
+        rgba(255,255,255,.98);
+      box-shadow: var(--shadow);
     }
     .sermonTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
     .sermonCard h4{margin:0 0 6px; font-size: 16px}
@@ -281,13 +286,17 @@
     form{display:grid; gap: 10px; margin-top: 12px}
     input, textarea, select{
       width:100%;
-      background: rgba(0,0,0,.20);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 12px 12px;
+      background: rgba(248,250,252,.9);
+      border: 1px solid rgba(26,32,44,.08);
+      border-radius: 10px;
+      padding: 14px 16px;
       color: var(--text);
       outline:none;
-      font-size: 14px;
+      font-size: 15px;
+      transition: border-color .2s ease;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(45,90,39,.3);
     }
     textarea{min-height: 110px; resize: vertical}
     label{font-size: 13px; color: var(--muted)}
@@ -296,10 +305,10 @@
 
     /* Footer */
     footer{
-      margin-top: 22px;
-      border-top:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.20);
-      padding: 26px 0 18px;
+      margin-top: 32px;
+      border-top:1px solid rgba(26,32,44,.06);
+      background: rgba(248,250,252,.9);
+      padding: 32px 0 24px;
     }
     .footerGrid{
       display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px;
@@ -312,17 +321,17 @@
     .muted{color: var(--muted)}
     .spacer{height: 4px}
     .toast{
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,.65);
-      border: 1px solid rgba(255,255,255,.16);
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(45,90,39,.2);
       color: var(--text);
-      padding: 12px 14px;
-      border-radius: 999px;
+      padding: 14px 18px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
       display:none;
       z-index: 99;
-      backdrop-filter: blur(12px);
-      font-size: 13.5px;
+      backdrop-filter: blur(16px);
+      font-size: 14px;
     }
     .toast.show{display:block; animation: pop .2s ease}
     @keyframes pop{from{transform:translateX(-50%) translateY(8px); opacity:.3} to{transform:translateX(-50%) translateY(0); opacity:1}}
@@ -347,6 +356,9 @@
             <li><a href="#word">Word of the Day</a></li>
             <li><a href="#sermons">Sermons</a></li>
             <li><a href="#events">Events</a></li>
+            <li><a href="#mission">Mission</a></li>
+            <li><a href="#beliefs">Beliefs</a></li>
+            <li><a href="#staff">Staff</a></li>
             <li><a href="#give">Give</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -364,6 +376,9 @@
         <a href="#word">Word of the Day</a>
         <a href="#sermons">Sermons</a>
         <a href="#events">Events</a>
+        <a href="#mission">Mission</a>
+        <a href="#beliefs">Beliefs</a>
+        <a href="#staff">Staff</a>
         <a href="#give">Give</a>
         <a href="#prayer">Prayer Request</a>
         <a href="#contact">Contact</a>
@@ -376,17 +391,17 @@
       <div class="heroGrid">
         <div class="heroCard">
           <span class="pill">📍 12 Example Street, Your City • ☎️ (012) 345 6789 • 💬 WhatsApp available</span>
-          <h1>A modern church website that makes it easy to visit, belong, and grow.</h1>
+          <h1>Find Your Place in Our Community</h1>
           <p>
-            This is a demo layout you can customize. It highlights the essentials: service times, Word of the Day,
-            sermons, events, giving, and prayer requests — all in one clean place.
+            Experience authentic worship, meaningful connections, and spiritual growth in a welcoming environment
+            where everyone belongs and faith comes alive.
           </p>
 
           <div class="heroActions">
-            <a class="btn primary" href="#visit">Plan a Visit</a>
-            <a class="btn" href="#sermons">Watch Sermons</a>
-            <a class="btn" href="#events">See Events</a>
-            <a class="btn ghost" href="#give">Give Online</a>
+            <a class="btn primary" href="#visit">Plan Your Visit</a>
+            <a class="btn" href="#sermons">Latest Sermons</a>
+            <a class="btn" href="#mission">Our Story</a>
+            <a class="btn ghost" href="#give">Support Us</a>
           </div>
 
           <div class="meta">
@@ -811,6 +826,168 @@
       </div>
     </section>
 
+    <section id="mission">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Our Mission & Vision</h2>
+            <p>Guided by faith, serving with love, growing in grace.</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Our Mission</div>
+            <h4>To love God and love people</h4>
+            <p>We exist to help people encounter Jesus Christ, grow in their faith, and serve their community with compassion and excellence.</p>
+            <div class="verse" style="margin-top:14px">
+              "Love the Lord your God with all your heart and with all your soul and with all your mind. This is the first and greatest commandment. And the second is like it: Love your neighbor as yourself."
+              <small>Matthew 22:37-39</small>
+            </div>
+          </div>
+
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Our Vision</div>
+            <h4>A community transformed by grace</h4>
+            <p>To be a welcoming church where everyone can belong, grow spiritually, and make a difference in the world around them.</p>
+            <div class="miniActions" style="margin-top:14px">
+              <a class="btn primary" href="#visit">Join Our Community</a>
+              <a class="btn" href="#ministries">Get Involved</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="beliefs">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>What We Believe</h2>
+            <p>Our foundation in biblical truth and Christian doctrine.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> The Bible</div>
+            <h4>God's Inspired Word</h4>
+            <p>The Bible is God's inspired Word, authoritative for faith and practice, revealing His plan for salvation through Jesus Christ.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Jesus Christ</div>
+            <h4>Our Savior & Lord</h4>
+            <p>Jesus is fully God and fully man, born of a virgin, lived a sinless life, died for our sins, rose again, and will return in glory.</p>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot warn"></span> Salvation</div>
+            <h4>By Grace Through Faith</h4>
+            <p>Salvation is a free gift of God's grace, received through faith in Jesus Christ, not by works or human merit.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="staff">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Meet Our Team</h2>
+            <p>Dedicated leaders serving our community with passion and purpose.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Senior Pastor</div>
+            <h4>Pastor David Johnson</h4>
+            <p>Leading with vision and compassion for over 15 years. Passionate about discipleship and community outreach.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn" href="mailto:pastor@gracechurch.demo">Email Pastor</a>
+            </div>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Youth Pastor</div>
+            <h4>Pastor Sarah Martinez</h4>
+            <p>Connecting with teens and young adults, leading worship, and mentoring the next generation of believers.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn" href="#youth">Youth Programs</a>
+            </div>
+          </div>
+          <div class="infoCard">
+            <div class="badge"><span class="dot warn"></span> Children's Director</div>
+            <h4>Maria Rodriguez</h4>
+            <p>Creating safe, fun environments where kids can learn about Jesus and grow in faith through age-appropriate programs.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn" href="#kids">Kids Ministry</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Stories of Faith</h2>
+            <p>Hear how God is working in the lives of our community members.</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Sarah's Story</div>
+            <h4>"Found hope when I needed it most"</h4>
+            <p>"After losing my job and going through a difficult divorce, I felt completely lost. The community here welcomed me with open arms and showed me God's love in practical ways. I'm now serving on the worship team and volunteering at the food pantry."</p>
+            <small style="color: var(--muted)">Sarah T., Member since 2022</small>
+          </div>
+
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Michael's Journey</div>
+            <h4>"From skeptic to believer"</h4>
+            <p>"I came to church out of curiosity and stayed because of the genuine relationships I found. The teaching is solid, the music is excellent, and I finally understand what it means to have a personal relationship with Jesus."</p>
+            <small style="color: var(--muted)">Michael R., Member since 2021</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="livestream">
+      <div class="container">
+        <div class="sectionTitle">
+          <div>
+            <h2>Live Stream</h2>
+            <p>Join us online when you can't be with us in person.</p>
+          </div>
+          <div class="right">
+            <a class="btn primary" href="#">Watch Live</a>
+            <a class="btn" href="#">Past Services</a>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="infoCard">
+            <div class="badge"><span class="dot ok"></span> Sunday Services</div>
+            <h4>Live at 9:00 & 11:00 AM</h4>
+            <p>Experience our worship services from home. Includes live chat, prayer requests, and interactive elements.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn primary" href="#">Join Live Service</a>
+            </div>
+          </div>
+
+          <div class="infoCard">
+            <div class="badge"><span class="dot"></span> Special Events</div>
+            <h4>Conferences & Retreats</h4>
+            <p>Major events are streamed live and archived for later viewing. Never miss an important message or special gathering.</p>
+            <div class="miniActions" style="margin-top:12px">
+              <a class="btn" href="#">View Archives</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <footer>
       <div class="container">
         <div class="footerGrid">
@@ -819,13 +996,18 @@
               <div class="logo" aria-hidden="true"></div>
               <div>
                 Grace Community Church
-                <small class="muted">Faith • Community • Growth</small>
+                <small class="muted">Faith • Community • Purpose • Impact</small>
               </div>
             </div>
             <p class="muted" style="line-height:1.6; margin:0">
-              Demo site for a church. Replace the content with your church name, location,
-              social links, livestream, and real giving/prayer tools.
+              Grace Community Church is a vibrant faith community committed to helping people discover their purpose,
+              build meaningful relationships, and make a positive impact in our world through Christ's love.
             </p>
+            <div style="margin-top:12px">
+              <a href="#" style="margin-right:12px; color: var(--brand)">📘 Facebook</a>
+              <a href="#" style="margin-right:12px; color: var(--brand)">📷 Instagram</a>
+              <a href="#" style="margin-right:12px; color: var(--brand)">🎵 YouTube</a>
+            </div>
             <div class="fine">© <span id="year"></span> Grace Community Church (Demo). All rights reserved.</div>
           </div>
 
@@ -835,19 +1017,22 @@
               <a href="#visit">Plan a Visit</a>
               <a href="#sermons">Sermons</a>
               <a href="#events">Events</a>
+              <a href="#mission">Our Mission</a>
+              <a href="#beliefs">What We Believe</a>
+              <a href="#staff">Meet the Team</a>
               <a href="#give">Give Online</a>
               <a href="#prayer">Prayer Requests</a>
             </div>
           </div>
 
           <div>
-            <h4 style="margin:0 0 10px">Recommendations</h4>
-            <div class="muted" style="display:grid; gap:10px">
-              <span>✅ Livestream page (YouTube embed)</span>
-              <span>✅ Volunteer sign-up</span>
-              <span>✅ Small group directory</span>
-              <span>✅ Staff page + church beliefs</span>
-              <span>✅ Accessibility + privacy policy</span>
+            <h4 style="margin:0 0 12px">Life Groups</h4>
+            <div class="muted" style="display:grid; gap:8px">
+              <span>👥 Small Groups</span>
+              <span>🎵 Worship Teams</span>
+              <span>🤝 Outreach Ministry</span>
+              <span>📚 Bible Study</span>
+              <span>⚽ Sports & Recreation</span>
             </div>
           </div>
         </div>

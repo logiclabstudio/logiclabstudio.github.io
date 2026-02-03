@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Logic Lab Whiteboard — Canva-style</title>
+
+  <style>
+    :root{
+      --bg:#f3f5fb;
+      --panel:#ffffff;
+      --panel2:#f7f8fc;
+      --text:#0b1020;
+      --muted:#667085;
+      --line:rgba(2,6,23,.12);
+      --shadow: 0 18px 55px rgba(2,6,23,.10);
+      --radius:16px;
+
+      --brand:#0b1020;
+      --accent:#2563eb;
+      --accent2:#38bdf8;
+      --danger:#ef4444;
+
+      --gridA: rgba(2,6,23,.06);
+      --gridB: rgba(2,6,23,.03);
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow:hidden;
+    }
+
+    .app{
+      height:100%;
+      display:grid;
+      grid-template-rows: auto auto 1fr;
+      gap:10px;
+      padding:12px;
+    }
+
+    /* ===== Canva-ish top header ===== */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 260px;
+    }
+    .logo{
+      width:40px; height:40px; border-radius: 14px;
+      background: radial-gradient(120% 120% at 20% 20%, var(--accent2), var(--accent) 45%, var(--brand));
+      box-shadow: 0 12px 30px rgba(2,6,23,.15);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      transform: rotate(25deg);
+      animation: shine 3.2s linear infinite;
+    }
+    @keyframes shine{
+      0%{transform: translateX(-35%) rotate(25deg)}
+      100%{transform: translateX(35%) rotate(25deg)}
+    }
+    .brand h1{margin:0; font-size:14px; line-height:1.1}
+    .brand p{margin:2px 0 0; font-size:12px; color: var(--muted)}
+
+    .search{
+      flex:1;
+      max-width: 520px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      background: var(--panel2);
+      border:1px solid rgba(2,6,23,.08);
+    }
+    .search input{
+      width:100%;
+      border:none;
+      outline:none;
+      background: transparent;
+      font-weight:600;
+      color: var(--text);
+    }
+
+    .top-actions{
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition: transform .06s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn:hover{border-color: rgba(37,99,235,.35); box-shadow: 0 12px 32px rgba(2,6,23,.10)}
+    .btn.primary{
+      border-color: rgba(37,99,235,.35);
+      background: linear-gradient(180deg, rgba(37,99,235,.16), rgba(37,99,235,.08));
+    }
+    .btn.danger{
+      border-color: rgba(239,68,68,.35);
+      background: linear-gradient(180deg, rgba(239,68,68,.14), rgba(239,68,68,.06));
+    }
+    .btn.on{
+      outline: 2px solid rgba(37,99,235,.22);
+      border-color: rgba(37,99,235,.55);
+    }
+
+    /* ===== Canva-ish tool row ===== */
+    .toolrow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow:auto;
+    }
+
+    .pill{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid rgba(2,6,23,.10);
+      border-radius: 999px;
+      background: var(--panel2);
+      white-space:nowrap;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:800;
+    }
+    .pill input[type="color"]{
+      width:28px;height:22px;border:none;background:transparent;padding:0;cursor:pointer;
+    }
+    .pill input[type="range"]{width:110px}
+    .pill label{display:flex;align-items:center;gap:8px;cursor:pointer}
+    .pill input[type="checkbox"]{transform: translateY(1px)}
+
+    /* ===== Canvas stage ===== */
+    .stage{
+      position:relative;
+      border-radius: var(--radius);
+      overflow:hidden;
+      border:1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .grid{
+      position:absolute; inset:0;
+      pointer-events:none;
+      transform-origin: 0 0;
+      background:
+        linear-gradient(var(--gridA) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gridA) 1px, transparent 1px),
+        linear-gradient(var(--gridB) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gridB) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+    }
+
+    canvas{position:absolute; inset:0; width:100%; height:100%; touch-action:none;}
+    .overlay{position:absolute; inset:0; transform-origin:0 0;}
+
+    /* ===== Items ===== */
+    .item{
+      position:absolute;
+      border-radius: 14px;
+      user-select:none;
+      pointer-events:auto;
+    }
+    .item.selected{outline:2px solid rgba(37,99,235,.40); box-shadow: 0 16px 40px rgba(37,99,235,.10)}
+    .handle{
+      position:absolute; width:12px;height:12px;border-radius:999px;
+      background: var(--panel);
+      border:2px solid rgba(37,99,235,.65);
+      box-shadow: 0 10px 20px rgba(37,99,235,.18);
+      display:none;
+    }
+    .item.selected .handle{display:block}
+    .handle.nw{left:-6px;top:-6px;cursor:nwse-resize}
+    .handle.ne{right:-6px;top:-6px;cursor:nesw-resize}
+    .handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+    .handle.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+
+    .note{
+      background:#fff4a3;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 14px 36px rgba(2,6,23,.12);
+      padding:12px 12px 10px;
+      transform: rotate(-.4deg);
+      min-width: 160px; min-height: 120px;
+    }
+    .note .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-size:12px; font-weight:900; color: rgba(31,41,55,.8);
+      margin-bottom:8px;
+    }
+    .note textarea{
+      width:100%;
+      height: calc(100% - 22px);
+      border:none; outline:none; resize:none;
+      background: transparent;
+      font-family: var(--sans);
+      font-size:14px;
+      color:#1f2937;
+    }
+
+    .textbox{
+      background: rgba(255,255,255,.72);
+      border:1px solid rgba(2,6,23,.12);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 12px 30px rgba(2,6,23,.10);
+      padding:10px 12px;
+      min-width: 140px; min-height: 48px;
+      cursor:text;
+      user-select:text;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .textbox:focus{outline:2px solid rgba(37,99,235,.25)}
+
+    .shape{
+      border:2px solid rgba(2,6,23,.35);
+      background: rgba(37,99,235,.10);
+      box-shadow: 0 14px 34px rgba(2,6,23,.10);
+      border-radius: 16px;
+    }
+    .shape.circle{border-radius:999px}
+    .shape.diamond{transform: rotate(45deg); border-radius: 14px}
+
+    .footerMark{
+      position:absolute;
+      left:14px;
+      bottom:14px;
+      padding:8px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:900;
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(2,6,23,.10);
+      backdrop-filter: blur(10px);
+      color: rgba(2,6,23,.75);
+      pointer-events:none;
+    }
+
+    .kbd{
+      font-family: var(--mono);
+      border:1px solid rgba(2,6,23,.14);
+      border-bottom-width:3px;
+      padding:2px 7px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      color: var(--text);
+      font-size:11px;
+      font-weight:900;
+    }
+
+    @media (max-width: 760px){
+      .search{display:none}
+      .brand{min-width:unset}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Logic Lab Whiteboard</h1>
+          <p>Canva-style • Infinite canvas feel • <b>Powered by Logic Lab</b></p>
+        </div>
+      </div>
+
+      <div class="search" title="(UI only) Search">
+        🔎 <input value="Search elements (demo UI)" readonly />
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="themeBtn">Theme</button>
+        <button class="btn" id="helpBtn">Shortcuts</button>
+        <button class="btn danger" id="clearBtn">Clear</button>
+        <button class="btn primary" id="exportPngBtn">Export PNG</button>
+      </div>
+    </div>
+
+    <div class="toolrow" id="toolrow">
+      <button class="btn on" data-tool="select">Select</button>
+      <button class="btn" data-tool="pen">Draw</button>
+      <button class="btn" data-tool="eraser">Erase</button>
+      <button class="btn" data-tool="pan">Hand</button>
+
+      <button class="btn primary" data-add="note">Sticky note</button>
+      <button class="btn primary" data-add="text">Text</button>
+      <button class="btn" data-add="rect">Rectangle</button>
+      <button class="btn" data-add="circle">Circle</button>
+      <button class="btn" data-add="diamond">Diamond</button>
+
+      <div class="pill">
+        <span>Stroke</span>
+        <input type="color" id="strokeColor" value="#2563eb" />
+      </div>
+
+      <div class="pill">
+        <span>Size</span>
+        <input type="range" id="strokeSize" min="1" max="28" value="4" />
+        <span id="strokeSizeVal">4</span>
+      </div>
+
+      <div class="pill">
+        <label><input type="checkbox" id="snap" checked /> Snap to grid</label>
+      </div>
+
+      <div class="pill">
+        <button class="btn" id="undoBtn">Undo</button>
+        <button class="btn" id="redoBtn">Redo</button>
+      </div>
+
+      <div class="pill">
+        <button class="btn" id="saveBtn">Save JSON</button>
+        <button class="btn" id="loadBtn">Load JSON</button>
+        <input type="file" id="jsonFile" accept="application/json" hidden />
+      </div>
+
+      <div class="pill">
+        <span>Zoom</span>
+        <button class="btn" id="zoomOut">−</button>
+        <button class="btn" id="zoomIn">+</button>
+        <button class="btn" id="zoomReset">Reset</button>
+      </div>
+
+      <div class="pill">
+        <span>Tip:</span>
+        <span><span class="kbd">Space</span> drag = pan</span>
+        <span>•</span>
+        <span><span class="kbd">Ctrl</span> + wheel = zoom</span>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="grid" id="grid"></div>
+      <canvas id="ink"></canvas>
+      <div class="overlay" id="overlay"></div>
+      <div class="footerMark">Powered by Logic Lab</div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const $ = (s, r=document) => r.querySelector(s);
+      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+      const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
+      const uid = () => Math.random().toString(36).slice(2,10);
+
+      const stage = $("#stage");
+      const grid = $("#grid");
+      const ink = $("#ink");
+      const ctx = ink.getContext("2d");
+      const overlay = $("#overlay");
+
+      const strokeColor = $("#strokeColor");
+      const strokeSize = $("#strokeSize");
+      const strokeSizeVal = $("#strokeSizeVal");
+      const snapCb = $("#snap");
+
+      const state = {
+        tool: "select",
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+
+        isDown:false,
+        drag:null,
+        resize:null,
+        currentStroke:null,
+
+        items: [],
+        selectedId: null,
+
+        strokes: [],
+
+        undo: [],
+        redo: [],
+
+        spaceDown:false
+      };
+
+      const GRID = 20;
+
+      function snap(v){ return snapCb.checked ? Math.round(v/GRID)*GRID : v; }
+
+      function resizeCanvas(){
+        const r = stage.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        ink.width = Math.floor(r.width*dpr);
+        ink.height = Math.floor(r.height*dpr);
+        ink.style.width = r.width+"px";
+        ink.style.height = r.height+"px";
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        redraw();
+      }
+      window.addEventListener("resize", resizeCanvas);
+
+      function applyTransforms(){
+        overlay.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+        grid.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+      }
+
+      function screenToWorld(cx, cy){
+        const r = stage.getBoundingClientRect();
+        return {
+          x: (cx - r.left - state.panX) / state.zoom,
+          y: (cy - r.top  - state.panY) / state.zoom
+        };
+      }
+
+      function setTool(t){
+        state.tool = t;
+        $$("#toolrow [data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === t));
+      }
+
+      function snapshot(){
+        state.undo.push(JSON.stringify(serialize()));
+        if (state.undo.length > 60) state.undo.shift();
+        state.redo.length = 0;
+        updateUndoRedo();
+      }
+
+      function updateUndoRedo(){
+        $("#undoBtn").disabled = state.undo.length === 0;
+        $("#redoBtn").disabled = state.redo.length === 0;
+      }
+
+      function undo(){
+        if (!state.undo.length) return;
+        state.redo.push(JSON.stringify(serialize()));
+        const prev = state.undo.pop();
+        load(JSON.parse(prev), true);
+        updateUndoRedo();
+      }
+      function redo(){
+        if (!state.redo.length) return;
+        state.undo.push(JSON.stringify(serialize()));
+        const next = state.redo.pop();
+        load(JSON.parse(next), true);
+        updateUndoRedo();
+      }
+
+      function beginStroke(p){
+        state.currentStroke = {
+          id: uid(),
+          mode: state.tool, // pen/eraser
+          color: strokeColor.value,
+          size: Number(strokeSize.value),
+          points: [p]
+        };
+      }
+      function addPoint(p){ state.currentStroke?.points.push(p); }
+
+      function endStroke(){
+        if (!state.currentStroke) return;
+        state.strokes.push(state.currentStroke);
+        state.currentStroke = null;
+        snapshot();
+        redraw();
+      }
+
+      function drawStroke(s, c){
+        if (!s.points?.length) return;
+        c.save();
+        c.lineJoin="round";
+        c.lineCap="round";
+        c.lineWidth = s.size;
+        if (s.mode === "eraser"){
+          c.globalCompositeOperation = "destination-out";
+          c.strokeStyle = "rgba(0,0,0,1)";
+        } else {
+          c.globalCompositeOperation = "source-over";
+          c.strokeStyle = s.color;
+        }
+        c.beginPath();
+        c.moveTo(s.points[0].x, s.points[0].y);
+        for (let i=1;i<s.points.length;i++) c.lineTo(s.points[i].x, s.points[i].y);
+        c.stroke();
+        c.restore();
+      }
+
+      function clearCanvas(){
+        const r = stage.getBoundingClientRect();
+        ctx.clearRect(0,0,r.width,r.height);
+      }
+
+      function redraw(){
+        clearCanvas();
+        ctx.save();
+        ctx.translate(state.panX, state.panY);
+        ctx.scale(state.zoom, state.zoom);
+
+        for (const s of state.strokes) drawStroke(s, ctx);
+        if (state.currentStroke) drawStroke(state.currentStroke, ctx);
+
+        ctx.restore();
+        syncOverlay();
+        applyTransforms();
+      }
+
+      function setSelected(id){
+        state.selectedId = id;
+        syncOverlay();
+      }
+      function deselect(){
+        state.selectedId = null;
+        syncOverlay();
+      }
+      function getItem(id){ return state.items.find(x => x.id === id) || null; }
+
+      function ensureHandles(el, id){
+        if (el.querySelector(".handle")) return;
+        ["nw","ne","sw","se"].forEach(c => {
+          const h = document.createElement("div");
+          h.className = `handle ${c}`;
+          h.dataset.corner = c;
+          h.addEventListener("pointerdown", (e)=>startResize(e, id, c));
+          el.appendChild(h);
+        });
+      }
+
+      function syncOverlay(){
+        // remove stale
+        for (const el of $$(".item", overlay)){
+          if (!state.items.some(it => it.id === el.dataset.id)) el.remove();
+        }
+
+        for (const it of state.items){
+          let el = $(`.item[data-id="${it.id}"]`, overlay);
+          if (!el){
+            el = document.createElement("div");
+            el.className = "item";
+            el.dataset.id = it.id;
+            el.addEventListener("pointerdown", onItemDown);
+            el.addEventListener("dblclick", onItemDbl);
+            overlay.appendChild(el);
+          }
+
+          el.style.left = it.x + "px";
+          el.style.top  = it.y + "px";
+          el.style.width  = it.w + "px";
+          el.style.height = it.h + "px";
+          el.classList.toggle("selected", state.selectedId === it.id);
+
+          // type styling
+          el.classList.toggle("note", it.type === "note");
+          el.classList.toggle("textbox", it.type === "text");
+          el.classList.toggle("shape", ["rect","circle","diamond"].includes(it.type));
+          el.classList.toggle("circle", it.type === "circle");
+          el.classList.toggle("diamond", it.type === "diamond");
+
+          if (it.type === "note"){
+            if (!el.querySelector("textarea")){
+              el.innerHTML = `
+                <div class="top"><span>Sticky</span><span>📌</span></div>
+                <textarea spellcheck="false" placeholder="Type..."></textarea>
+              `;
+              const ta = el.querySelector("textarea");
+              ta.value = it.text || "";
+              ta.addEventListener("input", ()=> it.text = ta.value);
+              ta.addEventListener("change", ()=> snapshot());
+            } else {
+              const ta = el.querySelector("textarea");
+              if (ta.value !== (it.text||"")) ta.value = it.text||"";
+            }
+          }
+
+          if (it.type === "text"){
+            if (!el.dataset.inited){
+              el.dataset.inited = "1";
+              el.textContent = it.text || "Double-click to edit";
+            } else if (!el.isContentEditable){
+              el.textContent = it.text || "";
+            }
+          }
+
+          if (["rect","circle","diamond"].includes(it.type)){
+            el.style.borderColor = it.stroke || "rgba(2,6,23,.35)";
+            el.style.background = it.fill || "rgba(37,99,235,.10)";
+          }
+
+          ensureHandles(el, it.id);
+        }
+      }
+
+      function addItem(type){
+        const center = screenToWorld(stage.getBoundingClientRect().left + stage.clientWidth*0.5,
+                                     stage.getBoundingClientRect().top + stage.clientHeight*0.5);
+        const it = { id: uid(), type, x: snap(center.x-120), y: snap(center.y-80), w: 240, h: 160 };
+
+        if (type === "note"){
+          it.w = 240; it.h = 170; it.text = "";
+        }
+        if (type === "text"){
+          it.w = 260; it.h = 80; it.text = "Double-click to edit";
+        }
+        if (type === "circle" || type === "diamond"){
+          it.w = 170; it.h = 170;
+        }
+        if (["rect","circle","diamond"].includes(type)){
+          it.stroke = strokeColor.value;
+          it.fill = "rgba(37,99,235,.10)";
+        }
+
+        state.items.push(it);
+        snapshot();
+        setSelected(it.id);
+        redraw();
+
+        if (type === "note"){
+          setTimeout(()=> $(`.item[data-id="${it.id}"] textarea`, overlay)?.focus(), 0);
+        }
+      }
+
+      function onItemDown(e){
+        if (state.tool !== "select" && !state.spaceDown) return;
+        if (state.spaceDown) return; // stage pans
+
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it) return;
+        if (e.target.tagName.toLowerCase() === "textarea" || e.target.isContentEditable) return;
+
+        setSelected(it.id);
+        const p = screenToWorld(e.clientX, e.clientY);
+
+        state.drag = { id: it.id, sx: p.x, sy: p.y, ox: it.x, oy: it.y };
+        el.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+      }
+
+      function onItemDbl(e){
+        const el = e.currentTarget;
+        const it = getItem(el.dataset.id);
+        if (!it || it.type !== "text") return;
+
+        el.contentEditable = "true";
+        el.focus();
+
+        const done = () => {
+          el.contentEditable = "false";
+          it.text = el.textContent || "";
+          snapshot();
+          el.removeEventListener("blur", done);
+          el.removeEventListener("keydown", onKey);
+        };
+        const onKey = (ev) => {
+          if (ev.key === "Escape"){ el.textContent = it.text || ""; el.blur(); }
+          if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); el.blur(); }
+        };
+        el.addEventListener("blur", done);
+        el.addEventListener("keydown", onKey);
+      }
+
+      function startResize(e, id, corner){
+        if (state.tool !== "select") return;
+        const it = getItem(id);
+        if (!it) return;
+        setSelected(id);
+
+        const p = screenToWorld(e.clientX, e.clientY);
+        state.resize = { id, corner, sx: p.x, sy: p.y, ox: it.x, oy: it.y, ow: it.w, oh: it.h };
+
+        e.currentTarget.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      overlay.addEventListener("pointermove", (e) => {
+        if (state.drag){
+          const it = getItem(state.drag.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          it.x = snap(state.drag.ox + (p.x - state.drag.sx));
+          it.y = snap(state.drag.oy + (p.y - state.drag.sy));
+          syncOverlay();
+        }
+        if (state.resize){
+          const it = getItem(state.resize.id);
+          if (!it) return;
+          const p = screenToWorld(e.clientX, e.clientY);
+          const dx = p.x - state.resize.sx;
+          const dy = p.y - state.resize.sy;
+
+          let x=state.resize.ox, y=state.resize.oy, w=state.resize.ow, h=state.resize.oh;
+          const c = state.resize.corner;
+          if (c.includes("e")) w = state.resize.ow + dx;
+          if (c.includes("s")) h = state.resize.oh + dy;
+          if (c.includes("w")) { w = state.resize.ow - dx; x = state.resize.ox + dx; }
+          if (c.includes("n")) { h = state.resize.oh - dy; y = state.resize.oy + dy; }
+
+          w = Math.max(80, w); h = Math.max(50, h);
+          it.x = snap(x); it.y = snap(y); it.w = snap(w); it.h = snap(h);
+          syncOverlay();
+        }
+      });
+
+      overlay.addEventListener("pointerup", () => {
+        if (state.drag){ state.drag = null; snapshot(); }
+        if (state.resize){ state.resize = null; snapshot(); }
+      });
+
+      function setZoom(z, anchor){
+        const old = state.zoom;
+        z = clamp(z, 0.25, 3.0);
+
+        if (anchor){
+          const before = screenToWorld(anchor.x, anchor.y);
+          state.zoom = z;
+          const after = screenToWorld(anchor.x, anchor.y);
+          state.panX += (after.x - before.x) * state.zoom;
+          state.panY += (after.y - before.y) * state.zoom;
+        } else {
+          state.zoom = z;
+        }
+        redraw();
+      }
+
+      // Stage input
+      stage.addEventListener("pointerdown", (e) => {
+        if (e.target.closest(".item")) return;
+
+        state.isDown = true;
+
+        const tool = state.spaceDown ? "pan" : state.tool;
+
+        if (tool === "select"){ deselect(); return; }
+
+        if (tool === "pan"){
+          stage.setPointerCapture(e.pointerId);
+          state.drag = { mode:"pan", cx:e.clientX, cy:e.clientY, px: state.panX, py: state.panY };
+          return;
+        }
+
+        const p = screenToWorld(e.clientX, e.clientY);
+        if (tool === "pen" || tool === "eraser"){
+          stage.setPointerCapture(e.pointerId);
+          beginStroke(p);
+          redraw();
+        }
+      });
+
+      stage.addEventListener("pointermove", (e) => {
+        if (!state.isDown) return;
+
+        const tool = state.spaceDown ? "pan" : state.tool;
+
+        if (state.drag && state.drag.mode === "pan"){
+          state.panX = state.drag.px + (e.clientX - state.drag.cx);
+          state.panY = state.drag.py + (e.clientY - state.drag.cy);
+          redraw();
+          return;
+        }
+
+        if (tool === "pen" || tool === "eraser"){
+          const p = screenToWorld(e.clientX, e.clientY);
+          addPoint(p);
+          redraw();
+        }
+      });
+
+      stage.addEventListener("pointerup", () => {
+        state.isDown = false;
+        if (state.drag && state.drag.mode === "pan"){ state.drag = null; return; }
+        if (state.tool === "pen" || state.tool === "eraser") endStroke();
+      });
+      stage.addEventListener("pointercancel", () => { state.isDown=false; state.drag=null; });
+
+      // Ctrl+wheel zoom
+      stage.addEventListener("wheel", (e) => {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        e.preventDefault();
+        const dir = Math.sign(e.deltaY);
+        const factor = dir > 0 ? 0.92 : 1.08;
+        setZoom(state.zoom * factor, {x:e.clientX, y:e.clientY});
+      }, {passive:false});
+
+      // UI wire-up
+      $$("#toolrow [data-tool]").forEach(b => b.addEventListener("click", ()=> setTool(b.dataset.tool)));
+      $$("#toolrow [data-add]").forEach(b => b.addEventListener("click", ()=> addItem(b.dataset.add)));
+
+      strokeSize.addEventListener("input", ()=> strokeSizeVal.textContent = strokeSize.value);
+
+      $("#undoBtn").addEventListener("click", undo);
+      $("#redoBtn").addEventListener("click", redo);
+
+      $("#zoomIn").addEventListener("click", ()=> setZoom(state.zoom*1.12));
+      $("#zoomOut").addEventListener("click", ()=> setZoom(state.zoom/1.12));
+      $("#zoomReset").addEventListener("click", ()=> { state.zoom=1; state.panX=0; state.panY=0; redraw(); });
+
+      $("#helpBtn").addEventListener("click", ()=> {
+        alert(`Shortcuts
+V = Select
+D = Draw
+E = Erase
+H = Hand
+Delete = remove selected item
+Ctrl+Z = undo
+Ctrl+Y / Ctrl+Shift+Z = redo
+Space (hold) = pan
+Ctrl + wheel = zoom`);
+      });
+
+      $("#clearBtn").addEventListener("click", ()=> {
+        if (!confirm("Clear the entire board?")) return;
+        snapshot();
+        state.items = [];
+        state.strokes = [];
+        state.selectedId = null;
+        redraw();
+      });
+
+      $("#themeBtn").addEventListener("click", ()=> {
+        document.documentElement.dataset.theme =
+          document.documentElement.dataset.theme === "white" ? "white" : "white"; // keep white (you can extend)
+      });
+
+      // Save/Load JSON
+      $("#saveBtn").addEventListener("click", ()=> {
+        download(`logiclab-board-${Date.now()}.json`, JSON.stringify(serialize(), null, 2), "application/json");
+      });
+      $("#loadBtn").addEventListener("click", ()=> $("#jsonFile").click());
+      $("#jsonFile").addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const txt = await file.text();
+        try{ load(JSON.parse(txt)); }
+        catch{ alert("Invalid JSON file."); }
+        finally{ e.target.value = ""; }
+      });
+
+      // Export PNG
+      $("#exportPngBtn").addEventListener("click", exportPNG);
+
+      // Topbar theme button uses id "themeBtn"? Fix:
+      const themeBtn = $("#themeBtn");
+      if (!themeBtn) {
+        // create safe: do nothing
+      }
+
+      // Keyboard
+      window.addEventListener("keydown", (e) => {
+        if (e.key === " ") state.spaceDown = true;
+
+        const tag = (e.target?.tagName || "").toLowerCase();
+        const typing = tag === "input" || tag === "textarea" || e.target?.isContentEditable;
+        if (typing) return;
+
+        const k = e.key.toLowerCase();
+        if (k === "v") setTool("select");
+        if (k === "d") setTool("pen");
+        if (k === "e") setTool("eraser");
+        if (k === "h") setTool("pan");
+
+        const isMac = navigator.platform.toLowerCase().includes("mac");
+        const mod = isMac ? e.metaKey : e.ctrlKey;
+
+        if (mod && k === "z" && !e.shiftKey){ e.preventDefault(); undo(); }
+        if ((mod && k === "y") || (mod && k === "z" && e.shiftKey)){ e.preventDefault(); redo(); }
+
+        if ((e.key === "Delete" || e.key === "Backspace") && state.selectedId){
+          const idx = state.items.findIndex(it => it.id === state.selectedId);
+          if (idx >= 0){
+            snapshot();
+            state.items.splice(idx,1);
+            state.selectedId = null;
+            redraw();
+          }
+        }
+        if (e.key === "Escape") deselect();
+      });
+
+      window.addEventListener("keyup", (e)=> { if (e.key === " ") state.spaceDown = false; });
+
+      // Serialize/load
+      function serialize(){
+        return {
+          app: "logiclab-whiteboard-canva-style",
+          version: 1,
+          ts: new Date().toISOString(),
+          view: { zoom: state.zoom, panX: state.panX, panY: state.panY },
+          strokes: state.strokes,
+          items: state.items
+        };
+      }
+
+      function load(obj, skipSnapshot=false){
+        if (!skipSnapshot) snapshot();
+        state.items = Array.isArray(obj.items) ? obj.items : [];
+        state.strokes = Array.isArray(obj.strokes) ? obj.strokes : [];
+        state.selectedId = null;
+
+        if (obj.view){
+          state.zoom = obj.view.zoom ?? 1;
+          state.panX = obj.view.panX ?? 0;
+          state.panY = obj.view.panY ?? 0;
+        }
+        redraw();
+      }
+
+      function download(name, text, mime){
+        const blob = new Blob([text], {type:mime});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 800);
+      }
+
+      async function exportPNG(){
+        const r = stage.getBoundingClientRect();
+        const scale = 2;
+
+        const out = document.createElement("canvas");
+        out.width = Math.floor(r.width*scale);
+        out.height = Math.floor(r.height*scale);
+        const octx = out.getContext("2d");
+
+        // background
+        octx.fillStyle = "#ffffff";
+        octx.fillRect(0,0,out.width,out.height);
+
+        // grid
+        octx.strokeStyle = "rgba(2,6,23,.04)";
+        octx.lineWidth = 1;
+        for (let x=0; x<out.width; x+=40){ octx.beginPath(); octx.moveTo(x,0); octx.lineTo(x,out.height); octx.stroke(); }
+        for (let y=0; y<out.height; y+=40){ octx.beginPath(); octx.moveTo(0,y); octx.lineTo(out.width,y); octx.stroke(); }
+
+        // strokes
+        octx.save();
+        octx.translate(state.panX*scale, state.panY*scale);
+        octx.scale(state.zoom*scale, state.zoom*scale);
+        for (const s of state.strokes) drawStroke(s, octx);
+        octx.restore();
+
+        // items (simple)
+        octx.save();
+        octx.translate(state.panX*scale, state.panY*scale);
+        octx.scale(state.zoom*scale, state.zoom*scale);
+
+        for (const it of state.items){
+          if (it.type === "note"){
+            octx.fillStyle = "#fff4a3";
+            octx.strokeStyle = "rgba(0,0,0,.12)";
+            roundRect(octx, it.x, it.y, it.w, it.h, 14);
+            octx.fill(); octx.stroke();
+
+            octx.fillStyle = "rgba(31,41,55,.8)";
+            octx.font = "900 12px system-ui";
+            octx.fillText("Sticky", it.x+12, it.y+20);
+
+            octx.fillStyle = "#1f2937";
+            octx.font = "400 14px system-ui";
+            const lines = (it.text||"").split("\n");
+            let yy = it.y + 44;
+            for (const line of lines){
+              if (yy > it.y + it.h - 10) break;
+              octx.fillText(line.slice(0, 64), it.x+12, yy);
+              yy += 18;
+            }
+          }
+
+          if (it.type === "text"){
+            octx.fillStyle = "#0b1020";
+            octx.font = "800 20px system-ui";
+            const lines = (it.text||"").split("\n");
+            let yy = it.y + 26;
+            for (const line of lines){
+              octx.fillText(line, it.x+12, yy);
+              yy += 24;
+            }
+          }
+
+          if (["rect","circle","diamond"].includes(it.type)){
+            octx.strokeStyle = it.stroke || "#2563eb";
+            octx.lineWidth = 2;
+            octx.fillStyle = it.fill || "rgba(37,99,235,.10)";
+            if (it.type === "circle"){
+              octx.beginPath();
+              octx.ellipse(it.x+it.w/2, it.y+it.h/2, it.w/2, it.h/2, 0, 0, Math.PI*2);
+              octx.fill(); octx.stroke();
+            } else if (it.type === "diamond"){
+              octx.save();
+              octx.translate(it.x+it.w/2, it.y+it.h/2);
+              octx.rotate(Math.PI/4);
+              octx.translate(-(it.x+it.w/2), -(it.y+it.h/2));
+              roundRect(octx, it.x, it.y, it.w, it.h, 14);
+              octx.fill(); octx.stroke();
+              octx.restore();
+            } else {
+              roundRect(octx, it.x, it.y, it.w, it.h, 16);
+              octx.fill(); octx.stroke();
+            }
+          }
+        }
+
+        // watermark
+        octx.globalAlpha = 0.65;
+        octx.fillStyle = "#0b1020";
+        octx.font = "900 14px system-ui";
+        octx.fillText("Powered by Logic Lab", 18, out.height-18);
+        octx.restore();
+
+        const a = document.createElement("a");
+        a.href = out.toDataURL("image/png");
+        a.download = `logiclab-whiteboard-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      function roundRect(c, x, y, w, h, r){
+        const rr = Math.min(r, w/2, h/2);
+        c.beginPath();
+        c.moveTo(x+rr, y);
+        c.arcTo(x+w, y, x+w, y+h, rr);
+        c.arcTo(x+w, y+h, x, y+h, rr);
+        c.arcTo(x, y+h, x, y, rr);
+        c.arcTo(x, y, x+w, y, rr);
+        c.closePath();
+      }
+
+      // Fix theme button id mismatch (top bar button is themeBtn)
+      $("#themeBtn")?.addEventListener("click", ()=> {
+        // add more themes later; for now keep the clean Canva-ish white look
+        alert("Theme system ready. Add brown/dark next if you want.");
+      });
+
+      // init
+      setTool("select");
+      resizeCanvas();
+      applyTransforms();
+      snapshot();
+      updateUndoRedo();
+    })();
+  </script>
+</body>
+</html>
