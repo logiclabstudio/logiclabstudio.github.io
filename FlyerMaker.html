@@ -282,6 +282,7 @@
       background: rgba(15,23,42,.55);
     }
     .zoom{ width:140px; }
+    .mobileOnly{display:none}
 
     /* Layers list */
     .layersList{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
@@ -333,23 +334,64 @@
        ========================= */
     @media (max-width: 980px){
       .app{
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+        display:flex;
+        flex-direction:column;
         height: 100dvh;
-        padding: 10px;
-        gap: 10px;
-      }
-      aside.panel{
-        max-height: 42dvh;
-        overflow: auto;
+        padding: 8px;
+        gap: 8px;
+        overflow:hidden;
       }
       .canvasWrap{
-        min-width: 0; /* stop forced overflow */
+        order:1;
+        min-width: 0;
+        flex: 1 1 auto;
+        min-height: 52dvh;
+      }
+      aside.panel{
+        order:2;
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        z-index: 25;
+        height: min(74dvh, 700px);
+        max-height: 82dvh;
+        transform: translateY(calc(100% - 58px));
+        transition: transform .28s ease;
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      aside.panel.open{
+        transform: translateY(0);
+      }
+      .mobileOnly{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
       }
       .topbar{
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 12;
+      }
+      .tabs{
+        overflow-x:auto;
+        overflow-y:hidden;
+        flex-wrap:nowrap;
+        scrollbar-width:thin;
+      }
+      .tab{
+        min-width:94px;
+        font-size:13px;
+      }
+      .panel-inner{
+        padding:12px;
+      }
+      label{
+        font-size:13px;
+      }
+      input[type="text"], input[type="number"], textarea, select{
+        min-height:42px;
       }
       .stage{
         padding: 10px;
@@ -358,7 +400,6 @@
 
     @media (max-width: 640px){
       .app{ padding: 8px; gap: 8px; }
-      aside.panel{ max-height: 48dvh; }
 
       .row{ grid-template-columns: 1fr; }
       .row3{ grid-template-columns: 1fr; }
@@ -379,7 +420,7 @@
 <body>
   <div class="app">
     <!-- LEFT PANEL -->
-    <aside class="panel">
+    <aside class="panel" id="leftPanel">
       <div class="title panel-inner">
         <h1>Digital Flyer Maker Pro</h1>
         <div class="badge" id="badgeSize">A4 • 96DPI Edit</div>
@@ -869,6 +910,7 @@
           <span class="kbd" id="topPx">794×1123 px</span>
         </div>
         <div class="right">
+          <button type="button" id="mobilePanelToggle" class="mobileOnly">Controls</button>
           <span class="kbd">Zoom</span>
           <input class="zoom" id="zoom" type="range" min="40" max="140" value="100">
           <span class="kbd" id="zoomLabel">100%</span>
@@ -959,6 +1001,8 @@
     const tabEffects = document.getElementById("tabEffects");
     const tabTemplates = document.getElementById("tabTemplates");
     const tabBrand = document.getElementById("tabBrand");
+    const leftPanel = document.getElementById("leftPanel");
+    const mobilePanelToggle = document.getElementById("mobilePanelToggle");
     const designTab = document.getElementById("designTab");
     const layersTab = document.getElementById("layersTab");
     const assetsTab = document.getElementById("assetsTab");
@@ -1429,7 +1473,6 @@
 
     // ===== Templates =====
     function addHeaderTemplate(){
-      console.log("addHeaderTemplate called");
       // Add title
       addText({
         name: "Header Title",
@@ -1549,7 +1592,7 @@
       let elementsToDrag = [];
       if(selectedId === id && el.type === "group"){
         // If dragging a group, include all children
-        elementsToDrag = [el, ...elements.filter(e=>el.children.includes(e.id))];
+        elementsToDrag = [el, ...elements.filter(e=>e.groupId === el.id)];
       } else if(selectedId === id){
         elementsToDrag = [el];
       } else {
@@ -1622,7 +1665,14 @@
     function startResizePointer(e, id){
       const el = elements.find(x=>x.id===id);
       if(!el) return;
-      resize = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
+      const payload = { id, startX: e.clientX, startY: e.clientY, w: el.w, h: el.h };
+      if(el.type === "group"){
+        const children = elements.filter(x=>x.groupId === el.id);
+        payload.children = children.map(c=>({
+          id: c.id, x: c.x, y: c.y, w: c.w, h: c.h
+        }));
+      }
+      resize = payload;
       window.addEventListener("pointermove", onResizeMovePointer);
       window.addEventListener("pointerup", onResizeEndPointer, { once:true });
       window.addEventListener("pointercancel", onResizeEndPointer, { once:true });
@@ -1633,8 +1683,22 @@
       if(!el) return;
       const dx = e.clientX - resize.startX;
       const dy = e.clientY - resize.startY;
-      el.w = snap(clamp(resize.w + dx, 30, paper.clientWidth - el.x));
-      el.h = snap(clamp(resize.h + dy, 24, paper.clientHeight - el.y));
+      const newW = snap(clamp(resize.w + dx, 30, paper.clientWidth - el.x));
+      const newH = snap(clamp(resize.h + dy, 24, paper.clientHeight - el.y));
+      if(el.type === "group" && Array.isArray(resize.children) && resize.children.length){
+        const sx = newW / Math.max(1, resize.w);
+        const sy = newH / Math.max(1, resize.h);
+        resize.children.forEach(ch=>{
+          const c = elements.find(x=>x.id===ch.id);
+          if(!c) return;
+          c.x = snap(clamp(el.x + (ch.x - el.x) * sx, 0, paper.clientWidth - 10));
+          c.y = snap(clamp(el.y + (ch.y - el.y) * sy, 0, paper.clientHeight - 10));
+          c.w = snap(clamp(ch.w * sx, 30, paper.clientWidth - c.x));
+          c.h = snap(clamp(ch.h * sy, 24, paper.clientHeight - c.y));
+        });
+      }
+      el.w = newW;
+      el.h = newH;
       render();
       updateEditPanelQuiet();
       setStatus("Resizing", `w:${Math.round(el.w)} h:${Math.round(el.h)}`);
@@ -1711,7 +1775,7 @@
         const isSelected = selectedIds.has(el.id) || el.id === selectedId;
         const isInSelectedGroup = Array.from(selectedIds).some(id => {
           const group = elements.find(e => e.id === id && e.type === "group");
-          return group && group.children.includes(el.id);
+          return group && el.groupId === group.id;
         });
         if(isSelected || isInSelectedGroup) node.classList.add("selected");
 
@@ -1875,7 +1939,10 @@
 
         // ✅ Pointer events: works for mouse + touch
         node.addEventListener("pointerdown", (e) => {
-          if(el.hidden || el.locked) return;
+          const dragTarget = (el.groupId && el.type !== "group")
+            ? (elements.find(x=>x.id===el.groupId) || el)
+            : el;
+          if(dragTarget.hidden || dragTarget.locked) return;
 
           // keep receiving moves even if finger leaves the element
           node.setPointerCapture?.(e.pointerId);
@@ -1885,26 +1952,26 @@
 
           if(isRotateHandle){
             e.preventDefault();
-            select(el.id);
-            startRotatePointer(e, el.id);
+            select(dragTarget.id);
+            startRotatePointer(e, dragTarget.id);
             return;
           }
 
           if(isHandle){
             e.preventDefault();
-            select(el.id);
-            startResizePointer(e, el.id);
+            select(dragTarget.id);
+            startResizePointer(e, dragTarget.id);
             return;
           }
 
           e.preventDefault();
           if(e.shiftKey){
             // Multi-select
-            select(el.id, true);
+            select(dragTarget.id, true);
           } else {
-            select(el.id);
+            select(dragTarget.id);
           }
-          startDragPointer(e, el.id);
+          startDragPointer(e, dragTarget.id);
         });
 
         // Double-click for inline editing
@@ -2227,7 +2294,8 @@
         nm.textContent = el.name || el.type;
         const meta = document.createElement("div");
         meta.className = "meta";
-        meta.textContent = `${el.type}${el.type==="shape" ? `/${el.kind}` : ""} • z:${el.z}` + (el.hidden ? " • hidden" : "");
+        const inGroup = el.groupId ? " • in group" : "";
+        meta.textContent = `${el.type}${el.type==="shape" ? `/${el.kind}` : ""} • z:${el.z}${inGroup}` + (el.hidden ? " • hidden" : "");
         title.appendChild(nm);
         title.appendChild(meta);
 
@@ -2819,6 +2887,22 @@
       autoFitToScreen();
     }
 
+    function isMobileView(){
+      return window.matchMedia("(max-width: 980px)").matches;
+    }
+    function syncMobilePanelState(){
+      if(!isMobileView()){
+        leftPanel.classList.remove("open");
+        mobilePanelToggle.textContent = "Controls";
+        return;
+      }
+      mobilePanelToggle.textContent = leftPanel.classList.contains("open") ? "Close" : "Controls";
+    }
+    mobilePanelToggle.onclick = ()=>{
+      leftPanel.classList.toggle("open");
+      syncMobilePanelState();
+    };
+
     // Tabs
     function setTab(which){
       tabDesign.classList.toggle("active", which === "design");
@@ -3039,9 +3123,7 @@
     };
 
     document.getElementById("distributeHoriz").onclick = ()=>{
-      console.log("distributeHoriz clicked");
       const selectedElements = getSelectedElements();
-      console.log("selectedElements for distribute:", selectedElements.length);
       if(selectedElements.length < 3) return;
       const sorted = selectedElements.sort((a,b)=>a.x - b.x);
       const leftmost = sorted[0].x;
@@ -3092,77 +3174,130 @@
       render(); updateEditPanelQuiet(); renderLayers();
     };
 
-    function removeSelected(){
-      if(selectedId){
-        elements = elements.filter(e=>e.id !== selectedId);
-        selectedId = null;
-      } else if(selectedIds.size > 0){
-        elements = elements.filter(e=>!selectedIds.has(e.id));
-        selectedIds.clear();
+    function getGroupChildren(groupId){
+      return elements.filter(e=>e.groupId === groupId);
+    }
+    function updateGroupBounds(groupId){
+      const group = elements.find(e=>e.id === groupId && e.type === "group");
+      if(!group) return;
+      const children = getGroupChildren(groupId);
+      if(children.length === 0){
+        elements = elements.filter(e=>e.id !== groupId);
+        return;
       }
+      group.x = Math.min(...children.map(e=>e.x));
+      group.y = Math.min(...children.map(e=>e.y));
+      group.w = Math.max(...children.map(e=>e.x + e.w)) - group.x;
+      group.h = Math.max(...children.map(e=>e.y + e.h)) - group.y;
+    }
+
+    function removeSelected(){
+      const idsToDelete = new Set();
+      if(selectedId) idsToDelete.add(selectedId);
+      selectedIds.forEach(id=>idsToDelete.add(id));
+      if(idsToDelete.size === 0) return;
+
+      for(const id of [...idsToDelete]){
+        const el = elements.find(e=>e.id===id);
+        if(el?.type === "group"){
+          getGroupChildren(el.id).forEach(ch=>idsToDelete.add(ch.id));
+        }
+      }
+
+      elements = elements.filter(e=>!idsToDelete.has(e.id));
+      selectedId = null;
+      selectedIds.clear();
       render(); renderLayers(); updateEditPanel();
       setStatus("Deleted", "Ready");
     }
 
     function groupSelected(){
-      console.log("groupSelected called, selectedIds.size:", selectedIds.size);
-      if(selectedIds.size < 2) return;
-
       const selectedElements = elements.filter(e=>selectedIds.has(e.id));
-      console.log("selectedElements:", selectedElements.length);
-      if(selectedElements.length < 2) return;
+      if(selectedElements.length < 2){
+        alert("Select at least 2 elements to group.");
+        return;
+      }
+      if(selectedElements.some(e=>e.type === "group")){
+        alert("Ungroup existing groups first before creating a new group.");
+        return;
+      }
+      if(selectedElements.some(e=>e.groupId)){
+        alert("Some selected elements are already grouped.");
+        return;
+      }
 
-      // Calculate group bounds
       const minX = Math.min(...selectedElements.map(e=>e.x));
       const minY = Math.min(...selectedElements.map(e=>e.y));
       const maxX = Math.max(...selectedElements.map(e=>e.x + e.w));
       const maxY = Math.max(...selectedElements.map(e=>e.y + e.h));
+      const topZ = Math.max(...selectedElements.map(e=>e.z || 1), 1);
 
-      // Create group element
       const group = {
         id: uid(),
         type: "group",
-        name: "Group",
+        name: `Group (${selectedElements.length})`,
         x: minX,
         y: minY,
         w: maxX - minX,
         h: maxY - minY,
-        z: ++zCounter,
-        children: selectedElements.map(e=>e.id),
+        z: topZ + 1,
         bg: "#ffffff",
         bgAlpha: 0,
         locked: false,
         hidden: false
       };
 
-      // Remove individual elements and add group
-      elements = elements.filter(e=>!selectedIds.has(e.id));
+      selectedElements.forEach(e=>{
+        e.groupId = group.id;
+        if(e.z >= group.z) e.z = group.z - 1;
+      });
       elements.push(group);
-
+      zCounter = Math.max(zCounter, group.z);
       select(group.id);
       render(); renderLayers(); updateEditPanel();
-      setStatus("Grouped", "Ready");
+      setStatus("Grouped", `${selectedElements.length} elements`);
     }
 
     function ungroupSelected(){
-      const el = getSelected();
-      if(!el || el.type !== "group") return;
-
-      // Get child elements
-      const children = elements.filter(e=>el.children.includes(e.id));
-      if(children.length === 0) return;
-
-      // Remove group and add children back
-      elements = elements.filter(e=>e.id !== el.id);
-      elements.push(...children);
-
-      // Select the first child
-      select(children[0].id);
+      const group = getSelected();
+      if(!group || group.type !== "group") return;
+      const children = getGroupChildren(group.id);
+      children.forEach(ch=> ch.groupId = null);
+      elements = elements.filter(e=>e.id !== group.id);
+      if(children[0]) select(children[0].id);
       render(); renderLayers(); updateEditPanel();
-      setStatus("Ungrouped", "Ready");
+      setStatus("Ungrouped", `${children.length} elements`);
     }
     function duplicateSelected(){
       const el = getSelected(); if(!el) return;
+      if(el.type === "group"){
+        const children = getGroupChildren(el.id);
+        if(children.length === 0) return;
+        const groupCopyId = uid();
+        const groupCopy = JSON.parse(JSON.stringify(el));
+        groupCopy.id = groupCopyId;
+        groupCopy.name = `${el.name || "Group"} copy`;
+        groupCopy.x = clamp(groupCopy.x + 20, 0, paper.clientWidth - 10);
+        groupCopy.y = clamp(groupCopy.y + 20, 0, paper.clientHeight - 10);
+        groupCopy.z = ++zCounter;
+        elements.push(groupCopy);
+        children.forEach(ch=>{
+          const c = JSON.parse(JSON.stringify(ch));
+          c.id = uid();
+          c.groupId = groupCopyId;
+          c.x = clamp(c.x + 20, 0, paper.clientWidth - 10);
+          c.y = clamp(c.y + 20, 0, paper.clientHeight - 10);
+          c.z = Math.max(1, (groupCopy.z || 2) - 1);
+          elements.push(c);
+        });
+        updateGroupBounds(groupCopyId);
+        render();
+        select(groupCopyId);
+        renderLayers();
+        setStatus("Duplicated", "Group copy created");
+        return;
+      }
+
       const copy = JSON.parse(JSON.stringify(el));
       copy.id = uid();
       copy.x = clamp(copy.x + 20, 0, paper.clientWidth - 10);
@@ -3177,7 +3312,6 @@
     document.getElementById("deleteEl").onclick = removeSelected;
     document.getElementById("duplicateEl").onclick = duplicateSelected;
     document.getElementById("groupEl").onclick = groupSelected;
-    console.log("groupEl button:", document.getElementById("groupEl"));
     document.getElementById("ungroupEl").onclick = ungroupSelected;
 
     // Layer actions
@@ -3256,9 +3390,16 @@
     clearAll();
 
     // Auto-fit on load for small screens, and keep fitting on resize/orientation change
+    syncMobilePanelState();
     autoFitToScreen();
-    window.addEventListener("resize", ()=> autoFitToScreen());
-    window.addEventListener("orientationchange", ()=> setTimeout(()=>autoFitToScreen(true), 150));
+    window.addEventListener("resize", ()=>{
+      syncMobilePanelState();
+      autoFitToScreen();
+    });
+    window.addEventListener("orientationchange", ()=> setTimeout(()=>{
+      syncMobilePanelState();
+      autoFitToScreen(true);
+    }, 150));
     });
   </script>
 </body>
