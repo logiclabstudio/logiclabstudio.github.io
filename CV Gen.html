@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
-  <title>Logic Lab Studio : CV Generator</title>
+  <title>CV Generator | Guidance Template</title>
   <style>
     :root{
       --bg:#0b1020;
@@ -180,6 +180,44 @@
     .split{
       display:flex; gap:8px; flex-wrap:wrap; align-items:center;
     }
+    .scoreCard{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .scoreHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+      font-size:12px;
+    }
+    .scoreHead b{font-size:12px;}
+    .scoreTrack{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .scoreFill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #fb7185 0%, #f59e0b 45%, #22c55e 100%);
+      transition: width .2s ease;
+    }
+    .suggestions{
+      margin: 10px 0 0;
+      padding-left: 16px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .suggestions li{margin-bottom:6px;}
+    .suggestions li:last-child{margin-bottom:0;}
 
     /* ===== Preview (Screen) ===== */
     .previewWrap{
@@ -375,11 +413,11 @@
             <div class="row">
               <div>
                 <label>Full name</label>
-                <input id="fullName" placeholder="e.g. Mosa Mokgesi" />
+                <input id="fullName" placeholder="e.g. Your Full Name" />
               </div>
               <div>
                 <label>Headline / Role</label>
-                <input id="headline" placeholder="e.g. Junior Software Developer" />
+                <input id="headline" placeholder="e.g. Your Target Role" />
               </div>
             </div>
             <div class="row">
@@ -395,11 +433,11 @@
             <div class="row">
               <div>
                 <label>Website / Portfolio</label>
-                <input id="website" placeholder="e.g. logiclabstudi.co.za" />
+                <input id="website" placeholder="e.g. yourportfolio.com" />
               </div>
               <div>
                 <label>Location</label>
-                <input id="location" placeholder="e.g. South Africa" />
+                <input id="location" placeholder="e.g. City, Country" />
               </div>
             </div>
             <div class="row one">
@@ -438,7 +476,7 @@
               </div>
               <div>
                 <label>Company (1)</label>
-                <input id="exp_company_1" placeholder="e.g. Logic Lab Studio" />
+                <input id="exp_company_1" placeholder="e.g. Company Name" />
               </div>
             </div>
             <div class="row">
@@ -467,7 +505,7 @@
               </div>
               <div>
                 <label>Company (2)</label>
-                <input id="exp_company_2" placeholder="e.g. Vocentra" />
+                <input id="exp_company_2" placeholder="e.g. Previous Company" />
               </div>
             </div>
             <div class="row">
@@ -477,7 +515,7 @@
               </div>
               <div>
                 <label>Location (2)</label>
-                <input id="exp_loc_2" placeholder="e.g. Johannesburg" />
+                <input id="exp_loc_2" placeholder="e.g. City / Remote" />
               </div>
             </div>
             <div class="row one">
@@ -588,7 +626,7 @@
             <div class="row one">
               <div>
                 <label>Projects (name — short result)</label>
-                <textarea id="projects" placeholder="Logic Lab Studio — HTML-first SaaS tools\nVocentra — job posting website\nSmart Whiteboard — offline task board"></textarea>
+                <textarea id="projects" placeholder="Project Name — what it does + result\nProject Name — stack used + impact\nProject Name — measurable outcome"></textarea>
               </div>
             </div>
           </div>
@@ -605,6 +643,24 @@
               </div>
             </div>
             <div class="hint">When exporting, choose A4 and enable “Background graphics” for best look.</div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">
+              <b>Suggestions & Improvements</b>
+              <span class="pill" id="qualityLevel">Draft</span>
+            </div>
+            <div class="scoreCard">
+              <div class="scoreHead">
+                <b>CV quality score</b>
+                <span id="qualityScore">0 / 100</span>
+              </div>
+              <div class="scoreTrack" aria-hidden="true">
+                <div class="scoreFill" id="qualityFill"></div>
+              </div>
+            </div>
+            <ul class="suggestions" id="improvementList"></ul>
+            <div class="hint">Tip: Strong CVs are specific, measurable, and keyword-rich for ATS scans.</div>
           </div>
 
         </div>
@@ -805,6 +861,133 @@
       return rows.map(r => "• " + r).join("\n");
     }
 
+    function getQualityAssessment(){
+      let score = 0;
+      const suggestions = [];
+
+      const fullName = safe($("fullName").value);
+      const headline = safe($("headline").value);
+      const phone = safe($("phone").value);
+      const email = safe($("email").value);
+      const website = safe($("website").value);
+      const location = safe($("location").value);
+      const summary = safe($("summary").value);
+      const skills = commaToTags($("skills").value);
+      const projects = linesToBullets($("projects").value);
+
+      if(fullName) score += 8; else suggestions.push("Add your full name so recruiters can identify your CV immediately.");
+      if(headline) score += 8; else suggestions.push("Add a role headline (e.g. Frontend Developer, Data Analyst).");
+
+      const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if(phone) score += 5; else suggestions.push("Add a phone number in international format.");
+      if(emailLooksValid) score += 7; else suggestions.push("Use a professional, valid email address.");
+      if(website) score += 5; else suggestions.push("Add a portfolio, GitHub, or LinkedIn link.");
+      if(location) score += 3;
+
+      const summaryWords = summary ? summary.split(/\s+/).filter(Boolean).length : 0;
+      if(summaryWords >= 35 && summaryWords <= 120){
+        score += 14;
+      } else if(summaryWords > 0){
+        score += 6;
+        suggestions.push("Keep summary between 35 and 120 words with clear strengths and target role.");
+      } else {
+        suggestions.push("Write a focused summary: strengths, tools, and outcomes.");
+      }
+
+      if(skills.length >= 8){
+        score += 12;
+      } else if(skills.length >= 4){
+        score += 7;
+        suggestions.push("Add 4-8 more role-specific skills to improve ATS matching.");
+      } else {
+        suggestions.push("List at least 8 skills (technical + domain + tools).");
+      }
+
+      let expCount = 0;
+      let expBulletCount = 0;
+      let quantifiedCount = 0;
+      for(let i=1;i<=4;i++){
+        const role = safe($(`exp_role_${i}`).value);
+        const company = safe($(`exp_company_${i}`).value);
+        const dates = safe($(`exp_dates_${i}`).value);
+        const points = linesToBullets($(`exp_points_${i}`).value);
+        if(role || company || dates || points.length){
+          expCount++;
+          expBulletCount += points.length;
+          quantifiedCount += points.filter(p => /(\d+|%|\$|kpi|reduced|increased|improved|cut|grew)/i.test(p)).length;
+        }
+      }
+
+      if(expCount >= 2){
+        score += 12;
+      } else if(expCount === 1){
+        score += 6;
+        suggestions.push("Add at least one more experience entry for stronger credibility.");
+      } else {
+        suggestions.push("Add experience entries with role, company, dates, and highlights.");
+      }
+
+      if(expBulletCount >= 6){
+        score += 8;
+      } else if(expBulletCount > 0){
+        score += 4;
+        suggestions.push("Add more impact bullets (aim for 2-4 bullets per role).");
+      } else {
+        suggestions.push("Add achievement bullets under each role.");
+      }
+
+      if(quantifiedCount >= 3){
+        score += 10;
+      } else {
+        suggestions.push("Add measurable results to bullets (numbers, %, time saved, revenue, users).");
+      }
+
+      if(projects.length >= 2){
+        score += 8;
+      } else if(projects.length === 1){
+        score += 4;
+        suggestions.push("Add one more project with a clear result.");
+      } else {
+        suggestions.push("Add 2-5 projects with technologies and outcomes.");
+      }
+
+      const edu = [safe($("edu_title").value), safe($("edu_school").value)].filter(Boolean).length;
+      if(edu > 0) score += 4;
+
+      const extras = linesToBullets($("extras").value).length;
+      if(extras > 0) score += 4;
+
+      score = Math.max(0, Math.min(100, score));
+      const level = score >= 80 ? "Strong" : (score >= 60 ? "Good" : (score >= 40 ? "Developing" : "Draft"));
+      return { score, level, suggestions: suggestions.slice(0, 6) };
+    }
+
+    function renderQuality(){
+      const scoreEl = $("qualityScore");
+      const fillEl = $("qualityFill");
+      const levelEl = $("qualityLevel");
+      const listEl = $("improvementList");
+      if(!scoreEl || !fillEl || !levelEl || !listEl) return;
+
+      const result = getQualityAssessment();
+      scoreEl.textContent = `${result.score} / 100`;
+      fillEl.style.width = `${result.score}%`;
+      levelEl.textContent = result.level;
+
+      listEl.innerHTML = "";
+      if(!result.suggestions.length){
+        const li = document.createElement("li");
+        li.textContent = "Great base CV. Tailor keywords to each job description before exporting.";
+        listEl.appendChild(li);
+        return;
+      }
+      for(const msg of result.suggestions){
+        const li = document.createElement("li");
+        li.textContent = msg;
+        listEl.appendChild(li);
+      }
+    }
+
     function render(){
       $("p_name").textContent = safe($("fullName").value) || "Your Name";
       $("p_headline").textContent = safe($("headline").value) || "Your Role / Headline";
@@ -840,6 +1023,7 @@
       $("p_projects").textContent = buildProjects();
       $("p_education").textContent = buildEducation();
       $("p_extras").textContent = buildExtras();
+      renderQuality();
     }
 
     function getState(){
@@ -915,6 +1099,7 @@
     $("btnReset").addEventListener("click", () => {
       if(!confirm("Reset all fields?")) return;
       for(const id of ids) $(id).value = "";
+      try{ localStorage.removeItem(KEY); } catch {}
       render();
     });
 

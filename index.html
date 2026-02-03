@@ -118,6 +118,33 @@
       color: #ffffff;
       text-shadow: 0 1px 2px rgba(0,0,0,.25);
     }
+    .btn.new{
+      border-color: rgba(34,197,94,.45);
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color:#04150b;
+      font-weight:800;
+    }
+    .new-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(34,197,94,.45);
+      background: rgba(34,197,94,.14);
+      color: rgba(229,231,235,.98);
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.2px;
+    }
+    .new-badge::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: var(--ok);
+      box-shadow: 0 0 0 4px rgba(34,197,94,.16);
+    }
     .hamburger{display:none}
 
     /* Hero */
@@ -594,6 +621,7 @@
 
             <div class="hero-cta">
               <a class="btn primary" href="#pricing">See packages</a>
+              <a class="btn new" href="CV Gen.html">NEW: CV Generator</a>
               <a class="btn" href="#tools">Explore tools</a>
               <button class="btn" type="button" id="openContact1">Talk to us</button>
             </div>
@@ -841,6 +869,38 @@
   <div class="tool-actions">
     <a class="btn primary" href="BusinessCardGen.html">Open Business Card Generator</a>
     <a class="btn" href="#pricing">Need customization?</a>
+  </div>
+</div>
+
+<div class="tool-card" style="margin-top:16px;">
+  <div class="tool-top">
+    <div class="tool-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M6 2h9l3 3v17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+        <path d="M15 2v4h4"/>
+        <path d="M8 10h8"/>
+        <path d="M8 14h8"/>
+        <path d="M8 18h6"/>
+      </svg>
+    </div>
+    <span class="new-badge">NEW</span>
+  </div>
+
+  <h3 class="tool-title">CV Generator</h3>
+  <p class="tool-desc">
+    Build a clean, ATS-friendly CV with live preview, quality suggestions, JSON save/load, and one-click Print to PDF export.
+  </p>
+
+  <div class="tool-meta" aria-label="CV generator tool highlights">
+    <span class="tool-pill">ATS-friendly</span>
+    <span class="tool-pill">Live preview</span>
+    <span class="tool-pill">Quality score</span>
+    <span class="tool-pill">Print to PDF</span>
+  </div>
+
+  <div class="tool-actions">
+    <a class="btn new" href="CV Gen.html">Try New CV Generator</a>
+    <a class="btn" href="#templates">See examples</a>
   </div>
 </div>
 
