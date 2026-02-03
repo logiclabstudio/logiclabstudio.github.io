@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#0b1020" />
+  <link rel="icon" type="image/png" href="CV.png" />
   <title>CV Generator | Guidance Template</title>
   <style>
     :root{
@@ -46,9 +47,14 @@
       display:flex; gap:12px; align-items:center;
     }
     .logo{
-      width:44px; height:44px; border-radius: 14px;
-      background: linear-gradient(135deg, rgba(96,165,250,.9), rgba(34,197,94,.7));
-      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      width:58px; height:58px; border-radius: 16px;
+      object-fit: cover;
+      display:block;
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.05);
+      box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        0 0 0 6px rgba(96,165,250,.12);
     }
     h1{
       margin:0;
@@ -62,6 +68,27 @@
     }
     .top-actions{
       display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .themePick{
+      min-width: 220px;
+      padding: 10px 11px;
+      border-radius: 12px;
+      border:1px solid rgba(148,163,184,.35);
+      background: #0f172a;
+      color: #f8fafc;
+      font-weight: 650;
+      font-size: 12px;
+      letter-spacing:.2px;
+      outline:none;
+      cursor:pointer;
+    }
+    .themePick option{
+      background:#0f172a;
+      color:#f8fafc;
+    }
+    .themePick:focus{
+      border-color: rgba(96,165,250,.6);
+      box-shadow: 0 0 0 4px rgba(96,165,250,.12);
     }
     .btn{
       border:1px solid var(--line);
@@ -376,13 +403,40 @@
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <img class="logo" src="CV.png" alt="CV Generator logo" />
         <div>
           <h1>CV Generator</h1>
           <div class="sub">Fill in the form → preview updates live → export via Print to PDF</div>
         </div>
       </div>
       <div class="top-actions">
+        <select id="themeSelect" class="themePick" aria-label="Choose color theme">
+          <option value="" disabled>Choose theme</option>
+          <optgroup label="Dark themes">
+          <option value="midnight">Theme: Midnight</option>
+          <option value="ocean">Theme: Ocean</option>
+          <option value="forest">Theme: Forest</option>
+          <option value="sunset">Theme: Sunset</option>
+          <option value="royal">Theme: Royal</option>
+          <option value="graphite">Theme: Graphite</option>
+          <option value="rose">Theme: Rose</option>
+          <option value="teal">Theme: Teal</option>
+          <option value="amber">Theme: Amber</option>
+          <option value="violet">Theme: Violet</option>
+          </optgroup>
+          <optgroup label="Light themes">
+          <option value="light_snow">Theme: Light Snow</option>
+          <option value="light_sky">Theme: Light Sky</option>
+          <option value="light_sage">Theme: Light Sage</option>
+          <option value="light_sand">Theme: Light Sand</option>
+          <option value="light_lavender">Theme: Light Lavender</option>
+          <option value="light_mint">Theme: Light Mint</option>
+          <option value="light_rose">Theme: Light Rose</option>
+          <option value="light_peach">Theme: Light Peach</option>
+          <option value="light_slate">Theme: Light Slate</option>
+          <option value="light_cloud">Theme: Light Cloud</option>
+          </optgroup>
+        </select>
         <button class="btn primary" id="btnPrint">🖨️ Print / Save as PDF</button>
         <button class="btn ok" id="btnSave">💾 Save JSON</button>
         <label class="btn" style="cursor:pointer">
@@ -1064,10 +1118,56 @@
     }
     function escapeHtmlAttr(str){ return escapeHtml(str).replaceAll("`","&#96;"); }
 
+    const THEME_KEY = "cvgen_theme_v1";
+    const THEMES = {
+      midnight: { bg:"#0b1020", bg2:"#0f172a", card:"rgba(255,255,255,.06)", text:"#e5e7eb", muted:"#9ca3af", line:"rgba(255,255,255,.12)", accent:"#60a5fa", accent2:"#22c55e", danger:"#fb7185" },
+      ocean:    { bg:"#061628", bg2:"#0a2238", card:"rgba(184,230,255,.08)", text:"#e7f6ff", muted:"#9cc3da", line:"rgba(156,195,218,.25)", accent:"#38bdf8", accent2:"#22d3ee", danger:"#f87171" },
+      forest:   { bg:"#0b1a12", bg2:"#132a1d", card:"rgba(180,220,180,.08)", text:"#e8f6ea", muted:"#9fc2a8", line:"rgba(159,194,168,.26)", accent:"#34d399", accent2:"#84cc16", danger:"#fb7185" },
+      sunset:   { bg:"#1a1020", bg2:"#2a1630", card:"rgba(255,202,165,.09)", text:"#fff1e8", muted:"#e8b6a0", line:"rgba(232,182,160,.28)", accent:"#fb923c", accent2:"#f43f5e", danger:"#fb7185" },
+      royal:    { bg:"#120f2b", bg2:"#1d1742", card:"rgba(199,210,254,.09)", text:"#eef2ff", muted:"#b4bde8", line:"rgba(180,189,232,.26)", accent:"#818cf8", accent2:"#a78bfa", danger:"#fb7185" },
+      graphite: { bg:"#111317", bg2:"#1a1f27", card:"rgba(203,213,225,.08)", text:"#f1f5f9", muted:"#a8b3c0", line:"rgba(168,179,192,.24)", accent:"#94a3b8", accent2:"#38bdf8", danger:"#fb7185" },
+      rose:     { bg:"#2a1020", bg2:"#3a1830", card:"rgba(251,207,232,.08)", text:"#fff1f7", muted:"#e7b5cc", line:"rgba(231,181,204,.28)", accent:"#f472b6", accent2:"#fb7185", danger:"#fb7185" },
+      teal:     { bg:"#0c1f22", bg2:"#133036", card:"rgba(153,246,228,.08)", text:"#ecfeff", muted:"#9bc9c8", line:"rgba(155,201,200,.26)", accent:"#2dd4bf", accent2:"#22d3ee", danger:"#fb7185" },
+      amber:    { bg:"#24170a", bg2:"#352211", card:"rgba(254,243,199,.09)", text:"#fff7e8", muted:"#e3c89c", line:"rgba(227,200,156,.28)", accent:"#f59e0b", accent2:"#f97316", danger:"#fb7185" },
+      violet:   { bg:"#1b1230", bg2:"#281a45", card:"rgba(221,214,254,.09)", text:"#f5f3ff", muted:"#c4b8e8", line:"rgba(196,184,232,.26)", accent:"#8b5cf6", accent2:"#6366f1", danger:"#fb7185" },
+      light_snow:     { bg:"#f8fafc", bg2:"#eef2f7", card:"rgba(15,23,42,.04)", text:"#0f172a", muted:"#475569", line:"rgba(15,23,42,.16)", accent:"#2563eb", accent2:"#0ea5e9", danger:"#e11d48" },
+      light_sky:      { bg:"#f0f9ff", bg2:"#e0f2fe", card:"rgba(3,105,161,.05)", text:"#082f49", muted:"#0c4a6e", line:"rgba(12,74,110,.18)", accent:"#0284c7", accent2:"#22d3ee", danger:"#e11d48" },
+      light_sage:     { bg:"#f4fbf6", bg2:"#e8f5ea", card:"rgba(22,101,52,.05)", text:"#14532d", muted:"#3f6f53", line:"rgba(20,83,45,.16)", accent:"#16a34a", accent2:"#65a30d", danger:"#dc2626" },
+      light_sand:     { bg:"#fff9f1", bg2:"#fff1de", card:"rgba(146,64,14,.05)", text:"#7c2d12", muted:"#9a5b2b", line:"rgba(124,45,18,.18)", accent:"#ea580c", accent2:"#f59e0b", danger:"#dc2626" },
+      light_lavender: { bg:"#f7f5ff", bg2:"#efeaff", card:"rgba(76,29,149,.05)", text:"#3b0764", muted:"#6b4a8b", line:"rgba(59,7,100,.16)", accent:"#7c3aed", accent2:"#a855f7", danger:"#db2777" },
+      light_mint:     { bg:"#f1fffb", bg2:"#dcfdf4", card:"rgba(6,95,70,.05)", text:"#064e3b", muted:"#2f7f6b", line:"rgba(6,78,59,.16)", accent:"#059669", accent2:"#14b8a6", danger:"#dc2626" },
+      light_rose:     { bg:"#fff5f8", bg2:"#ffe7ef", card:"rgba(157,23,77,.05)", text:"#881337", muted:"#9b4968", line:"rgba(136,19,55,.18)", accent:"#e11d48", accent2:"#f472b6", danger:"#be123c" },
+      light_peach:    { bg:"#fff7ed", bg2:"#ffedd5", card:"rgba(154,52,18,.05)", text:"#7c2d12", muted:"#a16232", line:"rgba(124,45,18,.18)", accent:"#f97316", accent2:"#fb923c", danger:"#dc2626" },
+      light_slate:    { bg:"#f8fafc", bg2:"#f1f5f9", card:"rgba(30,41,59,.05)", text:"#0f172a", muted:"#475569", line:"rgba(15,23,42,.18)", accent:"#334155", accent2:"#6366f1", danger:"#dc2626" },
+      light_cloud:    { bg:"#fdfdfd", bg2:"#f3f4f6", card:"rgba(17,24,39,.04)", text:"#111827", muted:"#4b5563", line:"rgba(17,24,39,.14)", accent:"#4f46e5", accent2:"#06b6d4", danger:"#dc2626" }
+    };
+
+    function applyTheme(name){
+      const theme = THEMES[name] || THEMES.midnight;
+      const root = document.documentElement.style;
+      root.setProperty("--bg", theme.bg);
+      root.setProperty("--bg2", theme.bg2);
+      root.setProperty("--card", theme.card);
+      root.setProperty("--text", theme.text);
+      root.setProperty("--muted", theme.muted);
+      root.setProperty("--line", theme.line);
+      root.setProperty("--accent", theme.accent);
+      root.setProperty("--accent2", theme.accent2);
+      root.setProperty("--danger", theme.danger);
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.setAttribute("content", theme.bg);
+    }
+
     // Wire up events
     for(const id of ids){
       $(id).addEventListener("input", render);
     }
+
+    $("themeSelect").addEventListener("change", (e) => {
+      const themeName = e.target.value;
+      applyTheme(themeName);
+      try{ localStorage.setItem(THEME_KEY, themeName); } catch {}
+    });
 
     $("btnPrint").addEventListener("click", () => {
       // Make sure preview is up to date before printing
@@ -1100,8 +1200,18 @@
       if(!confirm("Reset all fields?")) return;
       for(const id of ids) $(id).value = "";
       try{ localStorage.removeItem(KEY); } catch {}
+      try{ localStorage.removeItem(THEME_KEY); } catch {}
+      $("themeSelect").value = "midnight";
+      applyTheme("midnight");
       render();
     });
+
+    const savedTheme = (() => {
+      try{ return localStorage.getItem(THEME_KEY); } catch { return null; }
+    })();
+    const initialTheme = savedTheme && THEMES[savedTheme] ? savedTheme : "midnight";
+    $("themeSelect").value = initialTheme;
+    applyTheme(initialTheme);
 
     // First render
     render();
