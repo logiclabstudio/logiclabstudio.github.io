@@ -395,6 +395,7 @@
       }
       .stage{
         padding: 10px;
+        overflow: hidden;
       }
     }
 
@@ -1269,6 +1270,21 @@
       setStatus("Canvas resized", `${wPx}×${hPx}px`);
     }
 
+    function setPaperScale(z, centerMobile=false){
+      if(isMobileView() && centerMobile){
+        const wrap = document.querySelector(".stage");
+        if(wrap){
+          const w = paper.clientWidth || 1;
+          const h = paper.clientHeight || 1;
+          const tx = Math.round((wrap.clientWidth - (w * z)) / 2);
+          const ty = Math.round((wrap.clientHeight - (h * z)) / 2);
+          paper.style.transform = `translate(${tx}px, ${ty}px) scale(${z})`;
+          return;
+        }
+      }
+      paper.style.transform = `scale(${z})`;
+    }
+
     // ===== Auto-fit to screen (mobile friendly) =====
     function autoFitToScreen(force=false){
       if(!force && window.matchMedia("(min-width: 981px)").matches) return;
@@ -1288,7 +1304,7 @@
       const z = clamp(Math.min(scaleW, scaleH, 1), 0.4, 1);
       const pct = Math.round(z * 100);
 
-      paper.style.transform = `scale(${z})`;
+      setPaperScale(z, true);
       zoom.value = pct;
       zoomLabel.textContent = `${pct}%`;
     }
@@ -2894,6 +2910,7 @@
       if(!isMobileView()){
         leftPanel.classList.remove("open");
         mobilePanelToggle.textContent = "Controls";
+        setPaperScale(Number(zoom.value) / 100, false);
         return;
       }
       mobilePanelToggle.textContent = leftPanel.classList.contains("open") ? "Close" : "Controls";
@@ -2901,6 +2918,7 @@
     mobilePanelToggle.onclick = ()=>{
       leftPanel.classList.toggle("open");
       syncMobilePanelState();
+      autoFitToScreen(true);
     };
 
     // Tabs
@@ -3081,7 +3099,7 @@
     // Zoom (manual overrides)
     zoom.addEventListener("input", ()=>{
       const z = Number(zoom.value) / 100;
-      paper.style.transform = `scale(${z})`;
+      setPaperScale(z, isMobileView());
       zoomLabel.textContent = `${zoom.value}%`;
     });
 
@@ -3377,7 +3395,7 @@
     canvasPresetKey = "a4";
     canvasLandscape = false;
 
-    paper.style.transform = "scale(1)";
+    setPaperScale(1, isMobileView());
     zoom.value = 100;
     zoomLabel.textContent = "100%";
 
