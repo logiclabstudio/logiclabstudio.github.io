@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="BusinessCard.png" />
   <title>Business Card Generator — Pro</title>
   <meta name="description" content="Design professional business cards in your browser. Export print-ready PNG with bleed, trim, and safe guides." />
   <style>
@@ -76,25 +77,33 @@
       gap:12px;
     }
     .brand{
-      display:flex; align-items:center; gap:12px;
+      display:flex; align-items:center; gap:14px;
       min-width: 240px;
     }
     .logoMark{
-      width:38px; height:38px; border-radius: 14px;
-      background: radial-gradient(circle at 30% 30%, rgba(96,165,250,.95), rgba(167,139,250,.85));
-      box-shadow: 0 10px 30px rgba(96,165,250,.15);
-      position:relative;
+      width:58px; height:58px; border-radius: 18px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(96,165,250,.26), transparent 60%),
+        #0b1020 url('BusinessCard.png') center/contain no-repeat;
+      border:1px solid rgba(255,255,255,.24);
+      box-shadow:
+        0 12px 34px rgba(96,165,250,.24),
+        inset 0 0 0 1px rgba(255,255,255,.08);
       overflow:hidden;
     }
     .logoMark:after{
-      content:"";
-      position:absolute; inset:-20%;
-      background: radial-gradient(circle at 25% 25%, rgba(255,255,255,.35), transparent 55%);
-      transform: rotate(18deg);
+      content:none;
     }
     .brandText{display:flex; flex-direction:column; line-height:1.15}
-    .brandText strong{font-weight:900; letter-spacing:.2px; font-size:14px}
-    .brandText span{color:var(--muted); font-size:12px}
+    .brandText strong{font-weight:900; letter-spacing:.2px; font-size:15px}
+    .brandText span{color:var(--muted); font-size:12.5px}
+
+    @media (max-width: 600px){
+      .logoMark{
+        width:50px;
+        height:50px;
+      }
+    }
 
     .topActions{
       display:grid;
