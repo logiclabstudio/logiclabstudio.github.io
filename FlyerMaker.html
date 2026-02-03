@@ -1272,16 +1272,17 @@
 
     function setPaperScale(z, centerMobile=false){
       if(isMobileView() && centerMobile){
-        const wrap = document.querySelector(".stage");
-        if(wrap){
-          const w = paper.clientWidth || 1;
-          const h = paper.clientHeight || 1;
-          const tx = Math.round((wrap.clientWidth - (w * z)) / 2);
-          const ty = Math.round((wrap.clientHeight - (h * z)) / 2);
-          paper.style.transform = `translate(${tx}px, ${ty}px) scale(${z})`;
-          return;
-        }
+        paper.style.position = "absolute";
+        paper.style.left = "50%";
+        paper.style.top = "50%";
+        paper.style.margin = "0";
+        paper.style.transform = `translate(-50%, -50%) scale(${z})`;
+        return;
       }
+      paper.style.position = "relative";
+      paper.style.left = "";
+      paper.style.top = "";
+      paper.style.margin = "";
       paper.style.transform = `scale(${z})`;
     }
 
