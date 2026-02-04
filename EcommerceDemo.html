@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f8fc" />
+  <title>Aurora Market | Demo Ecommerce</title>
+  <style>
+    :root{
+      --bg:#f6f8fc;
+      --panel:#ffffff;
+      --text:#162235;
+      --muted:#5b6b82;
+      --line:#d8e0ea;
+      --brand:#1363df;
+      --brand2:#3c9dff;
+      --good:#0f9d66;
+      --radius:18px;
+      --max:1200px;
+      --shadow:0 16px 38px rgba(15,30,58,.10);
+      --heading:"Palatino Linotype", "Book Antiqua", Palatino, serif;
+      --body:"Avenir Next", "Segoe UI Variable", "Trebuchet MS", sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:var(--body);
+      background:
+        radial-gradient(900px 500px at -10% -20%, #e7efff, transparent 60%),
+        radial-gradient(800px 480px at 110% 0%, #eaf7ff, transparent 58%),
+        var(--bg);
+    }
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max);margin:0 auto;padding:0 20px}
+    .top{
+      position:sticky;top:0;z-index:20;
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(8px);
+      background:rgba(246,248,252,.85);
+    }
+    .nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .mark{
+      width:38px;height:38px;border-radius:12px;
+      background:linear-gradient(140deg,var(--brand),var(--brand2));
+      box-shadow:0 10px 24px rgba(19,99,223,.28);
+    }
+    .navlinks{display:flex;gap:16px;color:var(--muted);font-weight:700}
+    .navlinks a{padding:8px 10px;border-radius:10px}
+    .navlinks a:hover{background:#e9f2ff;color:#0f274a}
+    .btn{
+      border:1px solid #bfd4ee;
+      background:#fff;
+      color:#0f274a;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn.primary{
+      border-color:#2f7fe7;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
+      color:#fff;
+    }
+    .hero{padding:48px 0 26px}
+    .heroGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    .heroCard,.heroPromo{
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:var(--panel);
+      box-shadow:var(--shadow);
+      padding:26px;
+    }
+    h1{
+      margin:0 0 12px;
+      font:800 clamp(34px,5vw,56px)/1.02 var(--heading);
+      letter-spacing:-.6px;
+    }
+    .lead{margin:0 0 18px;color:var(--muted);max-width:58ch}
+    .heroRow{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid #cfe0f4;background:#f5faff;font-size:13px;font-weight:700;color:#204064;
+    }
+    .heroPromo{background:linear-gradient(160deg,#ffffff,#f4f8ff)}
+    .heroPromo h3{margin:0 0 8px;font-size:22px}
+    .heroPromo p{margin:0 0 14px;color:var(--muted)}
+    section{padding:18px 0}
+    .sectionTop{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}
+    .sectionTop h2{margin:0;font-size:28px;font-family:var(--heading)}
+    .sectionTop p{margin:0;color:var(--muted)}
+    .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .cat{
+      border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;box-shadow:var(--shadow);
+      font-weight:800;color:#163253;
+    }
+    .products{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .product{
+      border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden;box-shadow:var(--shadow);
+      display:flex;flex-direction:column;
+    }
+    .thumb{
+      height:150px;border-bottom:1px solid var(--line);
+      background:linear-gradient(135deg,#eef5ff,#f9fbff 45%,#ecf8ff);
+      display:grid;place-items:center;font-weight:800;color:#2b4b72;
+    }
+    .meta{padding:12px}
+    .meta h3{margin:0 0 4px;font-size:16px}
+    .meta p{margin:0 0 10px;color:var(--muted);font-size:13px}
+    .price{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .price strong{font-size:18px}
+    .cartBtn{width:100%}
+    .banner{
+      margin-top:16px;border:1px solid #cfe1f8;border-radius:18px;padding:16px;background:#eef6ff;
+      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;
+    }
+    .footer{padding:28px 0 38px;color:var(--muted);font-size:14px}
+    .drawer{
+      position:fixed;right:0;top:0;height:100%;width:min(400px,92vw);background:#fff;border-left:1px solid var(--line);
+      transform:translateX(100%);transition:transform .22s ease;z-index:40;display:flex;flex-direction:column;
+      box-shadow:-16px 0 34px rgba(15,30,58,.15);
+    }
+    .drawer.open{transform:translateX(0)}
+    .drawerHd{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .cartItems{padding:14px;display:grid;gap:10px;overflow:auto}
+    .cartItem{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff}
+    .drawerFt{margin-top:auto;padding:14px;border-top:1px solid var(--line);display:grid;gap:10px}
+    .overlay{position:fixed;inset:0;background:rgba(9,20,35,.25);display:none;z-index:30}
+    .overlay.show{display:block}
+    @media (max-width:980px){
+      .heroGrid,.products{grid-template-columns:1fr 1fr}
+      .cats{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:640px){
+      .navlinks{display:none}
+      .heroGrid,.products,.cats{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="container nav">
+      <a class="brand" href="#"><span class="mark" aria-hidden="true"></span><span>Aurora Market</span></a>
+      <nav class="navlinks" aria-label="Primary">
+        <a href="#">Shop</a><a href="#">Collections</a><a href="#">About</a><a href="#">Support</a>
+      </nav>
+      <button class="btn" id="openCart" type="button">Cart (<span id="cartCount">0</span>)</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="heroGrid">
+        <article class="heroCard">
+          <h1>Modern products for a cleaner daily routine.</h1>
+          <p class="lead">Professional demo ecommerce front page with conversion-focused sections, featured catalog, and quick cart flow.</p>
+          <div class="heroRow">
+            <a class="btn primary" href="#featured">Shop featured</a>
+            <a class="btn" href="#">View all categories</a>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="pill">Free shipping over $50</span>
+            <span class="pill">30-day returns</span>
+            <span class="pill">Secure checkout</span>
+          </div>
+        </article>
+        <aside class="heroPromo">
+          <h3>Weekend Launch Offer</h3>
+          <p>Save 20% on curated essentials with code <b>START20</b>. Ideal for demo banners and campaign blocks.</p>
+          <button class="btn primary" type="button">Claim Offer</button>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="sectionTop">
+        <h2>Popular Categories</h2>
+        <p>Built for quick scanning and easy navigation.</p>
+      </div>
+      <div class="cats">
+        <div class="cat">Home Care</div>
+        <div class="cat">Personal Wellness</div>
+        <div class="cat">Travel Essentials</div>
+        <div class="cat">Office Setup</div>
+      </div>
+    </section>
+
+    <section id="featured">
+      <div class="sectionTop">
+        <h2>Featured Products</h2>
+        <p>Clean product card system with add-to-cart actions.</p>
+      </div>
+      <div class="products" id="productGrid"></div>
+      <div class="banner">
+        <div><b>Need a full store build?</b> This demo can be extended with real checkout, auth, and CMS integration.</div>
+        <a class="btn primary" href="#">Request Full Ecommerce Build</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <div>Demo Ecommerce • Light Theme • Professional Layout</div>
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-label="Cart drawer">
+    <div class="drawerHd">
+      <strong>Your Cart</strong>
+      <button class="btn" id="closeCart" type="button">Close</button>
+    </div>
+    <div class="cartItems" id="cartItems"></div>
+    <div class="drawerFt">
+      <div style="display:flex;justify-content:space-between"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+      <button class="btn primary" type="button">Proceed to Checkout</button>
+    </div>
+  </aside>
+
+  <script>
+    const products = [
+      { id: 1, name: "Lumen Desk Lamp", price: 39.99, desc: "Warm/cool light with minimal design." },
+      { id: 2, name: "Ceramic Aroma Diffuser", price: 24.5, desc: "Quiet mist mode and timer control." },
+      { id: 3, name: "Commuter Bottle", price: 18.0, desc: "Insulated stainless steel, 750ml." },
+      { id: 4, name: "Cloud Keyboard", price: 69.0, desc: "Low-profile mechanical feel." },
+      { id: 5, name: "Soft Cotton Throw", price: 29.0, desc: "Breathable, machine-wash safe." },
+      { id: 6, name: "Air Purifier Mini", price: 58.0, desc: "HEPA filter for desks and bedrooms." },
+      { id: 7, name: "Daily Planner Kit", price: 16.0, desc: "Weekly pages + productivity prompts." },
+      { id: 8, name: "Travel Organizer", price: 21.99, desc: "Compartment-based cable storage." }
+    ];
+
+    const cart = [];
+    const $ = (id) => document.getElementById(id);
+
+    function renderProducts() {
+      $("productGrid").innerHTML = products.map((p) => `
+        <article class="product">
+          <div class="thumb">${p.name.split(" ").slice(0,2).join(" ")}</div>
+          <div class="meta">
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+            <div class="price">
+              <strong>$${p.price.toFixed(2)}</strong>
+            </div>
+            <button class="btn primary cartBtn" data-id="${p.id}" type="button">Add to cart</button>
+          </div>
+        </article>
+      `).join("");
+
+      document.querySelectorAll("[data-id]").forEach((btn) => {
+        btn.addEventListener("click", () => addToCart(Number(btn.dataset.id)));
+      });
+    }
+
+    function addToCart(id) {
+      const item = products.find((p) => p.id === id);
+      if (!item) return;
+      const existing = cart.find((c) => c.id === id);
+      if (existing) existing.qty += 1;
+      else cart.push({ ...item, qty: 1 });
+      renderCart();
+      openDrawer();
+    }
+
+    function renderCart() {
+      $("cartCount").textContent = String(cart.reduce((n, c) => n + c.qty, 0));
+      $("cartItems").innerHTML = cart.length
+        ? cart.map((c) => `<div class="cartItem"><b>${c.name}</b><div>Qty ${c.qty} • $${(c.price * c.qty).toFixed(2)}</div></div>`).join("")
+        : "<div class='cartItem'>Your cart is empty.</div>";
+      const subtotal = cart.reduce((s, c) => s + c.price * c.qty, 0);
+      $("subtotal").textContent = `$${subtotal.toFixed(2)}`;
+    }
+
+    function openDrawer(){ $("drawer").classList.add("open"); $("overlay").classList.add("show"); }
+    function closeDrawer(){ $("drawer").classList.remove("open"); $("overlay").classList.remove("show"); }
+
+    $("openCart").addEventListener("click", openDrawer);
+    $("closeCart").addEventListener("click", closeDrawer);
+    $("overlay").addEventListener("click", closeDrawer);
+
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>

@@ -18,6 +18,7 @@
   <meta property="og:title" content="Logic Lab | Software Development Studio" />
   <meta property="og:description" content="We build fast, reliable web and mobile products for growing businesses." />
   <meta property="og:type" content="website" />
+  <script>document.documentElement.classList.add('js');</script>
 
   <style>
     :root{
@@ -185,6 +186,25 @@
     }
     .hero-cta{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
     .hero-cta .btn{padding:13px 16px}
+    .js .hero-copy h1,
+    .js .hero-copy .lead{
+      visibility:hidden;
+    }
+    .js .hero-copy.typing-started h1{
+      visibility:visible;
+    }
+    .js .hero-copy.lead-typing-started .lead{
+      visibility:visible;
+    }
+    .typing-caret{
+      border-right: 2px solid rgba(229,231,235,.85);
+      padding-right: 2px;
+      animation: caretBlink .9s step-end infinite;
+    }
+    @keyframes caretBlink{
+      0%, 49%{ border-right-color: rgba(229,231,235,.85); }
+      50%, 100%{ border-right-color: transparent; }
+    }
     .trust{
       margin-top:18px;
       display:flex; flex-wrap:wrap; gap:10px;
@@ -207,6 +227,9 @@
       overflow:hidden;
       position:relative;
       min-height: 420px;
+      opacity:0;
+      transform: translateY(32px);
+      transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
     }
     .hero-card:before{
       content:"";
@@ -216,6 +239,20 @@
                   radial-gradient(520px 320px at 40% 90%, rgba(34,197,94,.12), transparent 60%);
       pointer-events:none;
     }
+    .hero-card:after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.16) 50%, transparent 70%);
+      transform: translateX(-70%) rotate(6deg);
+      pointer-events:none;
+      animation: dashboardShimmer 6.5s linear infinite;
+    }
+    .hero-card.in-view{
+      opacity:1;
+      transform: translateY(0);
+      animation: dashboardFloat 7s ease-in-out .75s infinite;
+    }
     .mock{
       position:absolute; inset:18px;
       border-radius: 18px;
@@ -223,11 +260,34 @@
       background: rgba(11,15,25,.55);
       overflow:hidden;
     }
+    .mock-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:.28;
+      filter: saturate(1.05) contrast(1.02);
+      pointer-events:none;
+      z-index:0;
+    }
+    .mock:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(80% 60% at 50% 100%, rgba(17,24,39,.34), transparent 70%),
+        linear-gradient(180deg, rgba(11,15,25,.45), rgba(11,15,25,.62));
+      pointer-events:none;
+      z-index:1;
+    }
     .mock-top{
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 14px;
       border-bottom: 1px solid rgba(148,163,184,.10);
       background: rgba(17,24,39,.45);
+      position:relative;
+      z-index:2;
     }
     .circles{display:flex; gap:8px}
     .c{width:10px; height:10px; border-radius:999px; background: rgba(148,163,184,.35)}
@@ -240,6 +300,8 @@
       display:grid;
       gap:12px;
       grid-template-columns: 1fr;
+      position:relative;
+      z-index:2;
     }
     .mini{
       border:1px solid rgba(148,163,184,.12);
@@ -249,6 +311,76 @@
     }
     .mini h3{margin:0 0 6px; font-size:14px; letter-spacing:-.2px}
     .mini p{margin:0; color: rgba(148,163,184,.92); font-size:13px}
+    .dash-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .dash-controls{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .dash-select{
+      border:1px solid rgba(148,163,184,.2);
+      background: rgba(11,15,25,.55);
+      color: rgba(229,231,235,.95);
+      border-radius: 10px;
+      padding:7px 9px;
+      font-size:12px;
+      font-weight:700;
+    }
+    .dash-btn{
+      border:1px solid rgba(148,163,184,.2);
+      background: rgba(11,15,25,.55);
+      color: rgba(229,231,235,.95);
+      border-radius: 10px;
+      padding:7px 10px;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .kpiGrid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
+    }
+    .kpi{
+      border:1px solid rgba(148,163,184,.14);
+      border-radius: 12px;
+      padding:9px;
+      background: rgba(11,15,25,.46);
+    }
+    .kpi b{display:block; font-size:16px; margin-bottom:2px;}
+    .kpi span{font-size:11px; color: rgba(148,163,184,.92);}
+    .bar{
+      height:9px;
+      border:1px solid rgba(148,163,184,.2);
+      border-radius:999px;
+      background: rgba(11,15,25,.45);
+      overflow:hidden;
+      margin: 6px 0;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0;
+      background: linear-gradient(90deg, rgba(96,165,250,.92), rgba(34,197,94,.88));
+      transition: width .45s ease;
+    }
+    .barMeta{
+      font-size:11px;
+      color: rgba(229,231,235,.9);
+      font-weight:800;
+    }
+    .feed{
+      margin:0;
+      padding-left:18px;
+      color: rgba(148,163,184,.95);
+      font-size:12px;
+      line-height:1.5;
+      display:grid;
+      gap:5px;
+    }
+    @media (max-width: 1100px){
+      .kpiGrid{grid-template-columns: repeat(2, minmax(0,1fr));}
+    }
     .row{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -270,6 +402,14 @@
       border-radius:3px;
       background: linear-gradient(135deg, var(--brand), var(--brand2));
       box-shadow: 0 0 0 4px rgba(96,165,250,.12);
+    }
+    @keyframes dashboardFloat{
+      0%,100%{transform: translateY(0);}
+      50%{transform: translateY(-10px);}
+    }
+    @keyframes dashboardShimmer{
+      0%{transform: translateX(-70%) rotate(6deg);}
+      100%{transform: translateX(85%) rotate(6deg);}
     }
 
     /* Sections */
@@ -547,7 +687,9 @@
       .hamburger{display:inline-flex}
     }
     @media (prefers-reduced-motion: reduce){
-      *{scroll-behavior:auto !important; transition:none !important}
+      *{scroll-behavior:auto !important; transition:none !important; animation:none !important}
+      .hero-card{opacity:1; transform:none;}
+      .typing-caret{border-right:none;}
     }
   </style>
 </head>
@@ -611,9 +753,9 @@
     <div class="container">
       <section class="hero">
         <div class="hero-grid">
-          <div>
+          <div class="hero-copy">
             <div class="kicker"><span class="dot" aria-hidden="true"></span>Shipping clean software, fast.</div>
-            <h1>Build products that feel premium — and work reliably.</h1>
+            <h1>Build products that feel premium, and work reliably.</h1>
             <p class="lead">
               Logic Lab is a software development studio for founders and businesses that need quality.
               We design, build, and ship web apps, mobile apps, and APIs with speed and discipline.
@@ -636,6 +778,9 @@
 
           <div class="hero-card" aria-label="Preview">
             <div class="mock" role="img" aria-label="Product delivery dashboard mock">
+              <video class="mock-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+                <source src="dashboard.mp4" type="video/mp4" />
+              </video>
               <div class="mock-top">
                 <div class="circles" aria-hidden="true"><span class="c"></span><span class="c"></span><span class="c"></span></div>
                 <div class="mock-title">Logic Lab · Delivery Dashboard</div>
@@ -643,14 +788,48 @@
               </div>
               <div class="mock-body">
                 <div class="mini">
-                  <h3>Weekly build status</h3>
-                  <p>Milestones, QA checks, and deployment logs — always visible.</p>
+                  <div class="dash-head">
+                    <h3>Weekly build status</h3>
+                    <div class="dash-controls">
+                      <select id="dashSprint" class="dash-select" aria-label="Choose sprint">
+                        <option value="launch">Sprint: Launch</option>
+                        <option value="stabilize">Sprint: Stabilize</option>
+                        <option value="scale">Sprint: Scale</option>
+                      </select>
+                      <button id="dashRefresh" class="dash-btn" type="button">Refresh</button>
+                      <button id="dashVideoToggle" class="dash-btn" type="button">Pause video</button>
+                    </div>
+                  </div>
+                  <p id="dashStatus">Milestones, QA checks, and deployment logs are visible in one place.</p>
+                </div>
+                <div class="kpiGrid" aria-label="Delivery metrics">
+                  <div class="kpi"><b id="dashDeploys">7</b><span>Deploys this week</span></div>
+                  <div class="kpi"><b id="dashUptime">99.98%</b><span>Uptime</span></div>
+                  <div class="kpi"><b id="dashLead">2.4d</b><span>Lead time</span></div>
+                  <div class="kpi"><b id="dashAlerts">2 open</b><span>QA alerts</span></div>
                 </div>
                 <div class="row">
-                  <div class="mini"><h3>Speed</h3><p>Lean scope, tight feedback loops, rapid iteration.</p></div>
-                  <div class="mini"><h3>Quality</h3><p>Testing + reviews to keep bugs low and confidence high.</p></div>
+                  <div class="mini">
+                    <h3>Speed</h3>
+                    <div class="bar"><i id="dashSpeedBar"></i></div>
+                    <div class="barMeta" id="dashSpeedVal">92%</div>
+                    <p>Lean scope, tight feedback loops, rapid iteration.</p>
+                  </div>
+                  <div class="mini">
+                    <h3>Quality</h3>
+                    <div class="bar"><i id="dashQualityBar"></i></div>
+                    <div class="barMeta" id="dashQualityVal">96%</div>
+                    <p>Testing plus reviews to keep bugs low and confidence high.</p>
+                  </div>
                 </div>
-                <div class="mini"><h3>Stack options</h3><p>React / Next.js, Node / .NET, PostgreSQL, Firebase, AWS, Azure.</p></div>
+                <div class="mini">
+                  <h3>Latest activity</h3>
+                  <ul class="feed" id="dashFeed">
+                    <li>CI passed and deployed to staging.</li>
+                    <li>QA run completed with zero critical issues.</li>
+                    <li>Client feedback merged into sprint board.</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -1317,6 +1496,180 @@
         if (menuSheet.style.display === 'block') closeMenu();
       }
     });
+
+    // Hero reveal animations
+    function revealOnceOnView(el, threshold){
+      if (!el) return;
+      if (!('IntersectionObserver' in window)){
+        el.classList.add('in-view');
+        return;
+      }
+      const io = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          el.classList.add('in-view');
+          observer.disconnect();
+        });
+      }, { threshold });
+      io.observe(el);
+    }
+
+    // Typewriter for hero copy
+    function typeText(el, text, speed, done){
+      if (!el) return done && done();
+      let i = 0;
+      el.textContent = '';
+      el.classList.add('typing-caret');
+      const tick = () => {
+        i += 1;
+        el.textContent = text.slice(0, i);
+        if (i < text.length){
+          setTimeout(tick, speed);
+          return;
+        }
+        el.classList.remove('typing-caret');
+        if (done) done();
+      };
+      tick();
+    }
+
+    function initHeroTypewriter(){
+      const copy = document.querySelector('.hero-copy');
+      if (!copy) return;
+      const title = copy.querySelector('h1');
+      const lead = copy.querySelector('.lead');
+      if (!title || !lead) return;
+
+      const titleText = title.textContent.trim();
+      const leadText = lead.textContent.replace(/\s+/g, ' ').trim();
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const startTyping = () => {
+        const lockHeight = copy.offsetHeight;
+        copy.style.minHeight = `${lockHeight}px`;
+        copy.classList.add('typing-started');
+        if (reduceMotion){
+          title.textContent = titleText;
+          lead.textContent = leadText;
+          copy.style.minHeight = '';
+          return;
+        }
+        title.textContent = '';
+        lead.textContent = '';
+        typeText(title, titleText, 24, () => {
+          copy.classList.add('lead-typing-started');
+          typeText(lead, leadText, 11, () => {
+            copy.style.minHeight = '';
+          });
+        });
+      };
+
+      if (!('IntersectionObserver' in window)){
+        startTyping();
+        return;
+      }
+      const io = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.disconnect();
+          startTyping();
+        });
+      }, { threshold: 0.2 });
+      io.observe(copy);
+    }
+
+    function initDashboardPanel(){
+      const sprintSel = $('dashSprint');
+      const refreshBtn = $('dashRefresh');
+      const videoBtn = $('dashVideoToggle');
+      const video = document.querySelector('.mock-video');
+      if (!sprintSel) return;
+
+      const scenarios = {
+        launch: {
+          status: 'Launch sprint is on track with active QA and fast merge cycles.',
+          deploys: '7',
+          uptime: '99.98%',
+          lead: '2.4d',
+          alerts: '2 open',
+          speed: 92,
+          quality: 96,
+          feed: [
+            'CI passed and deployed to staging.',
+            'QA run completed with zero critical issues.',
+            'Client feedback merged into sprint board.'
+          ]
+        },
+        stabilize: {
+          status: 'Stabilization sprint focused on reliability and regression coverage.',
+          deploys: '5',
+          uptime: '99.99%',
+          lead: '2.1d',
+          alerts: '1 open',
+          speed: 84,
+          quality: 98,
+          feed: [
+            'Regression suite expanded by 34 test cases.',
+            'Error budget alert resolved on checkout API.',
+            'Performance benchmark improved by 18%.'
+          ]
+        },
+        scale: {
+          status: 'Scale sprint focused on throughput, caching, and cloud readiness.',
+          deploys: '9',
+          uptime: '99.97%',
+          lead: '1.8d',
+          alerts: '3 open',
+          speed: 95,
+          quality: 91,
+          feed: [
+            'Read replica enabled for reporting queries.',
+            'Queue workers autoscaled for peak load.',
+            'Stress test passed at 4x baseline traffic.'
+          ]
+        }
+      };
+
+      const setScenario = (key) => {
+        const d = scenarios[key] || scenarios.launch;
+        $('dashStatus').textContent = d.status;
+        $('dashDeploys').textContent = d.deploys;
+        $('dashUptime').textContent = d.uptime;
+        $('dashLead').textContent = d.lead;
+        $('dashAlerts').textContent = d.alerts;
+        $('dashSpeedVal').textContent = `${d.speed}%`;
+        $('dashQualityVal').textContent = `${d.quality}%`;
+        $('dashSpeedBar').style.width = `${d.speed}%`;
+        $('dashQualityBar').style.width = `${d.quality}%`;
+        $('dashFeed').innerHTML = d.feed.map(item => `<li>${item}</li>`).join('');
+      };
+
+      sprintSel.addEventListener('change', (e) => setScenario(e.target.value));
+
+      refreshBtn?.addEventListener('click', () => {
+        const active = sprintSel.value;
+        setScenario(active);
+        refreshBtn.textContent = 'Updated';
+        setTimeout(() => { refreshBtn.textContent = 'Refresh'; }, 900);
+      });
+
+      videoBtn?.addEventListener('click', () => {
+        if (!video) return;
+        if (video.paused){
+          video.play().catch(()=>{});
+          videoBtn.textContent = 'Pause video';
+        } else {
+          video.pause();
+          videoBtn.textContent = 'Play video';
+        }
+      });
+
+      setScenario('launch');
+    }
+
+    initDashboardPanel();
+    initHeroTypewriter();
+    revealOnceOnView(document.querySelector('.hero-card'), 0.28);
 
     // Nice-to-have: smooth scroll for in-page links
     document.querySelectorAll('a[href^="#"]').forEach(a => {
