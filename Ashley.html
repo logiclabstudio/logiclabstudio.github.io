@@ -1,1068 +1,451 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1020" />
-  <title>Ashley Smart Grocery List — Scanner + Price</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#ff4d6d" />
+  <title>Be My Valentine?</title>
   <style>
     :root{
-      --bg:#f6f7fb; --bg2:#ffffff; --card:rgba(15,23,42,.06);
-      --text:#0f172a; --muted:#475569; --line:rgba(15,23,42,.12);
-      --accent:#2563eb; --accent2:#7c3aed; --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
-      --radius:18px; --shadow:0 18px 55px rgba(2,6,23,.12);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    [data-theme="dark"]{
-      --bg:#0b1020; --bg2:#0f172a; --card:rgba(255,255,255,.06);
-      --text:#e5e7eb; --muted:#94a3b8; --line:rgba(255,255,255,.12);
-      --shadow:0 18px 55px rgba(0,0,0,.45);
+      --bg1:#fff0f4;
+      --bg2:#ffe3ec;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --pink:#ff4d6d;
+      --pink2:#ff7aa2;
+      --shadow: 0 18px 60px rgba(0,0,0,.12);
+      --r: 22px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family:var(--sans);
-      background:
-        radial-gradient(1200px 800px at 10% 0%, rgba(37,99,235,.20), transparent 50%),
-        radial-gradient(1000px 700px at 90% 10%, rgba(124,58,237,.18), transparent 55%),
-        linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 70%, #000 30%));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-    }
-
-    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 96px}
-    .card{
-      background: color-mix(in srgb, var(--bg2) 92%, transparent);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(255,77,109,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% 80%, rgba(255,122,162,.18), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
       overflow:hidden;
     }
 
-    header.card{padding:14px}
-    .top{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
-    .brand{display:flex; gap:10px; align-items:center; min-width:240px;}
-    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg, var(--accent), var(--accent2));box-shadow: var(--shadow);flex:0 0 auto;}
-    h1{margin:0;font-size:18px;line-height:1.1}
-    .sub{margin:4px 0 0;color:var(--muted);font-size:12px}
-    .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-
-    button, input, select, textarea{font:inherit; color:inherit}
-    .btn{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      padding:10px 12px;
-      border-radius:14px;
-      cursor:pointer;
-      transition:.12s transform, .12s opacity;
-      touch-action: manipulation;
+    /* Floating hearts background */
+    .hearts{
+      position:fixed; inset:0; pointer-events:none; overflow:hidden;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.10));
+      opacity:.75;
     }
-    .btn:active{transform:scale(.98); opacity:.92}
-    .btn.primary{border:0;background:linear-gradient(135deg, var(--accent), var(--accent2));color:white;font-weight:800;}
-    .btn.danger{border-color: color-mix(in srgb, var(--bad) 55%, var(--line));}
-    .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
-
-    .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px;}
-
-    .panelHead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 12px 10px; border-bottom:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+    .heart{
+      position:absolute;
+      width:16px; height:16px;
+      background: var(--pink);
+      transform: rotate(45deg);
+      border-radius: 3px;
+      animation: floatUp linear infinite;
     }
-    .panelHead b{font-size:13px}
-    .panelBody{padding:12px}
+    .heart:before, .heart:after{
+      content:"";
+      position:absolute;
+      width:16px; height:16px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart:before{left:-8px; top:0}
+    .heart:after{left:0; top:-8px}
+    @keyframes floatUp{
+      from{ transform: translateY(20vh) rotate(45deg) scale(var(--s)); opacity:0}
+      10%{opacity:.8}
+      to{ transform: translateY(-120vh) rotate(45deg) scale(var(--s)); opacity:0}
+    }
 
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:end}
-    .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:140px}
-    .label{font-size:12px;color:var(--muted)}
-    .input,.select,.textarea{border:1px solid var(--line); background:rgba(255,255,255,.06); border-radius:14px; padding:10px 12px; outline:none;}
-    .textarea{min-height:80px; resize:vertical}
-
-    .hint{font-size:12px;color:var(--muted);margin-top:8px}
-    .sep{height:1px;background:var(--line);margin:12px 0}
-
-    .list{display:flex; flex-direction:column; gap:10px}
-    .item{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      border-radius:16px;
-      padding:10px;
+    .wrap{
+      position:relative;
+      height:100%;
       display:grid;
-      grid-template-columns: 28px 1fr auto;
+      place-items:center;
+      padding:24px;
+    }
+    .card{
+      width:min(680px, 92vw);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 26px 22px;
+      text-align:center;
+      position:relative;
+    }
+    .badge{
+      display:inline-flex;
       gap:10px;
       align-items:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,77,109,.10);
+      border: 1px solid rgba(255,77,109,.18);
+      color: #b4234f;
+      font-weight: 700;
+      letter-spacing:.2px;
+      font-size: 14px;
     }
-    .chk{width:22px;height:22px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;user-select:none;background:rgba(255,255,255,.04);}
-    .chk[data-on="true"]{border-color: color-mix(in srgb, var(--ok) 60%, var(--line));background: color-mix(in srgb, var(--ok) 25%, rgba(255,255,255,.05));}
-    .meta{min-width:0}
-    .title{display:flex; align-items:center; gap:8px; min-width:0;}
-    .title b{font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-    .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:5px}
-    .tag{font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); background:rgba(255,255,255,.04);}
-    .tag.ok{color: color-mix(in srgb, var(--ok) 65%, var(--text)); border-color: color-mix(in srgb, var(--ok) 40%, var(--line));}
-    .tag.warn{color: color-mix(in srgb, var(--warn) 65%, var(--text)); border-color: color-mix(in srgb, var(--warn) 40%, var(--line));}
-    .right{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
-    .iconbtn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);cursor:pointer;touch-action: manipulation;}
-    .done{opacity:.60}
-
-    /* Sticky mobile add bar */
-    .stickyBar{
-      position:fixed; left:0; right:0; bottom:0;
-      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-      background: color-mix(in srgb, var(--bg2) 88%, transparent);
-      border-top:1px solid var(--line);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index:999;
+    .badge .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--pink);
+      box-shadow: 0 0 0 6px rgba(255,77,109,.12);
     }
-    .stickyInner{max-width:980px; margin:0 auto; display:flex; gap:10px; align-items:center;}
-    .stickyInner input{flex:1; min-width:0;}
 
-    /* Modal */
-    .backdrop{position:fixed; inset:0; display:none; background: rgba(2,6,23,.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index:1000; padding:14px;}
-    .modal{max-width:860px; margin:6vh auto 0; border-radius:22px; border:1px solid var(--line); background: color-mix(in srgb, var(--bg2) 92%, transparent); box-shadow: var(--shadow); overflow:hidden;}
-    .modalHead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line);}
-    .modalHead b{font-size:14px}
-    .modalBody{padding:12px 14px}
-    .modalActions{padding:12px 14px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;}
-
-    /* Scanner */
-    .videoBox{position:relative; border-radius:18px; overflow:hidden; border:1px solid var(--line); background: rgba(0,0,0,.25); aspect-ratio: 3 / 4;}
-    video{width:100%;height:100%;object-fit:cover;display:block}
-    .overlay{position:absolute; inset:0; pointer-events:none; display:grid; place-items:center;}
-    .frame{width:min(78%, 360px); aspect-ratio: 1 / 1; border-radius:18px; border:2px solid rgba(255,255,255,.70); box-shadow: 0 0 0 9999px rgba(0,0,0,.18);}    
-
-    /* Price keypad */
-    .priceGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    .priceBig{font-family:var(--mono); font-weight:900; font-size:22px; padding:14px 12px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.06);}
-    .quickPrices{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
-
-    /* Toast */
-    .toast{position:fixed; left:50%; bottom:86px; transform:translateX(-50%);
-      background: rgba(15,23,42,.88); color:#fff; border:1px solid rgba(255,255,255,.16);
-      padding:10px 12px; border-radius:999px; box-shadow: 0 18px 55px rgba(0,0,0,.35);
-      opacity:0; pointer-events:none; transition:.18s opacity, .18s transform;
-      max-width:min(720px, calc(100vw - 24px)); z-index:1100; font-size:13px;
+    h1{
+      margin: 14px 0 8px;
+      font-size: clamp(28px, 4.5vw, 44px);
+      line-height:1.1;
+      letter-spacing:-.02em;
     }
-    .toast.show{opacity:1; transform:translateX(-50%) translateY(-2px)}
+    p{
+      margin:0 auto;
+      max-width: 48ch;
+      color: var(--muted);
+      font-size: 16px;
+      line-height:1.6;
+    }
 
-    @media (max-width:520px){
-      .actions{width:100%}
-      .actions .btn{flex:1}
-      .item{grid-template-columns:28px 1fr}
-      .right{grid-column:1 / -1; justify-content:flex-start}
-      .priceGrid{grid-template-columns:1fr}
+    .stage{
+      margin-top: 18px;
+      position:relative;
+      height: 180px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,77,109,.25);
+      background:
+        radial-gradient(500px 180px at 50% 0%, rgba(255,77,109,.12), transparent 60%),
+        rgba(255,255,255,.55);
+      overflow:hidden;
+    }
+
+    .btn{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 16px;
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99) }
+
+    .btn-yes{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255,77,109,.30);
+      min-width: 150px;
+    }
+    .btn-yes:hover{ filter: brightness(1.02) }
+
+    .btn-no{
+      background: rgba(31,41,55,.08);
+      color: #111827;
+      border: 1px solid rgba(31,41,55,.12);
+      min-width: 150px;
+    }
+
+    .buttons{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+    }
+    /* We'll position the "No" button absolutely and move it around */
+    #noBtn{
+      position:absolute;
+      left: 58%;
+      top: 55%;
+      transform: translate(-50%,-50%);
+      transition: left .12s ease, top .12s ease, transform .12s ease;
+      will-change:left,top,transform;
+    }
+    #yesBtn{
+      position:absolute;
+      left: 36%;
+      top: 55%;
+      transform: translate(-50%,-50%) scale(1);
+      will-change: transform;
+    }
+
+    .hint{
+      margin-top: 14px;
+      font-size: 13px;
+      color: rgba(107,114,128,.9);
+    }
+
+    /* Result modal-ish */
+    .reveal{
+      display:none;
+      margin-top: 18px;
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(255,77,109,.10);
+      border: 1px solid rgba(255,77,109,.20);
+    }
+    .reveal h2{
+      margin:0 0 8px;
+      font-size: 22px;
+    }
+    .reveal p{
+      color:#3f3f46;
+      max-width: 58ch;
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      display:none;
+    }
+    .confetti i{
+      position:absolute;
+      width: 10px; height: 18px;
+      background: var(--pink);
+      border-radius: 3px;
+      opacity:.95;
+      transform: translateY(-10vh) rotate(0deg);
+      animation: confFall linear forwards;
+    }
+    @keyframes confFall{
+      to{
+        transform: translateY(120vh) rotate(520deg);
+        opacity: .95;
+      }
+    }
+
+    /* Subtle wiggle for NO on near-miss */
+    @keyframes wiggle{
+      0%{ transform: translate(-50%,-50%) rotate(0deg) }
+      25%{ transform: translate(-50%,-50%) rotate(3deg) }
+      50%{ transform: translate(-50%,-50%) rotate(-3deg) }
+      100%{ transform: translate(-50%,-50%) rotate(0deg) }
+    }
+    .wiggle{ animation: wiggle .25s ease }
+
+    /* Mobile safety */
+    @media (max-width:420px){
+      #yesBtn{ left: 34% }
+      #noBtn{ left: 66% }
+      .stage{ height: 200px }
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header class="card">
-      <div class="top">
-        <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
-          <div>
-            <h1>Ashley Smart Grocery List</h1>
-            <div class="sub">Scan → name (if needed) → price input → added. Saves offline.</div>
-          </div>
-        </div>
+  <div class="hearts" aria-hidden="true" id="bgHearts"></div>
+  <div class="confetti" aria-hidden="true" id="confetti"></div>
 
-        <div class="actions">
-          <button class="btn" id="themeBtn">Theme</button>
-          <button class="btn primary" id="scanBtn">Scan</button>
-          <button class="btn" id="shareBtn">Share</button>
-          <button class="btn danger" id="clearBtn">Clear</button>
-        </div>
-      </div>
-    </header>
-
-    <div class="grid">
-      <section class="card">
-        <div class="panelHead">
-          <b>List</b>
-          <span id="status" style="font-size:12px;color:var(--muted)">Saved</span>
-        </div>
-        <div class="panelBody">
-
-          <div class="row">
-            <div class="field">
-              <div class="label">Search</div>
-              <input class="input" id="search" placeholder="Type to filter..." />
-            </div>
-            <div class="field" style="flex:.9">
-              <div class="label">View</div>
-              <select class="select" id="view">
-                <option value="needed">Needed</option>
-                <option value="all">All</option>
-                <option value="done">Checked</option>
-              </select>
-            </div>
-            <div class="field" style="flex:.9">
-              <div class="label">Sort</div>
-              <select class="select" id="sort">
-                <option value="added">Recently added</option>
-                <option value="name">Name</option>
-                <option value="cat">Category</option>
-                <option value="cost">Price</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div id="list" class="list"></div>
-
-          <div class="hint" id="counts"></div>
-          <div class="hint" id="total" style="font-family:var(--mono)"></div>
-          <div class="hint">
-            Camera note: scanning needs <b>HTTPS</b> or <b>localhost</b>.
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="panelHead">
-          <b>Defaults</b>
-          <button class="btn small" id="barcodesBtn">Barcodes</button>
-        </div>
-        <div class="panelBody">
-          <div class="row">
-            <div class="field">
-              <div class="label">Category</div>
-              <select class="select" id="cat">
-                <option>Produce</option><option>Dairy</option><option>Meat</option><option>Bakery</option>
-                <option>Pantry</option><option>Frozen</option><option>Snacks</option><option>Drinks</option>
-                <option>Household</option><option>Health</option><option>Other</option>
-              </select>
-            </div>
-            <div class="field">
-              <div class="label">Qty</div>
-              <input class="input" id="qty" type="number" min="1" step="1" value="1" />
-            </div>
-            <div class="field">
-              <div class="label">Priority</div>
-              <select class="select" id="pri">
-                <option value="normal">Normal</option>
-                <option value="soon">Soon</option>
-                <option value="urgent">Urgent</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div class="field">
-            <div class="label">Notes</div>
-            <textarea class="textarea" id="notes" placeholder="e.g. Prefer lactose-free milk"></textarea>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <!-- Sticky add bar -->
-  <div class="stickyBar">
-    <div class="stickyInner">
-      <input class="input" id="quickName" placeholder="Add item… (tap +)" />
-      <button class="btn primary" id="addBtn">+</button>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="backdrop" id="backdrop" role="dialog" aria-modal="true">
-    <div class="modal">
-      <div class="modalHead">
-        <b id="mTitle">Modal</b>
-        <button class="btn" id="mClose">Close</button>
-      </div>
-      <div class="modalBody" id="mBody"></div>
-      <div class="modalActions" id="mActions"></div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-<script>
-(function(){
-  "use strict";
-
-  const $ = (q) => document.querySelector(q);
-  const KEY = "ashley_smart_list_scanner_v3";
-
-  const els = {
-    themeBtn: $("#themeBtn"),
-    scanBtn: $("#scanBtn"),
-    shareBtn: $("#shareBtn"),
-    clearBtn: $("#clearBtn"),
-
-    addBtn: $("#addBtn"),
-    quickName: $("#quickName"),
-
-    search: $("#search"),
-    view: $("#view"),
-    sort: $("#sort"),
-    list: $("#list"),
-    counts: $("#counts"),
-    total: $("#total"),
-    status: $("#status"),
-
-    cat: $("#cat"),
-    qty: $("#qty"),
-    pri: $("#pri"),
-    notes: $("#notes"),
-
-    barcodesBtn: $("#barcodesBtn"),
-
-    backdrop: $("#backdrop"),
-    mTitle: $("#mTitle"),
-    mBody: $("#mBody"),
-    mActions: $("#mActions"),
-    mClose: $("#mClose"),
-
-    toast: $("#toast"),
-  };
-
-  const DEFAULT = {
-    theme: "light",
-    items: [],
-    notes: "",
-    defaults: { cat:"Produce", qty:1, pri:"normal" },
-    view: "needed",
-    sort: "added",
-    currency: "R",
-    // code -> {name, cat}
-    barcodeMap: {},
-    // remember last used price for quick repeat
-    lastPrice: ""
-  };
-
-  let state = load();
-
-  // ===== helpers =====
-  function uid(){ return Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(2,7); }
-  function esc(s){ return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
-  function parseMoney(v){
-    const s = String(v ?? "").replace(/,/g,'.').replace(/[^0-9.]/g,'');
-    const n = Number(s);
-    return Number.isFinite(n) ? n : NaN;
-  }
-  function money(n){
-    if(!Number.isFinite(n)) return "";
-    return n.toFixed(2);
-  }
-  function toast(msg){
-    els.toast.textContent = msg;
-    els.toast.classList.add("show");
-    clearTimeout(toast._t);
-    toast._t = setTimeout(()=>els.toast.classList.remove("show"), 1400);
-  }
-
-  let saveT = null;
-  function save(soft){
-    clearTimeout(saveT);
-    els.status.textContent = "Saving…";
-    saveT = setTimeout(()=>{
-      localStorage.setItem(KEY, JSON.stringify(state));
-      els.status.textContent = "Saved";
-      if(!soft) toast("Saved ✅");
-    }, 120);
-  }
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(KEY);
-      if(!raw) return structuredClone(DEFAULT);
-      const parsed = JSON.parse(raw);
-      return { ...structuredClone(DEFAULT), ...parsed };
-    }catch{
-      return structuredClone(DEFAULT);
-    }
-  }
-
-  function applyTheme(){
-    document.documentElement.setAttribute("data-theme", state.theme);
-  }
-
-  // ===== modal =====
-  function openModal(title, bodyHtml, actions){
-    els.mTitle.textContent = title;
-    els.mBody.innerHTML = bodyHtml;
-    els.mActions.innerHTML = "";
-
-    (actions || []).forEach(a=>{
-      const b = document.createElement("button");
-      b.className = "btn " + (a.className || "");
-      b.textContent = a.text;
-      b.addEventListener("click", a.onClick);
-      els.mActions.appendChild(b);
-    });
-
-    els.backdrop.style.display = "block";
-  }
-  function closeModal(){
-    stopScanner();
-    els.backdrop.style.display = "none";
-    els.mBody.innerHTML = "";
-    els.mActions.innerHTML = "";
-  }
-
-  // ===== list =====
-  function addItemObject(obj){
-    state.items.unshift(obj);
-    save(true);
-    render(true);
-  }
-
-  function addItem(name, opts){
-    name = (name || "").trim();
-    if(!name){ toast("Type an item"); els.quickName.focus(); return; }
-
-    const it = {
-      id: uid(),
-      name,
-      cat: (opts && opts.cat) || state.defaults.cat || "Other",
-      qty: (opts && opts.qty) || state.defaults.qty || 1,
-      pri: (opts && opts.pri) || state.defaults.pri || "normal",
-      done: false,
-      addedAt: Date.now(),
-      barcode: (opts && opts.barcode) || null,
-      unitPrice: (opts && Number.isFinite(opts.unitPrice)) ? opts.unitPrice : NaN,
-    };
-    addItemObject(it);
-    toast("Added ✨");
-  }
-
-  function toggleDone(id){
-    const it = state.items.find(x=>x.id===id);
-    if(!it) return;
-    it.done = !it.done;
-    save(true);
-    render(true);
-  }
-
-  function removeItem(id){
-    state.items = state.items.filter(x=>x.id!==id);
-    save(true);
-    render(true);
-    toast("Removed");
-  }
-
-  function editItem(id){
-    const it = state.items.find(x=>x.id===id);
-    if(!it) return;
-
-    openModal("Edit item", `
-      <div class="row">
-        <div class="field">
-          <div class="label">Name</div>
-          <input class="input" id="eName" value="${esc(it.name)}" />
-        </div>
-        <div class="field">
-          <div class="label">Category</div>
-          <select class="select" id="eCat">
-            ${cats().map(c=>`<option ${c===it.cat?"selected":""}>${esc(c)}</option>`).join("")}
-          </select>
-        </div>
-        <div class="field" style="flex:.7">
-          <div class="label">Qty</div>
-          <input class="input" id="eQty" type="number" min="1" step="1" value="${it.qty}" />
-        </div>
-        <div class="field" style="flex:.9">
-          <div class="label">Priority</div>
-          <select class="select" id="ePri">
-            <option value="normal" ${it.pri==="normal"?"selected":""}>Normal</option>
-            <option value="soon" ${it.pri==="soon"?"selected":""}>Soon</option>
-            <option value="urgent" ${it.pri==="urgent"?"selected":""}>Urgent</option>
-          </select>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <div class="field">
-          <div class="label">Unit price (${esc(state.currency)})</div>
-          <input class="input" id="ePrice" inputmode="decimal" placeholder="e.g. 29.99" value="${Number.isFinite(it.unitPrice)?esc(money(it.unitPrice)):""}" />
-        </div>
-      </div>
-      ${it.barcode ? `<div class="hint">Barcode: <span style="font-family:var(--mono)">${esc(it.barcode)}</span></div>` : ``}
-    `, [
-      { text:"Cancel", onClick: closeModal },
-      { text:"Save", className:"primary", onClick: ()=>{
-          const n = ($("#eName").value || "").trim();
-          if(!n){ toast("Name required"); return; }
-          it.name = n;
-          it.cat = $("#eCat").value;
-          it.qty = Math.max(1, Math.floor(Number($("#eQty").value || 1)));
-          it.pri = $("#ePri").value;
-
-          const p = parseMoney($("#ePrice").value);
-          it.unitPrice = Number.isFinite(p) ? p : NaN;
-
-          save(true);
-          closeModal();
-          render(true);
-          toast("Updated ✅");
-        }
-      }
-    ]);
-
-    setTimeout(()=>$("#eName").focus(), 50);
-  }
-
-  function clearAll(){
-    openModal("Clear everything", `
-      <p style="margin:0;color:var(--muted);font-size:13px">
-        This clears the list and learned barcodes on this device.
+  <main class="wrap">
+    <section class="card" role="region" aria-label="Valentine card">
+      <div class="badge"><span class="dot"></span> Valentine Mode: ON</div>
+      <h1>Will you be my Valentine? 💘</h1>
+      <p>
+        I made this just for you. Be honest… but also choose wisely 😅
       </p>
-    `, [
-      { text:"Cancel", onClick: closeModal },
-      { text:"Clear", className:"danger", onClick: ()=>{
-          state = structuredClone(DEFAULT);
-          localStorage.removeItem(KEY);
-          applyTheme();
-          closeModal();
-          syncUIFromState();
-          render(true);
-          toast("Cleared ✅");
-        }
-      }
-    ]);
-  }
 
-  // ===== rendering =====
-  function cats(){
-    return ["Produce","Dairy","Meat","Bakery","Pantry","Frozen","Snacks","Drinks","Household","Health","Other"];
-  }
-
-  function priTag(pri){
-    if(pri==="urgent") return `<span class="tag warn">Urgent</span>`;
-    if(pri==="soon") return `<span class="tag warn">Soon</span>`;
-    return `<span class="tag">Normal</span>`;
-  }
-
-  function filtered(){
-    const q = (els.search.value || "").trim().toLowerCase();
-    const view = els.view.value;
-
-    let arr = state.items.slice();
-    if(view==="needed") arr = arr.filter(x=>!x.done);
-    if(view==="done") arr = arr.filter(x=>x.done);
-
-    if(q){
-      arr = arr.filter(x => (`${x.name} ${x.cat} ${x.pri} ${x.barcode||""}`).toLowerCase().includes(q));
-    }
-
-    const sort = els.sort.value;
-    if(sort==="name") arr.sort((a,b)=>a.name.localeCompare(b.name));
-    else if(sort==="cat") arr.sort((a,b)=>a.cat.localeCompare(b.cat));
-    else if(sort==="cost"){
-      arr.sort((a,b)=>{
-        const ap = Number.isFinite(a.unitPrice)?a.unitPrice:Infinity;
-        const bp = Number.isFinite(b.unitPrice)?b.unitPrice:Infinity;
-        return ap - bp;
-      });
-    }
-    else arr.sort((a,b)=>b.addedAt - a.addedAt);
-
-    return arr;
-  }
-
-  function render(soft){
-    const arr = filtered();
-
-    els.list.innerHTML = arr.map(it=>{
-      const doneClass = it.done ? "done" : "";
-      const chkOn = it.done ? "true" : "false";
-      const barcodeTag = it.barcode ? `<span class="tag">🔎 ${esc(it.barcode)}</span>` : "";
-      const priceTag = Number.isFinite(it.unitPrice)
-        ? `<span class="tag ok">${esc(state.currency)} ${esc(money(it.unitPrice))}</span>`
-        : `<span class="tag">No price</span>`;
-
-      const lineTotal = Number.isFinite(it.unitPrice) ? (it.unitPrice * (it.qty||1)) : NaN;
-      const lineTotalTag = Number.isFinite(lineTotal)
-        ? `<span class="tag">Line: ${esc(state.currency)} ${esc(money(lineTotal))}</span>`
-        : "";
-
-      return `
-        <div class="item ${doneClass}" data-id="${it.id}">
-          <div class="chk" data-on="${chkOn}" title="Check">${it.done ? "✓" : ""}</div>
-          <div class="meta">
-            <div class="title"><b>${esc(it.name)}</b></div>
-            <div class="tags">
-              <span class="tag ok">${esc(it.cat)}</span>
-              <span class="tag">Qty ${it.qty}</span>
-              ${priTag(it.pri)}
-              ${priceTag}
-              ${lineTotalTag}
-              ${barcodeTag}
-            </div>
-          </div>
-          <div class="right">
-            <button class="iconbtn" data-act="price" title="Set price">💰</button>
-            <button class="iconbtn" data-act="edit" title="Edit">✏️</button>
-            <button class="iconbtn" data-act="del" title="Delete">🗑️</button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    const total = state.items.length;
-    const needed = state.items.filter(x=>!x.done).length;
-    const done = state.items.filter(x=>x.done).length;
-    els.counts.textContent = `${total} total • ${needed} needed • ${done} checked`;
-
-    // Total cost (only priced items)
-    const sum = state.items
-      .filter(x=>!x.done)
-      .reduce((acc,x)=> acc + (Number.isFinite(x.unitPrice) ? x.unitPrice*(x.qty||1) : 0), 0);
-    els.total.textContent = `Estimated total: ${state.currency} ${money(sum)}`;
-
-    if(!soft) save(true);
-  }
-
-  // Delegated list clicks
-  function onListClick(e){
-    const itemEl = e.target.closest(".item");
-    if(!itemEl) return;
-    const id = itemEl.getAttribute("data-id");
-
-    if(e.target.closest(".chk")) return toggleDone(id);
-
-    const act = e.target.closest("[data-act]")?.getAttribute("data-act");
-    if(act==="edit") return editItem(id);
-    if(act==="del") return removeItem(id);
-    if(act==="price") return promptPriceForItem(id);
-  }
-
-  // ===== SMART PRICE PROMPT (klaar) =====
-  function promptPriceFlow({ code, suggestedName, suggestedCat, requireName }){
-    // One single flow: name (if needed) + price required
-
-    openModal("Scan details", `
-      <div class="hint">Barcode: <b style="font-family:var(--mono)">${esc(code)}</b></div>
-
-      <div class="sep"></div>
-
-      <div class="priceGrid">
-        <div class="field">
-          <div class="label">Item name ${requireName?"(required)":""}</div>
-          <input class="input" id="pName" placeholder="e.g. 2L Milk" value="${esc(suggestedName||"")}" />
-        </div>
-
-        <div class="field">
-          <div class="label">Category</div>
-          <select class="select" id="pCat">
-            ${cats().map(c=>`<option ${c===(suggestedCat||state.defaults.cat)?"selected":""}>${esc(c)}</option>`).join("")}
-          </select>
-        </div>
-
-        <div class="field" style="grid-column:1/-1">
-          <div class="label">Price (${esc(state.currency)}) — required</div>
-          <input class="priceBig" id="pPrice" inputmode="decimal" placeholder="e.g. 29.99" value="${esc(state.lastPrice||"")}" />
-          <div class="quickPrices" aria-label="quick prices">
-            ${["9.99","14.99","19.99","24.99","29.99","49.99","79.99","99.99"].map(v=>`<button class="btn small" data-qprice="${v}">${state.currency} ${v}</button>`).join("")}
-            <button class="btn small" data-qprice="last">Last</button>
-            <button class="btn small" data-qprice="clear">Clear</button>
-          </div>
-          <div class="hint">Tip: tap a quick price, or type. We won’t add without a price. Klaar.</div>
-        </div>
-
-        <div class="field" style="grid-column:1/-1">
-          <div class="label">Qty</div>
-          <input class="input" id="pQty" type="number" min="1" step="1" value="1" />
+      <div class="stage" id="stage">
+        <div class="buttons">
+          <button class="btn btn-yes" id="yesBtn">Yes 💗</button>
+          <button class="btn btn-no" id="noBtn">No 🙈</button>
         </div>
       </div>
-    `, [
-      { text:"Cancel", onClick: closeModal },
-      { text:"Add", className:"primary", onClick: ()=>{
-          const name = ($("#pName").value || "").trim();
-          const cat = $("#pCat").value;
-          const qty = Math.max(1, Math.floor(Number($("#pQty").value || 1)));
-          const p = parseMoney($("#pPrice").value);
 
-          if(requireName && !name){ toast("Name required"); return; }
-          if(!name){ toast("Name required"); return; }
-          if(!Number.isFinite(p) || p<=0){ toast("Price required"); return; }
+      <div class="hint" id="hint">Tip: try pressing “No” if you can 😏</div>
 
-          // learn barcode
-          state.barcodeMap[code] = { name, cat };
-          state.lastPrice = money(p);
-          save(true);
-
-          closeModal();
-          addItem(name, { cat, qty, pri: state.defaults.pri, barcode: code, unitPrice: p });
-        }
-      }
-    ]);
-
-    // quick price buttons
-    els.mBody.addEventListener("click", (e)=>{
-      const b = e.target.closest("[data-qprice]");
-      if(!b) return;
-      const v = b.getAttribute("data-qprice");
-      if(v==="clear") $("#pPrice").value = "";
-      else if(v==="last") $("#pPrice").value = state.lastPrice || "";
-      else $("#pPrice").value = v;
-      $("#pPrice").focus();
-    });
-
-    // enter to add
-    setTimeout(()=>{
-      const nameEl = $("#pName");
-      const priceEl = $("#pPrice");
-      if(requireName || !nameEl.value) nameEl.focus();
-      else priceEl.focus();
-
-      [nameEl, priceEl, $("#pQty")].forEach(el=>{
-        el.addEventListener("keydown", (ev)=>{
-          if(ev.key === "Enter"){
-            ev.preventDefault();
-            els.mActions.querySelector(".primary")?.click();
-          }
-        });
-      });
-    }, 50);
-  }
-
-  function promptPriceForItem(id){
-    const it = state.items.find(x=>x.id===id);
-    if(!it) return;
-
-    openModal("Set price", `
-      <div class="hint">Item: <b>${esc(it.name)}</b></div>
-      <div class="sep"></div>
-      <div class="field">
-        <div class="label">Unit price (${esc(state.currency)}) — required</div>
-        <input class="priceBig" id="setPrice" inputmode="decimal" placeholder="e.g. 29.99" value="${Number.isFinite(it.unitPrice)?esc(money(it.unitPrice)):(esc(state.lastPrice||""))}" />
-        <div class="quickPrices">
-          ${["9.99","14.99","19.99","24.99","29.99","49.99","79.99","99.99"].map(v=>`<button class="btn small" data-sprice="${v}">${state.currency} ${v}</button>`).join("")}
-          <button class="btn small" data-sprice="last">Last</button>
-          <button class="btn small" data-sprice="clear">Clear</button>
-        </div>
-      </div>
-    `, [
-      { text:"Cancel", onClick: closeModal },
-      { text:"Save", className:"primary", onClick: ()=>{
-          const p = parseMoney($("#setPrice").value);
-          if(!Number.isFinite(p) || p<=0){ toast("Price required"); return; }
-          it.unitPrice = p;
-          state.lastPrice = money(p);
-          save(true);
-          closeModal();
-          render(true);
-          toast("Price set ✅");
-        }
-      }
-    ]);
-
-    els.mBody.addEventListener("click", (e)=>{
-      const b = e.target.closest("[data-sprice]");
-      if(!b) return;
-      const v = b.getAttribute("data-sprice");
-      if(v==="clear") $("#setPrice").value = "";
-      else if(v==="last") $("#setPrice").value = state.lastPrice || "";
-      else $("#setPrice").value = v;
-      $("#setPrice").focus();
-    });
-
-    setTimeout(()=>$("#setPrice").focus(), 50);
-  }
-
-  // ===== share =====
-  async function share(){
-    const needed = state.items.filter(x=>!x.done);
-    if(!needed.length){ toast("Nothing to share"); return; }
-
-    // Group by category
-    const grouped = new Map();
-    for(const it of needed){
-      if(!grouped.has(it.cat)) grouped.set(it.cat, []);
-      grouped.get(it.cat).push(it);
-    }
-
-    let msg = "🛒 Ashley Grocery List\n\n";
-    for(const [cat, items] of Array.from(grouped.entries()).sort((a,b)=>a[0].localeCompare(b[0]))){
-      msg += `• ${cat}\n`;
-      for(const it of items){
-        const price = Number.isFinite(it.unitPrice) ? ` (${state.currency} ${money(it.unitPrice)} ea)` : "";
-        msg += `  - ${it.name}${it.qty>1?` x${it.qty}`:""}${price}\n`;
-      }
-      msg += "\n";
-    }
-
-    // Total
-    const sum = needed.reduce((acc,x)=> acc + (Number.isFinite(x.unitPrice) ? x.unitPrice*(x.qty||1) : 0), 0);
-    msg += `Estimated total: ${state.currency} ${money(sum)}`;
-
-    msg = msg.trim();
-
-    try{
-      await navigator.clipboard.writeText(msg);
-      toast("Copied ✅ (paste on WhatsApp)");
-    }catch{
-      openModal("Copy this", `<textarea class=\"textarea\" style=\"width:100%\">${esc(msg)}</textarea>`,
-        [{ text:"Close", onClick: closeModal }]
-      );
-    }
-  }
-
-  // ===== barcode scanning =====
-  let scanStream = null;
-  let scanVideo = null;
-  let scanRAF = null;
-  let detector = null;
-  let scanning = false;
-  let lastCode = "";
-  let lastAt = 0;
-
-  function stopScanner(){
-    scanning = false;
-    if(scanRAF) cancelAnimationFrame(scanRAF);
-    scanRAF = null;
-
-    try{
-      if(scanVideo){
-        scanVideo.pause();
-        scanVideo.srcObject = null;
-      }
-    }catch{}
-    scanVideo = null;
-
-    if(scanStream){
-      scanStream.getTracks().forEach(t=>t.stop());
-    }
-    scanStream = null;
-    detector = null;
-  }
-
-  async function openScanner(){
-    if(!window.isSecureContext){
-      openModal("Scanner needs HTTPS", `
-        <p style="margin:0;color:var(--muted);font-size:13px">
-          Camera access usually won’t work on <b>file://</b> or plain http.
-          Use <b>https</b hosting or <b>localhost</b> (VS Code Live Server).
+      <div class="reveal" id="reveal">
+        <h2>Yessss! 🥹💞</h2>
+        <p id="finalMsg">
+          You just made my whole day. I’ll plan something special for us.
+          You’re my favorite person. Always.
         </p>
-      `, [{ text:"Close", onClick: closeModal }]);
-      return;
-    }
-    if(!navigator.mediaDevices?.getUserMedia){
-      toast("Camera not supported");
-      return;
-    }
-    if(!("BarcodeDetector" in window)){
-      openModal("No BarcodeDetector", `
-        <p style="margin:0;color:var(--muted);font-size:13px">
-          Your browser doesn’t support BarcodeDetector. Use Chrome/Edge (latest), especially on Android.
-        </p>
-      `, [{ text:"Close", onClick: closeModal }]);
-      return;
-    }
-
-    detector = new BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","itf","codabar","qr_code"] });
-
-    openModal("Scan barcode", `
-      <div class="videoBox">
-        <video id="scanVideo" playsinline autoplay muted></video>
-        <div class="overlay"><div class="frame"></div></div>
       </div>
-      <div class="hint" id="scanStatus">Requesting camera…</div>
-    `, [
-      { text:"Stop", className:"danger", onClick: closeModal }
-    ]);
+    </section>
+  </main>
 
-    scanVideo = $("#scanVideo");
-
-    try{
-      scanStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
-      scanVideo.srcObject = scanStream;
-      await scanVideo.play();
-      $("#scanStatus").textContent = "Scanning…";
-      scanning = true;
-      lastCode = "";
-      lastAt = 0;
-      scanLoop();
-    }catch(err){
-      $("#scanStatus").textContent = "Camera blocked";
-      openModal("Camera permission needed", `
-        <p style="margin:0;color:var(--muted);font-size:13px">Allow camera permission, then try again.</p>
-        <div class="hint" style="font-family:var(--mono)">${esc(err?.message || String(err))}</div>
-      `, [{ text:"Close", onClick: closeModal }]);
+  <script>
+    // ====== Background hearts ======
+    const bg = document.getElementById('bgHearts');
+    const HEARTS = 18;
+    for(let i=0;i<HEARTS;i++){
+      const h = document.createElement('div');
+      h.className = 'heart';
+      const left = Math.random()*100;
+      const delay = Math.random()*6;
+      const dur = 6 + Math.random()*8;
+      const size = 0.6 + Math.random()*1.3;
+      h.style.left = left + 'vw';
+      h.style.bottom = (-10 - Math.random()*30) + 'vh';
+      h.style.animationDelay = delay + 's';
+      h.style.animationDuration = dur + 's';
+      h.style.setProperty('--s', size.toFixed(2));
+      h.style.background = Math.random() > 0.5 ? 'var(--pink)' : 'var(--pink2)';
+      bg.appendChild(h);
     }
-  }
 
-  function scanLoop(){
-    if(!scanning || !scanVideo || scanVideo.readyState < 2) return;
+    // ====== Buttons logic ======
+    const stage = document.getElementById('stage');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+    const reveal = document.getElementById('reveal');
+    const confetti = document.getElementById('confetti');
+    const hint = document.getElementById('hint');
 
-    detector.detect(scanVideo).then(list=>{
-      if(list && list.length){
-        const code = (list[0].rawValue || "").trim();
-        if(code){
-          const now = Date.now();
-          if(code !== lastCode || (now - lastAt) > 1200){
-            lastCode = code;
-            lastAt = now;
-            stopScanner();
-            closeModal();
-            handleBarcode(code);
-            return;
-          }
-        }
+    let yesScale = 1;
+    let dodgeCount = 0;
+    let finished = false;
+
+    function stageRect(){
+      return stage.getBoundingClientRect();
+    }
+
+    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+    function moveNoButtonAwayFrom(x, y){
+      if(finished) return;
+
+      const r = stageRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // Choose a new position away from pointer
+      const padding = 18;
+      const maxLeft = r.width - btnRect.width - padding;
+      const maxTop  = r.height - btnRect.height - padding;
+
+      // Candidate random position
+      let newLeft = Math.random() * maxLeft + padding;
+      let newTop  = Math.random() * maxTop + padding;
+
+      // If pointer info exists, bias away from pointer location within stage
+      if(typeof x === 'number' && typeof y === 'number'){
+        const px = x - r.left;
+        const py = y - r.top;
+
+        // push opposite direction a bit
+        if(px > r.width/2) newLeft = clamp(newLeft - r.width*0.18, padding, maxLeft);
+        else newLeft = clamp(newLeft + r.width*0.18, padding, maxLeft);
+
+        if(py > r.height/2) newTop = clamp(newTop - r.height*0.18, padding, maxTop);
+        else newTop = clamp(newTop + r.height*0.18, padding, maxTop);
       }
-      scanRAF = requestAnimationFrame(scanLoop);
-    }).catch(()=>{
-      scanRAF = requestAnimationFrame(scanLoop);
-    });
-  }
 
-  function handleBarcode(code){
-    const hit = state.barcodeMap[code];
+      // Apply
+      noBtn.style.left = newLeft + 'px';
+      noBtn.style.top  = newTop + 'px';
+      noBtn.style.transform = 'translate(0,0)';
 
-    // Smart flow: always require price input
-    promptPriceFlow({
-      code,
-      suggestedName: hit?.name || "",
-      suggestedCat: hit?.cat || state.defaults.cat,
-      requireName: !hit?.name
-    });
-  }
+      // Make YES grow a bit every dodge
+      dodgeCount++;
+      yesScale = Math.min(2.3, yesScale + 0.12);
+      yesBtn.style.transform = `translate(-50%,-50%) scale(${yesScale.toFixed(2)})`;
 
-  // ===== barcode manager =====
-  function openBarcodeManager(){
-    const entries = Object.entries(state.barcodeMap || {});
-    const rows = entries.length ? entries
-      .sort((a,b)=>a[0].localeCompare(b[0]))
-      .map(([code, v]) => `
-        <div class="item" style="grid-template-columns:1fr auto">
-          <div class="meta">
-            <div class="title"><b style="font-family:var(--mono)">${esc(code)}</b></div>
-            <div class="hint">${esc(v.name||"")} • ${esc(v.cat||"Other")}</div>
-          </div>
-          <div class="right">
-            <button class="iconbtn" data-delcode="${esc(code)}" title="Forget">🗑️</button>
-          </div>
-        </div>
-      `).join("")
-      : `<div class="hint">No learned barcodes yet. Scan something to teach the app.</div>`;
+      // Cute hint updates
+      if(dodgeCount === 2) hint.textContent = "No is getting shy 😅";
+      if(dodgeCount === 4) hint.textContent = "Okay stop trying to break my code 😂";
+      if(dodgeCount === 7) hint.textContent = "Just press Yes already 💗";
+    }
 
-    openModal("Barcodes", `
-      <div class="list">${rows}</div>
-      <div class="sep"></div>
-      <div class="field">
-        <div class="label">Export (JSON)</div>
-        <textarea class="textarea" id="exportJson">${esc(JSON.stringify(state.barcodeMap || {}, null, 2))}</textarea>
-      </div>
-      <div class="field">
-        <div class="label">Import (JSON)</div>
-        <textarea class="textarea" id="importJson" placeholder='{"600...":{"name":"Milk","cat":"Dairy"}}'></textarea>
-      </div>
-    `, [
-      { text:"Close", onClick: closeModal },
-      { text:"Import", className:"primary", onClick: ()=>{
-          const raw = ($("#importJson").value || "").trim();
-          if(!raw){ toast("Paste JSON"); return; }
-          try{
-            const obj = JSON.parse(raw);
-            if(!obj || typeof obj !== "object") throw new Error("bad");
-            state.barcodeMap = { ...(state.barcodeMap||{}), ...obj };
-            save(true);
-            closeModal();
-            toast("Imported ✅");
-          }catch{
-            toast("Invalid JSON");
-          }
-        }
-      }
-    ]);
+    // Desktop: dodge when mouse gets close
+    stage.addEventListener('mousemove', (e) => {
+      if(finished) return;
+      const r = stageRect();
+      const nx = e.clientX, ny = e.clientY;
 
-    els.mBody.addEventListener("click", (e)=>{
-      const code = e.target.closest("[data-delcode]")?.getAttribute("data-delcode");
-      if(!code) return;
-      delete state.barcodeMap[code];
-      save(true);
-      closeModal();
-      toast("Forgot barcode");
-    }, { once:true });
-  }
+      const b = noBtn.getBoundingClientRect();
+      const cx = b.left + b.width/2;
+      const cy = b.top + b.height/2;
 
-  // ===== UI =====
-  function syncUIFromState(){
-    applyTheme();
-    els.view.value = state.view || "needed";
-    els.sort.value = state.sort || "added";
-    els.notes.value = state.notes || "";
+      const dist = Math.hypot(nx - cx, ny - cy);
 
-    els.cat.value = state.defaults.cat || "Produce";
-    els.qty.value = state.defaults.qty || 1;
-    els.pri.value = state.defaults.pri || "normal";
-  }
-
-  function wireEvents(){
-    els.themeBtn.addEventListener("click", ()=>{
-      state.theme = (state.theme === "light") ? "dark" : "light";
-      applyTheme();
-      save(true);
-      toast("Theme changed");
-    });
-
-    els.scanBtn.addEventListener("click", openScanner);
-    els.shareBtn.addEventListener("click", share);
-    els.clearBtn.addEventListener("click", clearAll);
-
-    els.addBtn.addEventListener("click", ()=>{
-      addItem(els.quickName.value, {});
-      els.quickName.value = "";
-      els.quickName.focus();
-    });
-
-    els.quickName.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){ e.preventDefault(); els.addBtn.click(); }
-    });
-
-    els.list.addEventListener("click", onListClick);
-
-    els.search.addEventListener("input", ()=>render(true));
-
-    els.view.addEventListener("change", ()=>{
-      state.view = els.view.value;
-      save(true);
-      render(true);
-    });
-    els.sort.addEventListener("change", ()=>{
-      state.sort = els.sort.value;
-      save(true);
-      render(true);
-    });
-
-    els.notes.addEventListener("input", ()=>{
-      state.notes = els.notes.value;
-      save(true);
-    });
-
-    els.cat.addEventListener("change", ()=>{ state.defaults.cat = els.cat.value; save(true); });
-    els.qty.addEventListener("input", ()=>{ state.defaults.qty = Math.max(1, Math.floor(Number(els.qty.value||1))); save(true); });
-    els.pri.addEventListener("change", ()=>{ state.defaults.pri = els.pri.value; save(true); });
-
-    els.barcodesBtn.addEventListener("click", openBarcodeManager);
-
-    els.mClose.addEventListener("click", closeModal);
-    els.backdrop.addEventListener("click", (e)=>{ if(e.target === els.backdrop) closeModal(); });
-
-    document.addEventListener("keydown", (e)=>{
-      if(e.key === "Escape") closeModal();
-      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="k"){
-        e.preventDefault();
-        els.quickName.focus();
+      if(dist < 110){
+        noBtn.classList.remove('wiggle');
+        void noBtn.offsetWidth;
+        noBtn.classList.add('wiggle');
+        moveNoButtonAwayFrom(nx, ny);
       }
     });
-  }
 
-  // ===== boot =====
-  syncUIFromState();
-  wireEvents();
-  render(true);
+    // Mobile: dodge on touchstart near it
+    stage.addEventListener('touchstart', (e) => {
+      if(finished) return;
+      const t = e.touches[0];
+      const nx = t.clientX, ny = t.clientY;
 
-})();
-</script>
+      const b = noBtn.getBoundingClientRect();
+      const cx = b.left + b.width/2;
+      const cy = b.top + b.height/2;
+
+      const dist = Math.hypot(nx - cx, ny - cy);
+
+      if(dist < 140){
+        moveNoButtonAwayFrom(nx, ny);
+      }
+    }, {passive:true});
+
+    // Also dodge if they try to click it
+    noBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      moveNoButtonAwayFrom(e.clientX, e.clientY);
+    });
+
+    // YES clicked: celebrate
+    yesBtn.addEventListener('click', () => {
+      if(finished) return;
+      finished = true;
+
+      // Lock buttons
+      noBtn.style.display = 'none';
+      yesBtn.style.transform = 'translate(-50%,-50%) scale(2.35)';
+      yesBtn.textContent = "Yayyyy! 💞";
+
+      // Reveal message
+      reveal.style.display = 'block';
+      hint.textContent = "I knew it 😌💘";
+
+      // Confetti
+      fireConfetti();
+    });
+
+    function fireConfetti(){
+      confetti.style.display = 'block';
+      confetti.innerHTML = '';
+      const pieces = 140;
+
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+
+      for(let i=0;i<pieces;i++){
+        const p = document.createElement('i');
+        const left = Math.random()*vw;
+        const delay = Math.random()*0.35;
+        const dur = 2.4 + Math.random()*1.8;
+        const w = 6 + Math.random()*10;
+        const h = 10 + Math.random()*18;
+
+        p.style.left = left + 'px';
+        p.style.animationDelay = delay + 's';
+        p.style.animationDuration = dur + 's';
+        p.style.width = w + 'px';
+        p.style.height = h + 'px';
+        p.style.background = Math.random() > 0.5 ? 'var(--pink)' : 'var(--pink2)';
+        p.style.opacity = (0.7 + Math.random()*0.3).toFixed(2);
+
+        confetti.appendChild(p);
+      }
+
+      // Auto-hide after a bit
+      setTimeout(() => {
+        confetti.style.display = 'none';
+      }, 4500);
+    }
+
+    // Start with a tiny dodge so it feels alive
+    setTimeout(() => moveNoButtonAwayFrom(), 450);
+  </script>
 </body>
 </html>
