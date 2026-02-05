@@ -29,6 +29,20 @@
         linear-gradient(135deg, var(--bg1), var(--bg2));
       overflow:hidden;
     }
+    body{
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+    }
+    .page{
+      width:100%;
+      max-width:480px;
+      min-height:100dvh;
+      margin:0 auto;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+    }
 
     /* Floating hearts background */
     .hearts{
@@ -61,19 +75,20 @@
 
     .wrap{
       position:relative;
-      height:100%;
+      flex:1;
       display:grid;
       place-items:center;
-      padding:24px;
+      padding:20px 16px 28px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom));
     }
     .card{
-      width:min(680px, 92vw);
+      width:100%;
       background: rgba(255,255,255,.82);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,.65);
       border-radius: var(--r);
       box-shadow: var(--shadow);
-      padding: 26px 22px;
+      padding: 24px 18px;
       text-align:center;
       position:relative;
     }
@@ -113,7 +128,7 @@
     .stage{
       margin-top: 18px;
       position:relative;
-      height: 180px;
+      height: 210px;
       border-radius: 18px;
       border: 1px dashed rgba(255,77,109,.25);
       background:
@@ -168,7 +183,7 @@
     }
     #yesBtn{
       position:absolute;
-      left: 36%;
+      left: 34%;
       top: 55%;
       transform: translate(-50%,-50%) scale(1);
       will-change: transform;
@@ -232,9 +247,34 @@
 
     /* Mobile safety */
     @media (max-width:420px){
-      #yesBtn{ left: 34% }
-      #noBtn{ left: 66% }
+      #yesBtn{ left: 32% }
+      #noBtn{ left: 68% }
       .stage{ height: 200px }
+      .btn{ min-width: 140px; font-size: 15px; padding: 12px 16px }
+    }
+
+    /* Desktop block (mobile-only experience) */
+    .desktop-block{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(255,77,109,.22), transparent 60%),
+        radial-gradient(900px 500px at 80% 80%, rgba(255,122,162,.18), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      z-index:50;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:24px;
+    }
+    .desktop-block .card{
+      max-width:520px;
+      width:92vw;
+    }
+    @media (min-width: 768px){
+      .desktop-block{ display:flex; }
+      .page{ filter: blur(2px); pointer-events:none; }
     }
   </style>
 </head>
@@ -242,32 +282,42 @@
   <div class="hearts" aria-hidden="true" id="bgHearts"></div>
   <div class="confetti" aria-hidden="true" id="confetti"></div>
 
-  <main class="wrap">
-    <section class="card" role="region" aria-label="Valentine card">
-      <div class="badge"><span class="dot"></span> Valentine Mode: ON</div>
-      <h1>Will you be my Valentine? 💘</h1>
-      <p>
-        I made this just for you. Be honest… but also choose wisely 😅
-      </p>
-
-      <div class="stage" id="stage">
-        <div class="buttons">
-          <button class="btn btn-yes" id="yesBtn">Yes 💗</button>
-          <button class="btn btn-no" id="noBtn">No 🙈</button>
-        </div>
-      </div>
-
-      <div class="hint" id="hint">Tip: try pressing “No” if you can 😏</div>
-
-      <div class="reveal" id="reveal">
-        <h2>Yessss! 🥹💞</h2>
-        <p id="finalMsg">
-          You just made my whole day. I’ll plan something special for us.
-          You’re my favorite person. Always.
-        </p>
-      </div>
+  <div class="desktop-block" aria-hidden="true">
+    <section class="card" role="region" aria-label="Mobile-only notice">
+      <div class="badge"><span class="dot"></span> Mobile-only</div>
+      <h1>Open on your phone</h1>
+      <p>This experience is designed for mobile. Resize your browser or open this page on a phone.</p>
     </section>
-  </main>
+  </div>
+
+  <div class="page">
+    <main class="wrap">
+      <section class="card" role="region" aria-label="Valentine card">
+        <div class="badge"><span class="dot"></span> Valentine Mode: ON</div>
+        <h1>Will you be my Valentine? 💘</h1>
+        <p>
+          I made this just for you. Be honest… but also choose wisely 😅
+        </p>
+
+        <div class="stage" id="stage">
+          <div class="buttons">
+            <button class="btn btn-yes" id="yesBtn">Yes 💗</button>
+            <button class="btn btn-no" id="noBtn">No 🙈</button>
+          </div>
+        </div>
+
+        <div class="hint" id="hint">Tip: try pressing “No” if you can 😏</div>
+
+        <div class="reveal" id="reveal">
+          <h2>Yessss! 🥹💞</h2>
+          <p id="finalMsg">
+            You just made my whole day. I’ll plan something special for us.
+            You’re my favorite person. Always.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
     // ====== Background hearts ======
