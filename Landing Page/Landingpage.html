@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b0f19" />
+  <meta name="theme-color" content="#080707" />
 
   <title>Kaya Lounge | Bookings, Hours & Directions</title>
   <meta name="description" content="Bookings, operating hours, and directions. Reserve your spot via WhatsApp." />
@@ -12,6 +12,9 @@
   <meta property="og:title" content="Kaya Lounge | Bookings, Hours & Directions" />
   <meta property="og:description" content="Reserve via WhatsApp. View hours and get directions." />
   <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -334,6 +337,174 @@
     .dot.green{background:rgba(34,197,94,.85)}
     .dot.blue{background:rgba(96,165,250,.85)}
     .dot.gold{background:rgba(251,191,36,.85)}
+
+    /* Theme sync overrides (matches homepage studio system) */
+    :root{
+      --bg:#0a0a0a;
+      --card:#151515;
+      --card2:#111111;
+      --text:#f4f4f4;
+      --muted:#b7b7b7;
+      --ring:rgba(255,255,255,.18);
+      --brand:#ffffff;
+      --accent:#ffffff;
+      --gold:#ffffff;
+      --shadow: 0 22px 54px rgba(0,0,0,.48);
+      --radius: 12px;
+    }
+
+    html[data-theme="graphite"]{
+      --bg:#0d1014;
+      --card:#1a1f25;
+      --card2:#13181d;
+      --text:#ecf0f3;
+      --muted:#aeb7c0;
+      --ring:rgba(219,231,240,.2);
+      --brand:#d8e3ef;
+      --accent:#d8e3ef;
+      --gold:#d8e3ef;
+    }
+
+    html[data-theme="paper"]{
+      --bg:#ececec;
+      --card:#ffffff;
+      --card2:#f6f6f6;
+      --text:#151515;
+      --muted:#515151;
+      --ring:rgba(17,17,17,.2);
+      --brand:#101010;
+      --accent:#101010;
+      --gold:#101010;
+      --shadow: 0 20px 44px rgba(0,0,0,.16);
+    }
+
+    body{
+      font-family: "Manrope","Segoe UI",sans-serif;
+      background:
+        radial-gradient(1200px 650px at 10% -12%, rgba(255,255,255,.07), transparent 66%),
+        radial-gradient(900px 560px at 90% 8%, rgba(255,255,255,.05), transparent 64%),
+        linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, #000 15%) 100%);
+      color:var(--text);
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      height:180px;
+      pointer-events:none;
+      z-index:-1;
+      background:
+        linear-gradient(to top, rgba(255,255,255,.08), rgba(255,255,255,.01) 50%, transparent),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 18px, rgba(255,255,255,.03) 18px 38px, transparent 38px 54px);
+      clip-path: polygon(0 100%, 0 40%, 8% 58%, 16% 46%, 26% 62%, 35% 50%, 46% 66%, 56% 52%, 68% 70%, 79% 57%, 89% 64%, 100% 48%, 100% 100%);
+    }
+
+    header{
+      background: color-mix(in srgb, var(--bg) 72%, transparent);
+      border-bottom:1px solid var(--ring);
+    }
+
+    .brandTitle strong,.headline,.sectionCard h3,.side h3{
+      font-family:"Space Grotesk","Segoe UI",sans-serif;
+      letter-spacing:-.02em;
+    }
+
+    .logo{
+      background: linear-gradient(140deg, color-mix(in srgb, var(--text) 90%, transparent), color-mix(in srgb, var(--text) 56%, transparent));
+      border:1px solid var(--ring);
+      filter:grayscale(1);
+      border-radius:10px;
+    }
+
+    .brandTitle span,.navlink,.sub,.feature span,.row span,.sectionCard p,.mutedLink,footer{
+      color:var(--muted);
+    }
+
+    .navlink:hover{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border-color:var(--ring);
+    }
+
+    .navcta,.btnPrimary,.btnSecondary{
+      background: var(--brand);
+      color: var(--bg);
+      border-color: color-mix(in srgb, var(--brand) 86%, #000 14%);
+      font-weight:700;
+    }
+
+    .card,.feature,.row,.map{
+      border-color:var(--ring);
+      background: linear-gradient(165deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      backdrop-filter: blur(14px);
+    }
+
+    .heroVisual{
+      background:
+        radial-gradient(520px 320px at 18% 18%, rgba(255,255,255,.14), transparent 60%),
+        radial-gradient(520px 320px at 82% 20%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(520px 320px at 55% 92%, rgba(255,255,255,.08), transparent 55%);
+    }
+
+    .gridOverlay{
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.08) 1px, transparent 1px);
+      opacity:.16;
+    }
+
+    .pill,.note{
+      color:var(--muted);
+      border-color:var(--ring);
+      background: rgba(255,255,255,.06);
+    }
+
+    .btn,.navcta,.navlink,.feature,.card{
+      border-radius:12px;
+      transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .btn:hover,.navcta:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 30px rgba(0,0,0,.32);
+      border-color:rgba(255,255,255,.38);
+    }
+
+    .dot,.dot.green,.dot.blue,.dot.gold{background: color-mix(in srgb, var(--bg) 78%, #fff 22%);}
+
+    .theme-switch{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--ring);
+      background: color-mix(in srgb, var(--card2) 86%, transparent);
+      margin-right: 6px;
+    }
+
+    .theme-dot{
+      width:18px;
+      height:18px;
+      border:1px solid rgba(255,255,255,.45);
+      border-radius:999px;
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease;
+      padding:0;
+    }
+
+    .theme-dot:hover{transform:scale(1.12)}
+    .theme-dot.is-active{border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.22)}
+    .theme-dot[data-theme="mono"]{background:linear-gradient(135deg,#0a0a0a 50%,#f4f4f4 50%)}
+    .theme-dot[data-theme="graphite"]{background:linear-gradient(135deg,#111723 50%,#d4dce6 50%)}
+    .theme-dot[data-theme="paper"]{background:linear-gradient(135deg,#f0f0f0 50%,#101010 50%); border-color:rgba(0,0,0,.45)}
+
+    @media (max-width: 980px){
+      .theme-switch{display:none}
+    }
   </style>
 </head>
 
@@ -343,12 +514,17 @@
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div class="brandTitle">
-          <strong id="venueNameTop">Kaya Lounge</strong>
+          <strong id="venueNameTop">Timmothy's Lounge</strong>
           <span id="venueTag">Bookings • Events • Good Vibes</span>
         </div>
       </div>
 
       <nav aria-label="Primary">
+        <div class="theme-switch" role="group" aria-label="Theme selector">
+          <button class="theme-dot is-active" type="button" data-theme="mono" aria-label="Monochrome theme"></button>
+          <button class="theme-dot" type="button" data-theme="graphite" aria-label="Graphite theme"></button>
+          <button class="theme-dot" type="button" data-theme="paper" aria-label="Paper theme"></button>
+        </div>
         <a class="navlink" href="#book">Bookings</a>
         <a class="navlink" href="#hours">Hours</a>
         <a class="navlink" href="#directions">Directions</a>
@@ -533,6 +709,24 @@
     // NO NEED TO EDIT BELOW
     // =========================
     const $ = (id) => document.getElementById(id);
+    const root = document.documentElement;
+    const themeButtons = Array.from(document.querySelectorAll('.theme-dot[data-theme]'));
+
+    function applyTheme(theme){
+      root.setAttribute('data-theme', theme);
+      themeButtons.forEach(btn => btn.classList.toggle('is-active', btn.dataset.theme === theme));
+    }
+
+    const savedTheme = localStorage.getItem('logiclab-theme') || 'mono';
+    applyTheme(savedTheme);
+
+    themeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme || 'mono';
+        applyTheme(theme);
+        localStorage.setItem('logiclab-theme', theme);
+      });
+    });
 
     function setText(id, value){
       const el = $(id);
