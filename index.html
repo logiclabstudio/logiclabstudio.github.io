@@ -297,6 +297,77 @@
       font-weight: 400;
     }
 
+    /* —— VOCENTRA BETA —— */
+    .vocentra-beta {
+      background:
+        radial-gradient(720px 260px at 15% 0%, rgba(245,245,240,0.06), transparent 65%),
+        var(--off);
+    }
+    .vocentra-shell {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005));
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 0;
+    }
+    .vocentra-left {
+      padding: 56px 52px;
+      border-right: 1px solid var(--border);
+    }
+    .vocentra-desc {
+      margin-top: 26px;
+      max-width: 58ch;
+      font-size: 0.78rem;
+      color: var(--dim);
+      line-height: 1.9;
+    }
+    .vocentra-actions {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .vocentra-right {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+    }
+    .vocentra-card {
+      padding: 34px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .vocentra-card:last-child {
+      border-bottom: none;
+    }
+    .vocentra-card-title {
+      font-size: 0.56rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 16px;
+    }
+    .vocentra-points {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+    .vocentra-points li {
+      font-size: 0.73rem;
+      color: var(--off-white);
+      padding-left: 16px;
+      position: relative;
+    }
+    .vocentra-points li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--white);
+      position: absolute;
+      left: 0;
+      top: 0.63em;
+      opacity: 0.8;
+    }
+
     /* ── SERVICES ── */
     .services-layout {
       display: grid;
@@ -776,6 +847,10 @@
     @media (max-width: 960px) {
       .hero-content { grid-template-columns: 1fr; gap: 40px; }
       .hero-bottom { grid-template-columns: repeat(2,1fr); }
+      .vocentra-shell { grid-template-columns: 1fr; }
+      .vocentra-left { border-right: none; border-bottom: 1px solid var(--border); padding: 42px 28px; }
+      .vocentra-right { grid-template-rows: auto auto; }
+      .vocentra-card { padding: 28px; }
       .services-layout { grid-template-columns: 1fr; }
       .services-left { border-right: none; padding-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 60px; margin-bottom: 60px; }
       .services-right { padding-left: 0; }
@@ -832,6 +907,7 @@
     <span class="ticker-item">South Africa<span>—</span></span>
     <span class="ticker-item">Fast Delivery<span>—</span></span>
     <span class="ticker-item">Clear Pricing<span>—</span></span>
+    <span class="ticker-item">Vocentra Beta<span>—</span></span>
     <span class="ticker-item">Logic Lab Studio<span>—</span></span>
     <span class="ticker-item">Web Apps<span>—</span></span>
     <span class="ticker-item">Mobile Apps<span>—</span></span>
@@ -839,6 +915,7 @@
     <span class="ticker-item">South Africa<span>—</span></span>
     <span class="ticker-item">Fast Delivery<span>—</span></span>
     <span class="ticker-item">Clear Pricing<span>—</span></span>
+    <span class="ticker-item">Vocentra Beta<span>—</span></span>
   </div>
 </div>
 
@@ -850,6 +927,7 @@
       Logic Lab
     </a>
     <nav class="navlinks" aria-label="Primary">
+      <a href="Vocentra/">Vocentra Beta</a>
       <a href="#services">Services</a>
       <a href="#process">Process</a>
       <a href="#tools">Tools</a>
@@ -873,6 +951,7 @@
       <button class="btn sm" id="menuClose" type="button">✕ Close</button>
     </div>
     <div class="menu-links">
+      <a href="Vocentra/" class="m-link">Vocentra Beta</a>
       <a href="#services" class="m-link">Services</a>
       <a href="#process" class="m-link">Process</a>
       <a href="#tools" class="m-link">Tools</a>
@@ -907,6 +986,7 @@
           We design, build, and ship web apps, mobile apps, and APIs — with speed and precision.
         </p>
         <div class="hero-actions">
+          <a class="btn" href="#vocentra">Vocentra Beta</a>
           <button class="btn primary" type="button" id="openContact1">Start a project</button>
           <a class="btn" href="#services">Our services</a>
         </div>
@@ -931,6 +1011,44 @@
       </div>
     </div>
   </div>
+
+  <!-- VOCENTRA BETA -->
+  <section id="vocentra" class="vocentra-beta reveal">
+    <div class="container">
+      <div class="vocentra-shell">
+        <div class="vocentra-left">
+          <div class="sec-label"><span class="sec-num">Beta</span> Vocentra</div>
+          <h2 class="sec-title">Vocentra is now in<br><em>private beta.</em></h2>
+          <p class="vocentra-desc">
+            Vocentra is our hiring and talent platform in active beta. We are onboarding early businesses that want cleaner job posting, faster applicant review, and a focused recruitment workflow.
+          </p>
+          <div class="vocentra-actions">
+            <a class="btn primary" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab%2C%20I%20want%20to%20join%20Vocentra%20Beta.%20Please%20share%20next%20steps." target="_blank" rel="noreferrer">Join beta waitlist</a>
+            <button class="btn" type="button" id="openContactVocentra">Request beta demo</button>
+          </div>
+        </div>
+        <div class="vocentra-right">
+          <div class="vocentra-card">
+            <div class="vocentra-card-title">Beta focus</div>
+            <ul class="vocentra-points">
+              <li>Employer account onboarding</li>
+              <li>Job listing and candidate pipeline</li>
+              <li>Structured applicant profiles</li>
+              <li>Direct shortlist and interview flow</li>
+            </ul>
+          </div>
+          <div class="vocentra-card">
+            <div class="vocentra-card-title">Ideal beta users</div>
+            <ul class="vocentra-points">
+              <li>Startups hiring first core team</li>
+              <li>SMEs posting roles monthly</li>
+              <li>Ops teams needing simpler hiring process</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- SERVICES -->
   <section id="services">
@@ -1321,6 +1439,7 @@
       <div>
         <div class="footer-col-title">Navigation</div>
         <div class="footer-links">
+          <a href="Vocentra/">Vocentra Beta</a>
           <a href="#services">Services</a>
           <a href="#process">Process</a>
           <a href="#tools">Tools</a>
@@ -1433,7 +1552,7 @@
     backdrop.setAttribute('aria-hidden','true');
     document.body.style.overflow = '';
   }
-  ['openContact1','openContact2','openContact3','openContactFaq','openContactPricing','openContactMenu'].forEach(id => {
+  ['openContact1','openContact2','openContact3','openContactFaq','openContactPricing','openContactMenu','openContactVocentra'].forEach(id => {
     const el = $(id); if (el) el.addEventListener('click', () => openModal());
   });
   document.querySelectorAll('button[data-plan]').forEach(btn => {

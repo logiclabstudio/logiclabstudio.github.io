@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vocentra Beta | Logic Lab Studio</title>
+  <meta name="description" content="Join the Vocentra Beta - AI-powered hiring platform that revolutionizes talent acquisition for modern businesses.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Vocentra Beta | Logic Lab Studio">
+  <meta property="og:description" content="Transform your hiring process with Vocentra - the AI-driven talent platform in private beta.">
+  <meta property="og:url" content="https://logiclabstudio.github.io/vocentra.html">
+  <meta property="og:image" content="https://logiclabstudio.github.io/Logiclab.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://logiclabstudio.github.io/vocentra.html">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="wwwroot/css/design-system.css">
+</head>
+<body>
+  <div data-component="components/header.html"></div>
+
+  <main>
+    <section class="hero section-tight">
+      <div class="container reveal">
+        <span class="eyebrow">Vocentra Beta</span>
+        <h1 class="mt-6">Revolutionize Your Hiring with AI-Powered Talent Acquisition</h1>
+        <p class="lead mt-6">Vocentra is the next-generation hiring platform that uses advanced AI to match candidates with opportunities, streamline recruitment, and build stronger teams.</p>
+        <div class="mt-8 flex gap-4 flex-wrap">
+          <a class="btn primary" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab,%20I%20want%20to%20join%20the%20Vocentra%20Beta%20waitlist!" target="_blank" rel="noreferrer">Join Beta Waitlist</a>
+          <button class="btn" type="button" id="openContactVocentra">Request Demo</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="what-is-vocentra">
+      <div class="container reveal">
+        <p class="kicker">What is Vocentra?</p>
+        <h2 id="what-is-vocentra" class="mt-4">AI-Driven Hiring Platform for the Modern Workforce</h2>
+        <p class="mt-4">Vocentra combines cutting-edge artificial intelligence with intuitive design to transform how businesses find, evaluate, and hire top talent. Our platform analyzes candidate profiles, predicts fit, and automates the recruitment pipeline to save time and reduce bias.</p>
+      </div>
+    </section>
+
+    <section class="section section-alt" aria-labelledby="features">
+      <div class="container">
+        <div class="reveal">
+          <p class="kicker">Key Features</p>
+          <h2 id="features" class="mt-4">Built for Efficiency and Accuracy</h2>
+        </div>
+        <div class="grid grid-3 mt-8">
+          <article class="card reveal">
+            <h3>Smart Candidate Matching</h3>
+            <p>Our AI algorithms analyze skills, experience, and cultural fit to recommend the best candidates for your roles.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Automated Screening</h3>
+            <p>Streamline initial reviews with intelligent resume parsing and qualification checks.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Bias Reduction</h3>
+            <p>Minimize unconscious bias in hiring decisions with fair, data-driven evaluations.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Real-time Analytics</h3>
+            <p>Track hiring metrics and candidate pipeline performance with comprehensive dashboards.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Seamless Integration</h3>
+            <p>Connect with your existing HR tools, ATS systems, and job boards effortlessly.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Collaborative Hiring</h3>
+            <p>Enable team feedback and decision-making with shared candidate views and notes.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="beta-access">
+      <div class="container reveal">
+        <p class="kicker">Private Beta</p>
+        <h2 id="beta-access" class="mt-4">Be Among the First to Experience Vocentra</h2>
+        <p class="mt-4">We're currently in private beta, working with select companies to refine and perfect the platform. Join our waitlist to get early access and shape the future of hiring.</p>
+        <div class="mt-8 flex gap-4 flex-wrap">
+          <a class="btn primary" href="https://wa.me/27623881570?text=Hi%20Logic%20Lab,%20I%20want%20to%20join%20the%20Vocentra%20Beta%20waitlist!" target="_blank" rel="noreferrer">Join Waitlist</a>
+          <button class="btn" type="button" id="openContactVocentra">Schedule Demo</button>
+        </div>
+      </div>
+    </section>
+
+    <div data-component="components/cta-section.html" data-prop-eyebrow="Get Started" data-prop-title="Ready to Transform Your Hiring Process?" data-prop-description="Join the Vocentra Beta and discover how AI can revolutionize talent acquisition for your business." data-prop-primaryHref="https://wa.me/27623881570?text=Hi%20Logic%20Lab,%20I%20want%20to%20join%20the%20Vocentra%20Beta!" data-prop-primaryLabel="Join Beta Now" data-prop-secondaryHref="index.html" data-prop-secondaryLabel="Back to Home"></div>
+  </main>
+
+  <div data-component="components/footer.html"></div>
+
+  <script src="wwwroot/js/components.js"></script>
+  <script src="wwwroot/js/site.js"></script>
+  <script>
+    // Modal for Vocentra demo request
+    document.getElementById('openContactVocentra').addEventListener('click', function() {
+      // Assuming modal exists, trigger it
+      const modal = document.getElementById('contactModal');
+      if (modal) {
+        modal.style.display = 'block';
+        // Set some context for Vocentra
+        const subject = document.getElementById('contactSubject');
+        if (subject) subject.value = 'Vocentra Beta Demo Request';
+      }
+    });
+  </script>
+</body>
+</html>
