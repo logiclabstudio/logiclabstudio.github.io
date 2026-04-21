@@ -38,7 +38,7 @@ body{
 
 /* ── LAYOUT ─────────────────────────────── */
 .app{display:grid;grid-template-columns:280px 1fr;height:100vh;overflow:hidden;}
-@media(max-width:860px){.app{grid-template-columns:1fr;grid-template-rows:1fr auto;}}
+/* mobile overrides below */
 
 /* ── SIDEBAR ─────────────────────────────── */
 .sidebar{
@@ -263,13 +263,151 @@ input[type="range"].zoom-slider::-webkit-slider-thumb{
 .statusbar span{font-size:11px;color:var(--muted);}
 .statusbar span.ok-txt{color:var(--green);}
 
-/* SCROLL */
-@media(max-width:860px){
-  .app{height:100dvh;}
-  .sidebar{height:auto;max-height:50dvh;border-right:none;border-top:1px solid var(--border);}
-  .canvas-area{flex:1;min-height:0;}
-  .stage{overflow:auto;}
+/* ── MOBILE BOTTOM SHEET ────────────────────────────── */
+
+/* FAB — floating controls button */
+.fab{
+  display:none;
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:200;
+  padding:13px 28px;border-radius:100px;
+  background:var(--white);color:var(--black);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.5);
+  gap:8px;align-items:center;white-space:nowrap;
+  transition:background .2s;
 }
+.fab:hover{background:var(--accent);}
+.fab svg{width:16px;height:16px;flex-shrink:0;}
+
+/* Sheet drag handle */
+.sheet-handle{
+  display:none;width:36px;height:4px;border-radius:2px;
+  background:var(--border2);margin:10px auto 6px;flex-shrink:0;cursor:grab;
+}
+
+/* Sheet close pill */
+.sheet-close{
+  display:none;
+  position:absolute;right:14px;top:12px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted2);font-size:16px;line-height:1;
+  cursor:pointer;align-items:center;justify-content:center;
+  z-index:10;
+}
+
+/* Mobile toolbar at top of canvas — quick action strip */
+.mobile-toolbar{
+  display:none;
+  gap:4px;padding:8px 12px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);overflow-x:auto;
+  flex-shrink:0;scrollbar-width:none;
+}
+.mobile-toolbar::-webkit-scrollbar{display:none;}
+.mob-btn{
+  flex-shrink:0;padding:8px 14px;border-radius:100px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;white-space:nowrap;transition:all .15s;
+}
+.mob-btn:hover,.mob-btn.on{background:var(--card);color:var(--white);border-color:var(--border2);}
+.mob-btn.prim{background:var(--white);color:var(--black);border-color:var(--white);}
+
+/* Overlay backdrop */
+.sheet-backdrop{
+  display:none;
+  position:fixed;inset:0;z-index:149;
+  background:rgba(0,0,0,.55);
+  opacity:0;transition:opacity .3s;
+}
+.sheet-backdrop.on{opacity:1;}
+
+@media(max-width:860px){
+  /* Reset desktop layout */
+  .app{
+    display:flex;flex-direction:column;
+    height:100dvh;overflow:hidden;
+  }
+
+  /* Canvas takes full screen */
+  .canvas-area{
+    flex:1;min-height:0;display:flex;flex-direction:column;
+    position:relative;z-index:1;
+  }
+
+  /* Hide desktop topbar info pills to save space */
+  .topbar .kpill:last-of-type{display:none;}
+  .zoom-wrap{display:none;}
+  .topbar{padding:8px 12px;}
+
+  /* Mobile toolbar strip */
+  .mobile-toolbar{display:flex;}
+
+  /* Sidebar becomes bottom sheet */
+  .sidebar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    z-index:150;
+    height:auto;
+    max-height:88dvh;
+    border-right:none;
+    border-top:1px solid var(--border);
+    border-radius:16px 16px 0 0;
+    transform:translateY(100%);
+    transition:transform .32s cubic-bezier(.32,.72,0,1);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    will-change:transform;
+  }
+  .sidebar.open{transform:translateY(0);}
+
+  /* Show handle + close */
+  .sheet-handle{display:block;}
+  .sheet-close{display:flex;}
+
+  /* Sidebar header strip */
+  .sidebar-head{
+    padding:0 14px 10px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .sidebar-logo{display:none;}
+
+  /* Panel scrolls inside sheet */
+  .panel{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+  /* Make inputs bigger for fingers */
+  .field input,.field select,.field textarea,
+  input.inp,select.sel,textarea.ta{
+    padding:11px 12px;font-size:14px;min-height:42px;
+  }
+  input[type="color"]{height:42px;}
+  .btn{padding:11px 16px;font-size:13px;}
+  .tab{padding:10px 6px;font-size:12px;}
+
+  /* Resize + rotate handles bigger on mobile */
+  .rh{width:18px;height:18px;right:-9px;bottom:-9px;border-radius:4px;}
+  .rot-h{width:18px;height:18px;top:-24px;}
+
+  /* FAB */
+  .fab{display:inline-flex;}
+
+  /* Status bar minimal */
+  .statusbar{padding:4px 12px;}
+
+  /* row3 → row2 on small screens */
+  .row3{grid-template-columns:1fr 1fr;}
+}
+
+@media(max-width:480px){
+  .row2{grid-template-columns:1fr;}
+  .row3{grid-template-columns:1fr;}
+  .btn-row{flex-direction:column;}
+  .btn-row .btn{width:100%;}
+}
+
 </style>
 </head>
 <body>
@@ -277,6 +415,8 @@ input[type="range"].zoom-slider::-webkit-slider-thumb{
 
 <!-- ══ SIDEBAR ══════════════════════════════════════════ -->
 <aside class="sidebar">
+  <div class="sheet-handle" id="sheet-handle"></div>
+  <button class="sheet-close" id="sheet-close" aria-label="Close">×</button>
   <div class="sidebar-head">
     <a class="sidebar-logo" href="http://logiclabstudi.co.za/">
       <div class="logo-sq">
@@ -705,6 +845,19 @@ input[type="range"].zoom-slider::-webkit-slider-thumb{
     </div>
   </div>
 
+  <!-- MOBILE TOOLBAR -->
+  <div class="mobile-toolbar" id="mobile-toolbar">
+    <button class="mob-btn" id="mob-add-text">+ Text</button>
+    <button class="mob-btn" id="mob-add-btn">+ Button</button>
+    <button class="mob-btn" id="mob-add-rect">+ Shape</button>
+    <button class="mob-btn" id="mob-upload">📷 Image</button>
+    <button class="mob-btn" id="mob-dup">Duplicate</button>
+    <button class="mob-btn danger" id="mob-del">Delete</button>
+    <button class="mob-btn" id="mob-front">↑ Front</button>
+    <button class="mob-btn" id="mob-back">↓ Back</button>
+    <button class="mob-btn" id="mob-center">⊕ Center</button>
+  </div>
+
   <div class="stage" id="stage">
     <div class="paper" id="paper">
       <div class="grid-ol"></div>
@@ -826,12 +979,14 @@ function applyCanvas(key,land,doScale){
 
 function autoZoom(){
   const{w,h}=currentPx();
-  const sw=stage.clientWidth-40,sh=stage.clientHeight-40;
-  const z=Math.min(sw/w,sh/h,1);
+  const mob=window.matchMedia("(max-width:860px)").matches;
+  const pad=mob?16:40;
+  const sw=stage.clientWidth-pad,sh=stage.clientHeight-pad;
+  const z=Math.min(sw/w,sh/h,mob?1.2:1);
   const pct=Math.round(z*100);
   paper.style.transform=`scale(${z})`;
   paper.style.transformOrigin="center center";
-  $("zoom").value=pct;
+  $("zoom").value=Math.min(pct,150);
   $("zoom-lbl").textContent=pct+"%";
 }
 
@@ -1562,8 +1717,118 @@ render();renderLayers();
 setStatus("Ready","Start designing");
 
 window.addEventListener("resize",()=>autoZoom());
+window.addEventListener("orientationchange",()=>setTimeout(autoZoom,200));
 
 })();
+
+// ── MOBILE BOTTOM SHEET ────────────────────────────────
+(()=>{
+  const fab=document.getElementById("fab-controls");
+  const sidebar=document.querySelector(".sidebar");
+  const backdrop=document.getElementById("sheet-backdrop");
+  const handle=document.getElementById("sheet-handle");
+  const closeBtn=document.getElementById("sheet-close");
+
+  function openSheet(){
+    sidebar.classList.add("open");
+    backdrop.classList.add("on");
+    backdrop.style.display="block";
+    fab.textContent=""; fab.innerHTML='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l12 12M16 4L4 16"/></svg> Close';
+  }
+  function closeSheet(){
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("on");
+    setTimeout(()=>{if(!sidebar.classList.contains("open"))backdrop.style.display="none";},300);
+    fab.innerHTML='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h14M3 10h14M3 14h14"/></svg> Controls';
+  }
+  function toggleSheet(){sidebar.classList.contains("open")?closeSheet():openSheet();}
+
+  fab.addEventListener("click",toggleSheet);
+  backdrop.addEventListener("click",closeSheet);
+  closeBtn.addEventListener("click",closeSheet);
+
+  // Drag handle to pull up / dismiss
+  let sheetDragStart=null,sheetStartY=null;
+  handle.addEventListener("pointerdown",e=>{
+    sheetDragStart=e.clientY;
+    sheetStartY=sidebar.getBoundingClientRect().top;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove",e=>{
+    if(sheetDragStart===null)return;
+    const dy=e.clientY-sheetDragStart;
+    if(dy>0)sidebar.style.transform=`translateY(${dy}px)`;
+  });
+  handle.addEventListener("pointerup",e=>{
+    if(sheetDragStart===null)return;
+    const dy=e.clientY-sheetDragStart;
+    sidebar.style.transform="";
+    if(dy>80)closeSheet();
+    sheetDragStart=null;
+  });
+
+  // Mobile toolbar buttons wire-up
+  const mob={
+    "mob-add-text":()=>document.getElementById("addText").click(),
+    "mob-add-btn":()=>document.getElementById("addBtn").click(),
+    "mob-add-rect":()=>document.getElementById("addRect").click(),
+    "mob-upload":()=>document.getElementById("imgUpload").click(),
+    "mob-dup":()=>document.getElementById("do-dup").click(),
+    "mob-del":()=>document.getElementById("do-del").click(),
+    "mob-front":()=>document.getElementById("do-front").click(),
+    "mob-back":()=>document.getElementById("do-back").click(),
+    "mob-center":()=>document.getElementById("do-acenter").click(),
+  };
+  Object.entries(mob).forEach(([id,fn])=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener("click",fn);
+  });
+
+  // Auto-open sheet when element is selected (so user can edit) — on mobile only
+  const origSelect=window._origSelectHook;
+  // Patch: observe stat-left changes to know when something is selected
+  const statL=document.getElementById("stat-left");
+  if(statL){
+    new MutationObserver(()=>{
+      if(window.matchMedia("(max-width:860px)").matches){
+        if(statL.textContent.startsWith("Selected")){
+          // Switch to Design tab for editing
+          const designTab=document.querySelector('.tab[data-pane="design"]');
+          if(designTab&&!designTab.classList.contains("on"))designTab.click();
+          // Don't auto-open — user can tap FAB if they want
+        }
+      }
+    }).observe(statL,{childList:true,characterData:true,subtree:true});
+  }
+
+  // Touch-swipe up to open sheet
+  let touchStartY=0;
+  document.querySelector(".stage").addEventListener("touchstart",e=>{
+    touchStartY=e.touches[0].clientY;
+  },{passive:true});
+  document.querySelector(".stage").addEventListener("touchend",e=>{
+    const dy=touchStartY-e.changedTouches[0].clientY;
+    if(dy>60&&window.matchMedia("(max-width:860px)").matches){
+      openSheet();
+    }
+  },{passive:true});
+
+  // Close sheet when tapping canvas
+  document.querySelector(".stage").addEventListener("pointerdown",()=>{
+    if(window.matchMedia("(max-width:860px)").matches&&sidebar.classList.contains("open")){
+      closeSheet();
+    }
+  },{passive:true});
+})();
 </script>
+<!-- FAB -->
+<button class="fab" id="fab-controls">
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+    <path d="M3 6h14M3 10h14M3 14h14"/>
+  </svg>
+  Controls
+</button>
+
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
 </body>
 </html>
