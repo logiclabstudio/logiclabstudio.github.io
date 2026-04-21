@@ -3,269 +3,556 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Vocentra — AI Hiring Platform</title>
+<title>Vocentra — Trusted Job Postings</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --black:#050505;
-  --off:#0d0d0d;
-  --white:#f5f5f0;
-  --dim:#6a6a62;
+  --black:#07080a;
+  --card:#0e1014;
+  --border:#1e2228;
+  --white:#ede9e2;
+  --muted:#7a7975;
+  --accent:#c8b98e;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
+
 body{
-  font-family:system-ui;
+  font-family:'DM Sans', sans-serif;
   background:var(--black);
   color:var(--white);
   overflow:hidden;
-}
-
-/* SCENE */
-.scene{
-  position:relative;
   height:100vh;
-  width:100%;
-  overflow:hidden;
+  width:100vw;
 }
 
-/* PARALLAX LAYERS */
-.layer{
+.scene{
   position:absolute;
-  width:100%;
-  height:100%;
-  top:0;left:0;
-  will-change:transform;
-}
-
-/* DEPTH */
-.layer.bg{ z-index:1; }
-.layer.mid{ z-index:2; }
-.layer.content{ z-index:3; display:flex; align-items:center; justify-content:center; }
-
-/* BACKGROUND VISUAL */
-.bg{
-  background:radial-gradient(circle at 50% 50%, #111 0%, #050505 80%);
-}
-
-/* CONTENT */
-.content-inner{
-  text-align:center;
-  max-width:800px;
-  padding:20px;
-}
-
-/* TEXT REVEAL */
-.reveal{
+  top:0; left:0;
+  width:100%; height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   opacity:0;
-  transform:translateY(40px);
-  transition:all 0.8s ease;
+  pointer-events:none;
+  transition:opacity 0.7s ease, transform 0.7s ease;
+  transform:translateY(60px);
 }
 
-.reveal.active{
+.scene.active{
   opacity:1;
+  pointer-events:all;
   transform:translateY(0);
 }
 
-/* TYPOGRAPHY */
-h1{
-  font-size:clamp(32px,6vw,72px);
-  margin-bottom:20px;
-}
-h2{
-  font-size:clamp(24px,4vw,48px);
-  margin-bottom:20px;
-}
-p{
-  color:#c8c8c0;
-  line-height:1.6;
+.scene.exit-up{
+  opacity:0;
+  transform:translateY(-60px);
+  pointer-events:none;
 }
 
-/* NAV DOTS */
+.scene-bg{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.grid-bg{
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:80px 80px;
+}
+
+.glow-gold{ background:radial-gradient(ellipse 60% 50% at 50% 50%, rgba(200,185,142,0.07) 0%, transparent 70%); }
+.glow-red{  background:radial-gradient(ellipse 60% 50% at 50% 50%, rgba(180,60,60,0.06) 0%, transparent 70%); }
+.glow-green{background:radial-gradient(ellipse 60% 50% at 50% 50%, rgba(60,160,100,0.07) 0%, transparent 70%); }
+.glow-white{background:radial-gradient(ellipse 60% 50% at 50% 50%, rgba(220,215,200,0.05) 0%, transparent 70%); }
+
+.content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  max-width:760px;
+  padding:40px 24px;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+.active .reveal{ opacity:1; transform:translateY(0); }
+.active .reveal:nth-child(1){ transition-delay:0.05s; }
+.active .reveal:nth-child(2){ transition-delay:0.18s; }
+.active .reveal:nth-child(3){ transition-delay:0.30s; }
+.active .reveal:nth-child(4){ transition-delay:0.42s; }
+
+.eyebrow{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:3.5px;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:24px;
+}
+
+h1{
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(40px, 7vw, 82px);
+  line-height:1.05;
+  letter-spacing:-2px;
+  color:var(--white);
+  margin-bottom:20px;
+}
+h1 em{ font-style:italic; color:var(--accent); }
+
+h2{
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(32px, 5.5vw, 64px);
+  line-height:1.08;
+  letter-spacing:-1.5px;
+  color:var(--white);
+  margin-bottom:20px;
+}
+h2 em{ font-style:italic; color:var(--accent); }
+
+.body-text{
+  font-size:17px;
+  font-weight:300;
+  color:var(--muted);
+  line-height:1.75;
+  max-width:520px;
+  margin:0 auto;
+}
+
+.wordmark{
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(52px, 10vw, 110px);
+  letter-spacing:-3px;
+  color:var(--white);
+  margin-bottom:16px;
+  display:block;
+}
+.wordmark span{ color:var(--accent); }
+
+.tagline{
+  font-size:16px;
+  font-weight:300;
+  color:var(--muted);
+  letter-spacing:0.5px;
+}
+
+.problem-row{
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  margin-top:36px;
+  flex-wrap:wrap;
+}
+
+.problem-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:22px 24px;
+  text-align:left;
+  flex:1;
+  min-width:160px;
+  max-width:210px;
+}
+
+.problem-card .label{
+  font-size:14px;
+  font-weight:500;
+  color:var(--white);
+  margin-bottom:8px;
+  display:block;
+}
+
+.problem-card p{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:300;
+  line-height:1.65;
+}
+
+.pillar-row{
+  display:flex;
+  gap:2px;
+  justify-content:center;
+  margin-top:40px;
+}
+
+.pillar{
+  flex:1;
+  max-width:210px;
+  border:1px solid var(--border);
+  padding:28px 22px;
+  text-align:left;
+  background:var(--card);
+}
+
+.pillar .num{
+  font-family:'DM Serif Display', serif;
+  font-size:36px;
+  color:var(--border);
+  margin-bottom:14px;
+  line-height:1;
+}
+
+.pillar h4{
+  font-size:14px;
+  font-weight:500;
+  color:var(--white);
+  margin-bottom:8px;
+}
+
+.pillar p{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:300;
+  line-height:1.65;
+}
+
+.stat-row{
+  display:flex;
+  gap:0;
+  justify-content:center;
+  margin-top:44px;
+  border:1px solid var(--border);
+}
+
+.stat{
+  flex:1;
+  padding:28px 20px;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat:last-child{ border-right:none; }
+
+.stat-val{
+  font-family:'DM Serif Display', serif;
+  font-size:40px;
+  color:var(--white);
+  letter-spacing:-1px;
+  margin-bottom:6px;
+}
+
+.stat-desc{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:300;
+  line-height:1.5;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border:1px solid #1a3d27;
+  border-radius:100px;
+  font-size:11px;
+  font-weight:500;
+  color:#6dbf8f;
+  background:#0a1f13;
+  letter-spacing:0.3px;
+  margin-bottom:28px;
+}
+
+.badge-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#6dbf8f;
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;}
+  50%{opacity:0.3;}
+}
+
+.cta-btn{
+  display:inline-block;
+  margin-top:36px;
+  padding:16px 40px;
+  border:1px solid var(--accent);
+  color:var(--accent);
+  text-decoration:none;
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:0.5px;
+  border-radius:2px;
+  transition:all 0.25s ease;
+}
+.cta-btn:hover{
+  background:var(--accent);
+  color:var(--black);
+}
+
 .dots{
   position:fixed;
-  right:20px;
+  right:24px;
   top:50%;
   transform:translateY(-50%);
-  z-index:10;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
+
 .dot{
-  width:10px;height:10px;
-  background:#444;
+  width:6px;
+  height:6px;
   border-radius:50%;
-  margin:10px 0;
+  background:var(--border);
+  cursor:pointer;
+  transition:all 0.3s ease;
 }
-.dot.active{background:#fff;}
+
+.dot.active{
+  background:var(--accent);
+  transform:scale(1.4);
+}
+
+.counter{
+  position:fixed;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:100;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:2px;
+  font-weight:400;
+}
+
+.scroll-hint{
+  position:fixed;
+  bottom:28px;
+  right:32px;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  transition:opacity 0.5s ease;
+}
+.scroll-hint.hidden{ opacity:0; pointer-events:none; }
+
+.scroll-hint span{
+  font-size:10px;
+  letter-spacing:2px;
+  color:var(--muted);
+  text-transform:uppercase;
+  font-weight:400;
+}
+
+.scroll-line{
+  width:1px;
+  height:40px;
+  background:linear-gradient(to bottom, var(--muted), transparent);
+  animation:scrolldown 1.8s ease infinite;
+}
+
+@keyframes scrolldown{
+  0%{ transform:scaleY(0); transform-origin:top; }
+  50%{ transform:scaleY(1); transform-origin:top; }
+  51%{ transform:scaleY(1); transform-origin:bottom; }
+  100%{ transform:scaleY(0); transform-origin:bottom; }
+}
 </style>
 </head>
-
 <body>
 
-<div id="wrapper">
+<!-- SCENE 1 — Wordmark -->
+<section class="scene active" data-index="0">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-gold"></div>
+  <div class="content">
+    <span class="wordmark reveal">Vocentra<span>.</span></span>
+    <p class="tagline reveal">A job board built on trust.</p>
+  </div>
+</section>
 
-  <!-- SCENE 1 -->
-  <section class="scene">
-    <div class="layer bg"></div>
+<!-- SCENE 2 — The problem -->
+<section class="scene" data-index="1">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-red"></div>
+  <div class="content">
+    <p class="eyebrow reveal">The problem</p>
+    <h2 class="reveal">Job hunting is<br><em>exhausting and broken.</em></h2>
+    <p class="body-text reveal">Most job boards are flooded with fake listings, outdated posts, and employers who never respond. Your time deserves better.</p>
+  </div>
+</section>
 
-    <div class="layer content">
-      <div class="content-inner">
-        <h1 class="reveal">Vocentra</h1>
-        <p class="reveal">AI-powered hiring for modern companies</p>
+<!-- SCENE 3 — Problems detailed -->
+<section class="scene" data-index="2">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-red"></div>
+  <div class="content">
+    <h2 class="reveal">Sound <em>familiar?</em></h2>
+    <div class="problem-row">
+      <div class="problem-card reveal">
+        <span class="label">Ghost listings</span>
+        <p>Roles posted months ago, filled long before you ever applied.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- SCENE 2 -->
-  <section class="scene">
-    <div class="layer bg"></div>
-
-    <div class="layer content">
-      <div class="content-inner">
-        <h2 class="reveal">Hiring is broken</h2>
-        <p class="reveal">Manual screening. Bias. Slow decisions.</p>
+      <div class="problem-card reveal">
+        <span class="label">No salary info</span>
+        <p>Applying blind, wasting weeks only to find out it doesn't match.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- SCENE 3 -->
-  <section class="scene">
-    <div class="layer bg"></div>
-
-    <div class="layer content">
-      <div class="content-inner">
-        <h2 class="reveal">Vocentra fixes it</h2>
-        <p class="reveal">AI matching, automated scoring, real insights.</p>
+      <div class="problem-card reveal">
+        <span class="label">Fake employers</span>
+        <p>Listings from companies that exist only to harvest your CV.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- SCENE 4 -->
-  <section class="scene">
-    <div class="layer bg"></div>
-
-    <div class="layer content">
-      <div class="content-inner">
-        <h2 class="reveal">Faster hiring</h2>
-        <p class="reveal">Reduce hiring time by up to 70%</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SCENE 5 -->
-<!-- SCENE 5 -->
-<section class="scene">
-  <div class="layer bg"></div>
-
-  <div class="layer content">
-    <div class="content-inner">
-
-      <h2 class="reveal">Join the Beta</h2>
-
-      <p class="reveal">
-        Get early access to Vocentra and experience AI-powered hiring.
-      </p>
-
-      <div class="reveal" style="margin-top:30px;">
-        <a 
-          href="https://vocentra-c7bra2aubkfbf7gv.southafricanorth-01.azurewebsites.net/"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="
-            display:inline-block;
-            padding:14px 26px;
-            border:1px solid #f5f5f0;
-            color:#f5f5f0;
-            text-decoration:none;
-            font-weight:500;
-            letter-spacing:1px;
-            transition:all 0.3s ease;
-          "
-          onmouseover="this.style.background='#f5f5f0'; this.style.color='#050505';"
-          onmouseout="this.style.background='transparent'; this.style.color='#f5f5f0';"
-        >
-          Enter Vocentra →
-        </a>
-      </div>
-
     </div>
   </div>
 </section>
 
-</div>
+<!-- SCENE 4 — The fix -->
+<section class="scene" data-index="3">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-green"></div>
+  <div class="content">
+    <p class="eyebrow reveal">The Vocentra way</p>
+    <h2 class="reveal">We built something<br><em>different.</em></h2>
+    <div class="pillar-row">
+      <div class="pillar reveal">
+        <div class="num">01</div>
+        <h4>Verified only</h4>
+        <p>Every listing is reviewed before going live. Real companies, real roles.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="num">02</div>
+        <h4>Always current</h4>
+        <p>Listings auto-expire when filled. What you see is open right now.</p>
+      </div>
+      <div class="pillar reveal">
+        <div class="num">03</div>
+        <h4>Full transparency</h4>
+        <p>Salary ranges and direct employer contacts — visible before you apply.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- SCENE 5 — Trust numbers -->
+<section class="scene" data-index="4">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-white"></div>
+  <div class="content">
+    <p class="eyebrow reveal">By the numbers</p>
+    <h2 class="reveal">Trust isn't a feature.<br><em>It's the foundation.</em></h2>
+    <div class="stat-row">
+      <div class="stat reveal">
+        <div class="stat-val">100%</div>
+        <div class="stat-desc">Listings reviewed<br>before going live</div>
+      </div>
+      <div class="stat reveal">
+        <div class="stat-val">Zero</div>
+        <div class="stat-desc">Ghost listings or<br>expired posts</div>
+      </div>
+      <div class="stat reveal">
+        <div class="stat-val">Free</div>
+        <div class="stat-desc">For job seekers,<br>always</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENE 6 — CTA -->
+<section class="scene" data-index="5">
+  <div class="scene-bg grid-bg"></div>
+  <div class="scene-bg glow-gold"></div>
+  <div class="content">
+    <div class="badge reveal">
+      <span class="badge-dot"></span>
+      Now accepting listings
+    </div>
+    <h1 class="reveal">Your next job<br>is <em>waiting.</em></h1>
+    <p class="body-text reveal">Browse verified, active job listings — or post a role your team needs filled today.</p>
+    <a class="cta-btn reveal" href="https://vocentra-c7bra2aubkfbf7gv.southafricanorth-01.azurewebsites.net/" target="_blank" rel="noopener noreferrer">Enter Vocentra →</a>
+  </div>
+</section>
+
+<!-- NAV DOTS -->
 <div class="dots" id="dots"></div>
+
+<!-- COUNTER -->
+<div class="counter" id="counter">01 / 06</div>
+
+<!-- SCROLL HINT -->
+<div class="scroll-hint" id="scrollHint">
+  <span>Scroll</span>
+  <div class="scroll-line"></div>
+</div>
 
 <script>
 const scenes = document.querySelectorAll('.scene');
-const reveals = document.querySelectorAll('.reveal');
-const dotsContainer = document.getElementById('dots');
+const dotsEl = document.getElementById('dots');
+const counter = document.getElementById('counter');
+const scrollHint = document.getElementById('scrollHint');
+const total = scenes.length;
 
 let index = 0;
 let locked = false;
 
-/* CREATE DOTS */
-scenes.forEach((_, i)=>{
-  const d=document.createElement('div');
-  d.className='dot'+(i===0?' active':'');
-  d.onclick=()=>go(i);
-  dotsContainer.appendChild(d);
+scenes.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => go(i));
+  dotsEl.appendChild(d);
 });
-const dots=document.querySelectorAll('.dot');
+const dots = document.querySelectorAll('.dot');
 
-/* MAIN NAVIGATION */
-function go(i){
-  if(i<0 || i>=scenes.length || locked) return;
+function go(i) {
+  if (i < 0 || i >= total || locked || i === index) return;
+  locked = true;
 
-  locked=true;
-  index=i;
+  const prev = index;
+  index = i;
 
-  window.scrollTo({
-    top: i * window.innerHeight,
-    behavior:'smooth'
-  });
+  scenes[prev].classList.remove('active');
+  if (i > prev) scenes[prev].classList.add('exit-up');
+  setTimeout(() => scenes[prev].classList.remove('exit-up'), 700);
 
-  dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
+  scenes[i].classList.add('active');
 
-  activateScene(i);
+  dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  scrollHint.classList.toggle('hidden', i === total - 1);
 
-  setTimeout(()=>locked=false,800);
+  setTimeout(() => { locked = false; }, 800);
 }
 
-/* TEXT REVEAL */
-function activateScene(i){
-  reveals.forEach(r=>r.classList.remove('active'));
+window.addEventListener('wheel', e => {
+  if (locked) return;
+  if (e.deltaY > 0) go(index + 1);
+  else go(index - 1);
+}, { passive: true });
 
-  const current = scenes[i].querySelectorAll('.reveal');
+let touchY = 0;
+window.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchend', e => {
+  if (locked) return;
+  const diff = touchY - e.changedTouches[0].clientY;
+  if (Math.abs(diff) > 40) {
+    if (diff > 0) go(index + 1);
+    else go(index - 1);
+  }
+}, { passive: true });
 
-  current.forEach((el,idx)=>{
-    setTimeout(()=>el.classList.add('active'), idx*150);
-  });
-}
-
-/* PARALLAX */
-window.addEventListener('scroll', ()=>{
-  const scrollY = window.scrollY;
-
-  scenes.forEach((scene, i)=>{
-    const rect = scene.getBoundingClientRect();
-    const offset = rect.top;
-
-    const bg = scene.querySelector('.bg');
-
-    bg.style.transform = `translateY(${offset * 0.3}px)`;
-  });
+window.addEventListener('keydown', e => {
+  if (locked) return;
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') go(index + 1);
+  if (e.key === 'ArrowUp' || e.key === 'PageUp') go(index - 1);
 });
-
-/* WHEEL CONTROL */
-window.addEventListener('wheel', e=>{
-  if(locked) return;
-
-  if(e.deltaY>0) go(index+1);
-  else go(index-1);
-});
-
-/* INIT */
-activateScene(0);
 </script>
 
 </body>

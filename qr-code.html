@@ -3,473 +3,795 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b1020" />
-  <title>Free QR Code Generator | Logic Lab Studio</title>
+  <meta name="theme-color" content="#07080a" />
+  <title>QR Code Generator — Logic Lab Studio</title>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5622407838304076"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5622407838304076" crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#070a12;
-      --bg2:#0b1020;
-      --card: rgba(17,24,39,.72);
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --blue:#60a5fa;
-      --blue2:#38bdf8;
-      --shadow: 0 18px 50px rgba(0,0,0,.55);
-      --radius: 20px;
-      --max: 980px;
-      --line: rgba(255,255,255,.12);
-      --soft: rgba(0,0,0,.18);
+    :root {
+      --black: #07080a;
+      --surface: #0d0f13;
+      --card: #111318;
+      --border: #1c1f26;
+      --border-hover: #2a2e38;
+      --white: #ede9e2;
+      --muted: #6b7280;
+      --muted2: #9ca3af;
+      --accent: #c8b98e;
+      --accent-dim: #7a6f58;
+      --green: #6dbf8f;
+      --green-bg: #0a1a11;
+      --green-border: #163324;
+      --radius: 6px;
+      --radius-lg: 10px;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
-      color:var(--text);
-      min-height:100vh;
-      background:
-        radial-gradient(900px 500px at 20% 10%, rgba(56,189,248,.18), transparent 55%),
-        radial-gradient(900px 500px at 80% 20%, rgba(96,165,250,.16), transparent 55%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 16px;
-    }
-    .wrap{
-      width:100%;
-      max-width:var(--max);
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:18px;
-    }
-    @media (max-width: 860px){ .wrap{grid-template-columns:1fr} }
 
-    .card{
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(600px 260px at 20% 10%, rgba(96,165,250,.18), transparent 55%),
-        radial-gradient(600px 260px at 80% 0%, rgba(56,189,248,.16), transparent 55%);
-      pointer-events:none;
-    }
-    .inner{position:relative; padding:26px}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:8px 12px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    /* TOP NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--white);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-mark svg { display: block; }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
       color: var(--muted);
       font-size: 13px;
+      font-weight: 400;
+      transition: color 0.2s;
     }
-    .dot{
-      width:10px; height:10px; border-radius:999px;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      box-shadow: 0 0 0 4px rgba(56,189,248,.10);
-    }
-    h1{
-      margin:14px 0 8px;
-      font-size: clamp(28px, 3.4vw, 44px);
-      line-height:1.05;
-      letter-spacing:-.02em;
-    }
-    p{ margin:0; color: var(--muted); font-size: 16px; line-height:1.6; }
+    .nav-back:hover { color: var(--white); }
 
-    .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; align-items:center;}
-    .input, .select, .textarea{
-      flex:1 1 320px;
-      padding:12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color: var(--text);
-      outline:none;
-    }
-    .select{flex: 0 0 220px}
-    .textarea{min-height: 90px; resize: vertical; flex: 1 1 100%}
+    .nav-back svg { width: 14px; height: 14px; }
 
-    .btn{
-      appearance:none; border:none; cursor:pointer;
-      border-radius: 14px; padding: 12px 16px;
-      font-weight: 800;
-      display:inline-flex; align-items:center; gap:10px;
-      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
-      user-select:none;
-    }
-    .btn:active{transform: translateY(1px)}
-    .primary{
-      color:#06101f;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      box-shadow: 0 10px 24px rgba(56,189,248,.22);
-    }
-    .ghost{
-      color: var(--text);
-      background: rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .mini{
-      padding:10px 12px;
-      font-weight:700;
-      border-radius: 12px;
-    }
-
-    /* QR */
-    .qrBox{
-      margin-top:18px;
-      display:flex;
-      gap:16px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .qrCard{
-      width: 260px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    #qrcode{
-      width: 220px;
-      height: 220px;
+    /* PAGE WRAPPER */
+    .page {
+      max-width: 1040px;
       margin: 0 auto;
-      background: #fff;
-      border-radius: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px;
-    }
-    .hint{
-      font-size: 13px;
-      color: rgba(148,163,184,.9);
-      margin-top:10px;
-      text-align:center;
-    }
-    .small{
-      font-size:12px;color:rgba(148,163,184,.85);margin-top:12px
-    }
-    .codebox{
-      display:block;
-      background:rgba(0,0,0,.25);
-      padding:10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      color:#e5e7eb;
-      word-break: break-all;
+      padding: 60px 24px 80px;
     }
 
-    /* Right side */
-    .side h2{margin:0 0 10px; font-size:18px;}
-    .list{margin:0; padding:0; list-style:none; display:grid; gap:10px;}
-    .item{
-      padding:12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      display:flex; justify-content:space-between; gap:10px; align-items:center;
+    /* HEADER */
+    .page-header {
+      margin-bottom: 48px;
     }
-    .item span{color: var(--muted); font-size: 13px}
-    .item button{white-space: nowrap}
-    .divider{height:1px;background:rgba(255,255,255,.10);margin:14px 0}
-    .hide{display:none !important;}
+
+    .tool-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border: 1px solid var(--green-border);
+      border-radius: 100px;
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .tool-badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .page-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4.5vw, 52px);
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .page-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .page-sub {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--muted2);
+      line-height: 1.65;
+    }
+
+    /* MAIN LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 2px;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    /* PANEL */
+    .panel {
+      background: var(--card);
+      padding: 32px;
+    }
+
+    .panel-right {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+
+    @media (max-width: 820px) {
+      .panel-right { border-left: none; border-top: 1px solid var(--border); }
+    }
+
+    /* SECTION LABEL */
+    .s-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    /* TYPE TABS */
+    .type-tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3px;
+      background: var(--black);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .tab:hover { color: var(--white); }
+
+    .tab.active {
+      background: var(--card);
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    /* FIELD GROUP */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted2);
+      letter-spacing: 0.3px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--accent-dim);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .field textarea {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .hide { display: none !important; }
+
+    /* GENERATED LINK */
+    .link-preview {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--muted2);
+      word-break: break-all;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      font-family: 'DM Mono', 'Fira Code', monospace;
+    }
+
+    /* ACTIONS */
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--black);
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-hover);
+      color: var(--white);
+    }
+
+    /* QR PANEL */
+    .qr-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+    }
+
+    #qrcode {
+      width: 200px;
+      height: 200px;
+      background: #fff;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    #qrcode img, #qrcode canvas {
+      width: 180px !important;
+      height: 180px !important;
+    }
+
+    .qr-status {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+      text-align: center;
+    }
+
+    .qr-status.ok { color: var(--green); }
+
+    /* QUICK PICK */
+    .quick-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 12px;
+    }
+
+    .quick-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--black);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .quick-item:hover {
+      border-color: var(--border-hover);
+      background: #0d0f14;
+    }
+
+    .quick-item.active-item {
+      border-color: var(--accent-dim);
+    }
+
+    .quick-item-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+
+    .quick-item-sub {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .quick-arrow {
+      color: var(--muted);
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+
+    .quick-item:hover .quick-arrow,
+    .quick-item.active-item .quick-arrow {
+      color: var(--accent);
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* TIP */
+    .tip {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--muted2);
+      line-height: 1.65;
+    }
+
+    .tip strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    /* FOOTER */
+    .page-footer {
+      margin-top: 60px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .footer-brand a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-tools {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-tools a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-tools a:hover { color: var(--white); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .page { padding: 40px 16px 60px; }
+      .panel { padding: 24px 20px; }
+      .panel-right { padding: 24px 20px; }
+      .actions { flex-direction: column; }
+      .field-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
 <body>
-  <main class="wrap">
-    <section class="card">
-      <div class="inner">
-        <div class="badge"><span class="dot"></span><span>QR Code Generator</span></div>
-        <h1>Logic Lab Studio QR</h1>
-        <p>Pick a type, fill details, then generate + download.</p>
 
-        <!-- TYPE SELECT -->
-        <div class="row">
-          <select class="select" id="typeSelect" aria-label="QR type">
-            <option value="website">Website</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="maps">Maps</option>
-          </select>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="http://logiclabstudi.co.za/">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="5" height="5" fill="#07080a"/>
+          <rect x="9" y="2" width="5" height="5" fill="#07080a"/>
+          <rect x="2" y="9" width="5" height="5" fill="#07080a"/>
+          <rect x="9" y="9" width="2" height="2" fill="#07080a"/>
+          <rect x="12" y="9" width="2" height="2" fill="#07080a"/>
+          <rect x="9" y="12" width="2" height="2" fill="#07080a"/>
+          <rect x="12" y="12" width="2" height="2" fill="#07080a"/>
+        </svg>
+      </div>
+      Logic Lab
+    </a>
 
-          <button class="btn ghost mini" id="useWebsite" type="button">Use website</button>
-          <button class="btn ghost mini" id="useWhatsApp" type="button">Use WhatsApp</button>
-          <button class="btn ghost mini" id="useMaps" type="button">Use maps</button>
+    <a class="nav-back" href="http://logiclabstudi.co.za/">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 2L4 7l5 5"/>
+      </svg>
+      Back to studio
+    </a>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="tool-badge"><span class="tool-badge-dot"></span> Free Tool</div>
+      <h1 class="page-title">QR Code <em>Generator.</em></h1>
+      <p class="page-sub">Turn any link into a scannable QR — for WhatsApp, Maps, websites, menus, and more.</p>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <p class="s-label">Configure</p>
+
+        <!-- TYPE TABS -->
+        <div class="type-tabs">
+          <button class="tab active" data-type="website">Website</button>
+          <button class="tab" data-type="whatsapp">WhatsApp</button>
+          <button class="tab" data-type="maps">Maps</button>
         </div>
 
-        <!-- WEBSITE INPUT -->
-        <div id="websiteFields" class="row">
-          <input class="input" id="websiteInput" placeholder="https://yourwebsite.com" value="https://logiclabstudio.github.io/" />
-        </div>
-
-        <!-- WHATSAPP INPUTS -->
-        <div id="whatsappFields" class="row hide">
-          <input class="input" id="waPhone" placeholder="Phone (international) e.g. 27623881570" value="27623881570" />
-          <textarea class="textarea" id="waMsg" placeholder="Optional message (auto-encoded)">Hi, I’m interested in your services.</textarea>
-        </div>
-
-        <!-- MAPS INPUTS -->
-        <div id="mapsFields" class="row hide">
-          <input class="input" id="mapsQuery" placeholder="Search place/address e.g. 'Logic Lab Studio Johannesburg'" />
-          <input class="input" id="mapsLat" placeholder="Latitude (optional)" />
-          <input class="input" id="mapsLng" placeholder="Longitude (optional)" />
-        </div>
-
-        <!-- FINAL LINK + ACTIONS -->
-        <div class="row">
-          <input class="input" id="finalLink" readonly />
-          <button class="btn primary" id="makeBtn" type="button">Generate QR</button>
-          <button class="btn ghost" id="downloadBtn" type="button">Download PNG</button>
-        </div>
-
-        <div class="qrBox">
-          <div class="qrCard">
-            <div id="qrcode" aria-label="QR code"></div>
-            <div class="hint" id="status">Ready.</div>
+        <!-- WEBSITE -->
+        <div id="websiteFields" class="field-group">
+          <div class="field">
+            <label>Website URL</label>
+            <input id="websiteInput" type="url" placeholder="https://yourwebsite.com" value="https://logiclabstudio.github.io/" />
           </div>
+        </div>
 
-          <div style="flex:1; min-width:220px">
-            <p style="margin-bottom:10px">
-              Your QR is generated from the link below (copy it if you want).
-            </p>
-            <div class="small">Current link:</div>
-            <code class="codebox" id="linkPreview"></code>
+        <!-- WHATSAPP -->
+        <div id="whatsappFields" class="field-group hide">
+          <div class="field">
+            <label>Phone number (international)</label>
+            <input id="waPhone" type="tel" placeholder="27623881570" value="27623881570" />
+          </div>
+          <div class="field">
+            <label>Pre-filled message (optional)</label>
+            <textarea id="waMsg" placeholder="Hi, I'm interested in your services.">Hi, I'm interested in your services.</textarea>
+          </div>
+        </div>
 
-            <div class="divider"></div>
-
-            <div class="small">
-              Printing tip: keep it on a white background, at least <b>3–4 cm</b> and don’t stretch it.
+        <!-- MAPS -->
+        <div id="mapsFields" class="field-group hide">
+          <div class="field">
+            <label>Search address or place name</label>
+            <input id="mapsQuery" type="text" placeholder="Logic Lab Studio Johannesburg" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Latitude (optional)</label>
+              <input id="mapsLat" type="text" placeholder="-26.2041" />
+            </div>
+            <div class="field">
+              <label>Longitude (optional)</label>
+              <input id="mapsLng" type="text" placeholder="28.0473" />
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <aside class="card side">
-      <div class="inner">
-        <h2>Quick options</h2>
-        <ul class="list">
-          <li class="item">
-            <div><strong>Website</strong><br><span>Any URL (homepage, page, PDF)</span></div>
-            <button class="btn ghost mini" type="button" data-pick="website">Pick</button>
-          </li>
-          <li class="item">
-            <div><strong>WhatsApp</strong><br><span>Direct chat + optional message</span></div>
-            <button class="btn ghost mini" type="button" data-pick="whatsapp">Pick</button>
-          </li>
-          <li class="item">
-            <div><strong>Maps</strong><br><span>Search address OR lat/lng</span></div>
-            <button class="btn ghost mini" type="button" data-pick="maps">Pick</button>
-          </li>
-        </ul>
+        <!-- LINK PREVIEW -->
+        <p class="s-label">Generated link</p>
+        <div class="link-preview" id="linkPreview">—</div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+          <button class="btn btn-primary" id="makeBtn">Generate QR</button>
+          <button class="btn btn-ghost" id="downloadBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M7 1v8M4 6l3 3 3-3M2 11h10"/>
+            </svg>
+            Download
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel panel-right">
+
+        <!-- QR DISPLAY -->
+        <p class="s-label">Preview</p>
+
+        <div class="qr-display">
+          <div id="qrcode"></div>
+          <p class="qr-status" id="status">Ready to generate.</p>
+        </div>
 
         <div class="divider"></div>
 
-        <div class="small">
-          Examples:
-          <br><br>
-          <span class="codebox">Website: https://logiclabstudi.co.za</span>
-          <br>
-          <span class="codebox">WhatsApp: https://wa.me/27623881570?text=Hi%20Logic%20Lab</span>
-          <br>
-          <span class="codebox">Maps: https://www.google.com/maps/search/?api=1&query=Johannesburg</span>
+        <!-- QUICK PICK -->
+        <p class="s-label">Quick pick</p>
+
+        <div class="quick-list">
+          <div class="quick-item active-item" data-pick="website">
+            <div>
+              <div class="quick-item-label">Website</div>
+              <div class="quick-item-sub">Any URL, homepage, PDF</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
+          <div class="quick-item" data-pick="whatsapp">
+            <div>
+              <div class="quick-item-label">WhatsApp</div>
+              <div class="quick-item-sub">Direct chat + pre-filled message</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
+          <div class="quick-item" data-pick="maps">
+            <div>
+              <div class="quick-item-label">Google Maps</div>
+              <div class="quick-item-sub">Address search or coordinates</div>
+            </div>
+            <span class="quick-arrow">→</span>
+          </div>
         </div>
+
+        <div class="divider"></div>
+
+        <!-- TIP -->
+        <div class="tip">
+          <strong>Printing tip</strong><br>
+          Keep QR on a white background, at least <strong>3–4 cm</strong> in size. Don't stretch or distort it.
+        </div>
+
       </div>
-    </aside>
-  </main>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="page-footer">
+      <p class="footer-brand">A free tool by <a href="http://logiclabstudi.co.za/">Logic Lab Studio</a> — South Africa</p>
+      <div class="footer-tools">
+        <a href="http://logiclabstudi.co.za/FlyerMaker.html">Flyer Maker</a>
+        <a href="http://logiclabstudi.co.za/InvoiceGenerator.html">Invoice Generator</a>
+        <a href="http://logiclabstudi.co.za/BusinessCard/BusinessCardGen.html">Business Cards</a>
+      </div>
+    </div>
+
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <script>
-    const typeSelect = document.getElementById("typeSelect");
+    const tabs = document.querySelectorAll('.tab');
+    const quickItems = document.querySelectorAll('.quick-item');
+    const websiteFields = document.getElementById('websiteFields');
+    const whatsappFields = document.getElementById('whatsappFields');
+    const mapsFields = document.getElementById('mapsFields');
+    const websiteInput = document.getElementById('websiteInput');
+    const waPhone = document.getElementById('waPhone');
+    const waMsg = document.getElementById('waMsg');
+    const mapsQuery = document.getElementById('mapsQuery');
+    const mapsLat = document.getElementById('mapsLat');
+    const mapsLng = document.getElementById('mapsLng');
+    const linkPreview = document.getElementById('linkPreview');
+    const makeBtn = document.getElementById('makeBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusEl = document.getElementById('status');
+    const qrEl = document.getElementById('qrcode');
 
-    const websiteFields = document.getElementById("websiteFields");
-    const whatsappFields = document.getElementById("whatsappFields");
-    const mapsFields = document.getElementById("mapsFields");
+    let currentType = 'website';
+    let qr = null;
 
-    const websiteInput = document.getElementById("websiteInput");
+    function safeTrim(v) { return (v || '').trim(); }
 
-    const waPhone = document.getElementById("waPhone");
-    const waMsg = document.getElementById("waMsg");
-
-    const mapsQuery = document.getElementById("mapsQuery");
-    const mapsLat = document.getElementById("mapsLat");
-    const mapsLng = document.getElementById("mapsLng");
-
-    const finalLink = document.getElementById("finalLink");
-    const linkPreview = document.getElementById("linkPreview");
-
-    const makeBtn = document.getElementById("makeBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const statusEl = document.getElementById("status");
-    const qrEl = document.getElementById("qrcode");
-
-    const useWebsite = document.getElementById("useWebsite");
-    const useWhatsApp = document.getElementById("useWhatsApp");
-    const useMaps = document.getElementById("useMaps");
-
-    let qr;
-
-    function safeTrim(v){ return (v || "").trim(); }
-
-    function normalizeWebsite(url){
+    function normalizeWebsite(url) {
       const t = safeTrim(url);
-      if(!t) return "";
-      // If user types "example.com" -> make it https://example.com
-      if(!/^https?:\/\//i.test(t)) return "https://" + t;
+      if (!t) return '';
+      if (!/^https?:\/\//i.test(t)) return 'https://' + t;
       return t;
     }
 
-    function normalizePhone(phone){
-      // Keep digits only
-      return safeTrim(phone).replace(/[^\d]/g, "");
-    }
+    function normalizePhone(p) { return safeTrim(p).replace(/[^\d]/g, ''); }
 
-    function buildWhatsAppLink(){
-      const phone = normalizePhone(waPhone.value);
-      if(!phone) return "";
-      const msg = safeTrim(waMsg.value);
-      const base = `https://wa.me/${phone}`;
-      if(!msg) return base;
-      return `${base}?text=${encodeURIComponent(msg)}`;
-    }
-
-    function buildMapsLink(){
-      const lat = safeTrim(mapsLat.value);
-      const lng = safeTrim(mapsLng.value);
-      const q = safeTrim(mapsQuery.value);
-
-      // If lat/lng provided -> use "query=lat,lng" (most reliable)
-      if(lat && lng){
-        const coords = `${lat},${lng}`;
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coords)}`;
+    function buildLink() {
+      if (currentType === 'website') return normalizeWebsite(websiteInput.value);
+      if (currentType === 'whatsapp') {
+        const phone = normalizePhone(waPhone.value);
+        if (!phone) return '';
+        const msg = safeTrim(waMsg.value);
+        return msg ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : `https://wa.me/${phone}`;
       }
-
-      // Otherwise query search
-      if(!q) return "";
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
-    }
-
-    function buildFinalLink(){
-      const type = typeSelect.value;
-
-      if(type === "website"){
-        return normalizeWebsite(websiteInput.value);
+      if (currentType === 'maps') {
+        const lat = safeTrim(mapsLat.value);
+        const lng = safeTrim(mapsLng.value);
+        const q = safeTrim(mapsQuery.value);
+        if (lat && lng) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat + ',' + lng)}`;
+        if (q) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+        return '';
       }
-      if(type === "whatsapp"){
-        return buildWhatsAppLink();
-      }
-      if(type === "maps"){
-        return buildMapsLink();
-      }
-      return "";
+      return '';
     }
 
-    function toggleFields(){
-      const type = typeSelect.value;
-      websiteFields.classList.toggle("hide", type !== "website");
-      whatsappFields.classList.toggle("hide", type !== "whatsapp");
-      mapsFields.classList.toggle("hide", type !== "maps");
-    }
+    function setType(type) {
+      currentType = type;
 
-    function updateLinkUI(){
-      const link = buildFinalLink();
-      finalLink.value = link;
-      linkPreview.textContent = link || "—";
-      if(!link) statusEl.textContent = "Fill the fields to build a valid link.";
-    }
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.type === type));
+      quickItems.forEach(i => i.classList.toggle('active-item', i.dataset.pick === type));
 
-    function renderQR(){
-      const link = buildFinalLink();
-      updateLinkUI();
+      websiteFields.classList.toggle('hide', type !== 'website');
+      whatsappFields.classList.toggle('hide', type !== 'whatsapp');
+      mapsFields.classList.toggle('hide', type !== 'maps');
 
-      if(!link){
-        qrEl.innerHTML = "";
-        statusEl.textContent = "Nothing to generate yet.";
-        return;
-      }
-
-      qrEl.innerHTML = "";
-      qr = new QRCode(qrEl, {
-        text: link,
-        width: 220,
-        height: 220,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-
-      statusEl.textContent = "QR generated ✅";
-    }
-
-    function downloadPNG(){
-      const img = qrEl.querySelector("img");
-      const canvas = qrEl.querySelector("canvas");
-
-      let dataUrl = "";
-      if (canvas) dataUrl = canvas.toDataURL("image/png");
-      else if (img) dataUrl = img.src;
-
-      if (!dataUrl){
-        statusEl.textContent = "Generate a QR first.";
-        return;
-      }
-
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "logic-lab-qr.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      statusEl.textContent = "Downloaded ✅";
-    }
-
-    function pickType(t){
-      typeSelect.value = t;
-      toggleFields();
-      updateLinkUI();
+      updateLink();
       renderQR();
     }
 
-    // Top quick buttons
-    useWebsite.addEventListener("click", () => pickType("website"));
-    useWhatsApp.addEventListener("click", () => pickType("whatsapp"));
-    useMaps.addEventListener("click", () => pickType("maps"));
+    function updateLink() {
+      const link = buildLink();
+      linkPreview.textContent = link || '—';
+    }
 
-    // Side “Pick” buttons
-    document.querySelectorAll("[data-pick]").forEach(btn=>{
-      btn.addEventListener("click", ()=> pickType(btn.dataset.pick));
-    });
+    function renderQR() {
+      const link = buildLink();
+      updateLink();
 
-    // Live updates
-    typeSelect.addEventListener("change", () => { toggleFields(); renderQR(); });
+      if (!link) {
+        qrEl.innerHTML = '';
+        statusEl.textContent = 'Fill in the fields above.';
+        statusEl.className = 'qr-status';
+        return;
+      }
 
-    [websiteInput, waPhone, waMsg, mapsQuery, mapsLat, mapsLng].forEach(el=>{
-      el.addEventListener("input", () => {
-        updateLinkUI();
-        // auto re-render so it feels instant
-        renderQR();
+      qrEl.innerHTML = '';
+      qr = new QRCode(qrEl, {
+        text: link,
+        width: 180,
+        height: 180,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
       });
+
+      statusEl.textContent = 'QR ready ✓';
+      statusEl.className = 'qr-status ok';
+    }
+
+    function downloadPNG() {
+      const img = qrEl.querySelector('img');
+      const canvas = qrEl.querySelector('canvas');
+      let dataUrl = '';
+      if (canvas) dataUrl = canvas.toDataURL('image/png');
+      else if (img) dataUrl = img.src;
+      if (!dataUrl) { statusEl.textContent = 'Generate a QR first.'; return; }
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'logic-lab-qr.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      statusEl.textContent = 'Downloaded ✓';
+      statusEl.className = 'qr-status ok';
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => setType(t.dataset.type)));
+    quickItems.forEach(i => i.addEventListener('click', () => setType(i.dataset.pick)));
+    makeBtn.addEventListener('click', renderQR);
+    downloadBtn.addEventListener('click', downloadPNG);
+
+    [websiteInput, waPhone, waMsg, mapsQuery, mapsLat, mapsLng].forEach(el => {
+      el.addEventListener('input', () => { updateLink(); renderQR(); });
     });
 
-    makeBtn.addEventListener("click", renderQR);
-    downloadBtn.addEventListener("click", downloadPNG);
-
-    // Init
-    toggleFields();
-    updateLinkUI();
+    updateLink();
     renderQR();
   </script>
+
 </body>
 </html>
