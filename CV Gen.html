@@ -1,1237 +1,766 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b1020" />
-  <link rel="icon" type="image/png" href="CV.png" />
-  <title>CV Generator | Guidance Template</title>
-  <style>
-    :root{
-      --bg:#0b1020;
-      --bg2:#0f172a;
-      --card: rgba(255,255,255,.06);
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --line: rgba(255,255,255,.12);
-      --accent:#60a5fa;
-      --accent2:#22c55e;
-      --danger:#fb7185;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --r:16px;
-      --max: 1200px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: var(--sans);
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(96,165,250,.25), transparent 60%),
-                  radial-gradient(1000px 600px at 90% 0%, rgba(34,197,94,.18), transparent 55%),
-                  linear-gradient(180deg, var(--bg), #070a12 70%);
-      color: var(--text);
-    }
-    a{color:inherit}
-    .wrap{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 18px 16px 26px;
-    }
-    header{
-      display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
-      margin-bottom: 14px;
-    }
-    .brand{
-      display:flex; gap:12px; align-items:center;
-    }
-    .logo{
-      width:58px; height:58px; border-radius: 16px;
-      object-fit: cover;
-      display:block;
-      border:1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.05);
-      box-shadow:
-        0 12px 30px rgba(0,0,0,.35),
-        0 0 0 6px rgba(96,165,250,.12);
-    }
-    h1{
-      margin:0;
-      font-size: 18px;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:2px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .top-actions{
-      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
-    }
-    .themePick{
-      min-width: 220px;
-      padding: 10px 11px;
-      border-radius: 12px;
-      border:1px solid rgba(148,163,184,.35);
-      background: #0f172a;
-      color: #f8fafc;
-      font-weight: 650;
-      font-size: 12px;
-      letter-spacing:.2px;
-      outline:none;
-      cursor:pointer;
-    }
-    .themePick option{
-      background:#0f172a;
-      color:#f8fafc;
-    }
-    .themePick:focus{
-      border-color: rgba(96,165,250,.6);
-      box-shadow: 0 0 0 4px rgba(96,165,250,.12);
-    }
-    .btn{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight: 650;
-      font-size: 12px;
-      letter-spacing:.2px;
-      cursor:pointer;
-      user-select:none;
-      display:inline-flex; align-items:center; gap:8px;
-    }
-    .btn:hover{border-color: rgba(96,165,250,.55)}
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(96,165,250,.55));
-      border-color: rgba(96,165,250,.5);
-      color: #07101f;
-    }
-    .btn.ok{
-      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(34,197,94,.55));
-      border-color: rgba(34,197,94,.45);
-      color: #06160e;
-    }
-    .btn.danger{
-      background: rgba(251,113,133,.10);
-      border-color: rgba(251,113,133,.35);
-    }
-    .pill{
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      color: var(--muted);
-      background: rgba(255,255,255,.03);
-      display:inline-flex; gap:8px; align-items:center;
-      white-space:nowrap;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr; }
-      header{flex-direction:column; align-items:stretch;}
-      .top-actions{justify-content:flex-start}
-    }
-    .panel{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panel .hd{
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background: rgba(0,0,0,.18);
-    }
-    .panel .hd strong{font-size: 13px}
-    .panel .bd{padding: 12px 14px;}
-    .section{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-    .section:last-child{margin-bottom:0}
-    .section-title{
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom: 10px;
-    }
-    .section-title b{font-size: 12px; letter-spacing:.25px}
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .row.one{grid-template-columns:1fr}
-    label{
-      display:block;
-      font-size: 11px;
-      color: var(--muted);
-      margin: 0 0 6px;
-    }
-    input, textarea, select{
-      width:100%;
-      padding: 10px 11px;
-      border-radius: 12px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      color: var(--text);
-      outline:none;
-      font-size: 13px;
-    }
-    textarea{min-height: 92px; resize: vertical}
-    input:focus, textarea:focus, select:focus{
-      border-color: rgba(96,165,250,.6);
-      box-shadow: 0 0 0 4px rgba(96,165,250,.12);
-    }
-    .mini{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-top: 10px;
-    }
-    .hint{
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 8px;
-      line-height: 1.35;
-    }
-    .split{
-      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-    }
-    .scoreCard{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      border-radius: 12px;
-      padding: 10px;
-    }
-    .scoreHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-      margin-bottom:8px;
-      font-size:12px;
-    }
-    .scoreHead b{font-size:12px;}
-    .scoreTrack{
-      width:100%;
-      height:10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.08);
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .scoreFill{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, #fb7185 0%, #f59e0b 45%, #22c55e 100%);
-      transition: width .2s ease;
-    }
-    .suggestions{
-      margin: 10px 0 0;
-      padding-left: 16px;
-      font-size: 12px;
-      color: var(--text);
-      line-height: 1.45;
-    }
-    .suggestions li{margin-bottom:6px;}
-    .suggestions li:last-child{margin-bottom:0;}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#07080a"/>
+<title>CV Generator — Logic Lab Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07080a;--surface:#0d0f13;--card:#111318;
+  --border:#1c1f26;--border2:#252930;
+  --white:#ede9e2;--muted:#6b7280;--muted2:#9ca3af;
+  --accent:#c8b98e;--accent-dim:#7a6f58;
+  --green:#6dbf8f;--green-bg:#0a1a11;--green-border:#163324;
+  --r:4px;--max:1180px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--black);
+  color:var(--white);
+  font-size:13px;
+  line-height:1.5;
+}
+a{color:inherit;}
 
-    /* ===== Preview (Screen) ===== */
-    .previewWrap{
-      padding: 14px;
-    }
-    .cv{
-      background: #ffffff;
-      color: #0b1220;
-      border-radius: 14px;
-      overflow:hidden;
-      border: 1px solid rgba(0,0,0,.10);
-    }
-    .cvInner{
-      padding: 28px 28px 22px;
-      font-family: var(--sans);
-    }
-    .cvTop{
-      display:flex; justify-content:space-between; gap:18px; align-items:flex-start;
-      border-bottom: 1px solid rgba(15,23,42,.12);
-      padding-bottom: 14px;
-      margin-bottom: 14px;
-    }
-    .name{
-      font-size: 28px;
-      font-weight: 820;
-      letter-spacing: .2px;
-      margin: 0;
-      line-height: 1.1;
-    }
-    .role{
-      margin: 6px 0 0;
-      font-size: 13.5px;
-      color: rgba(15,23,42,.75);
-      font-weight: 650;
-    }
-    .contact{
-      text-align:right;
-      font-size: 11.5px;
-      color: rgba(15,23,42,.78);
-      line-height: 1.55;
-      min-width: 210px;
-    }
-    .contact a{color: inherit; text-decoration: none;}
-    .twoCol{
-      display:grid;
-      grid-template-columns: 1fr 0.62fr;
-      gap: 18px;
-    }
-    .cv h3{
-      margin: 0 0 6px;
-      font-size: 12px;
-      letter-spacing: .26px;
-      text-transform: uppercase;
-      color: rgba(15,23,42,.85);
-    }
-    .summary{
-      font-size: 12.5px;
-      color: rgba(15,23,42,.86);
-      line-height: 1.55;
-      margin-bottom: 14px;
-      white-space: pre-wrap;
-    }
-    .item{
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(15,23,42,.10);
-    }
-    .item:last-child{border-bottom:none; padding-bottom:0; margin-bottom:0}
-    .itemTop{
-      display:flex; justify-content:space-between; gap:12px; align-items:baseline;
-    }
-    .itemTitle{
-      font-weight: 780;
-      font-size: 13px;
-      margin: 0;
-      color: rgba(15,23,42,.95);
-    }
-    .itemMeta{
-      font-size: 11px;
-      color: rgba(15,23,42,.70);
-      white-space:nowrap;
-    }
-    .itemSub{
-      margin: 3px 0 0;
-      font-size: 12px;
-      color: rgba(15,23,42,.82);
-      font-weight: 650;
-    }
-    .bullets{
-      margin: 6px 0 0;
-      padding-left: 16px;
-      color: rgba(15,23,42,.86);
-      font-size: 12.2px;
-      line-height: 1.5;
-    }
-    .tagList{
-      display:flex; flex-wrap:wrap; gap:6px;
-    }
-    .tag{
-      font-size: 11px;
-      padding: 6px 8px;
-      border-radius: 999px;
-      background: rgba(96,165,250,.12);
-      border: 1px solid rgba(96,165,250,.25);
-    }
-    .smallBox{
-      margin-bottom: 12px;
-    }
-    .smallText{
-      font-size: 12.2px;
-      color: rgba(15,23,42,.86);
-      line-height: 1.45;
-      white-space: pre-wrap;
-    }
+/* ── NAV ── */
+.nav{
+  border-bottom:1px solid var(--border);
+  padding:0 32px;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);position:sticky;top:0;z-index:50;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:9px;
+  text-decoration:none;color:var(--white);font-size:14px;font-weight:500;
+}
+.logo-sq{
+  width:26px;height:26px;background:var(--white);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.logo-sq svg{display:block;}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 
-    /* ===== Print / PDF ===== */
-    @page{
-      size: A4;
-      margin: 10mm;
-    }
-    @media print{
-      html, body{
-        background:#fff !important;
-      }
-      body{
-        margin:0 !important;
-      }
-      .wrap{
-        max-width:none;
-        margin:0;
-        padding:0;
-      }
-      header, .panel.left, .top-actions, .pill, .hint, .mini {display:none !important;}
-      .grid{display:block !important}
-      .panel.right{
-        border:none;
-        box-shadow:none;
-        background:transparent;
-        overflow:visible;
-      }
-      .panel.right .hd{display:none !important}
-      .previewWrap{padding:0}
-      .cv{
-        border:none;
-        border-radius:0;
-        box-shadow:none;
-      }
-      .cvInner{padding: 12mm 10mm 10mm}
-      .twoCol{grid-template-columns: 1fr 0.65fr;}
-      a{text-decoration:none}
-    }
-  </style>
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:var(--r);
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border);background:transparent;
+  color:var(--muted2);transition:all .15s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--border2);color:var(--white);}
+.btn.prim{background:var(--white);color:var(--black);border-color:var(--white);}
+.btn.prim:hover{background:var(--accent);border-color:var(--accent);}
+.btn.ok{color:var(--green);border-color:rgba(109,191,143,.3);}
+.btn.ok:hover{background:rgba(109,191,143,.08);}
+.btn.danger{color:#f87171;border-color:rgba(248,113,113,.3);}
+.btn.danger:hover{background:rgba(248,113,113,.08);}
+
+/* ── PAGE LAYOUT ── */
+.page{max-width:var(--max);margin:0 auto;padding:28px 20px 60px;}
+
+.page-head{margin-bottom:28px;}
+.badge{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 12px;border:1px solid var(--green-border);border-radius:100px;
+  background:var(--green-bg);color:var(--green);
+  font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;
+}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);}
+.page-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(26px,3.5vw,42px);letter-spacing:-1px;
+  color:var(--white);margin-bottom:6px;line-height:1.1;
+}
+.page-title em{font-style:italic;color:var(--accent);}
+.page-sub{font-size:14px;font-weight:300;color:var(--muted2);}
+
+/* theme + actions bar */
+.toolrow{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:20px;
+  padding-bottom:16px;border-bottom:1px solid var(--border);
+}
+.theme-sel{
+  padding:8px 12px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--black);
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;
+  outline:none;cursor:pointer;min-width:160px;
+}
+.theme-sel option{background:var(--black);color:var(--white);}
+.pill-tag{
+  font-size:10px;padding:4px 10px;border-radius:100px;
+  border:1px solid var(--border);color:var(--muted);
+  background:var(--black);white-space:nowrap;
+}
+
+/* ── MAIN GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:2px;
+  border:1px solid var(--border);
+}
+@media(max-width:900px){.grid{grid-template-columns:1fr;}}
+
+/* ── PANELS ── */
+.panel{background:var(--card);}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  position:sticky;top:58px;background:var(--card);z-index:10;
+}
+.panel-title{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--accent);}
+.panel-body{padding:18px;}
+
+/* ── FORM SECTIONS ── */
+.sec{margin-bottom:22px;}
+.sec-label{
+  font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px;display:flex;align-items:center;
+  justify-content:space-between;
+}
+.sec-label small{
+  font-size:10px;letter-spacing:0;text-transform:none;
+  color:var(--muted);font-weight:300;
+}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.frow.one{grid-template-columns:1fr;}
+.frow.three{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;color:var(--muted2);font-weight:400;}
+.field input,.field textarea,.field select{
+  background:var(--black);border:1px solid var(--border);
+  border-radius:var(--r);color:var(--white);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;
+  padding:9px 11px;outline:none;transition:border-color .15s;
+  width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent-dim);}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);}
+.field textarea{min-height:72px;resize:vertical;line-height:1.55;}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;}
+details summary{cursor:pointer;font-size:12px;color:var(--muted);margin-bottom:10px;list-style:none;}
+details summary::-webkit-details-marker{display:none;}
+details summary::before{content:"+ ";color:var(--accent);}
+details[open] summary::before{content:"– ";}
+
+/* ── SCORE CARD ── */
+.score-card{
+  background:var(--black);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:12px;
+}
+.score-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.score-head strong{font-size:12px;font-weight:500;}
+.score-val{font-size:12px;color:var(--accent);font-weight:500;}
+.score-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.score-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+.suggestions{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.suggestions li{
+  font-size:12px;font-weight:300;color:var(--muted2);
+  padding-left:14px;position:relative;line-height:1.5;
+}
+.suggestions li::before{content:"→";position:absolute;left:0;color:var(--accent);font-size:10px;top:2px;}
+
+/* ── CV PREVIEW PANEL ── */
+.preview-panel{
+  background:var(--surface);border-left:1px solid var(--border);
+}
+@media(max-width:900px){.preview-panel{border-left:none;border-top:1px solid var(--border);}}
+.preview-wrap{
+  padding:16px;
+  background:
+    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:40px 40px;
+  min-height:600px;
+}
+
+/* ── CV PAPER ── */
+.cv-paper{
+  background:#fff;color:#111;
+  width:100%;max-width:595px;
+  margin:0 auto;
+  padding:32px 28px;
+  font-family:'DM Sans',sans-serif;
+  font-size:10.5px;
+  line-height:1.45;
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+  border-radius:2px;
+  position:relative;
+}
+/* CV interior — uses own vars so theme doesn't bleed */
+.cv-paper{--cv-accent:#07080a;--cv-line:#e5e5e5;--cv-muted:#555;}
+.cv-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:14px;
+}
+.cv-name{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-0.5px;color:#111;line-height:1.1;}
+.cv-role{font-size:11px;font-weight:400;color:#555;margin-top:3px;letter-spacing:.3px;}
+.cv-contact{
+  text-align:right;font-size:10px;color:#555;
+  line-height:1.7;font-weight:300;
+}
+.cv-contact a{color:#555;text-decoration:none;}
+.cv-cols{display:grid;grid-template-columns:1fr 148px;gap:20px;}
+.cv-main{}
+.cv-side{}
+.cv-h3{
+  font-size:8.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:#111;border-bottom:1px solid #111;padding-bottom:4px;
+  margin:14px 0 8px;
+}
+.cv-h3:first-child{margin-top:0;}
+.cv-summary{font-size:10.5px;color:#333;font-weight:300;line-height:1.6;}
+.cv-item{margin-bottom:10px;}
+.cv-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.cv-item-title{font-size:10.5px;font-weight:600;color:#111;}
+.cv-item-meta{font-size:9.5px;color:#666;white-space:nowrap;flex-shrink:0;}
+.cv-item-sub{font-size:10px;color:#555;margin:1px 0 4px;}
+.cv-bullets{list-style:none;margin:0;padding:0;}
+.cv-bullets li{
+  font-size:10px;color:#333;font-weight:300;line-height:1.55;
+  padding-left:10px;position:relative;margin-bottom:2px;
+}
+.cv-bullets li::before{content:"–";position:absolute;left:0;color:#999;}
+.cv-smalltext{font-size:10px;color:#444;white-space:pre-line;line-height:1.6;font-weight:300;}
+.cv-tag-list{display:flex;flex-wrap:wrap;gap:4px;}
+.cv-tag{
+  font-size:9px;padding:2px 7px;border-radius:100px;
+  background:#f0f0f0;color:#333;font-weight:400;border:1px solid #e0e0e0;
+}
+.cv-smallbox{margin-bottom:14px;}
+
+/* print */
+@media print{
+  body{background:#fff!important;}
+  .nav,.page-head,.toolrow,.cv-form-panel,.cv-hints{display:none!important;}
+  .grid{display:block!important;border:none!important;}
+  .preview-panel{border:none!important;}
+  .preview-wrap{padding:0!important;background:none!important;}
+  .panel-head{display:none!important;}
+  .cv-paper{
+    box-shadow:none!important;max-width:100%!important;
+    padding:0!important;border-radius:0!important;
+  }
+}
+
+@media(max-width:600px){
+  .frow{grid-template-columns:1fr;}
+  .frow.three{grid-template-columns:1fr;}
+  .toolrow{flex-direction:column;align-items:flex-start;}
+  .theme-sel{width:100%;}
+}
+</style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <img class="logo" src="CV.png" alt="CV Generator logo" />
-        <div>
-          <h1>CV Generator</h1>
-          <div class="sub">Fill in the form → preview updates live → export via Print to PDF</div>
-        </div>
-      </div>
-      <div class="top-actions">
-        <select id="themeSelect" class="themePick" aria-label="Choose color theme">
-          <option value="" disabled>Choose theme</option>
-          <optgroup label="Dark themes">
-          <option value="midnight">Theme: Midnight</option>
-          <option value="ocean">Theme: Ocean</option>
-          <option value="forest">Theme: Forest</option>
-          <option value="sunset">Theme: Sunset</option>
-          <option value="royal">Theme: Royal</option>
-          <option value="graphite">Theme: Graphite</option>
-          <option value="rose">Theme: Rose</option>
-          <option value="teal">Theme: Teal</option>
-          <option value="amber">Theme: Amber</option>
-          <option value="violet">Theme: Violet</option>
-          </optgroup>
-          <optgroup label="Light themes">
-          <option value="light_snow">Theme: Light Snow</option>
-          <option value="light_sky">Theme: Light Sky</option>
-          <option value="light_sage">Theme: Light Sage</option>
-          <option value="light_sand">Theme: Light Sand</option>
-          <option value="light_lavender">Theme: Light Lavender</option>
-          <option value="light_mint">Theme: Light Mint</option>
-          <option value="light_rose">Theme: Light Rose</option>
-          <option value="light_peach">Theme: Light Peach</option>
-          <option value="light_slate">Theme: Light Slate</option>
-          <option value="light_cloud">Theme: Light Cloud</option>
-          </optgroup>
-        </select>
-        <button class="btn primary" id="btnPrint">🖨️ Print / Save as PDF</button>
-        <button class="btn ok" id="btnSave">💾 Save JSON</button>
-        <label class="btn" style="cursor:pointer">
-          ⬆️ Load JSON
-          <input id="fileLoad" type="file" accept="application/json" style="display:none">
-        </label>
-        <button class="btn danger" id="btnReset">🧨 Reset</button>
-        <span class="pill">Offline • Single file • No libraries</span>
-      </div>
-    </header>
 
-    <div class="grid">
-      <!-- LEFT: FORM -->
-      <div class="panel left">
-        <div class="hd">
-          <strong>Details</strong>
-          <div class="split">
-            <span class="pill">Tip: Use lines for bullets (• / -)</span>
-          </div>
-        </div>
-        <div class="bd">
-
-          <div class="section">
-            <div class="section-title">
-              <b>Profile</b>
-              <span class="pill">Top of CV</span>
-            </div>
-            <div class="row">
-              <div>
-                <label>Full name</label>
-                <input id="fullName" placeholder="e.g. Your Full Name" />
-              </div>
-              <div>
-                <label>Headline / Role</label>
-                <input id="headline" placeholder="e.g. Your Target Role" />
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label>Phone</label>
-                <input id="phone" placeholder="e.g. 062 388 1570" />
-              </div>
-              <div>
-                <label>Email</label>
-                <input id="email" placeholder="e.g. name@email.com" />
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label>Website / Portfolio</label>
-                <input id="website" placeholder="e.g. yourportfolio.com" />
-              </div>
-              <div>
-                <label>Location</label>
-                <input id="location" placeholder="e.g. City, Country" />
-              </div>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Professional summary</label>
-                <textarea id="summary" placeholder="2–5 lines: what you do + what you’re strong at + what you want."></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Skills</b>
-              <span class="pill">Comma separated</span>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Skills (comma separated)</label>
-                <textarea id="skills" placeholder="HTML, CSS, JavaScript, C#, .NET, SQL, Git, APIs, ..."></textarea>
-              </div>
-            </div>
-            <div class="hint">These appear as tags on the right column.</div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Experience</b>
-              <span class="pill">Max 4 items</span>
-            </div>
-
-            <!-- Experience items -->
-            <div class="row">
-              <div>
-                <label>Role (1)</label>
-                <input id="exp_role_1" placeholder="e.g. Software Developer" />
-              </div>
-              <div>
-                <label>Company (1)</label>
-                <input id="exp_company_1" placeholder="e.g. Company Name" />
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label>Dates (1)</label>
-                <input id="exp_dates_1" placeholder="e.g. 2025 – Present" />
-              </div>
-              <div>
-                <label>Location (1)</label>
-                <input id="exp_loc_1" placeholder="e.g. Remote" />
-              </div>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Highlights (1) — one per line</label>
-                <textarea id="exp_points_1" placeholder="Built X...\nImproved Y...\nShipped Z..."></textarea>
-              </div>
-            </div>
-
-            <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
-
-            <div class="row">
-              <div>
-                <label>Role (2)</label>
-                <input id="exp_role_2" placeholder="e.g. Production / Ops" />
-              </div>
-              <div>
-                <label>Company (2)</label>
-                <input id="exp_company_2" placeholder="e.g. Previous Company" />
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label>Dates (2)</label>
-                <input id="exp_dates_2" placeholder="e.g. 2023 – 2025" />
-              </div>
-              <div>
-                <label>Location (2)</label>
-                <input id="exp_loc_2" placeholder="e.g. City / Remote" />
-              </div>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Highlights (2) — one per line</label>
-                <textarea id="exp_points_2"></textarea>
-              </div>
-            </div>
-
-            <details style="margin-top:12px">
-              <summary style="cursor:pointer;color:var(--muted);font-size:12px">Add more experience (3 & 4)</summary>
-              <div style="margin-top:10px">
-
-                <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
-
-                <div class="row">
-                  <div>
-                    <label>Role (3)</label>
-                    <input id="exp_role_3" />
-                  </div>
-                  <div>
-                    <label>Company (3)</label>
-                    <input id="exp_company_3" />
-                  </div>
-                </div>
-                <div class="row">
-                  <div>
-                    <label>Dates (3)</label>
-                    <input id="exp_dates_3" />
-                  </div>
-                  <div>
-                    <label>Location (3)</label>
-                    <input id="exp_loc_3" />
-                  </div>
-                </div>
-                <div class="row one">
-                  <div>
-                    <label>Highlights (3)</label>
-                    <textarea id="exp_points_3"></textarea>
-                  </div>
-                </div>
-
-                <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
-
-                <div class="row">
-                  <div>
-                    <label>Role (4)</label>
-                    <input id="exp_role_4" />
-                  </div>
-                  <div>
-                    <label>Company (4)</label>
-                    <input id="exp_company_4" />
-                  </div>
-                </div>
-                <div class="row">
-                  <div>
-                    <label>Dates (4)</label>
-                    <input id="exp_dates_4" />
-                  </div>
-                  <div>
-                    <label>Location (4)</label>
-                    <input id="exp_loc_4" />
-                  </div>
-                </div>
-                <div class="row one">
-                  <div>
-                    <label>Highlights (4)</label>
-                    <textarea id="exp_points_4"></textarea>
-                  </div>
-                </div>
-
-              </div>
-            </details>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Education</b>
-              <span class="pill">Optional</span>
-            </div>
-            <div class="row">
-              <div>
-                <label>Qualification</label>
-                <input id="edu_title" placeholder="e.g. Diploma in IT" />
-              </div>
-              <div>
-                <label>Institution</label>
-                <input id="edu_school" placeholder="e.g. College / University" />
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label>Dates</label>
-                <input id="edu_dates" placeholder="e.g. 2021 – 2023" />
-              </div>
-              <div>
-                <label>Notes</label>
-                <input id="edu_notes" placeholder="e.g. Relevant modules / awards" />
-              </div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Projects</b>
-              <span class="pill">One per line</span>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Projects (name — short result)</label>
-                <textarea id="projects" placeholder="Project Name — what it does + result\nProject Name — stack used + impact\nProject Name — measurable outcome"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Extras</b>
-              <span class="pill">Optional</span>
-            </div>
-            <div class="row one">
-              <div>
-                <label>Certifications / Languages / Links (one per line)</label>
-                <textarea id="extras" placeholder="GitHub: github.com/...\nLinkedIn: linkedin.com/in/...\nDriver’s license: ..."></textarea>
-              </div>
-            </div>
-            <div class="hint">When exporting, choose A4 and enable “Background graphics” for best look.</div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">
-              <b>Suggestions & Improvements</b>
-              <span class="pill" id="qualityLevel">Draft</span>
-            </div>
-            <div class="scoreCard">
-              <div class="scoreHead">
-                <b>CV quality score</b>
-                <span id="qualityScore">0 / 100</span>
-              </div>
-              <div class="scoreTrack" aria-hidden="true">
-                <div class="scoreFill" id="qualityFill"></div>
-              </div>
-            </div>
-            <ul class="suggestions" id="improvementList"></ul>
-            <div class="hint">Tip: Strong CVs are specific, measurable, and keyword-rich for ATS scans.</div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- RIGHT: PREVIEW -->
-      <div class="panel right">
-        <div class="hd">
-          <strong>Preview</strong>
-          <div class="split">
-            <span class="pill">Print-ready</span>
-          </div>
-        </div>
-        <div class="previewWrap">
-          <div class="cv" id="cv">
-            <div class="cvInner">
-              <div class="cvTop">
-                <div>
-                  <h2 class="name" id="p_name">Your Name</h2>
-                  <div class="role" id="p_headline">Your Role / Headline</div>
-                </div>
-                <div class="contact" id="p_contact">
-                  Phone • Email • Website • Location
-                </div>
-              </div>
-
-              <div class="twoCol">
-                <div>
-                  <h3>Summary</h3>
-                  <div class="summary" id="p_summary">Write a short professional summary.</div>
-
-                  <h3>Experience</h3>
-                  <div id="p_experience"></div>
-
-                  <h3>Projects</h3>
-                  <div class="smallText" id="p_projects"></div>
-                </div>
-
-                <div>
-                  <div class="smallBox">
-                    <h3>Skills</h3>
-                    <div class="tagList" id="p_skills"></div>
-                  </div>
-
-                  <div class="smallBox">
-                    <h3>Education</h3>
-                    <div class="smallText" id="p_education"></div>
-                  </div>
-
-                  <div class="smallBox">
-                    <h3>Extras</h3>
-                    <div class="smallText" id="p_extras"></div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="hint">
-            Want it to auto-fill with your info? Tell me your details and I’ll paste a pre-filled version.
-          </div>
-        </div>
-      </div>
-
+<nav class="nav">
+  <a class="nav-logo" href="http://logiclabstudi.co.za/">
+    <div class="logo-sq">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="1" y="1" width="4" height="4" fill="#07080a"/>
+        <rect x="8" y="1" width="4" height="4" fill="#07080a"/>
+        <rect x="1" y="8" width="4" height="4" fill="#07080a"/>
+        <rect x="8" y="8" width="2" height="2" fill="#07080a"/>
+        <rect x="11" y="8" width="2" height="2" fill="#07080a"/>
+        <rect x="8" y="11" width="2" height="2" fill="#07080a"/>
+        <rect x="11" y="11" width="2" height="2" fill="#07080a"/>
+      </svg>
     </div>
+    Logic Lab
+  </a>
+  <div class="nav-right">
+    <button class="btn prim" id="btnPrint">Print / Save PDF</button>
+    <button class="btn ok" id="btnSave">Save JSON</button>
+    <label class="btn" style="cursor:pointer">
+      Load JSON
+      <input id="fileLoad" type="file" accept="application/json" style="display:none">
+    </label>
+    <button class="btn danger" id="btnReset">Reset</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-head">
+    <div class="badge"><span class="badge-dot"></span>Free Tool</div>
+    <h1 class="page-title">CV <em>Generator.</em></h1>
+    <p class="page-sub">Fill the form → preview updates live → Print to PDF when ready.</p>
   </div>
 
-  <script>
-    const ids = [
-      "fullName","headline","phone","email","website","location","summary","skills",
-      "exp_role_1","exp_company_1","exp_dates_1","exp_loc_1","exp_points_1",
-      "exp_role_2","exp_company_2","exp_dates_2","exp_loc_2","exp_points_2",
-      "exp_role_3","exp_company_3","exp_dates_3","exp_loc_3","exp_points_3",
-      "exp_role_4","exp_company_4","exp_dates_4","exp_loc_4","exp_points_4",
-      "edu_title","edu_school","edu_dates","edu_notes",
-      "projects","extras"
-    ];
+  <div class="toolrow">
+    <select id="themeSelect" class="theme-sel" aria-label="CV colour theme">
+      <option value="" disabled>CV colour theme</option>
+      <optgroup label="Dark">
+        <option value="midnight">Midnight</option>
+        <option value="ocean">Ocean</option>
+        <option value="forest">Forest</option>
+        <option value="sunset">Sunset</option>
+        <option value="royal">Royal</option>
+        <option value="graphite">Graphite</option>
+        <option value="rose">Rose</option>
+        <option value="teal">Teal</option>
+        <option value="amber">Amber</option>
+        <option value="violet">Violet</option>
+      </optgroup>
+      <optgroup label="Light">
+        <option value="light_snow">Light Snow</option>
+        <option value="light_sky">Light Sky</option>
+        <option value="light_sage">Light Sage</option>
+        <option value="light_sand">Light Sand</option>
+        <option value="light_lavender">Light Lavender</option>
+        <option value="light_mint">Light Mint</option>
+        <option value="light_rose">Light Rose</option>
+        <option value="light_peach">Light Peach</option>
+        <option value="light_slate">Light Slate</option>
+        <option value="light_cloud">Light Cloud</option>
+      </optgroup>
+    </select>
+    <span class="pill-tag">Offline · Single file · No libraries</span>
+    <span class="pill-tag">ATS-friendly</span>
+  </div>
 
-    const $ = (id) => document.getElementById(id);
+  <div class="grid">
 
-    function safe(v){ return (v ?? "").toString().trim(); }
+    <!-- FORM -->
+    <div class="panel cv-form-panel">
+      <div class="panel-head">
+        <span class="panel-title">Details</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:300;">Use – or • to start bullet lines</span>
+      </div>
+      <div class="panel-body">
 
-    function linesToBullets(txt){
-      const raw = safe(txt);
-      if(!raw) return [];
-      return raw
-        .split("\n")
-        .map(s => s.replace(/^\s*[-•]\s*/, "").trim())
-        .filter(Boolean);
-    }
-
-    function commaToTags(txt){
-      const raw = safe(txt);
-      if(!raw) return [];
-      return raw
-        .split(/[,\n]/)
-        .map(s => s.trim())
-        .filter(Boolean);
-    }
-
-    function buildContact(){
-      const phone = safe($("phone").value);
-      const email = safe($("email").value);
-      const website = safe($("website").value);
-      const location = safe($("location").value);
-
-      const parts = [];
-      if(phone) parts.push(phone);
-
-      if(email){
-        const e = email;
-        parts.push(`<a href="mailto:${escapeHtmlAttr(e)}">${escapeHtml(e)}</a>`);
-      }
-      if(website){
-        const w = website.replace(/^https?:\/\//i,"");
-        const href = website.match(/^https?:\/\//i) ? website : ("https://" + w);
-        parts.push(`<a href="${escapeHtmlAttr(href)}" target="_blank" rel="noopener">${escapeHtml(w)}</a>`);
-      }
-      if(location) parts.push(escapeHtml(location));
-
-      return parts.length ? parts.join("<br>") : "Phone • Email • Website • Location";
-    }
-
-    function buildExperience(){
-      const wrap = document.createElement("div");
-
-      for(let i=1;i<=4;i++){
-        const role = safe($(`exp_role_${i}`).value);
-        const company = safe($(`exp_company_${i}`).value);
-        const dates = safe($(`exp_dates_${i}`).value);
-        const loc = safe($(`exp_loc_${i}`).value);
-        const points = linesToBullets($(`exp_points_${i}`).value);
-
-        if(!role && !company && !dates && !loc && points.length===0) continue;
-
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const title = escapeHtml([role, company].filter(Boolean).join(" — ") || "Experience");
-        const meta = escapeHtml([dates, loc].filter(Boolean).join(" • "));
-
-        item.innerHTML = `
-          <div class="itemTop">
-            <div class="itemTitle">${title}</div>
-            <div class="itemMeta">${meta}</div>
+        <div class="sec">
+          <div class="sec-label">Profile <small>Top of CV</small></div>
+          <div class="frow" style="margin-bottom:10px;">
+            <div class="field"><label>Full Name</label><input id="fullName" placeholder="Your Full Name"/></div>
+            <div class="field"><label>Headline / Role</label><input id="headline" placeholder="e.g. Software Developer"/></div>
           </div>
-          ${company && role ? `<div class="itemSub">${escapeHtml(company)}</div>` : ``}
-        `;
+          <div class="frow" style="margin-bottom:10px;">
+            <div class="field"><label>Phone</label><input id="phone" placeholder="e.g. +27 62 388 1570"/></div>
+            <div class="field"><label>Email</label><input id="email" placeholder="name@email.com"/></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px;">
+            <div class="field"><label>Website / Portfolio</label><input id="website" placeholder="yourportfolio.com"/></div>
+            <div class="field"><label>Location</label><input id="location" placeholder="City, Country"/></div>
+          </div>
+          <div class="frow one">
+            <div class="field"><label>Professional Summary</label><textarea id="summary" placeholder="2–5 lines: what you do + key strengths + what you want next."></textarea></div>
+          </div>
+        </div>
 
-        if(points.length){
-          const ul = document.createElement("ul");
-          ul.className = "bullets";
-          for(const p of points){
-            const li = document.createElement("li");
-            li.textContent = p;
-            ul.appendChild(li);
-          }
-          item.appendChild(ul);
-        }
+        <div class="divider"></div>
 
-        wrap.appendChild(item);
-      }
+        <div class="sec">
+          <div class="sec-label">Skills <small>Comma separated</small></div>
+          <div class="frow one">
+            <div class="field"><textarea id="skills" placeholder="HTML, CSS, JavaScript, React, Node.js, SQL, Git, Azure..."></textarea></div>
+          </div>
+          <p class="hint">These render as tags on the CV sidebar.</p>
+        </div>
 
-      if(!wrap.children.length){
-        const empty = document.createElement("div");
-        empty.className = "smallText";
-        empty.textContent = "Add your work experience on the left.";
-        wrap.appendChild(empty);
-      }
-      return wrap;
-    }
+        <div class="divider"></div>
 
-    function buildProjects(){
-      const rows = linesToBullets($("projects").value);
-      if(!rows.length) return "Add 2–5 projects that show proof of work.";
-      return rows.map(r => "• " + r).join("\n");
-    }
+        <div class="sec">
+          <div class="sec-label">Experience <small>Up to 4 roles</small></div>
 
-    function buildEducation(){
-      const t = safe($("edu_title").value);
-      const s = safe($("edu_school").value);
-      const d = safe($("edu_dates").value);
-      const n = safe($("edu_notes").value);
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Role (1)</label><input id="exp_role_1" placeholder="Software Developer"/></div>
+            <div class="field"><label>Company (1)</label><input id="exp_company_1" placeholder="Company Name"/></div>
+          </div>
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Dates (1)</label><input id="exp_dates_1" placeholder="2023 – Present"/></div>
+            <div class="field"><label>Location (1)</label><input id="exp_loc_1" placeholder="Remote"/></div>
+          </div>
+          <div class="frow one" style="margin-bottom:14px;">
+            <div class="field"><label>Highlights (1) — one per line</label><textarea id="exp_points_1" placeholder="Built X that improved Y by Z%&#10;Shipped feature reducing load time by 40%"></textarea></div>
+          </div>
 
-      const parts = [];
-      const top = [t, s].filter(Boolean).join(" — ");
-      if(top) parts.push(top);
-      const meta = [d, n].filter(Boolean).join(" • ");
-      if(meta) parts.push(meta);
+          <div class="divider"></div>
 
-      return parts.length ? parts.join("\n") : "Optional — add your highest qualification.";
-    }
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Role (2)</label><input id="exp_role_2" placeholder="Previous Role"/></div>
+            <div class="field"><label>Company (2)</label><input id="exp_company_2" placeholder="Previous Company"/></div>
+          </div>
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Dates (2)</label><input id="exp_dates_2" placeholder="2021 – 2023"/></div>
+            <div class="field"><label>Location (2)</label><input id="exp_loc_2" placeholder="City / Remote"/></div>
+          </div>
+          <div class="frow one" style="margin-bottom:14px;">
+            <div class="field"><label>Highlights (2)</label><textarea id="exp_points_2"></textarea></div>
+          </div>
 
-    function buildExtras(){
-      const rows = linesToBullets($("extras").value);
-      if(!rows.length) return "Optional — certifications, links, languages, etc.";
-      return rows.map(r => "• " + r).join("\n");
-    }
+          <details>
+            <summary>Add roles 3 &amp; 4</summary>
+            <div>
+              <div class="divider"></div>
+              <div class="frow" style="margin-bottom:8px;">
+                <div class="field"><label>Role (3)</label><input id="exp_role_3"/></div>
+                <div class="field"><label>Company (3)</label><input id="exp_company_3"/></div>
+              </div>
+              <div class="frow" style="margin-bottom:8px;">
+                <div class="field"><label>Dates (3)</label><input id="exp_dates_3"/></div>
+                <div class="field"><label>Location (3)</label><input id="exp_loc_3"/></div>
+              </div>
+              <div class="frow one" style="margin-bottom:14px;">
+                <div class="field"><label>Highlights (3)</label><textarea id="exp_points_3"></textarea></div>
+              </div>
+              <div class="divider"></div>
+              <div class="frow" style="margin-bottom:8px;">
+                <div class="field"><label>Role (4)</label><input id="exp_role_4"/></div>
+                <div class="field"><label>Company (4)</label><input id="exp_company_4"/></div>
+              </div>
+              <div class="frow" style="margin-bottom:8px;">
+                <div class="field"><label>Dates (4)</label><input id="exp_dates_4"/></div>
+                <div class="field"><label>Location (4)</label><input id="exp_loc_4"/></div>
+              </div>
+              <div class="frow one">
+                <div class="field"><label>Highlights (4)</label><textarea id="exp_points_4"></textarea></div>
+              </div>
+            </div>
+          </details>
+        </div>
 
-    function getQualityAssessment(){
-      let score = 0;
-      const suggestions = [];
+        <div class="divider"></div>
 
-      const fullName = safe($("fullName").value);
-      const headline = safe($("headline").value);
-      const phone = safe($("phone").value);
-      const email = safe($("email").value);
-      const website = safe($("website").value);
-      const location = safe($("location").value);
-      const summary = safe($("summary").value);
-      const skills = commaToTags($("skills").value);
-      const projects = linesToBullets($("projects").value);
+        <div class="sec">
+          <div class="sec-label">Education</div>
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Qualification</label><input id="edu_title" placeholder="BSc Computer Science"/></div>
+            <div class="field"><label>Institution</label><input id="edu_school" placeholder="University Name"/></div>
+          </div>
+          <div class="frow" style="margin-bottom:8px;">
+            <div class="field"><label>Dates</label><input id="edu_dates" placeholder="2018 – 2021"/></div>
+            <div class="field"><label>Notes</label><input id="edu_notes" placeholder="Distinction, GPA, etc."/></div>
+          </div>
+        </div>
 
-      if(fullName) score += 8; else suggestions.push("Add your full name so recruiters can identify your CV immediately.");
-      if(headline) score += 8; else suggestions.push("Add a role headline (e.g. Frontend Developer, Data Analyst).");
+        <div class="divider"></div>
 
-      const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      if(phone) score += 5; else suggestions.push("Add a phone number in international format.");
-      if(emailLooksValid) score += 7; else suggestions.push("Use a professional, valid email address.");
-      if(website) score += 5; else suggestions.push("Add a portfolio, GitHub, or LinkedIn link.");
-      if(location) score += 3;
+        <div class="sec">
+          <div class="sec-label">Projects <small>One per line</small></div>
+          <div class="frow one">
+            <div class="field"><textarea id="projects" placeholder="Vocentra — Job platform built with Blazor & Azure&#10;Flyer Maker — Single-file HTML design tool"></textarea></div>
+          </div>
+        </div>
 
-      const summaryWords = summary ? summary.split(/\s+/).filter(Boolean).length : 0;
-      if(summaryWords >= 35 && summaryWords <= 120){
-        score += 14;
-      } else if(summaryWords > 0){
-        score += 6;
-        suggestions.push("Keep summary between 35 and 120 words with clear strengths and target role.");
-      } else {
-        suggestions.push("Write a focused summary: strengths, tools, and outcomes.");
-      }
+        <div class="divider"></div>
 
-      if(skills.length >= 8){
-        score += 12;
-      } else if(skills.length >= 4){
-        score += 7;
-        suggestions.push("Add 4-8 more role-specific skills to improve ATS matching.");
-      } else {
-        suggestions.push("List at least 8 skills (technical + domain + tools).");
-      }
+        <div class="sec">
+          <div class="sec-label">Extras <small>Certs, languages, links</small></div>
+          <div class="frow one">
+            <div class="field"><textarea id="extras" placeholder="AZ-900 Azure Fundamentals&#10;GitHub: github.com/yourname&#10;English (native) • Afrikaans (conversational)"></textarea></div>
+          </div>
+        </div>
 
-      let expCount = 0;
-      let expBulletCount = 0;
-      let quantifiedCount = 0;
-      for(let i=1;i<=4;i++){
-        const role = safe($(`exp_role_${i}`).value);
-        const company = safe($(`exp_company_${i}`).value);
-        const dates = safe($(`exp_dates_${i}`).value);
-        const points = linesToBullets($(`exp_points_${i}`).value);
-        if(role || company || dates || points.length){
-          expCount++;
-          expBulletCount += points.length;
-          quantifiedCount += points.filter(p => /(\d+|%|\$|kpi|reduced|increased|improved|cut|grew)/i.test(p)).length;
-        }
-      }
+        <div class="divider"></div>
 
-      if(expCount >= 2){
-        score += 12;
-      } else if(expCount === 1){
-        score += 6;
-        suggestions.push("Add at least one more experience entry for stronger credibility.");
-      } else {
-        suggestions.push("Add experience entries with role, company, dates, and highlights.");
-      }
+        <div class="sec">
+          <div class="sec-label">CV Quality Score <span id="qualityLevel" style="font-size:10px;color:var(--muted);letter-spacing:0;text-transform:none;font-weight:300;">Draft</span></div>
+          <div class="score-card">
+            <div class="score-head">
+              <strong>Overall score</strong>
+              <span class="score-val" id="qualityScore">0 / 100</span>
+            </div>
+            <div class="score-track"><div class="score-fill" id="qualityFill" style="width:0%"></div></div>
+          </div>
+          <ul class="suggestions" id="improvementList"></ul>
+          <p class="hint">Strong CVs are specific, measurable, and keyword-rich for ATS scans.</p>
+        </div>
 
-      if(expBulletCount >= 6){
-        score += 8;
-      } else if(expBulletCount > 0){
-        score += 4;
-        suggestions.push("Add more impact bullets (aim for 2-4 bullets per role).");
-      } else {
-        suggestions.push("Add achievement bullets under each role.");
-      }
+      </div>
+    </div>
 
-      if(quantifiedCount >= 3){
-        score += 10;
-      } else {
-        suggestions.push("Add measurable results to bullets (numbers, %, time saved, revenue, users).");
-      }
+    <!-- PREVIEW -->
+    <div class="panel preview-panel">
+      <div class="panel-head">
+        <span class="panel-title">Preview</span>
+        <button class="btn prim" id="btnPrint2">Print / Save PDF</button>
+      </div>
+      <div class="preview-wrap">
+        <div class="cv-paper" id="cv">
+          <div class="cv-top">
+            <div>
+              <div class="cv-name" id="p_name">Your Name</div>
+              <div class="cv-role" id="p_headline">Your Role / Headline</div>
+            </div>
+            <div class="cv-contact" id="p_contact">Phone<br>Email<br>Website<br>Location</div>
+          </div>
+          <div class="cv-cols">
+            <div class="cv-main">
+              <div class="cv-h3">Summary</div>
+              <div class="cv-summary" id="p_summary">Write a short professional summary.</div>
+              <div class="cv-h3">Experience</div>
+              <div id="p_experience"></div>
+              <div class="cv-h3">Projects</div>
+              <div class="cv-smalltext" id="p_projects">Add 2–5 projects that show proof of work.</div>
+            </div>
+            <div class="cv-side">
+              <div class="cv-smallbox">
+                <div class="cv-h3">Skills</div>
+                <div class="cv-tag-list" id="p_skills">
+                  <span class="cv-tag">Add skills (comma separated)</span>
+                </div>
+              </div>
+              <div class="cv-smallbox">
+                <div class="cv-h3">Education</div>
+                <div class="cv-smalltext" id="p_education">Optional — add your highest qualification.</div>
+              </div>
+              <div class="cv-smallbox">
+                <div class="cv-h3">Extras</div>
+                <div class="cv-smalltext" id="p_extras">Certifications, links, languages, etc.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      if(projects.length >= 2){
-        score += 8;
-      } else if(projects.length === 1){
-        score += 4;
-        suggestions.push("Add one more project with a clear result.");
-      } else {
-        suggestions.push("Add 2-5 projects with technologies and outcomes.");
-      }
+  </div>
+</div>
 
-      const edu = [safe($("edu_title").value), safe($("edu_school").value)].filter(Boolean).length;
-      if(edu > 0) score += 4;
+<script>
+(function(){
+"use strict";
 
-      const extras = linesToBullets($("extras").value).length;
-      if(extras > 0) score += 4;
+const G=id=>document.getElementById(id);
+const safe=v=>(v??'').toString().trim();
 
-      score = Math.max(0, Math.min(100, score));
-      const level = score >= 80 ? "Strong" : (score >= 60 ? "Good" : (score >= 40 ? "Developing" : "Draft"));
-      return { score, level, suggestions: suggestions.slice(0, 6) };
-    }
+const FIELD_IDS=[
+  "fullName","headline","phone","email","website","location","summary","skills",
+  "exp_role_1","exp_company_1","exp_dates_1","exp_loc_1","exp_points_1",
+  "exp_role_2","exp_company_2","exp_dates_2","exp_loc_2","exp_points_2",
+  "exp_role_3","exp_company_3","exp_dates_3","exp_loc_3","exp_points_3",
+  "exp_role_4","exp_company_4","exp_dates_4","exp_loc_4","exp_points_4",
+  "edu_title","edu_school","edu_dates","edu_notes","projects","extras"
+];
 
-    function renderQuality(){
-      const scoreEl = $("qualityScore");
-      const fillEl = $("qualityFill");
-      const levelEl = $("qualityLevel");
-      const listEl = $("improvementList");
-      if(!scoreEl || !fillEl || !levelEl || !listEl) return;
+function escHtml(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;");}
+function escAttr(s){return escHtml(s).replaceAll('`','&#96;');}
+function linesToBullets(txt){return safe(txt).split('\n').map(s=>s.replace(/^\s*[-•]\s*/,'').trim()).filter(Boolean);}
+function commaToTags(txt){return safe(txt).split(/[,\n]/).map(s=>s.trim()).filter(Boolean);}
 
-      const result = getQualityAssessment();
-      scoreEl.textContent = `${result.score} / 100`;
-      fillEl.style.width = `${result.score}%`;
-      levelEl.textContent = result.level;
+// ── CV PAPER THEMES ──────────────────────────────
+// Theme only changes the CV paper accent stripe colour
+const CV_THEMES={
+  midnight:{accent:'#1e293b',tag:'#e2e8f0',tagText:'#334155'},
+  ocean:{accent:'#0c4a6e',tag:'#e0f2fe',tagText:'#0c4a6e'},
+  forest:{accent:'#14532d',tag:'#dcfce7',tagText:'#14532d'},
+  sunset:{accent:'#7c2d12',tag:'#ffedd5',tagText:'#7c2d12'},
+  royal:{accent:'#312e81',tag:'#eef2ff',tagText:'#312e81'},
+  graphite:{accent:'#374151',tag:'#f1f5f9',tagText:'#374151'},
+  rose:{accent:'#881337',tag:'#ffe4e6',tagText:'#881337'},
+  teal:{accent:'#134e4a',tag:'#ccfbf1',tagText:'#134e4a'},
+  amber:{accent:'#78350f',tag:'#fef3c7',tagText:'#78350f'},
+  violet:{accent:'#4c1d95',tag:'#f5f3ff',tagText:'#4c1d95'},
+  light_snow:{accent:'#1e40af',tag:'#dbeafe',tagText:'#1e40af'},
+  light_sky:{accent:'#075985',tag:'#e0f2fe',tagText:'#075985'},
+  light_sage:{accent:'#166534',tag:'#dcfce7',tagText:'#166534'},
+  light_sand:{accent:'#9a3412',tag:'#ffedd5',tagText:'#9a3412'},
+  light_lavender:{accent:'#5b21b6',tag:'#ede9fe',tagText:'#5b21b6'},
+  light_mint:{accent:'#065f46',tag:'#d1fae5',tagText:'#065f46'},
+  light_rose:{accent:'#9f1239',tag:'#ffe4e6',tagText:'#9f1239'},
+  light_peach:{accent:'#c2410c',tag:'#ffedd5',tagText:'#c2410c'},
+  light_slate:{accent:'#1e293b',tag:'#f1f5f9',tagText:'#1e293b'},
+  light_cloud:{accent:'#3730a3',tag:'#eef2ff',tagText:'#3730a3'},
+};
+const THEME_KEY='cvgen_theme_v1';
+function applyTheme(name){
+  const t=CV_THEMES[name]||CV_THEMES.midnight;
+  const paper=G('cv');
+  if(!paper)return;
+  paper.style.setProperty('--cv-accent',t.accent);
+  const nameEl=G('p_name');
+  if(nameEl)nameEl.style.color=t.accent;
+  const h3s=paper.querySelectorAll('.cv-h3');
+  h3s.forEach(el=>{el.style.color=t.accent;el.style.borderBottomColor=t.accent;});
+  const tags=paper.querySelectorAll('.cv-tag');
+  tags.forEach(el=>{el.style.background=t.tag;el.style.color=t.tagText;el.style.borderColor=t.tag;});
+  try{localStorage.setItem(THEME_KEY,name);}catch{}
+}
 
-      listEl.innerHTML = "";
-      if(!result.suggestions.length){
-        const li = document.createElement("li");
-        li.textContent = "Great base CV. Tailor keywords to each job description before exporting.";
-        listEl.appendChild(li);
-        return;
-      }
-      for(const msg of result.suggestions){
-        const li = document.createElement("li");
-        li.textContent = msg;
-        listEl.appendChild(li);
-      }
-    }
+// ── RENDER ───────────────────────────────────────
+function buildContact(){
+  const parts=[];
+  const ph=safe(G('phone').value);
+  const em=safe(G('email').value);
+  const ws=safe(G('website').value);
+  const lo=safe(G('location').value);
+  if(ph)parts.push(escHtml(ph));
+  if(em)parts.push(`<a href="mailto:${escAttr(em)}">${escHtml(em)}</a>`);
+  if(ws){const w=ws.replace(/^https?:\/\//i,'');const hr=ws.match(/^https?:\/\//i)?ws:'https://'+w;parts.push(`<a href="${escAttr(hr)}" target="_blank" rel="noopener">${escHtml(w)}</a>`);}
+  if(lo)parts.push(escHtml(lo));
+  return parts.length?parts.join('<br>'):'Phone<br>Email<br>Website<br>Location';
+}
 
-    function render(){
-      $("p_name").textContent = safe($("fullName").value) || "Your Name";
-      $("p_headline").textContent = safe($("headline").value) || "Your Role / Headline";
-      $("p_contact").innerHTML = buildContact();
+function buildExperience(){
+  const wrap=document.createElement('div');
+  for(let i=1;i<=4;i++){
+    const role=safe(G(`exp_role_${i}`).value);
+    const co=safe(G(`exp_company_${i}`).value);
+    const dates=safe(G(`exp_dates_${i}`).value);
+    const loc=safe(G(`exp_loc_${i}`).value);
+    const pts=linesToBullets(G(`exp_points_${i}`).value);
+    if(!role&&!co&&!dates&&!loc&&!pts.length)continue;
+    const item=document.createElement('div');item.className='cv-item';
+    const title=escHtml([role,co].filter(Boolean).join(' — ')||'Experience');
+    const meta=escHtml([dates,loc].filter(Boolean).join(' • '));
+    item.innerHTML=`<div class="cv-item-top"><div class="cv-item-title">${title}</div><div class="cv-item-meta">${meta}</div></div>`;
+    if(pts.length){const ul=document.createElement('ul');ul.className='cv-bullets';pts.forEach(p=>{const li=document.createElement('li');li.textContent=p;ul.appendChild(li);});item.appendChild(ul);}
+    wrap.appendChild(item);
+  }
+  if(!wrap.children.length){const d=document.createElement('div');d.className='cv-smalltext';d.textContent='Add your work experience on the left.';wrap.appendChild(d);}
+  return wrap;
+}
 
-      $("p_summary").textContent = safe($("summary").value) || "Write a short professional summary.";
+function buildProjects(){
+  const rows=linesToBullets(G('projects').value);
+  if(!rows.length)return'Add 2–5 projects that show proof of work.';
+  return rows.map(r=>'• '+r).join('\n');
+}
+function buildEducation(){
+  const t=safe(G('edu_title').value),s=safe(G('edu_school').value),d=safe(G('edu_dates').value),n=safe(G('edu_notes').value);
+  const top=[t,s].filter(Boolean).join(' — ');
+  const meta=[d,n].filter(Boolean).join(' • ');
+  return[top,meta].filter(Boolean).join('\n')||'Optional — add your highest qualification.';
+}
+function buildExtras(){
+  const rows=linesToBullets(G('extras').value);
+  if(!rows.length)return'Certifications, links, languages, etc.';
+  return rows.map(r=>'• '+r).join('\n');
+}
 
-      // Skills tags
-      const skills = commaToTags($("skills").value);
-      const skillWrap = $("p_skills");
-      skillWrap.innerHTML = "";
-      if(skills.length){
-        for(const s of skills){
-          const el = document.createElement("span");
-          el.className = "tag";
-          el.textContent = s;
-          skillWrap.appendChild(el);
-        }
-      } else {
-        const el = document.createElement("span");
-        el.className = "tag";
-        el.textContent = "Add skills (comma separated)";
-        skillWrap.appendChild(el);
-      }
+function renderQuality(){
+  let score=0;const suggestions=[];
+  const fullName=safe(G('fullName').value),headline=safe(G('headline').value);
+  const phone=safe(G('phone').value),email=safe(G('email').value);
+  const website=safe(G('website').value),location=safe(G('location').value);
+  const summary=safe(G('summary').value),skills=commaToTags(G('skills').value);
+  const projects=linesToBullets(G('projects').value);
+  if(fullName)score+=8;else suggestions.push('Add your full name.');
+  if(headline)score+=8;else suggestions.push('Add a role headline (e.g. Frontend Developer).');
+  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(phone)score+=5;else suggestions.push('Add a phone number in international format.');
+  if(emailOk)score+=7;else suggestions.push('Use a valid professional email address.');
+  if(website)score+=5;else suggestions.push('Add a portfolio, GitHub, or LinkedIn link.');
+  if(location)score+=3;
+  const sw=summary?summary.split(/\s+/).filter(Boolean).length:0;
+  if(sw>=35&&sw<=120){score+=14;}else if(sw>0){score+=6;suggestions.push('Keep summary 35–120 words: strengths, tools, outcomes.');}else{suggestions.push('Write a focused summary: strengths, tools, and outcomes.');}
+  if(skills.length>=8){score+=12;}else if(skills.length>=4){score+=7;suggestions.push('Add 4–8 more role-specific skills for ATS matching.');}else{suggestions.push('List at least 8 skills (technical + domain + tools).');}
+  let expCount=0,expBullets=0,quantified=0;
+  for(let i=1;i<=4;i++){
+    const role=safe(G(`exp_role_${i}`).value),co=safe(G(`exp_company_${i}`).value);
+    const dates=safe(G(`exp_dates_${i}`).value),pts=linesToBullets(G(`exp_points_${i}`).value);
+    if(role||co||dates||pts.length){expCount++;expBullets+=pts.length;quantified+=pts.filter(p=>/(\\d+|%|\$|kpi|reduced|increased|improved|cut|grew)/i.test(p)).length;}
+  }
+  if(expCount>=2){score+=12;}else if(expCount===1){score+=6;suggestions.push('Add at least one more experience entry.');}else{suggestions.push('Add experience entries with role, company, dates, highlights.');}
+  if(expBullets>=6){score+=8;}else if(expBullets>0){score+=4;suggestions.push('Aim for 2–4 achievement bullets per role.');}else{suggestions.push('Add achievement bullets under each role.');}
+  if(quantified>=3){score+=10;}else{suggestions.push('Add measurable results (numbers, %, time saved, revenue).');}
+  if(projects.length>=2){score+=8;}else if(projects.length===1){score+=4;suggestions.push('Add one more project with a clear result.');}else{suggestions.push('Add 2–5 projects with technologies and outcomes.');}
+  const edu=[safe(G('edu_title').value),safe(G('edu_school').value)].filter(Boolean).length;
+  if(edu>0)score+=4;
+  const extras=linesToBullets(G('extras').value).length;
+  if(extras>0)score+=4;
+  score=Math.max(0,Math.min(100,score));
+  const level=score>=80?'Strong':(score>=60?'Good':(score>=40?'Developing':'Draft'));
+  G('qualityScore').textContent=`${score} / 100`;
+  G('qualityFill').style.width=`${score}%`;
+  G('qualityLevel').textContent=level;
+  const list=G('improvementList');list.innerHTML='';
+  const msgs=suggestions.slice(0,6);
+  if(!msgs.length){const li=document.createElement('li');li.textContent='Great base CV. Tailor keywords to each job before exporting.';list.appendChild(li);return;}
+  msgs.forEach(msg=>{const li=document.createElement('li');li.textContent=msg;list.appendChild(li);});
+}
 
-      // Experience
-      const exp = buildExperience();
-      const expWrap = $("p_experience");
-      expWrap.innerHTML = "";
-      expWrap.appendChild(exp);
+function render(){
+  G('p_name').textContent=safe(G('fullName').value)||'Your Name';
+  G('p_headline').textContent=safe(G('headline').value)||'Your Role / Headline';
+  G('p_contact').innerHTML=buildContact();
+  G('p_summary').textContent=safe(G('summary').value)||'Write a short professional summary.';
+  const skills=commaToTags(G('skills').value);
+  const sw=G('p_skills');sw.innerHTML='';
+  const themeKey=(()=>{try{return localStorage.getItem(THEME_KEY);}catch{return null;}})();
+  const t=CV_THEMES[themeKey||'midnight']||CV_THEMES.midnight;
+  if(skills.length){skills.forEach(s=>{const el=document.createElement('span');el.className='cv-tag';el.textContent=s;el.style.background=t.tag;el.style.color=t.tagText;sw.appendChild(el);});}
+  else{const el=document.createElement('span');el.className='cv-tag';el.textContent='Add skills (comma separated)';sw.appendChild(el);}
+  const exp=buildExperience();const expWrap=G('p_experience');expWrap.innerHTML='';expWrap.appendChild(exp);
+  G('p_projects').textContent=buildProjects();
+  G('p_education').textContent=buildEducation();
+  G('p_extras').textContent=buildExtras();
+  renderQuality();
+  // Reapply theme colours to new elements
+  const thName=(()=>{try{return localStorage.getItem(THEME_KEY);}catch{return null;}})();
+  if(thName)applyTheme(thName);
+}
 
-      // Projects / Education / Extras
-      $("p_projects").textContent = buildProjects();
-      $("p_education").textContent = buildEducation();
-      $("p_extras").textContent = buildExtras();
-      renderQuality();
-    }
+// ── STATE ────────────────────────────────────────
+function getState(){const s={v:1,data:{}};FIELD_IDS.forEach(id=>s.data[id]=G(id).value??'');return s;}
+function setState(s){
+  if(!s||!s.data)return;
+  FIELD_IDS.forEach(id=>{if(Object.prototype.hasOwnProperty.call(s.data,id))G(id).value=s.data[id];});
+  render();
+}
+function dlJson(name,text){
+  const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
 
-    function getState(){
-      const state = { version: 1, data: {} };
-      for(const id of ids) state.data[id] = $(id).value ?? "";
-      return state;
-    }
+// ── EVENTS ───────────────────────────────────────
+FIELD_IDS.forEach(id=>G(id).addEventListener('input',render));
 
-    function setState(state){
-      if(!state || !state.data) return;
-      for(const id of ids){
-        if(Object.prototype.hasOwnProperty.call(state.data, id)){
-          $(id).value = state.data[id];
-        }
-      }
-      render();
-    }
+G('themeSelect').addEventListener('change',e=>{applyTheme(e.target.value);try{localStorage.setItem(THEME_KEY,e.target.value);}catch{}});
+G('btnPrint').addEventListener('click',()=>{render();window.print();});
+G('btnPrint2').addEventListener('click',()=>{render();window.print();});
+G('btnSave').addEventListener('click',()=>{
+  const name=(safe(G('fullName').value)||'cv').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const stamp=new Date().toISOString().slice(0,10);
+  dlJson(`${name}-cv-${stamp}.json`,JSON.stringify(getState(),null,2));
+});
+G('fileLoad').addEventListener('change',async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{const txt=await file.text();setState(JSON.parse(txt));}
+  catch{alert('Invalid JSON file.');}
+  finally{e.target.value='';}
+});
+G('btnReset').addEventListener('click',()=>{
+  if(!confirm('Reset all fields?'))return;
+  FIELD_IDS.forEach(id=>G(id).value='');
+  const KEY='cvgen_state_v1';
+  try{localStorage.removeItem(KEY);}catch{}
+  try{localStorage.removeItem(THEME_KEY);}catch{}
+  G('themeSelect').value='midnight';
+  applyTheme('midnight');render();
+});
 
-    function download(filename, text){
-      const blob = new Blob([text], {type:"application/json;charset=utf-8"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
+// ── AUTOSAVE ─────────────────────────────────────
+const LS_KEY='cvgen_state_v1';
+function autosave(){try{localStorage.setItem(LS_KEY,JSON.stringify(getState()));}catch{}}
+function autoload(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);if(!raw)return;
+    setState(JSON.parse(raw));
+  }catch{}
+}
+FIELD_IDS.forEach(id=>G(id).addEventListener('input',autosave));
 
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
-    function escapeHtmlAttr(str){ return escapeHtml(str).replaceAll("`","&#96;"); }
+// ── INIT ─────────────────────────────────────────
+const savedTheme=(()=>{try{return localStorage.getItem(THEME_KEY);}catch{return null;}})();
+const initTheme=savedTheme&&CV_THEMES[savedTheme]?savedTheme:'midnight';
+G('themeSelect').value=initTheme;
+autoload();
+render();
+applyTheme(initTheme);
 
-    const THEME_KEY = "cvgen_theme_v1";
-    const THEMES = {
-      midnight: { bg:"#0b1020", bg2:"#0f172a", card:"rgba(255,255,255,.06)", text:"#e5e7eb", muted:"#9ca3af", line:"rgba(255,255,255,.12)", accent:"#60a5fa", accent2:"#22c55e", danger:"#fb7185" },
-      ocean:    { bg:"#061628", bg2:"#0a2238", card:"rgba(184,230,255,.08)", text:"#e7f6ff", muted:"#9cc3da", line:"rgba(156,195,218,.25)", accent:"#38bdf8", accent2:"#22d3ee", danger:"#f87171" },
-      forest:   { bg:"#0b1a12", bg2:"#132a1d", card:"rgba(180,220,180,.08)", text:"#e8f6ea", muted:"#9fc2a8", line:"rgba(159,194,168,.26)", accent:"#34d399", accent2:"#84cc16", danger:"#fb7185" },
-      sunset:   { bg:"#1a1020", bg2:"#2a1630", card:"rgba(255,202,165,.09)", text:"#fff1e8", muted:"#e8b6a0", line:"rgba(232,182,160,.28)", accent:"#fb923c", accent2:"#f43f5e", danger:"#fb7185" },
-      royal:    { bg:"#120f2b", bg2:"#1d1742", card:"rgba(199,210,254,.09)", text:"#eef2ff", muted:"#b4bde8", line:"rgba(180,189,232,.26)", accent:"#818cf8", accent2:"#a78bfa", danger:"#fb7185" },
-      graphite: { bg:"#111317", bg2:"#1a1f27", card:"rgba(203,213,225,.08)", text:"#f1f5f9", muted:"#a8b3c0", line:"rgba(168,179,192,.24)", accent:"#94a3b8", accent2:"#38bdf8", danger:"#fb7185" },
-      rose:     { bg:"#2a1020", bg2:"#3a1830", card:"rgba(251,207,232,.08)", text:"#fff1f7", muted:"#e7b5cc", line:"rgba(231,181,204,.28)", accent:"#f472b6", accent2:"#fb7185", danger:"#fb7185" },
-      teal:     { bg:"#0c1f22", bg2:"#133036", card:"rgba(153,246,228,.08)", text:"#ecfeff", muted:"#9bc9c8", line:"rgba(155,201,200,.26)", accent:"#2dd4bf", accent2:"#22d3ee", danger:"#fb7185" },
-      amber:    { bg:"#24170a", bg2:"#352211", card:"rgba(254,243,199,.09)", text:"#fff7e8", muted:"#e3c89c", line:"rgba(227,200,156,.28)", accent:"#f59e0b", accent2:"#f97316", danger:"#fb7185" },
-      violet:   { bg:"#1b1230", bg2:"#281a45", card:"rgba(221,214,254,.09)", text:"#f5f3ff", muted:"#c4b8e8", line:"rgba(196,184,232,.26)", accent:"#8b5cf6", accent2:"#6366f1", danger:"#fb7185" },
-      light_snow:     { bg:"#f8fafc", bg2:"#eef2f7", card:"rgba(15,23,42,.04)", text:"#0f172a", muted:"#475569", line:"rgba(15,23,42,.16)", accent:"#2563eb", accent2:"#0ea5e9", danger:"#e11d48" },
-      light_sky:      { bg:"#f0f9ff", bg2:"#e0f2fe", card:"rgba(3,105,161,.05)", text:"#082f49", muted:"#0c4a6e", line:"rgba(12,74,110,.18)", accent:"#0284c7", accent2:"#22d3ee", danger:"#e11d48" },
-      light_sage:     { bg:"#f4fbf6", bg2:"#e8f5ea", card:"rgba(22,101,52,.05)", text:"#14532d", muted:"#3f6f53", line:"rgba(20,83,45,.16)", accent:"#16a34a", accent2:"#65a30d", danger:"#dc2626" },
-      light_sand:     { bg:"#fff9f1", bg2:"#fff1de", card:"rgba(146,64,14,.05)", text:"#7c2d12", muted:"#9a5b2b", line:"rgba(124,45,18,.18)", accent:"#ea580c", accent2:"#f59e0b", danger:"#dc2626" },
-      light_lavender: { bg:"#f7f5ff", bg2:"#efeaff", card:"rgba(76,29,149,.05)", text:"#3b0764", muted:"#6b4a8b", line:"rgba(59,7,100,.16)", accent:"#7c3aed", accent2:"#a855f7", danger:"#db2777" },
-      light_mint:     { bg:"#f1fffb", bg2:"#dcfdf4", card:"rgba(6,95,70,.05)", text:"#064e3b", muted:"#2f7f6b", line:"rgba(6,78,59,.16)", accent:"#059669", accent2:"#14b8a6", danger:"#dc2626" },
-      light_rose:     { bg:"#fff5f8", bg2:"#ffe7ef", card:"rgba(157,23,77,.05)", text:"#881337", muted:"#9b4968", line:"rgba(136,19,55,.18)", accent:"#e11d48", accent2:"#f472b6", danger:"#be123c" },
-      light_peach:    { bg:"#fff7ed", bg2:"#ffedd5", card:"rgba(154,52,18,.05)", text:"#7c2d12", muted:"#a16232", line:"rgba(124,45,18,.18)", accent:"#f97316", accent2:"#fb923c", danger:"#dc2626" },
-      light_slate:    { bg:"#f8fafc", bg2:"#f1f5f9", card:"rgba(30,41,59,.05)", text:"#0f172a", muted:"#475569", line:"rgba(15,23,42,.18)", accent:"#334155", accent2:"#6366f1", danger:"#dc2626" },
-      light_cloud:    { bg:"#fdfdfd", bg2:"#f3f4f6", card:"rgba(17,24,39,.04)", text:"#111827", muted:"#4b5563", line:"rgba(17,24,39,.14)", accent:"#4f46e5", accent2:"#06b6d4", danger:"#dc2626" }
-    };
-
-    function applyTheme(name){
-      const theme = THEMES[name] || THEMES.midnight;
-      const root = document.documentElement.style;
-      root.setProperty("--bg", theme.bg);
-      root.setProperty("--bg2", theme.bg2);
-      root.setProperty("--card", theme.card);
-      root.setProperty("--text", theme.text);
-      root.setProperty("--muted", theme.muted);
-      root.setProperty("--line", theme.line);
-      root.setProperty("--accent", theme.accent);
-      root.setProperty("--accent2", theme.accent2);
-      root.setProperty("--danger", theme.danger);
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if(meta) meta.setAttribute("content", theme.bg);
-    }
-
-    // Wire up events
-    for(const id of ids){
-      $(id).addEventListener("input", render);
-    }
-
-    $("themeSelect").addEventListener("change", (e) => {
-      const themeName = e.target.value;
-      applyTheme(themeName);
-      try{ localStorage.setItem(THEME_KEY, themeName); } catch {}
-    });
-
-    $("btnPrint").addEventListener("click", () => {
-      // Make sure preview is up to date before printing
-      render();
-      window.print();
-    });
-
-    $("btnSave").addEventListener("click", () => {
-      const state = getState();
-      const name = safe($("fullName").value).replace(/\s+/g," ").trim() || "cv";
-      const stamp = new Date().toISOString().slice(0,10);
-      download(`${name.toLowerCase().replace(/[^a-z0-9]+/g,"-")}-cv-${stamp}.json`, JSON.stringify(state, null, 2));
-    });
-
-    $("fileLoad").addEventListener("change", async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if(!file) return;
-      try{
-        const text = await file.text();
-        const json = JSON.parse(text);
-        setState(json);
-      } catch(err){
-        alert("Invalid JSON file.");
-      } finally{
-        e.target.value = "";
-      }
-    });
-
-    $("btnReset").addEventListener("click", () => {
-      if(!confirm("Reset all fields?")) return;
-      for(const id of ids) $(id).value = "";
-      try{ localStorage.removeItem(KEY); } catch {}
-      try{ localStorage.removeItem(THEME_KEY); } catch {}
-      $("themeSelect").value = "midnight";
-      applyTheme("midnight");
-      render();
-    });
-
-    const savedTheme = (() => {
-      try{ return localStorage.getItem(THEME_KEY); } catch { return null; }
-    })();
-    const initialTheme = savedTheme && THEMES[savedTheme] ? savedTheme : "midnight";
-    $("themeSelect").value = initialTheme;
-    applyTheme(initialTheme);
-
-    // First render
-    render();
-
-    // (Optional) Lightweight autosave to localStorage
-    const KEY = "cvgen_state_v1";
-    function autosave(){
-      try{ localStorage.setItem(KEY, JSON.stringify(getState())); } catch {}
-    }
-    function autoload(){
-      try{
-        const raw = localStorage.getItem(KEY);
-        if(!raw) return;
-        const st = JSON.parse(raw);
-        setState(st);
-      } catch {}
-    }
-    // enable autosave
-    for(const id of ids) $(id).addEventListener("input", autosave);
-    autoload();
-  </script>
+})();
+</script>
 </body>
 </html>
