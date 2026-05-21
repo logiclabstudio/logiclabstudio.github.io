@@ -1,823 +1,725 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#080707" />
-
-  <title>Kaya Lounge | Bookings, Hours & Directions</title>
-  <meta name="description" content="Bookings, operating hours, and directions. Reserve your spot via WhatsApp." />
-
-  <!-- Basic OG -->
-  <meta property="og:title" content="Kaya Lounge | Bookings, Hours & Directions" />
-  <meta property="og:description" content="Reserve via WhatsApp. View hours and get directions." />
-  <meta property="og:type" content="website" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg:#0b0f19;
-      --card:#0f172a;
-      --card2:#111827;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --ring:rgba(255,255,255,.12);
-      --brand:#22c55e;   /* WhatsApp */
-      --accent:#60a5fa;  /* blue */
-      --gold:#fbbf24;    /* warm accent */
-      --shadow: 0 25px 70px rgba(0,0,0,.45);
-      --radius: 18px;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:
-        radial-gradient(900px 500px at 10% -10%, rgba(96,165,250,.18), transparent 60%),
-        radial-gradient(900px 500px at 110% 20%, rgba(34,197,94,.14), transparent 55%),
-        radial-gradient(800px 500px at 50% 110%, rgba(251,191,36,.10), transparent 55%),
-        var(--bg);
-      line-height:1.5;
-      overflow-x:hidden;
-    }
-
-    a{color:inherit; text-decoration:none}
-
-    .wrap{max-width:1180px; margin:0 auto; padding:28px 16px 64px}
-
-    /* Top bar */
-    header{
-      position:sticky;
-      top:0;
-      z-index:20;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(11,15,25,.78), rgba(11,15,25,.38));
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-
-    .topbar{
-      max-width:1180px;
-      margin:0 auto;
-      padding:14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:220px;
-    }
-
-    .logo{
-      width:44px;
-      height:44px;
-      border-radius:14px;
-      background:
-        radial-gradient(18px 18px at 25% 25%, rgba(255,255,255,.55), transparent 55%),
-        linear-gradient(135deg, rgba(96,165,250,.95), rgba(34,197,94,.85));
-      box-shadow: 0 18px 45px rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.12);
-    }
-
-    .brandTitle{display:flex; flex-direction:column; gap:2px}
-    .brandTitle strong{font-size:14px; letter-spacing:.2px}
-    .brandTitle span{font-size:12px; color:var(--muted)}
-
-    nav{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      align-items:center;
-    }
-
-    .navlink{
-      font-size:13px;
-      color:var(--muted);
-      padding:9px 10px;
-      border-radius:12px;
-      border:1px solid transparent;
-      transition: .15s ease;
-    }
-    .navlink:hover{
-      color:var(--text);
-      background:rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.10);
-    }
-
-    .navcta{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(34,197,94,.28);
-      background:rgba(34,197,94,.14);
-      font-size:13px;
-      font-weight:650;
-      transition:.15s ease;
-      white-space:nowrap;
-    }
-    .navcta:hover{background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.40)}
-
-    /* Hero */
-    .hero{
-      padding-top:28px;
-      display:grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    @media (max-width: 980px){
-      .hero{grid-template-columns:1fr}
-      .brand{min-width:auto}
-    }
-
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      border:1px solid var(--ring);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-
-    .heroLeft{
-      position:relative;
-      overflow:hidden;
-    }
-
-    /* Decorative “visuals” without images */
-    .heroVisual{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:.95;
-      background:
-        radial-gradient(520px 320px at 18% 18%, rgba(96,165,250,.25), transparent 60%),
-        radial-gradient(520px 320px at 82% 20%, rgba(34,197,94,.20), transparent 60%),
-        radial-gradient(520px 320px at 55% 92%, rgba(251,191,36,.16), transparent 55%);
-    }
-    .gridOverlay{
-      position:absolute;
-      inset:-1px;
-      background-image:
-        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
-      background-size: 64px 64px;
-      opacity:.12;
-      mask-image: radial-gradient(closest-side at 50% 35%, black 50%, transparent 90%);
-      pointer-events:none;
-    }
-
-    .heroContent{position:relative; padding:26px}
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(96,165,250,.24);
-      background:rgba(96,165,250,.12);
-      color:#d7ebff;
-      font-size:13px;
-      margin-bottom:14px;
-    }
-
-    .headline{
-      margin:0;
-      font-size:44px;
-      line-height:1.05;
-      letter-spacing:-.7px;
-    }
-
-    .sub{
-      margin:12px 0 18px;
-      color:var(--muted);
-      max-width:65ch;
-      font-size:16px;
-    }
-
-    .ctaRow{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      font-weight:650;
-      font-size:14px;
-      transition:.15s ease;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .btn:hover{background:rgba(255,255,255,.085); border-color:rgba(255,255,255,.22)}
-
-    .btnPrimary{
-      border-color: rgba(34,197,94,.30);
-      background: rgba(34,197,94,.14);
-    }
-    .btnPrimary:hover{background: rgba(34,197,94,.18); border-color: rgba(34,197,94,.42)}
-
-    .btnSecondary{
-      border-color: rgba(96,165,250,.26);
-      background: rgba(96,165,250,.12);
-    }
-    .btnSecondary:hover{background: rgba(96,165,250,.16); border-color: rgba(96,165,250,.40)}
-
-    .features{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-      margin-top:18px;
-    }
-    @media (max-width: 980px){
-      .features{grid-template-columns:1fr}
-      .headline{font-size:38px}
-    }
-
-    .feature{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(15,23,42,.35);
-      border-radius:16px;
-      padding:14px;
-    }
-    .feature strong{display:block; font-size:14px; margin-bottom:6px}
-    .feature span{display:block; color:var(--muted); font-size:13px}
-
-    /* Right column */
-    .side{padding:18px}
-    .side h3{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
-
-    .infoGrid{display:grid; gap:10px; margin-top:10px}
-    .row{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      font-size:14px;
-    }
-    .row span{color:var(--muted)}
-
-    .note{
-      margin-top:12px;
-      padding:12px;
-      border-radius:16px;
-      border:1px solid rgba(251,191,36,.22);
-      background: rgba(251,191,36,.08);
-      color:#ffe7b3;
-      font-size:13px;
-    }
-
-    /* Sections */
-    section{scroll-margin-top:90px}
-
-    .section{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:18px;
-    }
-    @media (max-width: 980px){
-      .section{grid-template-columns:1fr}
-    }
-
-    .sectionCard{padding:18px}
-    .sectionCard h3{margin:0 0 10px; font-size:16px}
-    .sectionCard p{margin:0; color:var(--muted); font-size:14px}
-
-    .kv{display:grid; gap:10px; margin-top:12px}
-
-    .mapWrap{padding:14px}
-    .map{
-      width:100%;
-      height:360px;
-      border:0;
-      border-radius:16px;
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.12);
-    }
-
-    /* Footer */
-    footer{
-      margin-top:22px;
-      display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:12px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .mutedLink{color:var(--muted)}
-    .mutedLink:hover{color:var(--text)}
-
-    /* Small icon dots */
-    .dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35)}
-    .dot.green{background:rgba(34,197,94,.85)}
-    .dot.blue{background:rgba(96,165,250,.85)}
-    .dot.gold{background:rgba(251,191,36,.85)}
-
-    /* Theme sync overrides (matches homepage studio system) */
-    :root{
-      --bg:#0a0a0a;
-      --card:#151515;
-      --card2:#111111;
-      --text:#f4f4f4;
-      --muted:#b7b7b7;
-      --ring:rgba(255,255,255,.18);
-      --brand:#ffffff;
-      --accent:#ffffff;
-      --gold:#ffffff;
-      --shadow: 0 22px 54px rgba(0,0,0,.48);
-      --radius: 12px;
-    }
-
-    html[data-theme="graphite"]{
-      --bg:#0d1014;
-      --card:#1a1f25;
-      --card2:#13181d;
-      --text:#ecf0f3;
-      --muted:#aeb7c0;
-      --ring:rgba(219,231,240,.2);
-      --brand:#d8e3ef;
-      --accent:#d8e3ef;
-      --gold:#d8e3ef;
-    }
-
-    html[data-theme="paper"]{
-      --bg:#ececec;
-      --card:#ffffff;
-      --card2:#f6f6f6;
-      --text:#151515;
-      --muted:#515151;
-      --ring:rgba(17,17,17,.2);
-      --brand:#101010;
-      --accent:#101010;
-      --gold:#101010;
-      --shadow: 0 20px 44px rgba(0,0,0,.16);
-    }
-
-    body{
-      font-family: "Manrope","Segoe UI",sans-serif;
-      background:
-        radial-gradient(1200px 650px at 10% -12%, rgba(255,255,255,.07), transparent 66%),
-        radial-gradient(900px 560px at 90% 8%, rgba(255,255,255,.05), transparent 64%),
-        linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, #000 15%) 100%);
-      color:var(--text);
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      height:180px;
-      pointer-events:none;
-      z-index:-1;
-      background:
-        linear-gradient(to top, rgba(255,255,255,.08), rgba(255,255,255,.01) 50%, transparent),
-        repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 18px, rgba(255,255,255,.03) 18px 38px, transparent 38px 54px);
-      clip-path: polygon(0 100%, 0 40%, 8% 58%, 16% 46%, 26% 62%, 35% 50%, 46% 66%, 56% 52%, 68% 70%, 79% 57%, 89% 64%, 100% 48%, 100% 100%);
-    }
-
-    header{
-      background: color-mix(in srgb, var(--bg) 72%, transparent);
-      border-bottom:1px solid var(--ring);
-    }
-
-    .brandTitle strong,.headline,.sectionCard h3,.side h3{
-      font-family:"Space Grotesk","Segoe UI",sans-serif;
-      letter-spacing:-.02em;
-    }
-
-    .logo{
-      background: linear-gradient(140deg, color-mix(in srgb, var(--text) 90%, transparent), color-mix(in srgb, var(--text) 56%, transparent));
-      border:1px solid var(--ring);
-      filter:grayscale(1);
-      border-radius:10px;
-    }
-
-    .brandTitle span,.navlink,.sub,.feature span,.row span,.sectionCard p,.mutedLink,footer{
-      color:var(--muted);
-    }
-
-    .navlink:hover{
-      color:var(--text);
-      background:rgba(255,255,255,.06);
-      border-color:var(--ring);
-    }
-
-    .navcta,.btnPrimary,.btnSecondary{
-      background: var(--brand);
-      color: var(--bg);
-      border-color: color-mix(in srgb, var(--brand) 86%, #000 14%);
-      font-weight:700;
-    }
-
-    .card,.feature,.row,.map{
-      border-color:var(--ring);
-      background: linear-gradient(165deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-      backdrop-filter: blur(14px);
-    }
-
-    .heroVisual{
-      background:
-        radial-gradient(520px 320px at 18% 18%, rgba(255,255,255,.14), transparent 60%),
-        radial-gradient(520px 320px at 82% 20%, rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(520px 320px at 55% 92%, rgba(255,255,255,.08), transparent 55%);
-    }
-
-    .gridOverlay{
-      background-image:
-        linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,.08) 1px, transparent 1px);
-      opacity:.16;
-    }
-
-    .pill,.note{
-      color:var(--muted);
-      border-color:var(--ring);
-      background: rgba(255,255,255,.06);
-    }
-
-    .btn,.navcta,.navlink,.feature,.card{
-      border-radius:12px;
-      transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-    }
-
-    .btn:hover,.navcta:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 30px rgba(0,0,0,.32);
-      border-color:rgba(255,255,255,.38);
-    }
-
-    .dot,.dot.green,.dot.blue,.dot.gold{background: color-mix(in srgb, var(--bg) 78%, #fff 22%);}
-
-    .theme-switch{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px;
-      border-radius:999px;
-      border:1px solid var(--ring);
-      background: color-mix(in srgb, var(--card2) 86%, transparent);
-      margin-right: 6px;
-    }
-
-    .theme-dot{
-      width:18px;
-      height:18px;
-      border:1px solid rgba(255,255,255,.45);
-      border-radius:999px;
-      cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease;
-      padding:0;
-    }
-
-    .theme-dot:hover{transform:scale(1.12)}
-    .theme-dot.is-active{border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.22)}
-    .theme-dot[data-theme="mono"]{background:linear-gradient(135deg,#0a0a0a 50%,#f4f4f4 50%)}
-    .theme-dot[data-theme="graphite"]{background:linear-gradient(135deg,#111723 50%,#d4dce6 50%)}
-    .theme-dot[data-theme="paper"]{background:linear-gradient(135deg,#f0f0f0 50%,#101010 50%); border-color:rgba(0,0,0,.45)}
-
-    @media (max-width: 980px){
-      .theme-switch{display:none}
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#080707"/>
+<title>Kaya Lounge — Orkney</title>
+<meta name="description" content="Premium lounge experience in Orkney. Reserve via WhatsApp."/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+:root{
+  --ink:#0c0c0b;
+  --ivory:#f5f0e8;
+  --ivory2:#ede7d9;
+  --cream:#c9b99a;
+  --gold:#b8923a;
+  --gold2:#d4a84b;
+  --dim:#7a7168;
+  --dimmer:#4a4640;
+  --ring:rgba(184,146,58,.22);
+  --wa:#25D366;
+}
+
+body{
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:"DM Sans",sans-serif;
+  font-weight:300;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+a{color:inherit;text-decoration:none}
+
+/* ── Grain overlay ── */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:100;
+  pointer-events:none;
+  opacity:.032;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+
+/* ── Background atmosphere ── */
+.bg-glow{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(184,146,58,.07), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(184,146,58,.04), transparent 60%);
+}
+
+/* ── Nav ── */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:50;
+  padding:22px 48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(12,12,11,.92),rgba(12,12,11,0));
+}
+
+.nav-logo{
+  font-family:"Cormorant Garamond",serif;
+  font-weight:300;
+  font-size:22px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ivory);
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:36px;
+}
+
+.nav-links a{
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--ivory)}
+
+.nav-wa{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 22px;
+  border:1px solid var(--ring);
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold2);
+  border-color:rgba(184,146,58,.35);
+  transition:background .2s,border-color .2s;
+}
+.nav-wa:hover{background:rgba(184,146,58,.08);border-color:rgba(184,146,58,.6)}
+
+/* ── Hero ── */
+.hero{
+  position:relative;
+  z-index:1;
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:0 48px 72px;
+}
+
+.hero-bg{
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(to bottom,rgba(12,12,11,.1) 0%,rgba(12,12,11,.5) 50%,rgba(12,12,11,.97) 100%),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(184,146,58,.025) 0px, rgba(184,146,58,.025) 1px,
+      transparent 1px, transparent 60px
+    );
+}
+
+.hero-eyebrow{
+  font-size:11px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.hero-eyebrow::before{
+  content:"";
+  display:block;
+  width:36px;
+  height:1px;
+  background:var(--gold);
+}
+
+.hero-headline{
+  font-family:"Cormorant Garamond",serif;
+  font-weight:300;
+  font-size:clamp(56px,8vw,110px);
+  line-height:.95;
+  letter-spacing:-.01em;
+  color:var(--ivory);
+  margin-bottom:8px;
+}
+.hero-headline em{
+  font-style:italic;
+  color:var(--gold2);
+}
+
+.hero-sub{
+  font-size:15px;
+  color:var(--dim);
+  max-width:480px;
+  margin:24px 0 40px;
+  line-height:1.7;
+}
+
+.hero-ctas{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.btn-primary{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  padding:15px 32px;
+  background:var(--gold);
+  color:var(--ink);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:500;
+  transition:background .2s,transform .2s;
+}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+
+.btn-ghost{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:15px 32px;
+  border:1px solid rgba(245,240,232,.18);
+  color:var(--ivory);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  transition:border-color .2s,background .2s;
+}
+.btn-ghost:hover{border-color:rgba(245,240,232,.4);background:rgba(245,240,232,.04)}
+
+.hero-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--dim);
+  letter-spacing:.08em;
+}
+.status-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 0 2px rgba(74,222,128,.25);
+  animation:pulse 2s ease-in-out infinite;
+}
+.status-dot.closed{background:var(--dimmer);box-shadow:none;animation:none}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 2px rgba(74,222,128,.25)} 50%{box-shadow:0 0 0 5px rgba(74,222,128,.08)}}
+
+/* ── Three pillars strip ── */
+.pillars{
+  position:relative;z-index:1;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  border-top:1px solid rgba(245,240,232,.08);
+  border-bottom:1px solid rgba(245,240,232,.08);
+}
+.pillar{
+  padding:36px 40px;
+  border-right:1px solid rgba(245,240,232,.08);
+  transition:background .2s;
+}
+.pillar:last-child{border-right:none}
+.pillar:hover{background:rgba(184,146,58,.04)}
+.pillar-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:36px;
+  font-weight:300;
+  color:rgba(184,146,58,.3);
+  line-height:1;
+  margin-bottom:12px;
+}
+.pillar h3{
+  font-size:13px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ivory);
+  margin-bottom:8px;
+  font-weight:400;
+}
+.pillar p{font-size:13px;color:var(--dim);line-height:1.6}
+
+/* ── Info section ── */
+.info-section{
+  position:relative;z-index:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:rgba(245,240,232,.07);
+  margin-top:80px;
+}
+
+.info-block{
+  background:var(--ink);
+  padding:56px 48px;
+}
+
+.section-label{
+  font-size:10px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:32px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.section-label::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:rgba(184,146,58,.2);
+}
+
+.hours-list{
+  display:grid;
+  gap:0;
+}
+.hour-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 0;
+  border-bottom:1px solid rgba(245,240,232,.06);
+  font-size:14px;
+}
+.hour-row:last-child{border-bottom:none}
+.hour-row .day{color:var(--dim);letter-spacing:.06em}
+.hour-row .time{color:var(--ivory);font-weight:400}
+.hour-row.today .day{color:var(--gold2)}
+.hour-row.today .time{color:var(--gold2)}
+.hour-row.closed-row .time{color:var(--dimmer)}
+
+.contact-block{
+  display:grid;
+  gap:20px;
+}
+.contact-item{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.contact-label{
+  font-size:10px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+}
+.contact-val{
+  font-size:18px;
+  font-family:"Cormorant Garamond",serif;
+  font-weight:300;
+  color:var(--ivory);
+}
+.contact-val a{transition:color .2s}
+.contact-val a:hover{color:var(--gold2)}
+
+/* ── Booking CTA band ── */
+.booking-band{
+  position:relative;z-index:1;
+  padding:80px 48px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:40px;
+  border-top:1px solid rgba(245,240,232,.08);
+  border-bottom:1px solid rgba(245,240,232,.08);
+  margin-top:80px;
+}
+.booking-band::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 80% 100% at 0% 50%,rgba(184,146,58,.06),transparent 70%);
+  pointer-events:none;
+}
+
+.booking-copy .tagline{
+  font-family:"Cormorant Garamond",serif;
+  font-size:clamp(30px,4vw,54px);
+  font-weight:300;
+  line-height:1.1;
+  margin-bottom:14px;
+}
+.booking-copy .tagline em{font-style:italic;color:var(--gold2)}
+.booking-copy p{font-size:14px;color:var(--dim);max-width:420px;line-height:1.7}
+
+.booking-tip{
+  margin-top:20px;
+  padding:18px 20px;
+  border:1px solid rgba(184,146,58,.2);
+  border-left:2px solid var(--gold);
+  background:rgba(184,146,58,.04);
+}
+.booking-tip p{
+  font-size:12px;
+  color:var(--cream);
+  letter-spacing:.04em;
+  line-height:1.7;
+}
+.booking-tip strong{color:var(--gold2)}
+
+.booking-actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:220px;
+}
+
+/* ── Map section ── */
+.map-section{
+  position:relative;z-index:1;
+  padding:0 48px 80px;
+}
+
+.map-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  padding:56px 0 28px;
+  border-bottom:1px solid rgba(245,240,232,.08);
+  margin-bottom:28px;
+}
+
+.map-title{
+  font-family:"Cormorant Garamond",serif;
+  font-size:40px;
+  font-weight:300;
+  line-height:1;
+}
+
+.map-address{
+  font-size:13px;
+  color:var(--dim);
+  text-align:right;
+  line-height:1.7;
+}
+
+.map-frame-wrap{
+  border:1px solid rgba(245,240,232,.08);
+  overflow:hidden;
+  height:420px;
+}
+.map-frame-wrap iframe{
+  width:100%;height:100%;border:0;
+  filter:grayscale(1) invert(1) contrast(.85) brightness(.88) sepia(.08);
+  display:block;
+}
+
+/* ── Footer ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid rgba(245,240,232,.08);
+  padding:28px 48px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.foot-name{
+  font-family:"Cormorant Garamond",serif;
+  font-size:18px;
+  font-weight:300;
+  color:var(--dim);
+  letter-spacing:.1em;
+}
+
+.foot-links{
+  display:flex;
+  gap:28px;
+}
+.foot-links a{
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  transition:color .2s;
+}
+.foot-links a:hover{color:var(--ivory)}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  nav{padding:18px 24px}
+  .nav-links{display:none}
+  .hero{padding:0 24px 56px}
+  .pillars{grid-template-columns:1fr}
+  .pillar{border-right:none;border-bottom:1px solid rgba(245,240,232,.08);padding:28px 24px}
+  .info-section{grid-template-columns:1fr}
+  .info-block{padding:40px 24px}
+  .booking-band{grid-template-columns:1fr;padding:48px 24px}
+  .booking-actions{flex-direction:row;flex-wrap:wrap}
+  .map-section{padding:0 24px 56px}
+  .map-header{flex-direction:column;align-items:flex-start;gap:12px}
+  .map-address{text-align:left}
+  footer{padding:24px;flex-direction:column;text-align:center}
+  .foot-links{justify-content:center}
+}
+
+/* ── Scroll animations ── */
+.fade-up{
+  opacity:0;
+  transform:translateY(22px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.fade-up.visible{opacity:1;transform:none}
+</style>
 </head>
-
 <body>
-  <header>
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div class="brandTitle">
-          <strong id="venueNameTop">Timmothy's Lounge</strong>
-          <span id="venueTag">Bookings • Events • Good Vibes</span>
-        </div>
-      </div>
 
-      <nav aria-label="Primary">
-        <div class="theme-switch" role="group" aria-label="Theme selector">
-          <button class="theme-dot is-active" type="button" data-theme="mono" aria-label="Monochrome theme"></button>
-          <button class="theme-dot" type="button" data-theme="graphite" aria-label="Graphite theme"></button>
-          <button class="theme-dot" type="button" data-theme="paper" aria-label="Paper theme"></button>
-        </div>
-        <a class="navlink" href="#book">Bookings</a>
-        <a class="navlink" href="#hours">Hours</a>
-        <a class="navlink" href="#directions">Directions</a>
-        <a class="navcta" id="navWhatsApp" href="#" target="_blank" rel="noopener">
-          <span class="dot green" aria-hidden="true"></span>
-          WhatsApp
-        </a>
-      </nav>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<nav>
+  <div class="nav-logo">Kaya Lounge</div>
+  <div class="nav-links">
+    <a href="#hours">Hours</a>
+    <a href="#directions">Directions</a>
+    <a href="#book">Reserve</a>
+    <a class="nav-wa" id="navWa" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#25D366"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l4.93-1.37A9.945 9.945 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.7 0-3.29-.45-4.67-1.23l-.33-.2-3.42.95.95-3.42-.2-.33A7.95 7.95 0 014 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z" fill="#25D366"/>
+      </svg>
+      WhatsApp
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <div class="hero-eyebrow">Orkney, North West</div>
+
+  <h1 class="hero-headline">
+    Where the<br>
+    night <em>begins.</em>
+  </h1>
+
+  <p class="hero-sub">
+    Kaya Lounge — a premium setting for tables, celebrations, and memorable evenings. Reserve in seconds. Arrive to perfection.
+  </p>
+
+  <div class="hero-ctas">
+    <a class="btn-primary" id="waBtn" href="#">Book via WhatsApp</a>
+    <a class="btn-ghost" id="mapsBtn" href="#" target="_blank" rel="noopener">Get Directions</a>
+    <div class="hero-status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Checking hours…</span>
     </div>
-  </header>
+  </div>
+</section>
 
-  <main class="wrap">
+<!-- PILLARS -->
+<div class="pillars">
+  <div class="pillar fade-up">
+    <div class="pillar-num">01</div>
+    <h3>Reservations</h3>
+    <p>Tables, birthday setups, and corporate group bookings handled with care — one WhatsApp message away.</p>
+  </div>
+  <div class="pillar fade-up" style="transition-delay:.1s">
+    <div class="pillar-num">02</div>
+    <h3>Atmosphere</h3>
+    <p>Curated sound, clean service, and a safe setting that makes every visit feel effortless.</p>
+  </div>
+  <div class="pillar fade-up" style="transition-delay:.2s">
+    <div class="pillar-num">03</div>
+    <h3>Convenience</h3>
+    <p>Fast responses, clear hours, and easy directions — no guessing, no waiting.</p>
+  </div>
+</div>
 
-    <section class="hero" id="book">
-      <div class="card heroLeft">
-        <div class="heroVisual" aria-hidden="true"></div>
-        <div class="gridOverlay" aria-hidden="true"></div>
-
-        <div class="heroContent">
-          <div class="pill">
-            <span class="dot blue" aria-hidden="true"></span>
-            Open for reservations · Quick reply on WhatsApp
-          </div>
-
-          <h1 class="headline" id="headline">A premium venue experience — without the hassle.</h1>
-          <p class="sub" id="subline">
-            Book tables, birthdays, and group arrivals in seconds. Get hours, directions, and the fastest way to secure your spot.
-          </p>
-
-          <div class="ctaRow">
-            <a class="btn btnPrimary" id="waBtn" href="#" target="_blank" rel="noopener">
-              <span class="dot green" aria-hidden="true"></span>
-              Book on WhatsApp
-            </a>
-            <a class="btn btnSecondary" id="mapsBtn" href="#" target="_blank" rel="noopener">
-              <span class="dot blue" aria-hidden="true"></span>
-              Open Maps
-            </a>
-            <a class="btn" id="callBtn" href="tel:+27623881570">
-              <span class="dot" aria-hidden="true"></span>
-              Call
-            </a>
-          </div>
-
-          <div class="features" aria-label="Highlights">
-            <div class="feature">
-              <strong>Bookings</strong>
-              <span>Tables · Birthdays · Corporate groups</span>
-            </div>
-            <div class="feature">
-              <strong>Atmosphere</strong>
-              <span>Curated music · Clean service · Safe setting</span>
-            </div>
-            <div class="feature">
-              <strong>Convenience</strong>
-              <span>Fast response · Clear info · Easy directions</span>
-            </div>
-          </div>
-        </div>
+<!-- HOURS + CONTACT -->
+<div class="info-section" id="hours">
+  <div class="info-block fade-up">
+    <div class="section-label">Operating Hours</div>
+    <div class="hours-list" id="hoursList"></div>
+  </div>
+  <div class="info-block fade-up" style="transition-delay:.1s">
+    <div class="section-label">Reach Us</div>
+    <div class="contact-block">
+      <div class="contact-item">
+        <span class="contact-label">WhatsApp</span>
+        <span class="contact-val"><a id="waContactLink" href="#">+27 62 388 1570</a></span>
       </div>
-
-      <aside class="card side" id="hours">
-        <h3>Today</h3>
-
-        <div class="infoGrid">
-          <div class="row">
-            <strong>Status</strong>
-            <span id="openStatus">Checking…</span>
-          </div>
-          <div class="row">
-            <strong>Hours</strong>
-            <span id="hoursToday">—</span>
-          </div>
-          <div class="row">
-            <strong>Area</strong>
-            <span id="area">Orkney, North West</span>
-          </div>
-        </div>
-
-        <div class="note">
-          Tip: Message <b>date</b>, <b>time</b>, and <b>number of guests</b> for the fastest booking.
-        </div>
-
-        <div class="infoGrid" style="margin-top:12px">
-          <div class="row">
-            <strong>WhatsApp</strong>
-            <span id="waDisplay">+27 62 388 1570</span>
-          </div>
-          <div class="row">
-            <strong>Phone</strong>
-            <span id="phoneDisplay">062 388 1570</span>
-          </div>
-          <div class="row">
-            <strong>Location</strong>
-            <span id="shortAddress">123 Main Road</span>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="section" id="directions">
-      <div class="card sectionCard">
-        <h3>Directions</h3>
-        <p>Use Google Maps for the quickest route. If you’re running late, WhatsApp your ETA.</p>
-
-        <div class="kv">
-          <div class="row">
-            <strong>Address</strong>
-            <span id="addressLine">123 Main Road, Orkney, 2620</span>
-          </div>
-          <div class="row">
-            <strong>Landmark</strong>
-            <span id="landmarkLine">Near the taxi rank</span>
-          </div>
-        </div>
-
-        <div class="ctaRow" style="margin-top:14px">
-          <a class="btn btnSecondary" id="mapsBtn2" href="#" target="_blank" rel="noopener">
-            <span class="dot blue" aria-hidden="true"></span>
-            Get Directions
-          </a>
-          <a class="btn btnPrimary" id="waBtn2" href="#" target="_blank" rel="noopener">
-            <span class="dot green" aria-hidden="true"></span>
-            WhatsApp Booking
-          </a>
-        </div>
+      <div class="contact-item">
+        <span class="contact-label">Phone</span>
+        <span class="contact-val"><a href="tel:+27623881570">062 388 1570</a></span>
       </div>
-
-      <div class="card mapWrap">
-        <iframe
-          class="map"
-          id="mapFrame"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps?q=Orkney%20North%20West%20South%20Africa&output=embed"
-          title="Map">
-        </iframe>
+      <div class="contact-item">
+        <span class="contact-label">Location</span>
+        <span class="contact-val">123 Main Road<br>Orkney, 2620</span>
       </div>
-    </section>
-
-    <footer>
-      <div>© <span id="year"></span> <span id="venueNameFoot">Kaya Lounge</span>. All rights reserved.</div>
-      <div>
-        <a class="mutedLink" href="#book">Bookings</a>
-        · <a class="mutedLink" href="#hours">Hours</a>
-        · <a class="mutedLink" href="#directions">Directions</a>
+      <div class="contact-item">
+        <span class="contact-label">Landmark</span>
+        <span class="contact-val" style="font-size:15px;color:var(--dim)">Near the taxi rank</span>
       </div>
-    </footer>
+    </div>
+  </div>
+</div>
 
-  </main>
+<!-- BOOKING CTA -->
+<div class="booking-band" id="book">
+  <div class="booking-copy fade-up">
+    <div class="tagline">Your table,<br><em>reserved.</em></div>
+    <p>Send your date, time, and group size — we respond fast and confirm your spot. Birthdays and events welcome.</p>
+    <div class="booking-tip" style="margin-top:20px">
+      <p>For the fastest booking, include: <strong>Date · Time · Number of guests · Name</strong></p>
+    </div>
+  </div>
+  <div class="booking-actions fade-up" style="transition-delay:.15s">
+    <a class="btn-primary" id="waBtn2" href="#">Book on WhatsApp</a>
+    <a class="btn-ghost" href="tel:+27623881570">Call Instead</a>
+  </div>
+</div>
 
-  <script>
-    // =========================
-    // EDIT THESE DETAILS ONLY
-    // =========================
-    const VENUE = {
-      name: "Kaya Lounge",
-      tag: "Bookings • Events • Good Vibes",
-      area: "Orkney, North West",
-      shortAddress: "123 Main Road",
-      address: "123 Main Road, Orkney, 2620",
-      landmark: "Near the taxi rank",
-      phoneDisplay: "062 388 1570",
-      phoneTel: "+27623881570",
-      whatsappNumberInternational: "27623881570", // no +, no spaces
-      mapsQuery: "123 Main Road, Orkney, 2620"
-    };
+<!-- MAP -->
+<div class="map-section" id="directions">
+  <div class="map-header fade-up">
+    <div class="map-title">Find Us</div>
+    <div class="map-address">
+      123 Main Road<br>
+      Orkney, North West, 2620<br>
+      <a id="mapsLink2" href="#" target="_blank" rel="noopener" style="color:var(--gold2);font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .2s">Open in Maps →</a>
+    </div>
+  </div>
+  <div class="map-frame-wrap fade-up" style="transition-delay:.1s">
+    <iframe
+      id="mapFrame"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q=Orkney+North+West+South+Africa&output=embed"
+      title="Map of Kaya Lounge location">
+    </iframe>
+  </div>
+</div>
 
-    // Hours (24h). 0=Sunday ... 6=Saturday
-    // If close time is after midnight, just set it (e.g. 02:00). Logic supports rollover.
-    const HOURS = {
-      0: { open: null, close: null, label: "Closed" },
-      1: { open: "16:00", close: "23:00" },
-      2: { open: "16:00", close: "23:00" },
-      3: { open: "16:00", close: "23:00" },
-      4: { open: "16:00", close: "00:00" },
-      5: { open: "16:00", close: "02:00" },
-      6: { open: "14:00", close: "02:00" }
-    };
+<footer>
+  <div class="foot-name">Kaya Lounge</div>
+  <div class="foot-links">
+    <a href="#hours">Hours</a>
+    <a href="#directions">Directions</a>
+    <a href="#book">Reserve</a>
+  </div>
+  <div style="font-size:12px;color:var(--dimmer)">© <span id="yr"></span> Kaya Lounge</div>
+</footer>
 
-    // =========================
-    // NO NEED TO EDIT BELOW
-    // =========================
-    const $ = (id) => document.getElementById(id);
-    const root = document.documentElement;
-    const themeButtons = Array.from(document.querySelectorAll('.theme-dot[data-theme]'));
+<script>
+const VENUE = {
+  name:"Kaya Lounge",
+  phoneTel:"+27623881570",
+  wa:"27623881570",
+  mapsQuery:"123 Main Road, Orkney, 2620, South Africa"
+};
 
-    function applyTheme(theme){
-      root.setAttribute('data-theme', theme);
-      themeButtons.forEach(btn => btn.classList.toggle('is-active', btn.dataset.theme === theme));
-    }
+const HOURS = {
+  0:{label:"Sunday",open:null,close:null},
+  1:{label:"Monday",open:"16:00",close:"23:00"},
+  2:{label:"Tuesday",open:"16:00",close:"23:00"},
+  3:{label:"Wednesday",open:"16:00",close:"23:00"},
+  4:{label:"Thursday",open:"16:00",close:"00:00"},
+  5:{label:"Friday",open:"16:00",close:"02:00"},
+  6:{label:"Saturday",open:"14:00",close:"02:00"}
+};
 
-    const savedTheme = localStorage.getItem('logiclab-theme') || 'mono';
-    applyTheme(savedTheme);
+function toMins(t){const[h,m]=t.split(":").map(Number);return h*60+m}
 
-    themeButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const theme = btn.dataset.theme || 'mono';
-        applyTheme(theme);
-        localStorage.setItem('logiclab-theme', theme);
-      });
-    });
+function fmt(t){
+  if(!t)return"";
+  let[h,m]=t.split(":").map(Number);
+  const ap=h>=12?"PM":"AM";
+  h=h%12||12;
+  return `${h}:${String(m).padStart(2,"0")} ${ap}`;
+}
 
-    function setText(id, value){
-      const el = $(id);
-      if (el) el.textContent = value;
-    }
+function isOpen(day,nowMins){
+  const c=HOURS[day];
+  if(!c||!c.open||!c.close)return false;
+  const o=toMins(c.open);
+  let cl=c.close==="00:00"?24*60:toMins(c.close);
+  if(cl<=o)return nowMins>=o||nowMins<cl;
+  return nowMins>=o&&nowMins<cl;
+}
 
-    function toMinutes(hhmm){
-      const [h,m] = hhmm.split(":").map(Number);
-      return h*60 + m;
-    }
+function displayHours(t){
+  if(!t.open||!t.close)return"Closed";
+  const cl=t.close==="00:00"?"12:00 AM":fmt(t.close);
+  return `${fmt(t.open)} – ${cl}`;
+}
 
-    function formatTime(hhmm){
-      if (!hhmm) return "";
-      let [h,m] = hhmm.split(":").map(Number);
-      const ampm = h >= 12 ? "PM" : "AM";
-      h = h % 12; if (h === 0) h = 12;
-      return `${h}:${String(m).padStart(2,"0")} ${ampm}`;
-    }
+function init(){
+  document.getElementById("yr").textContent=new Date().getFullYear();
 
-    function isOpenNow(day, nowMins){
-      const cfg = HOURS[day];
-      if (!cfg || !cfg.open || !cfg.close) return false;
+  const waMsg=encodeURIComponent(`Hi ${VENUE.name}, I'd like to book.\n\nDate: \nTime: \nGuests: \nName: `);
+  const waLink=`https://wa.me/${VENUE.wa}?text=${waMsg}`;
+  const mapsLink=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE.mapsQuery)}`;
 
-      const open = toMinutes(cfg.open);
-      let close = toMinutes(cfg.close);
+  document.getElementById("waBtn").href=waLink;
+  document.getElementById("waBtn2").href=waLink;
+  document.getElementById("navWa").href=waLink;
+  document.getElementById("waContactLink").href=waLink;
+  document.getElementById("mapsBtn").href=mapsLink;
+  document.getElementById("mapsLink2").href=mapsLink;
+  document.getElementById("mapFrame").src=`https://www.google.com/maps?q=${encodeURIComponent(VENUE.mapsQuery)}&output=embed`;
 
-      // Handle midnight close
-      if (cfg.close === "00:00") close = 24*60;
+  const now=new Date();
+  const day=now.getDay();
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const open=isOpen(day,nowMins);
+  const dot=document.getElementById("statusDot");
+  const st=document.getElementById("statusText");
+  if(open){
+    st.textContent=`Open now · Closes ${displayHours(HOURS[day]).split("–")[1].trim()}`;
+  }else{
+    dot.classList.add("closed");
+    st.textContent="Currently closed";
+  }
 
-      // If close is <= open, it closes next day
-      if (close <= open){
-        return nowMins >= open || nowMins < close;
-      }
-      return nowMins >= open && nowMins < close;
-    }
+  const list=document.getElementById("hoursList");
+  const order=[1,2,3,4,5,6,0];
+  order.forEach(d=>{
+    const h=HOURS[d];
+    const row=document.createElement("div");
+    row.className="hour-row"+(d===day?" today":"")+((!h.open)?" closed-row":"");
+    row.innerHTML=`<span class="day">${h.label}</span><span class="time">${displayHours(h)}</span>`;
+    list.appendChild(row);
+  });
+}
 
-    function todayLabel(day){
-      const cfg = HOURS[day];
-      if (!cfg || cfg.label === "Closed" || !cfg.open || !cfg.close) return "Closed";
+init();
 
-      // Display midnight as 12:00 AM
-      const closeLabel = (cfg.close === "00:00") ? "12:00 AM" : formatTime(cfg.close);
-      return `${formatTime(cfg.open)} – ${closeLabel}`;
-    }
-
-    function prettifyInternational(num){
-      // crude formatting for ZA numbers: 27 6x xxx xxxx
-      if (!num || num.length < 11) return `+${num}`;
-      return `+${num.slice(0,2)} ${num.slice(2,4)} ${num.slice(4,7)} ${num.slice(7)}`;
-    }
-
-    function init(){
-      // Title + labels
-      document.title = `${VENUE.name} | Bookings, Hours & Directions`;
-      setText("venueNameTop", VENUE.name);
-      setText("venueNameFoot", VENUE.name);
-      setText("venueTag", VENUE.tag);
-      setText("area", VENUE.area);
-      setText("shortAddress", VENUE.shortAddress);
-      setText("addressLine", VENUE.address);
-      setText("landmarkLine", VENUE.landmark);
-      setText("phoneDisplay", VENUE.phoneDisplay);
-      $("callBtn").setAttribute("href", `tel:${VENUE.phoneTel}`);
-      setText("year", new Date().getFullYear());
-
-      // WhatsApp links
-      const waBase = `https://wa.me/${VENUE.whatsappNumberInternational}`;
-      const waMsg = encodeURIComponent(
-        `Hi ${VENUE.name}, I'd like to book.\n\nDate: \nTime: \nGuests: \nName: `
-      );
-      const waLink = `${waBase}?text=${waMsg}`;
-      $("waBtn").setAttribute("href", waLink);
-      $("waBtn2").setAttribute("href", waLink);
-      $("navWhatsApp").setAttribute("href", waLink);
-      setText("waDisplay", prettifyInternational(VENUE.whatsappNumberInternational));
-
-      // Maps
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(VENUE.mapsQuery)}`;
-      $("mapsBtn").setAttribute("href", mapsLink);
-      $("mapsBtn2").setAttribute("href", mapsLink);
-      $("mapFrame").setAttribute("src", `https://www.google.com/maps?q=${encodeURIComponent(VENUE.mapsQuery)}&output=embed`);
-
-      // Hours
-      const now = new Date();
-      const day = now.getDay();
-      const nowMins = now.getHours()*60 + now.getMinutes();
-      setText("hoursToday", todayLabel(day));
-      setText("openStatus", isOpenNow(day, nowMins) ? "Open now" : "Currently closed");
-    }
-
-    init();
-  </script>
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target)}
+  });
+},{threshold:.12});
+document.querySelectorAll(".fade-up").forEach(el=>obs.observe(el));
+</script>
 </body>
 </html>

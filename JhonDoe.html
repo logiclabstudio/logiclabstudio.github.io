@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr. John Doe | Harvard Educator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --cream:#f5f0e8;--cream-soft:#ede7d9;--ink:#1a1510;--ink-mid:#3d3628;
+      --ink-muted:#7a7060;--gold:#9a7d3c;--gold-light:#c9a85c;
+      --gold-pale:rgba(154,125,60,.12);--white:#ffffff;
+      --line:rgba(26,21,16,.1);--line-gold:rgba(154,125,60,.25);
+      --r:16px;--shadow:0 32px 80px rgba(26,21,16,.14),0 8px 24px rgba(26,21,16,.08);
+      --max:1280px;--serif:"Cormorant Garamond",Georgia,serif;
+      --sans:"DM Sans","Helvetica Neue",sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:var(--sans);background:var(--cream);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none;}
+    #cursor{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .15s ease,opacity .2s;mix-blend-mode:multiply;}
+    #cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--gold);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .22s,height .22s,opacity .22s;opacity:.5;}
+    #site{display:block;}
+    #admin-shell{display:none;}
+
+    /* NAV */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 52px;height:70px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,border-color .4s,box-shadow .4s;border-bottom:1px solid transparent;}
+    .nav.solid{background:rgba(245,240,232,.92);backdrop-filter:blur(16px);border-color:var(--line);box-shadow:0 2px 20px rgba(26,21,16,.06);}
+    .nav-logo{font-family:var(--serif);font-size:1.22rem;font-weight:500;color:var(--ink);text-decoration:none;letter-spacing:.03em;}
+    .nav-logo em{color:var(--gold);font-style:normal;}
+    .nav-right{display:flex;align-items:center;gap:34px;}
+    .nav-links{display:flex;gap:28px;}
+    .nav-links a{font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--ink);}
+    .nav-cta{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;padding:9px 22px;border:1.5px solid var(--ink);border-radius:4px;color:var(--ink);text-decoration:none;transition:background .2s,color .2s;}
+    .nav-cta:hover{background:var(--ink);color:var(--cream)!important;}
+
+    /* SIDE INDEX */
+    .side-index{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:400;display:flex;flex-direction:column;gap:7px;align-items:flex-end;}
+    .side-index-item{display:flex;align-items:center;gap:10px;cursor:none;text-decoration:none;}
+    .si-label{font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-muted);opacity:0;transform:translateX(6px);transition:opacity .25s,transform .25s,color .25s;white-space:nowrap;}
+    .side-index-item:hover .si-label,.side-index-item.active .si-label{opacity:1;transform:translateX(0);}
+    .side-index-item.active .si-label{color:var(--gold);}
+    .si-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--ink-muted);background:transparent;transition:border-color .25s,background .25s,transform .25s;flex:0 0 auto;}
+    .side-index-item:hover .si-dot{border-color:var(--gold);}
+    .side-index-item.active .si-dot{border-color:var(--gold);background:var(--gold);transform:scale(1.35);}
+
+    /* SECTIONS */
+    .pg{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;}
+    .container{width:100%;max-width:var(--max);margin:0 auto;padding:0 80px;}
+
+    /* §1 HERO */
+    #welcome{background:var(--cream);}
+    .hero-wrap{display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:center;width:100%;max-width:var(--max);margin:0 auto;padding:130px 80px 80px;}
+    .hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
+    .hero-tag::before{content:'';display:block;width:32px;height:1px;background:var(--gold);}
+    .hero-h1{font-family:var(--serif);font-size:clamp(3.2rem,6vw,6rem);font-weight:300;line-height:1.04;color:var(--ink);margin-bottom:28px;letter-spacing:-.01em;}
+    .hero-h1 em{font-style:italic;color:var(--gold);}
+    .hero-sub{font-size:1.02rem;line-height:1.75;color:var(--ink-muted);max-width:52ch;margin-bottom:44px;}
+    .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+    .btn-gold{font-family:var(--sans);font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 30px;background:var(--gold);color:var(--white);text-decoration:none;border:none;cursor:none;border-radius:4px;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 8px 24px rgba(154,125,60,.3);}
+    .btn-gold:hover{background:#7d6430;transform:translateY(-2px);box-shadow:0 14px 32px rgba(154,125,60,.4);}
+    .btn-outline{font-family:var(--sans);font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:13px 30px;background:transparent;color:var(--ink);text-decoration:none;border:1.5px solid var(--line-gold);cursor:none;border-radius:4px;transition:border-color .2s,color .2s;}
+    .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+    .hero-portrait{position:relative;height:580px;border-radius:12px;overflow:hidden;}
+    .portrait-bg{position:absolute;inset:0;background:linear-gradient(155deg,#ecddc4 0%,#dcc89e 45%,#c8a96a 100%);}
+    .portrait-figure{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80%;height:88%;display:flex;align-items:center;justify-content:center;}
+    .portrait-figure svg{width:68%;filter:drop-shadow(0 8px 24px rgba(26,21,16,.18));}
+    .portrait-badge{position:absolute;bottom:22px;left:22px;right:22px;background:rgba(245,240,232,.95);backdrop-filter:blur(12px);border:1px solid var(--line-gold);border-radius:10px;padding:16px 20px;}
+    .portrait-badge strong{font-family:var(--serif);font-size:1.12rem;font-weight:500;display:block;margin-bottom:4px;}
+    .portrait-badge span{font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);}
+    .portrait-label{position:absolute;top:20px;right:20px;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);background:rgba(245,240,232,.85);padding:6px 12px;border-radius:999px;border:1px solid var(--line-gold);backdrop-filter:blur(6px);}
+    .portrait-dec{position:absolute;inset:14px;border:1px solid rgba(154,125,60,.2);border-radius:8px;pointer-events:none;}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:48px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--white);}
+    .hstat{padding:22px 24px;border-right:1px solid var(--line);}
+    .hstat:last-child{border-right:none;}
+    .hstat-num{font-family:var(--serif);font-size:2.1rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:5px;}
+    .hstat-label{font-size:.79rem;color:var(--ink-muted);letter-spacing:.04em;}
+
+    /* §2 ABOUT */
+    #about{background:var(--white);}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+    .section-tag{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+    .section-tag::before{content:'';display:block;width:24px;height:1px;background:var(--gold);}
+    .section-h2{font-family:var(--serif);font-size:clamp(2.2rem,3.6vw,3.6rem);font-weight:300;line-height:1.08;color:var(--ink);margin-bottom:24px;letter-spacing:-.01em;}
+    .section-h2 em{font-style:italic;color:var(--gold);}
+    .body-text{font-size:.98rem;line-height:1.82;color:var(--ink-muted);margin-bottom:18px;}
+    .divider-gold{width:48px;height:2px;background:var(--gold);border-radius:2px;margin:28px 0;}
+    .credential-list{display:flex;flex-direction:column;gap:13px;margin-top:28px;}
+    .cred{display:flex;gap:16px;align-items:flex-start;padding:17px 19px;border:1px solid var(--line);border-radius:10px;background:var(--cream);transition:border-color .2s,transform .2s;}
+    .cred:hover{border-color:var(--line-gold);transform:translateX(4px);}
+    .cred-icon{width:36px;height:36px;border-radius:8px;flex:0 0 auto;background:var(--gold-pale);border:1px solid var(--line-gold);display:grid;place-items:center;font-size:1.1rem;}
+    .cred-text strong{font-family:var(--serif);font-size:1.01rem;font-weight:500;display:block;margin-bottom:2px;}
+    .cred-text span{font-size:.81rem;color:var(--ink-muted);}
+    .pull-quote{position:relative;padding:36px 36px 36px 52px;background:var(--cream);border-radius:12px;border:1px solid var(--line);margin-top:32px;}
+    .pull-quote::before{content:'\201C';position:absolute;left:18px;top:12px;font-family:var(--serif);font-size:5rem;color:var(--gold);line-height:1;opacity:.45;}
+    .pull-quote p{font-family:var(--serif);font-size:1.3rem;font-weight:300;font-style:italic;line-height:1.64;color:var(--ink);}
+    .pull-quote cite{display:block;margin-top:14px;font-size:.77rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-muted);font-style:normal;}
+
+    /* §3 SUBJECTS */
+    #subjects{background:var(--cream);}
+    .subjects-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:60px;}
+    .subjects-note{font-size:1rem;line-height:1.76;color:var(--ink-muted);align-self:end;}
+    .subject-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+    .subj-card{padding:32px 28px;background:var(--white);border:1px solid var(--line);border-radius:12px;position:relative;overflow:hidden;transition:border-color .25s,transform .25s,box-shadow .25s;}
+    .subj-card:hover{border-color:var(--line-gold);transform:translateY(-4px);box-shadow:var(--shadow);}
+    .subj-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+    .subj-card:hover::after{transform:scaleX(1);}
+    .subj-num{font-family:var(--serif);font-size:3rem;font-weight:300;color:rgba(154,125,60,.2);line-height:1;margin-bottom:14px;}
+    .subj-card h3{font-family:var(--serif);font-size:1.5rem;font-weight:500;margin-bottom:10px;}
+    .subj-card p{font-size:.9rem;line-height:1.72;color:var(--ink-muted);}
+    .subj-tag{display:inline-block;margin-top:14px;font-size:.69rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:4px 10px;border:1px solid var(--line-gold);border-radius:999px;}
+
+    /* §4 RESULTS */
+    #results{background:var(--ink);}
+    #results .section-tag{color:var(--gold-light);}
+    #results .section-tag::before{background:var(--gold-light);}
+    #results .section-h2{color:var(--cream);}
+    .results-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:56px;align-items:end;}
+    .results-sub{font-size:1rem;line-height:1.74;color:rgba(245,240,232,.5);}
+    .outcomes-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(255,255,255,.09);border-radius:10px;overflow:hidden;margin-bottom:52px;}
+    .outcome{padding:28px 24px;border-right:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);}
+    .outcome:last-child{border-right:none;}
+    .outcome-num{font-family:var(--serif);font-size:2.4rem;font-weight:300;color:var(--gold-light);line-height:1;margin-bottom:6px;}
+    .outcome-label{font-size:.81rem;color:rgba(245,240,232,.45);letter-spacing:.04em;}
+    .testimonial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+    .tcard{padding:30px 26px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:18px;transition:border-color .25s,background .25s;}
+    .tcard:hover{border-color:rgba(154,125,60,.38);background:rgba(255,255,255,.065);}
+    .tcard-stars{color:var(--gold-light);letter-spacing:3px;font-size:.9rem;}
+    .tcard p{font-family:var(--serif);font-size:1.08rem;font-weight:300;font-style:italic;line-height:1.66;color:rgba(245,240,232,.85);flex:1;}
+    .tcard footer{font-size:.77rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(245,240,232,.35);padding-top:14px;border-top:1px solid rgba(255,255,255,.08);}
+
+    /* §5 PROCESS */
+    #process{background:var(--cream-soft);}
+    .process-head{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-bottom:64px;align-items:end;}
+    .process-note{font-size:1rem;line-height:1.74;color:var(--ink-muted);}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    .step{padding:32px 24px;border-right:1px solid var(--line);background:var(--white);position:relative;transition:background .2s;}
+    .step:last-child{border-right:none;}
+    .step:hover{background:var(--cream);}
+    .step-n{font-family:var(--serif);font-size:.73rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .step-n::after{content:'';flex:1;height:1px;background:var(--line-gold);}
+    .step h3{font-family:var(--serif);font-size:1.32rem;font-weight:500;margin-bottom:10px;}
+    .step p{font-size:.88rem;line-height:1.72;color:var(--ink-muted);}
+    .step-arrow{position:absolute;right:16px;top:28px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line-gold);display:grid;place-items:center;color:var(--gold);font-size:.7rem;}
+
+    /* §6 BOOK */
+    #book{background:var(--white);}
+    .book-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+    .book-right{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:44px 40px;}
+    .booking-form{display:flex;flex-direction:column;gap:15px;}
+    .form-group{display:flex;flex-direction:column;gap:6px;}
+    .form-group label{font-size:.73rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);}
+    .form-group input,.form-group select,.form-group textarea{font-family:var(--sans);font-size:.92rem;padding:12px 14px;background:var(--white);border:1px solid var(--line);border-radius:8px;color:var(--ink);outline:none;transition:border-color .2s;cursor:none;}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);}
+    .form-group textarea{resize:vertical;min-height:88px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+    /* FOOTER */
+    .site-footer{background:var(--ink);padding:48px 80px;}
+    .footer-inner{max-width:var(--max);margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+    .footer-brand{font-family:var(--serif);font-size:1.1rem;font-weight:300;color:var(--cream);}
+    .footer-brand em{color:var(--gold-light);font-style:normal;}
+    .footer-links{display:flex;gap:26px;}
+    .footer-links a{font-size:.77rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.38);text-decoration:none;transition:color .2s;}
+    .footer-links a:hover{color:var(--gold-light);}
+    .footer-copy{font-size:.77rem;color:rgba(245,240,232,.22);}
+
+    /* STUDENT PORTAL MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,21,16,.72);backdrop-filter:blur(10px);z-index:800;align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:var(--white);border-radius:16px;width:100%;max-width:420px;padding:44px 40px;position:relative;box-shadow:0 40px 100px rgba(26,21,16,.3);animation:modalIn .35s cubic-bezier(.22,.66,.2,1);}
+    @keyframes modalIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+    .modal-close{position:absolute;top:18px;right:20px;background:none;border:none;cursor:none;font-size:1.2rem;color:var(--ink-muted);padding:4px;}
+    .modal-close:hover{color:var(--ink);}
+    .modal-tag{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+    .modal-tag::before{content:'';width:18px;height:1px;background:var(--gold);}
+    .modal-box h3{font-family:var(--serif);font-size:1.9rem;font-weight:300;margin-bottom:24px;}
+    .modal-form{display:flex;flex-direction:column;gap:13px;}
+    .modal-form input{font-family:var(--sans);font-size:.92rem;padding:12px 14px;background:var(--cream);border:1px solid var(--line);border-radius:8px;color:var(--ink);outline:none;transition:border-color .2s;cursor:none;}
+    .modal-form input:focus{border-color:var(--gold);}
+    .portal-note{font-size:.78rem;color:var(--ink-muted);margin-top:10px;text-align:center;}
+
+    /* ADMIN SHELL */
+    #admin-shell{min-height:100vh;background:#f8f7f4;font-family:var(--sans);}
+    #admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);}
+    .admin-login-box{background:var(--cream);border-radius:18px;width:100%;max-width:400px;padding:50px 44px;text-align:center;box-shadow:0 40px 100px rgba(0,0,0,.42);}
+    .admin-logo-mark{width:52px;height:52px;border-radius:14px;background:var(--gold);color:var(--white);display:grid;place-items:center;font-family:var(--serif);font-size:1.5rem;margin:0 auto 22px;}
+    .admin-login-box h2{font-family:var(--serif);font-size:1.9rem;font-weight:300;margin-bottom:6px;}
+    .admin-login-box > p{font-size:.85rem;color:var(--ink-muted);margin-bottom:28px;}
+    .al-form{display:flex;flex-direction:column;gap:13px;}
+    .al-form input{font-family:var(--sans);font-size:.92rem;padding:12px 14px;background:var(--white);border:1.5px solid var(--line);border-radius:8px;color:var(--ink);outline:none;transition:border-color .2s;cursor:none;text-align:left;}
+    .al-form input:focus{border-color:var(--gold);}
+    .al-error{font-size:.8rem;color:#c0392b;text-align:center;display:none;margin-top:-4px;}
+    .admin-nav{height:60px;background:var(--white);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 32px;justify-content:space-between;position:sticky;top:0;z-index:200;}
+    .admin-nav-logo{font-family:var(--serif);font-size:1rem;font-weight:500;display:flex;align-items:center;gap:12px;color:var(--ink);}
+    .admin-nav-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+    .admin-nav-right{display:flex;align-items:center;gap:20px;}
+    .admin-nav-right span{font-size:.82rem;color:var(--ink-muted);}
+    .admin-btn-out{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 16px;border:1px solid var(--line);border-radius:4px;background:none;color:var(--ink-muted);cursor:none;transition:color .2s,border-color .2s;}
+    .admin-btn-out:hover{color:var(--ink);border-color:var(--ink);}
+    .admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
+    .admin-sidebar{background:var(--white);border-right:1px solid var(--line);padding:28px 0;}
+    .sidebar-label{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-muted);padding:0 20px;margin-bottom:4px;margin-top:14px;}
+    .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:none;font-size:.88rem;color:var(--ink-mid);transition:background .15s,color .15s;border-left:2.5px solid transparent;}
+    .sidebar-item:hover{background:var(--cream-soft);color:var(--ink);}
+    .sidebar-item.active{background:var(--cream-soft);color:var(--gold);border-left-color:var(--gold);font-weight:500;}
+    .sidebar-icon{font-size:1rem;width:18px;text-align:center;}
+    .admin-content{padding:36px 40px;}
+    .admin-page{display:none;}
+    .admin-page.active{display:block;}
+    .admin-page-title{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--ink);margin-bottom:6px;}
+    .admin-page-sub{font-size:.88rem;color:var(--ink-muted);margin-bottom:32px;}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    .kpi{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:22px 20px;transition:border-color .2s,transform .2s;}
+    .kpi:hover{border-color:var(--line-gold);transform:translateY(-2px);}
+    .kpi-val{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:4px;}
+    .kpi-label{font-size:.8rem;color:var(--ink-muted);}
+    .kpi-change{font-size:.72rem;color:#2e7d52;margin-top:6px;}
+    .kpi-change.neg{color:#c0392b;}
+    .admin-table-wrap{background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    .admin-table-header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+    .admin-table-header h4{font-family:var(--serif);font-size:1.12rem;font-weight:500;}
+    table{width:100%;border-collapse:collapse;}
+    th{font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);padding:11px 18px;text-align:left;background:#faf9f7;border-bottom:1px solid var(--line);}
+    td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:.88rem;color:var(--ink-mid);}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#fdfcfa;}
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.71rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;}
+    .badge-green{background:#e6f4ec;color:#2e7d52;}
+    .badge-gold{background:rgba(154,125,60,.12);color:var(--gold);}
+    .badge-grey{background:#f0eeeb;color:var(--ink-muted);}
+    .cal-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;}
+    .cal-main{background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    .cal-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+    .cal-head h4{font-family:var(--serif);font-size:1.05rem;font-weight:500;}
+    .cal-nav{display:flex;gap:8px;}
+    .cal-nav button{background:none;border:1px solid var(--line);border-radius:6px;width:30px;height:30px;cursor:none;font-size:.85rem;color:var(--ink-muted);transition:all .2s;}
+    .cal-nav button:hover{border-color:var(--gold);color:var(--gold);}
+    .cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+    .cal-day-name{text-align:center;padding:10px 0;font-size:.69rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);border-bottom:1px solid var(--line);}
+    .cal-day{text-align:center;padding:10px 4px;font-size:.88rem;color:var(--ink-mid);border-radius:8px;margin:2px;cursor:none;transition:all .2s;}
+    .cal-day:hover{background:var(--cream);}
+    .cal-day.today{background:var(--gold);color:var(--white);font-weight:500;}
+    .cal-day.has-lesson{position:relative;}
+    .cal-day.has-lesson::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold);}
+    .cal-day.today.has-lesson::after{background:var(--white);}
+    .cal-day.other-month{opacity:.28;}
+    .cal-sidebar-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:22px;}
+    .cal-sidebar-card h4{font-family:var(--serif);font-size:1.05rem;font-weight:500;margin-bottom:16px;}
+    .upcoming-lesson{padding:12px 14px;background:var(--cream);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);}
+    .ul-time{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+    .ul-student{font-size:.9rem;font-weight:500;color:var(--ink);margin-bottom:2px;}
+    .ul-subj{font-size:.8rem;color:var(--ink-muted);}
+    .messages-layout{display:grid;grid-template-columns:280px 1fr;height:600px;background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    .msg-list{border-right:1px solid var(--line);overflow-y:auto;}
+    .msg-item{padding:14px 16px;border-bottom:1px solid var(--line);cursor:none;transition:background .15s;}
+    .msg-item:hover,.msg-item.active{background:var(--cream);}
+    .msg-item.active{border-right:2px solid var(--gold);}
+    .msg-name{font-size:.9rem;font-weight:500;color:var(--ink);margin-bottom:3px;}
+    .msg-preview{font-size:.79rem;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .msg-time{font-size:.71rem;color:var(--ink-muted);float:right;margin-top:-2px;}
+    .msg-unread{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:5px;vertical-align:middle;}
+    .msg-thread{display:flex;flex-direction:column;height:100%;}
+    .msg-thread-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+    .msg-thread-head h4{font-family:var(--serif);font-size:1.05rem;font-weight:500;}
+    .msg-bubbles{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+    .bubble{max-width:68%;padding:11px 16px;border-radius:12px;font-size:.88rem;line-height:1.58;}
+    .bubble.them{background:var(--cream);color:var(--ink);align-self:flex-start;border-bottom-left-radius:3px;}
+    .bubble.me{background:var(--gold);color:var(--white);align-self:flex-end;border-bottom-right-radius:3px;}
+    .msg-composer{padding:14px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-end;}
+    .msg-composer input{flex:1;padding:10px 14px;background:var(--cream);border:1px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:.88rem;color:var(--ink);outline:none;cursor:none;}
+    .msg-composer input:focus{border-color:var(--gold);}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    .settings-section{background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    .settings-head{padding:16px 22px;border-bottom:1px solid var(--line);}
+    .settings-head h4{font-family:var(--serif);font-size:1.05rem;font-weight:500;}
+    .settings-body{padding:22px;}
+    .setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+    .setting-row:last-child{border-bottom:none;}
+    .setting-info strong{font-size:.9rem;display:block;margin-bottom:2px;}
+    .setting-info span{font-size:.8rem;color:var(--ink-muted);}
+    .toggle{width:40px;height:22px;border-radius:999px;background:var(--gold);border:none;cursor:none;position:relative;flex:0 0 auto;transition:background .2s;}
+    .toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;right:4px;transition:right .2s,left .2s;}
+    .toggle.off{background:#d0ccc4;}
+    .toggle.off::after{right:auto;left:4px;}
+    .si-input{cursor:none;font-family:var(--sans);font-size:.9rem;padding:10px 13px;background:var(--cream);border:1px solid var(--line);border-radius:8px;outline:none;color:var(--ink);width:100%;transition:border-color .2s;}
+    .si-input:focus{border-color:var(--gold);}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.22,.66,.2,1),transform .9s cubic-bezier(.22,.66,.2,1);}
+    .reveal.in{opacity:1;transform:none;}
+    .reveal.delay-1{transition-delay:.12s;}
+    .reveal.delay-2{transition-delay:.24s;}
+    .reveal.delay-3{transition-delay:.36s;}
+    .reveal.delay-4{transition-delay:.48s;}
+    .hero-in{opacity:0;transform:translateY(32px);animation:heroRise 1.1s cubic-bezier(.22,.66,.2,1) forwards;}
+    .hero-in.d1{animation-delay:.15s;}.hero-in.d2{animation-delay:.3s;}.hero-in.d3{animation-delay:.45s;}.hero-in.d4{animation-delay:.62s;}
+    @keyframes heroRise{to{opacity:1;transform:none;}}
+
+    /* RESPONSIVE */
+    @media(max-width:1100px){
+      .hero-wrap{grid-template-columns:1fr;gap:48px;padding:100px 40px 60px;}
+      .hero-portrait{height:420px;}
+      .about-grid,.results-intro,.subjects-intro,.process-head,.book-inner{grid-template-columns:1fr;gap:40px;}
+      .outcomes-strip,.testimonial-grid{grid-template-columns:1fr 1fr;}
+      .kpi-grid{grid-template-columns:1fr 1fr;}
+      .steps{grid-template-columns:1fr 1fr;}
+      .cal-grid{grid-template-columns:1fr;}
+      .admin-layout{grid-template-columns:1fr;}
+      .admin-sidebar{display:none;}
+    }
+    @media(max-width:900px){
+      .container{padding:0 28px;}.nav{padding:0 24px;}.side-index{display:none;}
+      .steps{grid-template-columns:1fr;}.subject-cards{grid-template-columns:1fr;}
+    }
+    @media(max-width:700px){
+      .hero-wrap{padding:90px 24px 48px;}.hero-stats{grid-template-columns:1fr;}
+      .outcomes-strip,.testimonial-grid,.settings-grid{grid-template-columns:1fr;}
+      .site-footer{padding:36px 24px;}.nav-links{display:none;}
+    }
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- ════ PUBLIC SITE ════ -->
+<div id="site">
+  <nav class="nav" id="mainNav">
+    <a class="nav-logo" href="#welcome"><em>Dr. John Doe</em> — Private Academic Tutor</a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#about" data-target="about">About</a>
+        <a href="#subjects" data-target="subjects">Subjects</a>
+        <a href="#results" data-target="results">Results</a>
+        <a href="#process" data-target="process">Process</a>
+      </div>
+      <a href="#book" class="nav-cta" id="navBookBtn">Book a Lesson</a>
+    </div>
+  </nav>
+
+  <nav class="side-index" id="sideIndex">
+    <a class="side-index-item active" href="#welcome" data-target="welcome"><span class="si-label">Welcome</span><span class="si-dot"></span></a>
+    <a class="side-index-item" href="#about" data-target="about"><span class="si-label">About</span><span class="si-dot"></span></a>
+    <a class="side-index-item" href="#subjects" data-target="subjects"><span class="si-label">Subjects</span><span class="si-dot"></span></a>
+    <a class="side-index-item" href="#results" data-target="results"><span class="si-label">Results</span><span class="si-dot"></span></a>
+    <a class="side-index-item" href="#process" data-target="process"><span class="si-label">Process</span><span class="si-dot"></span></a>
+    <a class="side-index-item" href="#book" data-target="book"><span class="si-label">Book</span><span class="si-dot"></span></a>
+  </nav>
+
+  <main>
+    <!-- § WELCOME -->
+    <section class="pg" id="welcome" data-section>
+      <div class="hero-wrap">
+        <div>
+          <div class="hero-tag hero-in">Harvard Graduate · Private Educator</div>
+          <h1 class="hero-h1 hero-in d1">Precision tutoring<br>for students who<br>demand <em>excellence.</em></h1>
+          <p class="hero-sub hero-in d2">I am Dr. John Doe — Harvard graduate, eight-year educator, and private academic coach trusted by ambitious families. Every session is built around a single goal: your academic distinction.</p>
+          <div class="hero-btns hero-in d3">
+            <a href="#book" class="btn-gold" id="heroBookBtn">Book a Private Lesson</a>
+            <button class="btn-outline" id="openStudentPortal">Student Portal →</button>
+          </div>
+          <div class="hero-stats hero-in d4">
+            <div class="hstat"><div class="hstat-num">8+</div><div class="hstat-label">Years Teaching</div></div>
+            <div class="hstat"><div class="hstat-num">200+</div><div class="hstat-label">Students Coached</div></div>
+            <div class="hstat"><div class="hstat-num">94%</div><div class="hstat-label">Grade Improvement Rate</div></div>
+          </div>
+        </div>
+        <div class="hero-portrait hero-in d2">
+          <div class="portrait-bg"></div>
+          <div class="portrait-figure">
+            <svg viewBox="0 0 200 290" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Graduation cap -->
+              <polygon points="100,10 138,28 100,36 62,28" fill="rgba(26,21,16,.32)"/>
+              <rect x="74" y="27" width="52" height="8" rx="2" fill="rgba(26,21,16,.25)"/>
+              <line x1="138" y1="28" x2="143" y2="46" stroke="rgba(154,125,60,.8)" stroke-width="2.2"/>
+              <circle cx="143" cy="50" r="4.5" fill="rgba(154,125,60,.9)"/>
+              <!-- Head -->
+              <ellipse cx="100" cy="68" rx="28" ry="32" fill="rgba(26,21,16,.2)"/>
+              <!-- Neck -->
+              <rect x="92" y="98" width="16" height="14" rx="4" fill="rgba(26,21,16,.18)"/>
+              <!-- Gown / torso -->
+              <path d="M40 160 Q44 115 72 108 Q86 103 100 103 Q114 103 128 108 Q156 115 160 160 L168 230 L32 230 Z" fill="rgba(26,21,16,.18)"/>
+              <!-- Gown center seam -->
+              <line x1="100" y1="105" x2="100" y2="230" stroke="rgba(154,125,60,.35)" stroke-width="1.5"/>
+              <!-- Collar / lapels -->
+              <path d="M82 110 L100 130 L118 110" stroke="rgba(154,125,60,.4)" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+              <!-- Book in hands -->
+              <rect x="74" y="185" width="52" height="36" rx="4" fill="rgba(154,125,60,.45)"/>
+              <line x1="100" y1="185" x2="100" y2="221" stroke="rgba(245,240,232,.5)" stroke-width="1.2"/>
+              <!-- Degree lines on book -->
+              <line x1="82" y1="197" x2="98" y2="197" stroke="rgba(245,240,232,.5)" stroke-width="1"/>
+              <line x1="82" y1="204" x2="98" y2="204" stroke="rgba(245,240,232,.35)" stroke-width="1"/>
+              <line x1="82" y1="211" x2="94" y2="211" stroke="rgba(245,240,232,.25)" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="portrait-dec"></div>
+          <div class="portrait-label">Harvard Graduate</div>
+          <div class="portrait-badge">
+            <strong>Dr. John Doe</strong>
+            <span>Private Academic Coach · Est. 2017</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § ABOUT -->
+    <section class="pg" id="about" data-section style="padding:100px 0;">
+      <div class="container">
+        <div class="about-grid">
+          <div>
+            <div class="section-tag reveal">About Dr. Doe</div>
+            <h2 class="section-h2 reveal delay-1">Rigour, care, and the<br>science of <em>how students learn.</em></h2>
+            <p class="body-text reveal delay-2">After graduating from Harvard University, I spent three years researching educational psychology before entering private tutoring practice. My approach is grounded in how memory, motivation, and metacognition work — not guesswork or generic exercises.</p>
+            <p class="body-text reveal delay-2">Every student receives a diagnostic, a tailored plan, and consistent accountability. Sessions are calm, structured, and deeply personal. I have coached students from top independent schools, university foundation programmes, and competitive scholarship pathways.</p>
+            <div class="divider-gold reveal delay-3"></div>
+            <div class="credential-list">
+              <div class="cred reveal delay-3"><div class="cred-icon">🎓</div><div class="cred-text"><strong>Harvard University, AB</strong><span>Graduated with Distinction · Psychology & Education</span></div></div>
+              <div class="cred reveal delay-4"><div class="cred-icon">📖</div><div class="cred-text"><strong>8 Years Private Practice</strong><span>Secondary, pre-university & high-stakes exam coaching</span></div></div>
+              <div class="cred reveal delay-4"><div class="cred-icon">🏅</div><div class="cred-text"><strong>Certified Learning Specialist</strong><span>Cognitive load · Spaced repetition · Retrieval practice</span></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="pull-quote reveal delay-2">
+              <p>I do not teach content. I teach students how to think about content — with precision, with discipline, and with enough self-belief to perform when it counts.</p>
+              <cite>— Dr. John Doe</cite>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § SUBJECTS -->
+    <section class="pg" id="subjects" data-section style="padding:100px 0;">
+      <div class="container">
+        <div class="subjects-intro">
+          <div>
+            <div class="section-tag reveal">Subjects & Programmes</div>
+            <h2 class="section-h2 reveal delay-1">Focused expertise.<br>Measurable <em>outcomes.</em></h2>
+          </div>
+          <p class="subjects-note reveal delay-2">Programmes are designed for students in Grades 9–12, pre-university candidates, and those preparing for competitive examinations. All sessions are 1:1 and fully personalised.</p>
+        </div>
+        <div class="subject-cards">
+          <div class="subj-card reveal"><div class="subj-num">01</div><h3>Advanced Mathematics</h3><p>From calculus foundations to competition-level problem solving. I build mathematical fluency through conceptual depth, not rote memorisation.</p><span class="subj-tag">Grade 9 – University</span></div>
+          <div class="subj-card reveal delay-1"><div class="subj-num">02</div><h3>Academic Writing</h3><p>Argument construction, analytical clarity, and the precise prose that earns distinction in essays, dissertations, and scholarship applications.</p><span class="subj-tag">All Levels</span></div>
+          <div class="subj-card reveal delay-2"><div class="subj-num">03</div><h3>Exam Strategy & Preparation</h3><p>Complete high-performance frameworks for timed exams, stress management, and consistent output under pressure. Not just content — execution.</p><span class="subj-tag">NSC · IEB · Cambridge · SAT</span></div>
+          <div class="subj-card reveal delay-3"><div class="subj-num">04</div><h3>University Readiness</h3><p>Transitioning students into elite academic environments. Critical thinking, independent study systems, and long-form research writing.</p><span class="subj-tag">Pre-University</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § RESULTS -->
+    <section class="pg" id="results" data-section style="padding:100px 0;">
+      <div class="container">
+        <div class="results-intro">
+          <div>
+            <div class="section-tag reveal">Results & Testimonials</div>
+            <h2 class="section-h2 reveal delay-1">Outcomes that<br>speak for themselves.</h2>
+          </div>
+          <p class="results-sub reveal delay-2">These are real outcomes from real students — families who committed to the process and achieved results they had stopped believing were possible.</p>
+        </div>
+        <div class="outcomes-strip reveal delay-2">
+          <div class="outcome"><div class="outcome-num">94%</div><div class="outcome-label">Grade improvement rate</div></div>
+          <div class="outcome"><div class="outcome-num">200+</div><div class="outcome-label">Students coached</div></div>
+          <div class="outcome"><div class="outcome-num">38</div><div class="outcome-label">University acceptances</div></div>
+          <div class="outcome"><div class="outcome-num">4.9★</div><div class="outcome-label">Average parent rating</div></div>
+        </div>
+        <div class="testimonial-grid">
+          <div class="tcard reveal"><div class="tcard-stars">★★★★★</div><p>"Our son moved from 58% to 91% in Mathematics within one academic year. What Dr. Doe gave him was not just knowledge — it was the discipline to use it."</p><footer>Parent of Grade 11 Student · Independent School</footer></div>
+          <div class="tcard reveal delay-1"><div class="tcard-stars">★★★★★</div><p>"I finally understood why I kept failing, and how to fix it. Dr. Doe restructured how I study completely. I passed my NSC with distinction."</p><footer>Student · NSC Matric Candidate</footer></div>
+          <div class="tcard reveal delay-2"><div class="tcard-stars">★★★★★</div><p>"Premium in every sense. Punctual, prepared, and genuinely invested. We have never seen growth like this from any other tutor or school programme."</p><footer>Parent · Pre-University Foundation Programme</footer></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § PROCESS -->
+    <section class="pg" id="process" data-section style="padding:100px 0;">
+      <div class="container">
+        <div class="process-head">
+          <div>
+            <div class="section-tag reveal">How It Works</div>
+            <h2 class="section-h2 reveal delay-1">A clear, disciplined<br>process from day <em>one.</em></h2>
+          </div>
+          <p class="process-note reveal delay-2">No guesswork, no improvised sessions. Students always know where they are, where they are going, and exactly what it takes to get there.</p>
+        </div>
+        <div class="steps">
+          <div class="step reveal"><div class="step-n">Step 01</div><div class="step-arrow">→</div><h3>Diagnostic Session</h3><p>Identifying knowledge gaps, learning patterns, and the student's specific academic goals and realistic timeline.</p></div>
+          <div class="step reveal delay-1"><div class="step-n">Step 02</div><div class="step-arrow">→</div><h3>Tailored Study Plan</h3><p>A personalised programme with weekly session structure, milestone targets, and a clear framework for independent study.</p></div>
+          <div class="step reveal delay-2"><div class="step-n">Step 03</div><div class="step-arrow">→</div><h3>Private 1:1 Sessions</h3><p>Focused 60-minute sessions designed to build mastery, address blockers, and develop high-performance academic habits.</p></div>
+          <div class="step reveal delay-3"><div class="step-n">Step 04</div><div class="step-arrow">→</div><h3>Progress Reviews</h3><p>Monthly reviews with parent and student. The plan is refined. Momentum is protected. Excellence is the only standard.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § BOOK -->
+    <section class="pg" id="book" data-section style="padding:100px 0;">
+      <div class="container">
+        <div class="book-inner">
+          <div>
+            <div class="section-tag reveal">Book a Private Lesson</div>
+            <h2 class="section-h2 reveal delay-1">Start with a<br>consultation. <em>No obligation.</em></h2>
+            <p class="body-text reveal delay-2">The first step is a complimentary 30-minute consultation to discuss your student's goals, current performance, and the right programme fit. Serious families only.</p>
+            <div class="divider-gold reveal delay-2"></div>
+            <p class="body-text reveal delay-3" style="font-size:.88rem;">Sessions are limited. A maximum of twelve students are accepted at any one time to ensure full commitment to every family enrolled.</p>
+          </div>
+          <div class="book-right reveal delay-2">
+            <div class="section-tag" style="margin-bottom:12px;">Booking Request</div>
+            <div class="booking-form">
+              <div class="form-row">
+                <div class="form-group"><label>Parent / Guardian Name</label><input type="text" placeholder="Full name"/></div>
+                <div class="form-group"><label>Student Name</label><input type="text" placeholder="Full name"/></div>
+              </div>
+              <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"/></div>
+              <div class="form-group"><label>Grade / Level</label>
+                <select><option>Select grade or level</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12 / Matric</option><option>Pre-University</option><option>University Foundation</option></select>
+              </div>
+              <div class="form-group"><label>Subject of Interest</label>
+                <select><option>Select subject</option><option>Advanced Mathematics</option><option>Academic Writing</option><option>Exam Preparation</option><option>University Readiness</option><option>Multiple Subjects</option></select>
+              </div>
+              <div class="form-group"><label>Brief Note (optional)</label><textarea placeholder="Tell Dr. Doe about your student's current situation and goals…"></textarea></div>
+              <button class="btn-gold" style="border-radius:4px;">Submit Booking Request</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><em>Dr. John Doe</em> · Private Academic Tutoring</div>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#subjects">Subjects</a>
+        <a href="#results">Results</a>
+        <a href="#book">Book</a>
+        <a href="#" id="adminAccessLink" style="opacity:.18;" title="Portal Access">Portal</a>
+      </div>
+      <div class="footer-copy">© <span id="footerYear"></span> Dr. John Doe. All rights reserved.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════ STUDENT PORTAL MODAL ════ -->
+<div class="modal-overlay" id="studentPortalModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closePortal">✕</button>
+    <div class="modal-tag">Student Portal</div>
+    <h3>Sign in to your<br>student account.</h3>
+    <div class="modal-form">
+      <input type="email" placeholder="Student email address"/>
+      <input type="password" placeholder="Password"/>
+      <button class="btn-gold" style="border-radius:4px;">Sign In →</button>
+    </div>
+    <p class="portal-note">No account? Contact Dr. Doe to be enrolled.</p>
+  </div>
+</div>
+
+<!-- ════ ADMIN SHELL ════ -->
+<div id="admin-shell">
+  <div id="admin-login">
+    <div class="admin-login-box">
+      <div class="admin-logo-mark">J</div>
+      <h2>Admin Access</h2>
+      <p>Dr. John Doe — Tutor Portal</p>
+      <div class="al-form">
+        <input type="email" id="adminEmail" placeholder="Admin email"/>
+        <input type="password" id="adminPass" placeholder="Password"/>
+        <div class="al-error" id="loginError">Incorrect credentials. Please try again.</div>
+        <button class="btn-gold" style="border-radius:4px;" id="adminLoginBtn">Sign In →</button>
+        <button class="btn-outline" style="text-align:center;" onclick="exitAdmin()">← Back to Site</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-dashboard" style="display:none;">
+    <nav class="admin-nav">
+      <div class="admin-nav-logo"><span class="dot"></span>Dr. John Doe — Admin Portal</div>
+      <div class="admin-nav-right"><span>Welcome back, Dr. Doe</span><button class="admin-btn-out" onclick="exitAdmin()">Sign Out</button></div>
+    </nav>
+    <div class="admin-layout">
+      <aside class="admin-sidebar">
+        <div class="sidebar-label">Overview</div>
+        <div class="sidebar-item active" data-page="dashboard" onclick="switchPage(this)"><span class="sidebar-icon">📊</span> Dashboard</div>
+        <div class="sidebar-label">Students</div>
+        <div class="sidebar-item" data-page="students" onclick="switchPage(this)"><span class="sidebar-icon">👤</span> All Students</div>
+        <div class="sidebar-item" data-page="sessions" onclick="switchPage(this)"><span class="sidebar-icon">📅</span> Sessions & Calendar</div>
+        <div class="sidebar-item" data-page="messages" onclick="switchPage(this)"><span class="sidebar-icon">💬</span> Messages <span class="msg-unread"></span></div>
+        <div class="sidebar-label">Business</div>
+        <div class="sidebar-item" data-page="payments" onclick="switchPage(this)"><span class="sidebar-icon">💳</span> Payments</div>
+        <div class="sidebar-item" data-page="settings" onclick="switchPage(this)"><span class="sidebar-icon">⚙️</span> Settings</div>
+      </aside>
+      <div class="admin-content">
+
+        <div class="admin-page active" id="page-dashboard">
+          <h2 class="admin-page-title">Good morning, Dr. Doe.</h2>
+          <p class="admin-page-sub">Here's your overview for this week.</p>
+          <div class="kpi-grid">
+            <div class="kpi"><div class="kpi-val">12</div><div class="kpi-label">Active Students</div><div class="kpi-change">↑ 2 enrolled this month</div></div>
+            <div class="kpi"><div class="kpi-val">8</div><div class="kpi-label">Sessions This Week</div><div class="kpi-change">↑ On track</div></div>
+            <div class="kpi"><div class="kpi-val">R14 200</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-change">↑ +R1 400 vs last month</div></div>
+            <div class="kpi"><div class="kpi-val">3</div><div class="kpi-label">Pending Requests</div><div class="kpi-change neg">Review needed</div></div>
+          </div>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header"><h4>Upcoming Sessions</h4><button class="btn-gold" style="padding:8px 18px;font-size:.78rem;border-radius:4px;cursor:none;">+ Add Session</button></div>
+            <table><thead><tr><th>Student</th><th>Subject</th><th>Date & Time</th><th>Duration</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Liam Hargreaves</td><td>Advanced Mathematics</td><td>Today, 14:00</td><td>60 min</td><td><span class="badge badge-green">Confirmed</span></td></tr>
+              <tr><td>Amara Osei</td><td>Exam Preparation</td><td>Today, 16:00</td><td>90 min</td><td><span class="badge badge-green">Confirmed</span></td></tr>
+              <tr><td>Daniel Ferreira</td><td>Academic Writing</td><td>Tomorrow, 09:00</td><td>60 min</td><td><span class="badge badge-gold">Pending</span></td></tr>
+              <tr><td>Sofia Nkosi</td><td>University Readiness</td><td>Thu, 10:00</td><td>60 min</td><td><span class="badge badge-green">Confirmed</span></td></tr>
+              <tr><td>Ethan Botha</td><td>Advanced Mathematics</td><td>Fri, 15:30</td><td>90 min</td><td><span class="badge badge-grey">Rescheduled</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="admin-page" id="page-students">
+          <h2 class="admin-page-title">Students</h2>
+          <p class="admin-page-sub">All active and inactive enrolled students.</p>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header"><h4>Student Roster</h4><button class="btn-gold" style="padding:8px 18px;font-size:.78rem;border-radius:4px;cursor:none;">+ Enrol Student</button></div>
+            <table><thead><tr><th>Name</th><th>Grade</th><th>Subject(s)</th><th>Sessions</th><th>Last Session</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Liam Hargreaves</td><td>Grade 12</td><td>Mathematics</td><td>24</td><td>Today</td><td><span class="badge badge-green">Active</span></td></tr>
+              <tr><td>Amara Osei</td><td>Grade 11</td><td>Exam Prep · Writing</td><td>18</td><td>Today</td><td><span class="badge badge-green">Active</span></td></tr>
+              <tr><td>Daniel Ferreira</td><td>Pre-University</td><td>Academic Writing</td><td>9</td><td>2 days ago</td><td><span class="badge badge-green">Active</span></td></tr>
+              <tr><td>Sofia Nkosi</td><td>Grade 12</td><td>University Readiness</td><td>12</td><td>4 days ago</td><td><span class="badge badge-green">Active</span></td></tr>
+              <tr><td>Ethan Botha</td><td>Grade 10</td><td>Mathematics</td><td>6</td><td>1 week ago</td><td><span class="badge badge-gold">Paused</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="admin-page" id="page-sessions">
+          <h2 class="admin-page-title">Sessions & Calendar</h2>
+          <p class="admin-page-sub">Your schedule for April 2026.</p>
+          <div class="cal-grid">
+            <div class="cal-main">
+              <div class="cal-head"><h4>April 2026</h4><div class="cal-nav"><button>‹</button><button>›</button></div></div>
+              <div class="cal-days" id="calGrid"></div>
+            </div>
+            <div class="cal-sidebar-card">
+              <h4>Today's Sessions</h4>
+              <div class="upcoming-lesson"><div class="ul-time">14:00 · 60 min</div><div class="ul-student">Liam Hargreaves</div><div class="ul-subj">Advanced Mathematics — Ch. 6</div></div>
+              <div class="upcoming-lesson"><div class="ul-time">16:00 · 90 min</div><div class="ul-student">Amara Osei</div><div class="ul-subj">Exam Prep — Paper 2 Review</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-page" id="page-messages">
+          <h2 class="admin-page-title">Messages</h2>
+          <p class="admin-page-sub">Communicate directly with students and parents.</p>
+          <div class="messages-layout">
+            <div class="msg-list">
+              <div class="msg-item active"><div class="msg-time">Now</div><div class="msg-name">Liam Hargreaves <span class="msg-unread"></span></div><div class="msg-preview">Hi Dr. Doe, just confirming today at 14:00…</div></div>
+              <div class="msg-item"><div class="msg-time">9:14</div><div class="msg-name">Mrs Osei (Parent)</div><div class="msg-preview">Thank you so much for the report, Amara was…</div></div>
+              <div class="msg-item"><div class="msg-time">Yesterday</div><div class="msg-name">Daniel Ferreira</div><div class="msg-preview">Can we move tomorrow's session to 10am?</div></div>
+              <div class="msg-item"><div class="msg-time">Mon</div><div class="msg-name">Sofia Nkosi</div><div class="msg-preview">I finished the essay draft — can you review…</div></div>
+            </div>
+            <div class="msg-thread">
+              <div class="msg-thread-head"><h4>Liam Hargreaves</h4><span style="font-size:.8rem;color:var(--ink-muted);">Grade 12 · Mathematics</span></div>
+              <div class="msg-bubbles">
+                <div class="bubble them">Hi Dr. Doe! Just confirming our session for today at 14:00. I've done the exercises you set.</div>
+                <div class="bubble me">Great to hear, Liam. See you at 14:00. Have your worked solutions ready — we'll go through your approach first.</div>
+                <div class="bubble them">Will do. Should I bring my past paper from last week too?</div>
+                <div class="bubble me">Absolutely. We'll use it as our warm-up. Well done for staying ahead.</div>
+              </div>
+              <div class="msg-composer"><input placeholder="Type a message…"/><button class="btn-gold" style="border-radius:6px;padding:9px 18px;font-size:.82rem;cursor:none;">Send</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-page" id="page-payments">
+          <h2 class="admin-page-title">Payments</h2>
+          <p class="admin-page-sub">Track invoices, outstanding balances, and monthly revenue.</p>
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="kpi"><div class="kpi-val">R14 200</div><div class="kpi-label">April Revenue</div><div class="kpi-change">↑ +10.9% vs March</div></div>
+            <div class="kpi"><div class="kpi-val">R2 800</div><div class="kpi-label">Outstanding</div><div class="kpi-change neg">2 invoices overdue</div></div>
+            <div class="kpi"><div class="kpi-val">R170 400</div><div class="kpi-label">YTD Revenue</div><div class="kpi-change">↑ Ahead of target</div></div>
+          </div>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header"><h4>Recent Invoices</h4></div>
+            <table><thead><tr><th>Student</th><th>Invoice #</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Liam Hargreaves</td><td>#INV-044</td><td>R2 400</td><td>1 Apr 2026</td><td><span class="badge badge-green">Paid</span></td></tr>
+              <tr><td>Amara Osei</td><td>#INV-045</td><td>R3 200</td><td>1 Apr 2026</td><td><span class="badge badge-green">Paid</span></td></tr>
+              <tr><td>Daniel Ferreira</td><td>#INV-046</td><td>R1 600</td><td>1 Apr 2026</td><td><span class="badge badge-gold">Pending</span></td></tr>
+              <tr><td>Sofia Nkosi</td><td>#INV-047</td><td>R2 000</td><td>1 Apr 2026</td><td><span class="badge badge-green">Paid</span></td></tr>
+              <tr><td>Ethan Botha</td><td>#INV-048</td><td>R1 200</td><td>5 Apr 2026</td><td><span class="badge badge-grey">Overdue</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="admin-page" id="page-settings">
+          <h2 class="admin-page-title">Settings</h2>
+          <p class="admin-page-sub">Manage your portal preferences and account details.</p>
+          <div class="settings-grid">
+            <div class="settings-section">
+              <div class="settings-head"><h4>Profile</h4></div>
+              <div class="settings-body" style="display:flex;flex-direction:column;gap:14px;">
+                <div class="form-group"><label>Display Name</label><input class="si-input" type="text" value="Dr. John Doe"/></div>
+                <div class="form-group"><label>Email</label><input class="si-input" type="email" value="admin@drjohndoe.com"/></div>
+                <button class="btn-gold" style="border-radius:4px;padding:11px 22px;font-size:.82rem;cursor:none;align-self:flex-start;">Save Changes</button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-head"><h4>Notifications</h4></div>
+              <div class="settings-body">
+                <div class="setting-row"><div class="setting-info"><strong>New Booking Requests</strong><span>Notify when a student submits a request</span></div><button class="toggle" onclick="this.classList.toggle('off')"></button></div>
+                <div class="setting-row"><div class="setting-info"><strong>Session Reminders</strong><span>24-hour email reminder before sessions</span></div><button class="toggle" onclick="this.classList.toggle('off')"></button></div>
+                <div class="setting-row"><div class="setting-info"><strong>Payment Alerts</strong><span>Notify on paid or overdue invoices</span></div><button class="toggle off" onclick="this.classList.toggle('off')"></button></div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-head"><h4>Change Password</h4></div>
+              <div class="settings-body" style="display:flex;flex-direction:column;gap:13px;">
+                <div class="form-group"><label>Current Password</label><input class="si-input" type="password" placeholder="••••••••"/></div>
+                <div class="form-group"><label>New Password</label><input class="si-input" type="password" placeholder="••••••••"/></div>
+                <button class="btn-outline" style="border-radius:4px;padding:10px 22px;font-size:.82rem;cursor:none;align-self:flex-start;">Update Password</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* CURSOR */
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+  document.querySelectorAll('a,button,input,select,textarea,[onclick]').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.4)';cur.style.opacity='.45';});
+    el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';cur.style.opacity='1';});
+  });
+
+  /* NAV */
+  const nav=document.getElementById('mainNav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('solid',window.scrollY>30),{passive:true});
+
+  /* SCROLL-JACK */
+  const sections=Array.from(document.querySelectorAll('#site section[data-section]'));
+  const sideLinks=Array.from(document.querySelectorAll('.side-index-item'));
+  let idx=0,lock=false;
+  const rm=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function setActive(id){
+    sideLinks.forEach(l=>l.classList.toggle('active',l.dataset.target===id));
+    document.querySelectorAll('.nav-links a[data-target]').forEach(l=>l.classList.toggle('active',l.dataset.target===id));
+  }
+  function goTo(i){if(i<0||i>=sections.length)return;idx=i;sections[i].scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});setActive(sections[i].id);}
+  function nearest(){const mid=window.scrollY+window.innerHeight/2;let n=0,sm=Infinity;sections.forEach((s,i)=>{const d=Math.abs(s.offsetTop+s.offsetHeight/2-mid);if(d<sm){sm=d;n=i;}});return n;}
+  window.addEventListener('wheel',e=>{if(rm)return;if(lock){e.preventDefault();return;}if(Math.abs(e.deltaY)<20)return;const n=Math.max(0,Math.min(sections.length-1,idx+(e.deltaY>0?1:-1)));if(n!==idx){e.preventDefault();lock=true;goTo(n);setTimeout(()=>{lock=false;},900);}},{passive:false});
+  let ty=0;
+  window.addEventListener('touchstart',e=>{ty=e.changedTouches[0].clientY;},{passive:true});
+  window.addEventListener('touchend',e=>{if(rm)return;const d=ty-e.changedTouches[0].clientY;if(Math.abs(d)<60||lock)return;const n=Math.max(0,Math.min(sections.length-1,idx+(d>0?1:-1)));if(n!==idx){lock=true;goTo(n);setTimeout(()=>{lock=false;},900);}},{passive:true});
+  const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){idx=sections.findIndex(s=>s.id===e.target.id);setActive(e.target.id);}});},{threshold:.5});
+  sections.forEach(s=>obs.observe(s));
+  sideLinks.forEach(l=>l.addEventListener('click',e=>{e.preventDefault();const i=sections.findIndex(s=>s.id===l.dataset.target);if(i>=0){lock=true;goTo(i);setTimeout(()=>{lock=false;},900);}}));
+  document.querySelectorAll('.nav-links a[data-target]').forEach(l=>l.addEventListener('click',e=>{e.preventDefault();const i=sections.findIndex(s=>s.id===l.dataset.target);if(i>=0){lock=true;goTo(i);setTimeout(()=>{lock=false;},900);}}));
+  ['heroBookBtn','navBookBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',e=>{e.preventDefault();const i=sections.findIndex(s=>s.id==='book');if(i>=0){lock=true;goTo(i);setTimeout(()=>{lock=false;},900);}});});
+  window.addEventListener('scroll',()=>{if(!lock){idx=nearest();setActive(sections[idx].id);}},{passive:true});
+
+  /* REVEALS */
+  const ro=new IntersectionObserver((en,o)=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');o.unobserve(e.target);}});},{threshold:.14,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+  /* STUDENT PORTAL */
+  const modal=document.getElementById('studentPortalModal');
+  document.getElementById('openStudentPortal').addEventListener('click',()=>modal.classList.add('open'));
+  document.getElementById('closePortal').addEventListener('click',()=>modal.classList.remove('open'));
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
+
+  /* FOOTER */
+  document.getElementById('footerYear').textContent=new Date().getFullYear();
+
+  /* ADMIN ACCESS */
+  document.getElementById('adminAccessLink').addEventListener('click',e=>{e.preventDefault();enterAdmin();});
+
+  /* ADMIN */
+  const AU='admin@drjohndoe.com',AP='JohnDoe2024!';
+  window.enterAdmin=function(){document.getElementById('site').style.display='none';document.getElementById('admin-shell').style.display='block';document.getElementById('admin-login').style.display='flex';document.getElementById('admin-dashboard').style.display='none';};
+  window.exitAdmin=function(){document.getElementById('site').style.display='block';document.getElementById('admin-shell').style.display='none';document.getElementById('admin-dashboard').style.display='none';document.getElementById('admin-login').style.display='flex';document.getElementById('adminEmail').value='';document.getElementById('adminPass').value='';document.getElementById('loginError').style.display='none';};
+  document.getElementById('adminLoginBtn').addEventListener('click',()=>{
+    const em=document.getElementById('adminEmail').value.trim();
+    const ps=document.getElementById('adminPass').value;
+    if(em===AU&&ps===AP){document.getElementById('admin-login').style.display='none';document.getElementById('admin-dashboard').style.display='block';document.getElementById('loginError').style.display='none';buildCal();}
+    else{document.getElementById('loginError').style.display='block';}
+  });
+  [document.getElementById('adminEmail'),document.getElementById('adminPass')].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('adminLoginBtn').click();}));
+
+  window.switchPage=function(el){
+    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));
+    const t=document.getElementById('page-'+el.dataset.page);
+    if(t)t.classList.add('active');
+  };
+
+  function buildCal(){
+    const g=document.getElementById('calGrid');
+    if(!g||g.children.length>0)return;
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{const n=document.createElement('div');n.className='cal-day-name';n.textContent=d;g.appendChild(n);});
+    const ld=[1,3,7,8,10,14,15,17,22,23,24,29];
+    for(let i=0;i<3;i++){const d=document.createElement('div');d.className='cal-day other-month';d.textContent=29+i;g.appendChild(d);}
+    for(let d=1;d<=30;d++){const el=document.createElement('div');el.className='cal-day'+(d===22?' today':'')+(ld.includes(d)?' has-lesson':'');el.textContent=d;g.appendChild(el);}
+  }
+
+  idx=nearest();setActive(sections[idx].id);
+})();
+</script>
+</body>
+</html>

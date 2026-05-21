@@ -486,7 +486,7 @@ input[type="range"].zslider::-webkit-slider-thumb{
           <label>DPI</label>
           <select id="exportDpi"><option value="96">96 — Web</option><option value="150">150 — Print</option><option value="300" selected>300 — Pro</option></select>
         </div>
-        <div class="brow"><button class="btn ok" id="btnExportPng">Export PNG</button><button class="btn" id="btnExportPdf">Export PDF</button></div>
+        <div class="brow"><button class="btn ok" id="btnExportPng">Download Png</button><button class="btn" id="btnExportPdf">Export PDF</button></div>
         <div class="brow"><button class="btn" id="btnSaveJson">Save JSON</button><button class="btn" id="btnLoadJson">Load JSON</button></div>
         <input id="loadJsonFile" type="file" accept="application/json" style="display:none"/>
         <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">PDF: pick "Save as PDF" in print dialog.</p>
@@ -1241,30 +1241,169 @@ G("logoUpload").addEventListener("change",e=>{
 });
 
 // ── EXPORT ────────────────────────────────────────
-G("btnExportPng").addEventListener("click",()=>{
-  const dpi=parseInt(G("exportDpi").value)||300;
+function pathRoundRect(ctx,x,y,w,h,r){
+  r=clamp(r||0,0,Math.min(w,h)/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+function setCanvasFx(ctx,el,scale){
+  ctx.globalCompositeOperation=el.blendMode&&el.blendMode!=="normal"?el.blendMode:"source-over";
+  ctx.filter=el.blur>0?`blur(${el.blur*scale}px)`:"none";
+  ctx.shadowOffsetX=(el.shadowX||0)*scale;
+  ctx.shadowOffsetY=(el.shadowY||0)*scale;
+  ctx.shadowBlur=(el.shadowBlur||0)*scale;
+  ctx.shadowColor=rgba(el.shadowColor||"#000000",el.shadowAlpha||0);
+}
+function resetCanvasFx(ctx){
+  ctx.globalCompositeOperation="source-over";
+  ctx.filter="none";
+  ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;ctx.shadowBlur=0;
+  ctx.shadowColor="rgba(0,0,0,0)";
+}
+function loadExportImage(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=reject;
+    if(!String(src).startsWith("data:"))img.crossOrigin="anonymous";
+    img.src=src;
+  });
+}
+function textWidthWithSpacing(ctx,text,spacing){
+  if(!spacing)return ctx.measureText(text).width;
+  return ctx.measureText(text).width+Math.max(0,text.length-1)*spacing;
+}
+function wrapCanvasText(ctx,text,maxW,spacing){
+  const lines=[];
+  String(text||"").split(/\n/).forEach(part=>{
+    const words=part.split(/\s+/).filter(Boolean);
+    if(!words.length){lines.push("");return;}
+    let line="";
+    words.forEach(word=>{
+      const test=line?line+" "+word:word;
+      if(line&&textWidthWithSpacing(ctx,test,spacing)>maxW){
+        lines.push(line);
+        line=word;
+      }else line=test;
+    });
+    lines.push(line);
+  });
+  return lines;
+}
+function drawSpacedText(ctx,text,x,y,spacing){
+  if(!spacing){ctx.fillText(text,x,y);return;}
+  [...text].forEach(ch=>{
+    ctx.fillText(ch,x,y);
+    x+=ctx.measureText(ch).width+spacing;
+  });
+}
+function drawCanvasText(ctx,el,scale){
+  const pad=(el.pad||12)*scale;
+  const fs=(el.fontSize||36)*scale;
+  const lh=fs*(el.lineHeight||1.2);
+  const spacing=(el.letterSpacing||0)*scale;
+  const innerW=Math.max(1,el.w*scale-pad*2);
+  ctx.font=`${el.fontWeight||400} ${fs}px ${el.fontFamily||"'DM Sans',sans-serif"}`;
+  ctx.textBaseline="top";
+  ctx.fillStyle=el.color||"#ffffff";
+  ctx.textAlign="left";
+  const lines=wrapCanvasText(ctx,el.text||"",innerW,spacing);
+  let y=pad+Math.max(0,(el.h*scale-pad*2-lines.length*lh)/2);
+  lines.forEach(line=>{
+    const tw=textWidthWithSpacing(ctx,line,spacing);
+    let x=pad;
+    if(el.align==="center")x=pad+(innerW-tw)/2;
+    if(el.align==="right")x=pad+innerW-tw;
+    drawSpacedText(ctx,line,x,y,spacing);
+    y+=lh;
+  });
+}
+async function renderFlyerPngBlob(dpi){
   const scale=dpi/EDIT_DPI;
   const w=pW(),h=pH(),ow=Math.round(w*scale),oh=Math.round(h*scale);
+  const cv=document.createElement("canvas");
+  cv.width=ow;cv.height=oh;
+  const ctx=cv.getContext("2d");
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality="high";
+  ctx.fillStyle=G("bgColor").value;
+  ctx.fillRect(0,0,ow,oh);
+  if(document.fonts?.ready)await document.fonts.ready;
+
+  for(const el of [...els].filter(e=>!e.hidden).sort((a,b)=>a.z-b.z)){
+    ctx.save();
+    const x=el.x*scale,y=el.y*scale,w2=el.w*scale,h2=el.h*scale;
+    ctx.translate(x+w2/2,y+h2/2);
+    ctx.rotate(((el.rotation||0)*Math.PI)/180);
+    ctx.translate(-w2/2,-h2/2);
+    setCanvasFx(ctx,el,scale);
+
+    if(el.type==="shape"){
+      if(el.kind==="circle"){
+        ctx.beginPath();
+        ctx.ellipse(w2/2,h2/2,w2/2,h2/2,0,0,Math.PI*2);
+      }else pathRoundRect(ctx,0,0,w2,h2,(el.radius||8)*scale);
+      ctx.fillStyle=rgba(el.fill,el.alpha);
+      ctx.fill();
+      if((el.borderW||0)>0){
+        ctx.lineWidth=(el.borderW||1)*scale;
+        ctx.strokeStyle=el.border||"transparent";
+        ctx.stroke();
+      }
+    }
+    if(el.type==="text"){
+      pathRoundRect(ctx,0,0,w2,h2,0);
+      ctx.fillStyle=rgba(el.bg,el.bgAlpha);
+      ctx.fill();
+      resetCanvasFx(ctx);
+      drawCanvasText(ctx,el,scale);
+    }
+    if(el.type==="image"){
+      try{
+        const img=await loadExportImage(el.src);
+        pathRoundRect(ctx,0,0,w2,h2,(el.radius||8)*scale);
+        ctx.clip();
+        const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+        const contain=el.fit==="contain";
+        const s=contain?Math.min(w2/iw,h2/ih):Math.max(w2/iw,h2/ih);
+        const dw=iw*s,dh=ih*s,dx=(w2-dw)/2,dy=(h2-dh)/2;
+        ctx.drawImage(img,dx,dy,dw,dh);
+      }catch{
+        setStatus("Image skipped","One image could not load");
+      }
+    }
+    ctx.restore();
+    resetCanvasFx(ctx);
+  }
+  return new Promise(resolve=>cv.toBlob(resolve,"image/png"));
+}
+G("btnExportPng").addEventListener("click",async()=>{
+  const dpi=parseInt(G("exportDpi").value)||300;
   setStatus("Exporting...","PNG @ "+dpi+" DPI");
-  const clone=paper.cloneNode(true);
-  clone.classList.remove("show-grid","show-guides","show-centers");
-  clone.querySelectorAll(".grid-ol,.pguide,.cguide,.ag,.rh,.roth").forEach(n=>n.remove());
-  clone.querySelectorAll(".item").forEach(n=>n.classList.remove("sel"));
-  const html=new XMLSerializer().serializeToString(clone);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${ow}" height="${oh}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(${scale});transform-origin:top left;width:${w}px;height:${h}px;">${html}</div></foreignObject></svg>`;
-  const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}));
-  const img=new Image();
-  img.onload=()=>{
-    const cv=document.createElement("canvas");cv.width=ow;cv.height=oh;
-    cv.getContext("2d").drawImage(img,0,0);URL.revokeObjectURL(url);
-    cv.toBlob(b=>{
-      if(!b){setStatus("Export failed","Try Chrome");return;}
-      const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`flyer-${presetKey}-${dpi}dpi.png`;a.click();
-      setStatus("Exported","Done");
-    },"image/png");
-  };
-  img.onerror=()=>{URL.revokeObjectURL(url);setStatus("Export failed","Try Chrome");};
-  img.src=url;
+  try{
+    const blob=await renderFlyerPngBlob(dpi);
+    if(!blob){setStatus("Export failed","Could not create PNG");return;}
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`flyer-${presetKey}-${dpi}dpi.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    setStatus("Downloaded","PNG saved");
+  }catch(err){
+    setStatus("Export failed",err.message||"Try again");
+  }
 });
 G("btnExportPdf").addEventListener("click",()=>{
   const s=SIZES[presetKey]||SIZES.a4;
