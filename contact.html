@@ -1,0 +1,90 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | Logic Lab SaaS Project Discovery</title>
+  <meta name="description" content="Contact Logic Lab to plan SaaS architecture, automation systems, and production-ready software delivery.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contact | Logic Lab SaaS Project Discovery">
+  <meta property="og:description" content="Schedule a technical discovery session for scalable platform architecture and deployment-ready software delivery.">
+  <meta property="og:url" content="https://logiclabstudio.github.io/contact.html">
+  <meta property="og:image" content="https://logiclabstudio.github.io/Logiclab.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://logiclabstudio.github.io/contact.html">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="wwwroot/css/design-system.css">
+</head>
+<body>
+  <div data-component="components/header.html"></div>
+
+  <main>
+    <section class="hero section-tight">
+      <div class="container reveal">
+        <span class="eyebrow">Contact Logic Lab</span>
+        <h1 class="mt-6">Plan your next software build with technical precision</h1>
+        <p class="lead mt-6">Share your business goals and platform requirements to begin a structured discovery process focused on delivery, scale, and monetization.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid grid-2">
+        <article class="card reveal" aria-labelledby="contact-form-title">
+          <h2 id="contact-form-title">Project discovery request</h2>
+          <p class="mt-4">Send project details to begin a technical scoping conversation.</p>
+          <form class="mt-8 form-stack" action="mailto:contact@logiclabstudio.com" method="post" enctype="text/plain">
+            <div>
+              <label for="name" class="kicker">Name</label>
+              <input id="name" name="Name" class="form-control" type="text" required>
+            </div>
+            <div>
+              <label for="company" class="kicker">Company</label>
+              <input id="company" name="Company" class="form-control" type="text" required>
+            </div>
+            <div>
+              <label for="email" class="kicker">Business Email</label>
+              <input id="email" name="Email" class="form-control" type="email" required>
+            </div>
+            <div>
+              <label for="scope" class="kicker">Project Scope</label>
+              <textarea id="scope" name="Scope" class="form-control" rows="6" required></textarea>
+            </div>
+            <div class="btn-row mt-8">
+              <button type="submit" class="btn btn-primary">Submit Discovery Request</button>
+              <a href="services.html" class="btn btn-secondary">Review Services</a>
+            </div>
+          </form>
+        </article>
+
+        <article class="card reveal" aria-labelledby="contact-details-title">
+          <h2 id="contact-details-title">Contact channels</h2>
+          <div class="feature-list mt-8">
+            <div class="feature-item"><span class="dot"></span><div><strong>Email</strong><p><a href="mailto:contact@logiclabstudio.com">contact@logiclabstudio.com</a></p></div></div>
+            <div class="feature-item"><span class="dot"></span><div><strong>Service focus</strong><p>SaaS platform architecture, automation systems, and internal software delivery.</p></div></div>
+            <div class="feature-item"><span class="dot"></span><div><strong>Cloud workflow</strong><p>Azure-first deployment standards with release and monitoring controls.</p></div></div>
+            <div class="feature-item"><span class="dot"></span><div><strong>Engagement model</strong><p>Discovery, implementation planning, development, deployment, and optimization.</p></div></div>
+          </div>
+          <div class="stats mt-8">
+            <div class="stat"><b>24-48h</b><span>Initial response window</span></div>
+            <div class="stat"><b>Scope</b><span>Architecture-led planning</span></div>
+            <div class="stat"><b>Launch</b><span>Production-focused execution</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div data-component="components/cta-section.html" data-prop-eyebrow="Next Step" data-prop-title="Move from concept to deployed software with confidence" data-prop-description="Engage Logic Lab for architecture planning and delivery of scalable, monetization-ready systems." data-prop-primaryHref="mailto:contact@logiclabstudio.com" data-prop-primaryLabel="Email Logic Lab" data-prop-secondaryHref="portfolio.html" data-prop-secondaryLabel="View Portfolio"></div>
+  </main>
+
+  <div data-component="components/footer.html"></div>
+
+  <script src="wwwroot/js/components.js"></script>
+  <script src="wwwroot/js/site.js"></script>
+  <script>
+    (async function () {
+      if (window.hydrateComponents) await window.hydrateComponents();
+      if (window.initSite) window.initSite();
+    })();
+  </script>
+</body>
+</html>

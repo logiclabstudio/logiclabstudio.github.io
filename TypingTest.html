@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WPM Typing Test</title>
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --panel: #fffdf9;
+      --ink: #211c16;
+      --muted: #6a6258;
+      --accent: #dd6e42;
+      --ok: #2f7d32;
+      --bad: #c62828;
+      --line: #d8ccc0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 20%, #f7d9c4 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, #f0c9b0 0%, transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(900px, 100%);
+      background: var(--panel);
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 14px 32px rgba(33, 28, 22, 0.14);
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      font-size: 1.25rem;
+    }
+
+    .prompt {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+      min-height: 110px;
+    }
+
+    .prompt span.correct { color: var(--ok); }
+    .prompt span.incorrect {
+      color: var(--bad);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+    }
+    .prompt span.current {
+      background: #ffe7d8;
+      border-radius: 2px;
+      outline: 2px solid #ffc9ad;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      font-family: Consolas, Menlo, monospace;
+      resize: vertical;
+      outline: none;
+      transition: border-color 180ms ease;
+    }
+
+    textarea:focus { border-color: var(--accent); }
+    textarea:disabled { background: #f5f5f5; cursor: not-allowed; }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary { background: var(--accent); color: #fff; }
+    .secondary {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    @media (max-width: 700px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>WPM Typing Test</h1>
+    <p class="subtitle">Type the text below. Timer starts on your first keystroke.</p>
+
+    <section class="stats">
+      <div class="stat"><span>Time Left</span><strong id="time">60s</strong></div>
+      <div class="stat"><span>WPM</span><strong id="wpm">0</strong></div>
+      <div class="stat"><span>Accuracy</span><strong id="accuracy">100%</strong></div>
+      <div class="stat"><span>Mistakes</span><strong id="mistakes">0</strong></div>
+    </section>
+
+    <div id="prompt" class="prompt" aria-live="polite"></div>
+
+    <label for="input" class="subtitle" style="display:block;margin:0 0 8px;">Your typing:</label>
+    <textarea id="input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+
+    <div class="actions">
+      <button id="restartBtn" class="primary" type="button">Restart Test</button>
+      <button id="newTextBtn" class="secondary" type="button">New Paragraph</button>
+    </div>
+  </main>
+
+  <script>
+    const testDuration = 60;
+
+    const passages = [
+      "Speed in typing is useful, but consistency and accuracy are what make writing effortless over time. Focus on clean keystrokes and rhythm before trying to rush.",
+      "Small daily practice sessions beat long sessions done once in a while. Build strong habits, correct finger placement, and relaxed posture to improve your results steadily.",
+      "Great software is built one careful step at a time. Clear thinking, readable code, and fast feedback loops usually matter more than dramatic bursts of activity.",
+      "When you measure progress, do not only track the fastest run. Track your average quality over many runs, because reliable performance wins in real projects.",
+      "Typing quickly is not about hammering keys. It is about seeing words ahead, reducing hesitation, and letting trained muscle memory carry the sentence forward."
+    ];
+
+    const promptEl = document.getElementById("prompt");
+    const inputEl = document.getElementById("input");
+    const timeEl = document.getElementById("time");
+    const wpmEl = document.getElementById("wpm");
+    const accuracyEl = document.getElementById("accuracy");
+    const mistakesEl = document.getElementById("mistakes");
+    const restartBtn = document.getElementById("restartBtn");
+    const newTextBtn = document.getElementById("newTextBtn");
+
+    let currentText = "";
+    let timerId = null;
+    let timeLeft = testDuration;
+    let started = false;
+
+    function chooseText() {
+      currentText = passages[Math.floor(Math.random() * passages.length)];
+      renderPrompt("");
+    }
+
+    function renderPrompt(typed) {
+      const chars = currentText.split("");
+      const typedChars = typed.split("");
+      promptEl.innerHTML = chars
+        .map((char, i) => {
+          const typedChar = typedChars[i];
+          let className = "";
+
+          if (typedChar == null) {
+            className = i === typedChars.length ? "current" : "";
+          } else if (typedChar === char) {
+            className = "correct";
+          } else {
+            className = "incorrect";
+          }
+
+          const safeChar = char === " " ? "&nbsp;" : char
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+
+          return `<span class="${className}">${safeChar}</span>`;
+        })
+        .join("");
+    }
+
+    function calculateStats() {
+      const typed = inputEl.value;
+      let correctChars = 0;
+
+      for (let i = 0; i < typed.length; i++) {
+        if (typed[i] === currentText[i]) correctChars++;
+      }
+
+      const mistakes = typed.length - correctChars;
+      const elapsed = testDuration - timeLeft;
+      const minutes = elapsed / 60;
+      const grossWpm = minutes > 0 ? (typed.length / 5) / minutes : 0;
+      const netWpm = Math.max(0, grossWpm - (mistakes / 5) / Math.max(minutes, 1 / 60));
+      const accuracy = typed.length > 0 ? (correctChars / typed.length) * 100 : 100;
+
+      mistakesEl.textContent = String(Math.max(0, mistakes));
+      wpmEl.textContent = String(Math.round(netWpm));
+      accuracyEl.textContent = `${Math.round(accuracy)}%`;
+
+      if (typed.length >= currentText.length) endTest();
+    }
+
+    function tick() {
+      timeLeft--;
+      timeEl.textContent = `${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        endTest();
+      }
+    }
+
+    function startTimer() {
+      if (started) return;
+      started = true;
+      timerId = setInterval(tick, 1000);
+    }
+
+    function endTest() {
+      clearInterval(timerId);
+      timerId = null;
+      started = false;
+      inputEl.disabled = true;
+      calculateStats();
+      timeEl.textContent = `${Math.max(0, timeLeft)}s`;
+    }
+
+    function resetTest(keepText = true) {
+      clearInterval(timerId);
+      timerId = null;
+      started = false;
+      timeLeft = testDuration;
+      timeEl.textContent = `${timeLeft}s`;
+      wpmEl.textContent = "0";
+      accuracyEl.textContent = "100%";
+      mistakesEl.textContent = "0";
+      inputEl.value = "";
+      inputEl.disabled = false;
+      if (!keepText) chooseText();
+      renderPrompt("");
+      inputEl.focus();
+    }
+
+    inputEl.addEventListener("input", () => {
+      startTimer();
+      renderPrompt(inputEl.value);
+      calculateStats();
+    });
+
+    restartBtn.addEventListener("click", () => resetTest(true));
+    newTextBtn.addEventListener("click", () => resetTest(false));
+
+    chooseText();
+    resetTest(true);
+  </script>
+</body>
+</html>

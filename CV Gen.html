@@ -14,7 +14,7 @@
   --border:#1c1f26;--border2:#252930;
   --white:#ede9e2;--muted:#6b7280;--muted2:#9ca3af;
   --accent:#c8b98e;--accent-dim:#7a6f58;
-  --green:#6dbf8f;--green-bg:#0a1a11;--green-border:#163324;
+  --green:#6dbf8f;
   --r:4px;--max:1180px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -66,13 +66,6 @@ a{color:inherit;}
 .page{max-width:var(--max);margin:0 auto;padding:28px 20px 60px;}
 
 .page-head{margin-bottom:28px;}
-.badge{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:5px 12px;border:1px solid var(--green-border);border-radius:100px;
-  background:var(--green-bg);color:var(--green);
-  font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;
-}
-.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);}
 .page-title{
   font-family:'DM Serif Display',serif;
   font-size:clamp(26px,3.5vw,42px);letter-spacing:-1px;
@@ -290,7 +283,6 @@ details[open] summary::before{content:"– ";}
 
 <div class="page">
   <div class="page-head">
-    <div class="badge"><span class="badge-dot"></span>Free Tool</div>
     <h1 class="page-title">CV <em>Generator.</em></h1>
     <p class="page-sub">Fill the form → preview updates live → Print to PDF when ready.</p>
   </div>
