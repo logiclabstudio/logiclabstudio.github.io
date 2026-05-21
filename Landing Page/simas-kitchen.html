@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simas Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #fdf6f4;
+  --card: #fff8f6;
+  --red: #c94040;
+  --red-light: #e06060;
+  --red-pale: #fbeaea;
+  --red-border: #f0c8c8;
+  --dark: #1a0a0a;
+  --muted: #8a6a6a;
+  --text: #1a0a0a;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:18px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(255,255,255,0);
+  transition:background .4s, backdrop-filter .4s, box-shadow .4s;
+}
+nav.scrolled{
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 var(--red-border);
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.35rem;
+  color:var(--dark);
+  letter-spacing:-.02em;
+}
+.nav-logo em{color:var(--red);font-style:italic;}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.8rem;
+  font-weight:500;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--red);}
+@media(max-width:600px){.nav-links{display:none;}}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:100px 20px 60px;
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.hero-bg-img{
+  position:absolute;
+  inset:0;
+  background:url('https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=1200&q=60') center/cover no-repeat;
+  opacity:0.07;
+  z-index:0;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 40%, rgba(201,64,64,.06) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0) 50%, rgba(255,255,255,1) 100%);
+  z-index:1;
+}
+
+/* decorative circle */
+.hero-circle{
+  position:absolute;
+  width:520px;
+  height:520px;
+  border-radius:50%;
+  border:1px solid rgba(201,64,64,.1);
+  top:50%;left:50%;
+  transform:translate(-50%,-54%);
+  z-index:1;
+  pointer-events:none;
+}
+.hero-circle::after{
+  content:'';
+  position:absolute;
+  inset:30px;
+  border-radius:50%;
+  border:1px dashed rgba(201,64,64,.08);
+}
+
+.tagline-pill{
+  display:inline-block;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:28px;
+  position:relative;
+  z-index:2;
+  animation:fadeUp .8s ease both;
+}
+
+.hero h1{
+  position:relative;
+  z-index:2;
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,12vw,7rem);
+  line-height:.88;
+  letter-spacing:-.04em;
+  color:var(--dark);
+  animation:fadeUp .9s .1s ease both;
+}
+.hero h1 em{
+  font-style:italic;
+  color:var(--red);
+}
+
+.hero-sub{
+  position:relative;
+  z-index:2;
+  margin-top:20px;
+  color:var(--muted);
+  font-size:1rem;
+  font-weight:300;
+  letter-spacing:.04em;
+  animation:fadeUp .9s .22s ease both;
+}
+
+.hero-cta{
+  position:relative;
+  z-index:2;
+  margin-top:36px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  justify-content:center;
+  animation:fadeUp .9s .34s ease both;
+}
+
+.btn{
+  display:inline-block;
+  text-decoration:none;
+  font-family:'DM Sans',sans-serif;
+  font-weight:500;
+  font-size:.88rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:14px 32px;
+  border-radius:4px;
+  transition:all .2s;
+  cursor:pointer;
+  border:none;
+}
+.btn-primary{
+  background:var(--red);
+  color:#fff;
+  border:2px solid var(--red);
+}
+.btn-primary:hover{background:var(--red-light);border-color:var(--red-light);transform:translateY(-2px);}
+.btn-ghost{
+  background:transparent;
+  color:var(--dark);
+  border:2px solid rgba(26,10,10,.18);
+}
+.btn-ghost:hover{border-color:var(--red);color:var(--red);transform:translateY(-2px);}
+
+/* ── MARQUEE ── */
+.marquee-wrap{
+  overflow:hidden;
+  border-top:1px solid var(--red-border);
+  border-bottom:1px solid var(--red-border);
+  background:var(--red-pale);
+  padding:13px 0;
+  position:relative;
+  z-index:2;
+}
+.marquee-inner{
+  display:flex;
+  animation:marqueeSroll 22s linear infinite;
+  white-space:nowrap;
+}
+.marquee-item{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  padding:0 30px;
+  color:var(--muted);
+  font-size:.78rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+.marquee-item .dot{color:var(--red);}
+@keyframes marqueeSroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+
+/* ── SECTIONS ── */
+.section{
+  position:relative;
+  padding:80px 24px;
+  max-width:1100px;
+  margin:0 auto;
+}
+.section-label{
+  display:inline-block;
+  font-size:.7rem;
+  font-weight:500;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:12px;
+}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3rem);
+  line-height:1.05;
+  letter-spacing:-.03em;
+  color:var(--dark);
+  margin-bottom:48px;
+}
+
+/* ── FEATURE CARDS ── */
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:2px;
+}
+.feature-card{
+  background:var(--card);
+  border:1px solid var(--red-border);
+  overflow:hidden;
+  position:relative;
+  transition:border-color .3s, box-shadow .3s;
+}
+.feature-card:hover{
+  border-color:var(--red);
+  box-shadow:0 8px 32px rgba(201,64,64,.08);
+}
+.feature-card:hover .card-img-inner{transform:scale(1.04);}
+
+.card-img{
+  height:220px;
+  overflow:hidden;
+  position:relative;
+  background:var(--red-pale);
+}
+.card-img-inner{
+  width:100%;height:100%;
+  display:block;
+  object-fit:cover;
+  transition:transform .6s ease;
+}
+.card-badge{
+  position:absolute;
+  top:12px;right:12px;
+  background:var(--red);
+  color:white;
+  font-size:.62rem;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:4px 10px;
+  border-radius:2px;
+}
+.card-body{padding:24px;}
+.card-name{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;
+  color:var(--dark);
+  margin-bottom:8px;
+}
+.card-desc{
+  color:var(--muted);
+  font-size:.85rem;
+  line-height:1.6;
+  margin-bottom:20px;
+}
+.card-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.card-price{
+  font-family:'Playfair Display',serif;
+  font-size:1.3rem;
+  color:var(--red);
+}
+.card-price sub{
+  font-family:'DM Sans',sans-serif;
+  font-size:.7rem;
+  color:var(--muted);
+  vertical-align:middle;
+}
+.card-order{
+  background:transparent;
+  border:1px solid rgba(201,64,64,.4);
+  color:var(--red);
+  font-size:.75rem;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:8px 18px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.card-order:hover{background:var(--red);color:#fff;}
+
+/* ── TICKER ── */
+.menu-ticker{
+  background:var(--red);
+  overflow:hidden;
+  padding:12px 0;
+  position:relative;
+  z-index:2;
+}
+.menu-ticker-inner{
+  display:flex;
+  animation:marqueeSroll 30s linear infinite;
+  white-space:nowrap;
+}
+.menu-ticker-item{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:0 24px;
+  font-size:.78rem;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#fff;
+  flex-shrink:0;
+}
+.menu-ticker-item .sep{opacity:.4;}
+
+/* ── FULL MENU ── */
+.menu-section{
+  background:var(--surface);
+  border-top:1px solid var(--red-border);
+  border-bottom:1px solid var(--red-border);
+}
+.menu-tabs{
+  display:flex;
+  border-bottom:1px solid var(--red-border);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.menu-tab{
+  flex-shrink:0;
+  background:transparent;
+  border:none;
+  color:var(--muted);
+  font-family:'DM Sans',sans-serif;
+  font-size:.8rem;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:16px 28px;
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+}
+.menu-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.menu-tab:hover{color:var(--dark);}
+
+.menu-list{display:none;}
+.menu-list.active{display:block;}
+
+.menu-item{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:20px 0;
+  border-bottom:1px solid rgba(201,64,64,.08);
+  transition:padding-left .2s;
+}
+.menu-item:hover{padding-left:8px;}
+.menu-item:last-child{border-bottom:none;}
+.menu-item-icon{font-size:2rem;flex-shrink:0;width:48px;text-align:center;}
+.menu-item-icon img{
+  width:48px;
+  height:48px;
+  display:block;
+  object-fit:cover;
+  border-radius:6px;
+}
+.menu-item-info{flex:1;}
+.menu-item-name{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;
+  color:var(--dark);
+  margin-bottom:4px;
+}
+.menu-item-note{font-size:.78rem;color:var(--muted);}
+.menu-item-price{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;
+  color:var(--red);
+  flex-shrink:0;
+}
+
+/* ── ABOUT ── */
+.about-strip{
+  background:var(--bg);
+  border-top:1px solid var(--red-border);
+}
+.about-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  max-width:1100px;
+  margin:0 auto;
+}
+.about-text{padding:80px 48px 80px 24px;}
+.about-img{
+  position:relative;
+  min-height:400px;
+  background:url('Simas Kitchen/Sima.png') center/cover no-repeat;
+  opacity:.75;
+}
+.about-img::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,#fff 0%,transparent 35%);
+  z-index:1;
+}
+@media(max-width:720px){
+  .about-inner{grid-template-columns:1fr;}
+  .about-img{min-height:240px;}
+  .about-text{padding:48px 24px;}
+  .feature-grid{grid-template-columns:1fr;}
+  .hero-circle{width:320px;height:320px;}
+}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--dark);
+  text-align:center;
+  padding:48px 24px;
+  color:rgba(255,255,255,.4);
+  font-size:.8rem;
+  letter-spacing:.06em;
+}
+footer .logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;
+  color:#fff;
+  margin-bottom:8px;
+}
+footer .logo em{color:var(--red);font-style:italic;}
+footer strong{color:rgba(255,255,255,.7);}
+footer a{color:var(--red);text-decoration:none;}
+.footer-divider{
+  border:none;
+  border-top:1px solid rgba(255,255,255,.08);
+  margin:24px auto;
+  max-width:200px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.reveal.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Sima's <em>Kitchen</em></div>
+  <ul class="nav-links">
+    <li><a href="#specials">Specials</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-circle"></div>
+
+  <div class="tagline-pill">Kasi Local Food · Orkney's Favourite Corner</div>
+  <h1>Sima's<br/><em>Kitchen</em></h1>
+  <p class="hero-sub">Magwinyas · Chakalaka · Stewed Meat · Home-Style Flavours</p>
+  <div class="hero-cta">
+    <a href="#menu" class="btn btn-primary">See the Menu</a>
+    <a href="#about" class="btn btn-ghost">Our Story</a>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <div class="marquee-item">Freshly Made Daily</div>
+    <div class="marquee-item">Kasi Vibes Only</div>
+    <div class="marquee-item">Magwinyas Served Hot</div>
+    <div class="marquee-item">Orkney's Best-Kept Secret</div>
+    <div class="marquee-item">Trailer Corner Kitchen</div>
+    <div class="marquee-item">Open 7 Days a Week</div>
+    <div class="marquee-item">Cooked with Love</div>
+    <div class="marquee-item">Freshly Made Daily</div>
+    <div class="marquee-item">Kasi Vibes Only</div>
+    <div class="marquee-item">Magwinyas Served Hot</div>
+    <div class="marquee-item">Orkney's Best-Kept Secret</div>
+    <div class="marquee-item">Trailer Corner Kitchen</div>
+    <div class="marquee-item">Open 7 Days a Week</div>
+    <div class="marquee-item">Cooked with Love</div>
+  </div>
+</div>
+
+<!-- SPECIALS -->
+<section class="section" id="specials">
+  <span class="section-label">Today's Specials</span>
+  <h2 class="section-title reveal">The ones everyone<br/>comes back for.</h2>
+  <div class="feature-grid">
+
+    <div class="feature-card reveal">
+      <div class="card-img">
+        <img class="card-img-inner" src="Simas Kitchen/Magwinya.png" alt="Sima's Magwinyas">
+        <div class="card-badge">Fan Fave</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Sima's Magwinyas</div>
+        <p class="card-desc">Golden fried dough, puffed and crispy on the outside, soft on the inside. Served plain or with polony & atchar. The kasi classic.</p>
+        <div class="card-footer">
+          <div class="card-price">R8 <sub>each</sub></div>
+          <button class="card-order">Order Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-card reveal" style="transition-delay:.1s">
+      <div class="card-img">
+        <img class="card-img-inner" src="Simas Kitchen/Chakalaka.png" alt="Chakalaka and pap">
+        <div class="card-badge">Best Seller</div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Chakalaka & Pap</div>
+        <p class="card-desc">Spicy chakalaka loaded with beans, peppers and tomatoes, served alongside stiff pap. Hearty, warm, unbeatable.</p>
+        <div class="card-footer">
+          <div class="card-price">R35 <sub>plate</sub></div>
+          <button class="card-order">Order Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-card reveal" style="transition-delay:.2s">
+      <div class="card-img">
+        <img class="card-img-inner" src="Simas Kitchen/Beef stew.png" alt="Slow-stewed beef">
+      </div>
+      <div class="card-body">
+        <div class="card-name">Slow-Stewed Beef</div>
+        <p class="card-desc">Tender beef stewed low and slow in rich tomato gravy. Served with samp, rice or pap — your choice. Soul food, properly done.</p>
+        <div class="card-footer">
+          <div class="card-price">R55 <sub>plate</sub></div>
+          <button class="card-order">Order Now</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="menu-ticker">
+  <div class="menu-ticker-inner">
+    <div class="menu-ticker-item">Magwinyas <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Chakalaka <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Stewed Beef <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Vetkoek <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Mogodu <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Magwinyas <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Chakalaka <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Stewed Beef <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Vetkoek <span class="sep">|</span></div>
+    <div class="menu-ticker-item">Mogodu <span class="sep">|</span></div>
+  </div>
+</div>
+
+<!-- FULL MENU -->
+<section class="menu-section" id="menu">
+  <div class="section" style="padding-top:60px">
+    <span class="section-label">Full Menu</span>
+    <h2 class="section-title reveal">Everything we serve.</h2>
+
+    <div class="menu-tabs">
+      <button class="menu-tab active" data-tab="street">Street Eats</button>
+      <button class="menu-tab" data-tab="mains">Mains</button>
+      <button class="menu-tab" data-tab="sides">Sides</button>
+    </div>
+
+    <div class="menu-list active" id="tab-street">
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Magwinya.png" alt="Magwinya"></div><div class="menu-item-info"><div class="menu-item-name">Magwinya (Plain)</div><div class="menu-item-note">Classic fried dough, served hot</div></div><div class="menu-item-price">R8</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Magwinya Polony Atchar.png" alt="Magwinya with Polony and Atchar"></div><div class="menu-item-info"><div class="menu-item-name">Magwinya with Polony & Atchar</div><div class="menu-item-note">The full kasi experience</div></div><div class="menu-item-price">R15</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Vetkoek and mince.png" alt="Vetkoek with mince"></div><div class="menu-item-info"><div class="menu-item-name">Vetkoek with Mince</div><div class="menu-item-note">Golden, filled, satisfying</div></div><div class="menu-item-price">R18</div></div>
+    </div>
+
+    <div class="menu-list" id="tab-mains">
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Beef stew.png" alt="Slow-stewed beef"></div><div class="menu-item-info"><div class="menu-item-name">Slow-Stewed Beef</div><div class="menu-item-note">With pap, rice or samp</div></div><div class="menu-item-price">R55</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Pap And chakalaka.png" alt="Chakalaka and pap"></div><div class="menu-item-info"><div class="menu-item-name">Chakalaka & Pap</div><div class="menu-item-note">Spicy, filling, vegetarian-friendly</div></div><div class="menu-item-price">R35</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Mogodu.png" alt="Mogodu"></div><div class="menu-item-info"><div class="menu-item-name">Mogodu (Tripe)</div><div class="menu-item-note">Traditional, slow-cooked with spices</div></div><div class="menu-item-price">R50</div></div>
+    </div>
+
+    <div class="menu-list" id="tab-sides">
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Stiff Paap.png" alt="Stiff pap"></div><div class="menu-item-info"><div class="menu-item-name">Stiff Pap</div><div class="menu-item-note">White maize, classic texture</div></div><div class="menu-item-price">R12</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/steamed rice.png" alt="Steamed rice"></div><div class="menu-item-info"><div class="menu-item-name">Steamed Rice</div><div class="menu-item-note">Fluffy, white, every time</div></div><div class="menu-item-price">R10</div></div>
+      <div class="menu-item"><div class="menu-item-icon"><img src="Simas Kitchen/Menu Placeholders/Chakalaka.png" alt="Chakalaka"></div><div class="menu-item-info"><div class="menu-item-name">Chakalaka (Side)</div><div class="menu-item-note">Spicy relish portion</div></div><div class="menu-item-price">R10</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="about-inner">
+    <div class="about-text">
+      <span class="section-label">Our Story</span>
+      <h2 class="section-title reveal" style="margin-bottom:24px">Cooked with<br/>soul since day one.</h2>
+      <p style="color:var(--muted);line-height:1.8;font-size:.95rem;max-width:420px;" class="reveal">
+        Sima's Kitchen started as a trailer corner spot with one goal: feeding the kasi real food, made fresh, made with love. No shortcuts, no compromises. From early morning magwinyas to afternoon plates of stew — every dish carries that home kitchen feeling.
+      </p>
+      <p style="color:var(--muted);line-height:1.8;font-size:.95rem;max-width:420px;margin-top:16px;" class="reveal">
+        Located in the heart of the community, we've become more than a food stop — we're a gathering place. Pull up, eat well, leave happy.
+      </p>
+    </div>
+    <div class="about-img"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="logo">Sima's <em>Kitchen</em></div>
+  <div style="margin-bottom:6px;margin-top:8px">Milton Avenue, Orkney, North West</div>
+  <div style="margin-bottom:6px"><strong>073 482 9165</strong> / <strong>081 604 2937</strong></div>
+  <div>Mon-Sun · Open Early till Late</div>
+  <hr class="footer-divider"/>
+  <div style="font-size:.72rem">© 2025 Sima's Kitchen · Built by <a href="#">Logic Lab Studio</a></div>
+</footer>
+
+<script>
+// NAV scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.12}).observe
+  ? (()=>{ const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, {threshold: 0.12}); reveals.forEach(el => obs.observe(el)); })()
+  : reveals.forEach(el => el.classList.add('visible'));
+
+// Menu tabs
+document.querySelectorAll('.menu-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.menu-list').forEach(l => l.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Order buttons
+document.querySelectorAll('.card-order').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.textContent = '✓ Added!';
+    btn.style.background = 'var(--red)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = 'Order Now';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2000);
+  });
+});
+</script>
+</body>
+</html>
